@@ -1,7 +1,7 @@
 <template>
   <v-card title="Crea un nuovo Ordine" class="mt-10">
     <v-card-text>
-      <v-form ref="form" @submit.prevent="sendOrder">
+      <v-form @submit.prevent="sendOrder">
         <v-row no-gutters>
           <v-col cols="12" md="6">
             <v-text-field
