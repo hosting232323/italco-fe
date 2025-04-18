@@ -3,8 +3,9 @@
     <v-container>
       <h1>{{ role }}</h1><hr>
       <DeliveryDashboard v-if="role === 'Delivery'" />
+      <OperatorDashboard v-else-if="role === 'Operator'" />
       <CustomesDashboard v-else-if="role === 'Customer'" />
-      <AdministrationDashboard v-else-if="['Admin', 'Operator'].includes(role)" />
+      <AdministrationDashboard v-else-if="role === 'Admin'" />
     </v-container>
   </div>
   <div v-else>
@@ -14,6 +15,7 @@
 
 <script setup>
 import DeliveryDashboard from '@/components/delivery/Dashboard';
+import OperatorDashboard from '@/components/operator/Dashboard';
 import CustomesDashboard from '@/components/customers/Dashboard';
 import AdministrationDashboard from '@/components/administration/Dashboard';
 

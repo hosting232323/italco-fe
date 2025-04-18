@@ -1,25 +1,32 @@
 <template>
   <v-card
-    :title="getFormTitle()"
+    :title="`Modifica Ordine ${order.id}`"
     class="mt-10 mb-5"
     v-if="Object.keys(order).length > 0"
   >
     <v-card-text>
       <p class="mb-2">
         Servizio: {{ order.service }}
-        Note: {{ order.note }}
+        Punto Vendita: {{ order.point_of_sale }}
       </p>
       <v-form @submit.prevent="updateOrder">
-        <v-textarea
-          v-if="['Anomaly', 'Cancelled'].includes(action)"
-          v-model="order.motivation"
-          label="Motivazione"
-          rows="3"
-        />
-        <v-file-input
-          accept="image/*"
-          label="Foto"
-        />
+        <v-row no-gutters>
+          <v-col cols="12" md="6">
+            <v-text-field
+              :class="isMobile ? '' : 'mr-2'"
+              v-model="order.note"
+              label="Note"
+            />
+          </v-col>
+          <v-col cols="12" md="6">
+            <v-select
+              :class="isMobile ? '' : 'ml-2'"
+              :items="['Milan', 'Napoli', 'Inter']"
+              v-model="order.group"
+              label="Gruppo di consegna"
+            />
+          </v-col>
+        </v-row>
         <v-btn type="submit" text="Invia" block />
       </v-form>
       <v-alert class="mt-10" v-if="message">
@@ -32,7 +39,7 @@
     :headers="[
       { title: 'ID', value: 'id' },
       { title: 'Servizio', value: 'service' },
-      { title: 'Note', value: 'note' },
+      { title: 'Punto Vendita', value: 'point_of_sale' },
       { title: 'Data', value: 'created_at' },
       { title: 'Stato', value: 'status' },
       { title: 'Azioni', key: 'actions' }
@@ -40,19 +47,9 @@
   >
     <template v-slot:item.actions="{ item }">
       <v-btn
-        icon="mdi-check-circle"
+        icon="mdi-pencil"
         variant="text"
-        @click="openForm(item, 'Completed')"
-      />
-      <v-btn
-        icon="mdi-close-circle"
-        variant="text"
-        @click="openForm(item, 'Cancelled')"
-      />
-      <v-btn
-        icon="mdi-alert-circle"
-        variant="text"
-        @click="openForm(item, 'Anomaly')"
+        @click="openForm(item)"
       />
     </template>
   </v-data-table>
@@ -60,31 +57,22 @@
 
 <script setup>
 import { ref } from 'vue';
+import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import { useOrderStore } from '@/stores/order';
 
-const action = ref('');
 const message = ref(false);
 const orderStore = useOrderStore();
+const isMobile = mobile.setupMobileUtils();
 const { list: orders, element: order } = storeToRefs(orderStore);
-orderStore.initList({status: 'In Progress'});
+orderStore.initList({status: 'Pending'});
 
-const openForm = (item, status) => {
+const openForm = (item) => {
   order.value = item;
-  action.value = status;
-};
-
-const getFormTitle = () => {
-  if (action.value === 'Completed')
-    return `Completa Ordine ${order.value.id}`;
-  else if (action.value === 'Cancelled')
-    return `Annulla Ordine ${order.value.id}`;
-  else if (action.value === 'Anomaly')
-    return `Segnala Anomalia Ordine ${order.value.id}`;
 };
 
 const updateOrder = () => {
-  order.value.status = action.value;
+  order.value.status = 'In Progress';
   orderStore.updateElement(function (data) {
     if (data.status == 'ok') {
       message.value = true;

@@ -20,8 +20,8 @@ export const useOrderStore = defineStore('order', {
         'PUT'
       );
     },
-    initList() {
-      http.getRequest('order', {}, this.setList);
+    initList(filter = {}) {
+      http.getRequest('order', filter, this.setList);
     },
     setList(data) {
       this.list = data.orders;
