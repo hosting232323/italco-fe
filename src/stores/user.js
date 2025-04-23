@@ -2,7 +2,8 @@ import { defineStore } from 'pinia';
 
 export const useUserStore = defineStore('user', {
   state: () => ({
-    role: ''
+    role: '',
+    userId: 0
   }),
   actions: {
   }

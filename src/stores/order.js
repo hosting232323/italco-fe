@@ -7,8 +7,14 @@ export const useOrderStore = defineStore('order', {
     list: []
   }),
   actions: {
-    createElement(func) {
-      http.postRequest('order', this.element, func);
+    createElement(router, func) {
+      http.postRequest(
+        'order',
+        this.element,
+        func,
+        'POST',
+        router
+      );
     },
     updateElement(func) {
       http.postRequest(

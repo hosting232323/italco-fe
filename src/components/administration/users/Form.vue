@@ -1,0 +1,56 @@
+<template>
+  <v-card
+    title="Crea Utente"
+    :subtitle="`Utenti disponibili: ${MAX_USERS - users.length}`"
+    class="mt-10 mb-5"
+    v-if="activeForm"
+  >
+    <v-card-text v-if="MAX_USERS - users.length > 0">
+      <v-form @submit.prevent="submitForm">
+        <v-row no-gutters>
+          <v-col cols="12" md="6">
+            <v-text-field
+              :class="isMobile ? '' : 'mr-2'"
+              v-model="user.email"
+              label="Nickname"
+            />
+          </v-col>
+          <v-col cols="12" md="6">
+            <v-text-field
+              :class="isMobile ? '' : 'ml-2'"
+              v-model="user.password"
+              label="Password"
+            />
+          </v-col>
+        </v-row>
+        <v-select
+          v-model="user.role"
+          label="Ruolo"
+          :items="['Operator', 'Customer', 'Delivery']"
+        />
+        <v-btn type="submit" text="Invia" block />
+      </v-form>
+    </v-card-text>
+  </v-card>
+</template>
+
+<script setup>
+import mobile from '@/utils/mobile';
+import { storeToRefs } from 'pinia';
+import { useAdministrationUserStore } from '@/stores/administrationUser';
+
+const MAX_USERS = 40;
+const isMobile = mobile.setupMobileUtils();
+const administrationUserStore = useAdministrationUserStore();
+const { element: user, list: users, activeForm } = storeToRefs(administrationUserStore);
+
+const submitForm = () => {
+  administrationUserStore.createElement(function (data) {
+    if (data.status == 'ok') {
+      user.value = {};
+      administrationUserStore.initList();
+      activeForm.value = false;
+    }
+  });
+};
+</script>
