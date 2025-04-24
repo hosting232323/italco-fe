@@ -16,5 +16,5 @@ import { useServiceStore } from '@/stores/service';
 const userStore = useUserStore();
 const serviceStore = useServiceStore();
 const { userId } = storeToRefs(userStore);
-serviceStore.initList({ customer_id: 4 });
+serviceStore.initList({ customer_id: userId.value });
 </script>

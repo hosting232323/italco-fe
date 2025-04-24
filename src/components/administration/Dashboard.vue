@@ -12,12 +12,10 @@
       { title: 'Motivation', value: 'motivation' }
     ]"
   />
-  <CustomesDashboard />
 </template>
 
 <script setup>
 import { storeToRefs } from 'pinia';
-import CustomesDashboard from '@/components/customers/Dashboard';
 import { useOrderStore } from '@/stores/order';
 
 const orderStore = useOrderStore();
