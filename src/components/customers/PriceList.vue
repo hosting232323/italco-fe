@@ -3,17 +3,21 @@
     <v-row no-gutters>
       <v-col cols="12" md="6" v-for="service in services">
         <v-list-item
-          :title="service.name"
           :value="service.id"
-          :subtitle="service.description"
           :style="{ '--item-bg-color': theme.current.value.primaryColor }"
           @click="clickItem(service.id)"
         >
+          <v-list-item-title class="contact-text">
+            {{ service.name }}
+          </v-list-item-title>
+          <v-list-item-subtitle>
+            {{ service.description }}
+          </v-list-item-subtitle>
           <template v-slot:append>
             <b>{{ getPrice(service) }} €</b>
           </template>
         </v-list-item>
-      </v-col>
+      </v-col>    
     </v-row>
   </v-list>
 </template>
@@ -45,6 +49,20 @@ const clickItem = (serviceId) => {
 <style scoped>
 .v-list-item {
   background-color: var(--item-bg-color);
+  margin: 2px;
   color: white;
+}
+.contact-text {
+  white-space: normal;
+}
+.v-list-item-subtitle {
+  display: -webkit-box;
+  display: box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>

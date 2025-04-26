@@ -34,7 +34,7 @@ const routes = [
       {
         path: 'addressees',
         name: 'Anagrafiche',
-        component: () => import('@/views/addressees.vue')
+        component: () => import('@/views/Addressees.vue')
       }
     ]
   }
