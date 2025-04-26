@@ -1,7 +1,7 @@
 import http from '@/utils/http';
 import { defineStore } from 'pinia';
 
-export const useDeliveryGroupStore = defineStore('deliveryGroup', {
+export const useaddresseesStore = defineStore('addressees', {
   state: () => ({
     element: {},
     list: [],
@@ -10,16 +10,27 @@ export const useDeliveryGroupStore = defineStore('deliveryGroup', {
   actions: {
     createElement(router, func) {
       http.postRequest(
-        'delivery_group',
+        'addressee',
         this.element,
         func,
         'POST',
         router
       );
     },
+    updateElement(router, func) {
+      http.postRequest(
+        `addressee/${this.element.id}`,
+        Object.fromEntries(
+          Object.entries(this.element).filter(([key]) => !['created_at', 'updated_at', 'users'].includes(key))
+        ),
+        func,
+        'PUT',
+        router
+      );
+    },
     initList(router) {
       http.getRequest(
-        'delivery_group',
+        'addressee',
         {},
         this.setList,
         'GET',
@@ -28,27 +39,15 @@ export const useDeliveryGroupStore = defineStore('deliveryGroup', {
     },
     deleteElement(element, router, func) {
       http.getRequest(
-        `delivery_group/${element.id}`,
+        `addressee/${element.id}`,
         {},
         func,
         'DELETE',
         router
       );
     },
-    assignUser(userId, router, func, deassign = false) {
-      http.postRequest(
-        'delivery_group/user',
-        {
-          user_id: userId,
-          delivery_group_id: deassign ? null : this.element.id
-        },
-        func,
-        'PATCH',
-        router
-      );
-    },
     setList(data) {
-      this.list = data.delivery_groups;
+      this.list = data.addressees;
     }
   }
 });

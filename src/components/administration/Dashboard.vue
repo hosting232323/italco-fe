@@ -4,8 +4,8 @@
     :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
     :headers="[
       { title: 'ID', value: 'id' },
-      { title: 'Servizio', value: 'service' },
-      { title: 'Punto Vendita', value: 'point_of_sale' },
+      { title: 'Servizio', value: 'service.name' },
+      { title: 'Punto Vendita', value: 'user.email' },
       { title: 'Data', value: 'created_at' },
       { title: 'Stato', value: 'status' },
       { title: 'Note', value: 'note' },

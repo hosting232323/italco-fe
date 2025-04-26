@@ -26,8 +26,8 @@
         <DeliveryGroupTable :activatorProps="activatorProps" />
       </v-container>
     </template>
-    <template v-slot:default="{ isActive }">
-      <UserPopUp :isActive="isActive" />
+    <template v-slot:default>
+      <UserPopUp />
     </template>
   </v-dialog>
 </template>

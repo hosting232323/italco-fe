@@ -16,7 +16,7 @@
         variant="text"
         icon="mdi-close"
         block
-        :loading="loading"
+        :disabled="loading"
         :color="theme.current.value.primaryColor"
         @click="emits('cancel')"
       />
@@ -25,11 +25,10 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
 import { useTheme } from 'vuetify';
 
 const emits = defineEmits(['cancel']);
+const props = defineProps(['loading']);
 
 const theme = useTheme();
-const loading = ref(false);
 </script>

@@ -1,7 +1,6 @@
 <template>
   <v-app v-if="isReady">
-    <AdministrationDrawer v-if="role === 'Admin'" />
-    <AppBar v-else />
+    <AdministrationDrawer v-if="['Admin', 'Customer'].includes(role)" />
     <v-main :style="{ backgroundColor: theme.current.value.secondaryColor }">
       <router-view />
     </v-main>
@@ -9,7 +8,6 @@
 </template>
 
 <script setup>
-import AppBar from '@/layouts/AppBar';
 import AdministrationDrawer from '@/layouts/AdministrationDrawer';
 
 import { useTheme } from 'vuetify';

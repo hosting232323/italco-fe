@@ -28,7 +28,10 @@
           label="Ruolo"
           :items="['Operator', 'Customer', 'Delivery']"
         />
-        <FormButtons @cancel="activeForm = false" />
+        <FormButtons
+          :loading="loading"
+          @cancel="activeForm = false"
+        />
       </v-form>
     </v-card-text>
   </v-card>
@@ -37,6 +40,7 @@
 <script setup>
 import FormButtons from '@/components/FormButtons';
 
+import { ref } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
@@ -44,13 +48,16 @@ import { useAdministrationUserStore } from '@/stores/administrationUser';
 
 const MAX_USERS = 40;
 
+const loading = ref(false);
 const router = useRouter();
 const isMobile = mobile.setupMobileUtils();
 const administrationUserStore = useAdministrationUserStore();
 const { element: user, list: users, activeForm } = storeToRefs(administrationUserStore);
 
 const submitForm = () => {
+  loading.value = true;
   administrationUserStore.createElement(router, function (data) {
+    loading.value = false;
     if (data.status == 'ok') {
       user.value = {};
       administrationUserStore.initList(router);

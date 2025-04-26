@@ -1,24 +1,44 @@
 <template>
   <v-card
-    :title="service.id ? `Modifica Servizio ${service.id}` : 'Crea Servizio'"
+    :title="addressee.id ? `Modifica Anagrafica ${addressee.id}` : 'Crea Anagrafica'"
     class="mt-10 mb-5"
     v-if="activeForm"
   >
     <v-card-text>
       <v-form @submit.prevent="submitForm">
+        <v-text-field
+          v-model="addressee.name"
+          label="Nominativo"
+        />
         <v-row no-gutters>
           <v-col cols="12" md="6">
             <v-text-field
               :class="isMobile ? '' : 'mr-2'"
-              v-model="service.name"
-              label="Nome"
+              v-model="addressee.address"
+              label="Indirizzo"
             />
           </v-col>
           <v-col cols="12" md="6">
             <v-text-field
               :class="isMobile ? '' : 'ml-2'"
-              v-model="service.description"
-              label="Descrizione"
+              v-model="addressee.city"
+              label="Città"
+            />
+          </v-col>
+        </v-row>
+        <v-row no-gutters>
+          <v-col cols="12" md="6">
+            <v-text-field
+              :class="isMobile ? '' : 'mr-2'"
+              v-model="addressee.cap"
+              label="Cap"
+            />
+          </v-col>
+          <v-col cols="12" md="6">
+            <v-text-field
+              :class="isMobile ? '' : 'ml-2'"
+              v-model="addressee.province"
+              label="Provincia"
             />
           </v-col>
         </v-row>
@@ -38,30 +58,30 @@ import { ref } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
-import { useServiceStore } from '@/stores/service';
+import { useaddresseesStore } from '@/stores/addressees';
 
 const loading = ref(false);
 const router = useRouter();
-const serviceStore = useServiceStore();
 const isMobile = mobile.setupMobileUtils();
-const { element: service, activeForm } = storeToRefs(serviceStore);
+const addresseesStore = useaddresseesStore();
+const { element: addressee, activeForm } = storeToRefs(addresseesStore);
 
 const submitForm = () => {
   loading.value = true;
-  if (service.value.id)
-    serviceStore.updateElement(router, function (data) {
+  if (addressee.value.id)
+    addresseesStore.updateElement(router, function (data) {
       loading.value = false;
       if (data.status == 'ok') {
-        service.value = {};
+        addressee.value = {};
         activeForm.value = false;
       }
     });
   else
-    serviceStore.createElement(router, function (data) {
+    addresseesStore.createElement(router, function (data) {
       loading.value = false;
       if (data.status == 'ok') {
-        serviceStore.initList(router);
-        service.value = {};
+        addressee.value = {};
+        addresseesStore.initList(router);
         activeForm.value = false;
       }
     });

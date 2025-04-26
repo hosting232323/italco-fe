@@ -1,0 +1,34 @@
+<template>
+  <v-container>
+    <h1>
+      Anagrafiche
+      <v-btn
+        icon="mdi-plus"
+        style="float: right;"
+        variant="text"
+        @click="openForm"
+      />
+    </h1><hr>
+    <AddresseeForm />
+    <AddresseeTable />
+  </v-container>
+</template>
+
+<script setup>
+import AddresseeForm from '@/components/customers/addressees/Form';
+import AddresseeTable from '@/components/customers/addressees/Table';
+
+import { storeToRefs } from 'pinia';
+import { useRouter } from 'vue-router';
+import { useaddresseesStore } from '@/stores/addressees';
+
+const router = useRouter();
+const addresseesStore = useaddresseesStore();
+const { activeForm, element: addressee } = storeToRefs(addresseesStore);
+addresseesStore.initList(router);
+
+const openForm = () => {
+  addressee.value = {};
+  activeForm.value = true;
+};
+</script>

@@ -12,7 +12,7 @@
       />
     </template>
     <v-card-text>
-      <PopUpForm v-if="formFlag" @closeForm="closeForm" />
+      <PopUpForm v-if="formFlag" @closeForm="formFlag = false" />
       <PopUpTable v-if="service.users.length > 0" />
       <template v-else-if="!formFlag">
         <v-form @submit.prevent="submitForm">
@@ -27,6 +27,7 @@
             type="submit"
             block
             :color="theme.current.value.primaryColor"
+            :loading="loading"
           />
         </v-form>
       </template>
@@ -47,21 +48,19 @@ import { useServiceStore } from '@/stores/service';
 
 const price = ref(null);
 const theme = useTheme();
-const router = useRouter();
 const loading = ref(false);
+const router = useRouter();
 const formFlag = ref(false);
 const serviceStore = useServiceStore();
 const { element: service } = storeToRefs(serviceStore);
 
-const closeForm = () => {
-  formFlag.value = false;
-};
-
 const submitForm = () => {
+  loading.value = true;
   http.getRequest('service/set-all-users', {
     service_id: service.value.id,
     price: price.value,
   }, function (data) {
+    loading.value = false;
     if (data.status == 'ok') {
       service.value.users = data.service_users;
       serviceStore.initList(router);

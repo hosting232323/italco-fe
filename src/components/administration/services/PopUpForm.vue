@@ -21,7 +21,10 @@
         />
       </v-col>
     </v-row>
-    <FormButtons @cancel="emits('closeForm');" />
+    <FormButtons
+      :loading="loading"
+      @cancel="emits('closeForm');"
+    />
   </v-form>
   <v-alert class="mt-5 mb-5" v-if="message">
     {{ message }}
@@ -40,6 +43,7 @@ import { useAdministrationUserStore } from '@/stores/administrationUser';
 
 const object = ref({});
 const message = ref('');
+const loading = ref(false);
 const router = useRouter();
 const serviceStore = useServiceStore();
 const emits = defineEmits(['closeForm']);
@@ -50,7 +54,9 @@ const { list: users } = storeToRefs(administrationUserStore);
 
 const submitForm = () => {
   message.value = '';
+  loading.value = true;
   serviceStore.createServiceUserRelationships(object.value, router, function (data) {
+    loading.value = false;
     if (data.status == 'ok') {
       serviceStore.initList(router);
       service.value.users.push(data.service_user);

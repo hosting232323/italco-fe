@@ -10,7 +10,10 @@
           v-model="deliveryGroup.name"
           label="Nome"
         />
-        <FormButtons @cancel="activeForm = false" />
+        <FormButtons
+          :loading="loading"
+          @cancel="activeForm = false"
+        />
       </v-form>
     </v-card-text>
   </v-card>
@@ -19,16 +22,20 @@
 <script setup>
 import FormButtons from '@/components/FormButtons';
 
+import { ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import { useDeliveryGroupStore } from '@/stores/deliveryGroup';
 
+const loading = ref(false);
 const router = useRouter();
 const deliveryGroupStore = useDeliveryGroupStore();
 const { element: deliveryGroup, activeForm } = storeToRefs(deliveryGroupStore);
 
 const submitForm = () => {
+  loading.value = true;
   deliveryGroupStore.createElement(router, function (data) {
+    loading.value = false;
     if (data.status == 'ok') {
       deliveryGroupStore.initList(router);
       deliveryGroup.value = {};
