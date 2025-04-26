@@ -1,7 +1,7 @@
 import http from '@/utils/http';
 import { defineStore } from 'pinia';
 
-export const useAdministrationUserStore = defineStore('administrationUser', {
+export const useDeliveryGroupStore = defineStore('deliveryGroup', {
   state: () => ({
     element: {},
     list: [],
@@ -10,7 +10,7 @@ export const useAdministrationUserStore = defineStore('administrationUser', {
   actions: {
     createElement(router, func) {
       http.postRequest(
-        'user',
+        'delivery_group',
         this.element,
         func,
         'POST',
@@ -19,7 +19,7 @@ export const useAdministrationUserStore = defineStore('administrationUser', {
     },
     initList(router) {
       http.getRequest(
-        'user',
+        'delivery_group',
         {},
         this.setList,
         'GET',
@@ -28,15 +28,27 @@ export const useAdministrationUserStore = defineStore('administrationUser', {
     },
     deleteElement(element, router, func) {
       http.getRequest(
-        `user/${element.email}`,
+        `delivery_group/${element.id}`,
         {},
         func,
         'DELETE',
         router
       );
     },
+    assignUser(userId, router, func) {
+      http.postRequest(
+        'delivery_group/user',
+        {
+          user_id: userId,
+          delivery_group_id: this.element.id
+        },
+        func,
+        'PATCH',
+        router
+      );
+    },
     setList(data) {
-      this.list = data.users;
+      this.list = data.delivery_groups;
     }
   }
 });

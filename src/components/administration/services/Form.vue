@@ -22,33 +22,37 @@
             />
           </v-col>
         </v-row>
-        <v-btn type="submit" text="Invia" block />
+        <FormButtons @cancel="activeForm = false" />
       </v-form>
     </v-card-text>
   </v-card>
 </template>
 
 <script setup>
+import FormButtons from '@/components/FormButtons';
+
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
+import { useRouter } from 'vue-router';
 import { useServiceStore } from '@/stores/service';
 
+const router = useRouter();
 const serviceStore = useServiceStore();
 const isMobile = mobile.setupMobileUtils();
 const { element: service, activeForm } = storeToRefs(serviceStore);
 
 const submitForm = () => {
   if (service.value.id)
-    serviceStore.updateElement(function (data) {
+    serviceStore.updateElement(router, function (data) {
       if (data.status == 'ok') {
         service.value = {};
         activeForm.value = false;
       }
     });
   else
-    serviceStore.createElement(function (data) {
+    serviceStore.createElement(router, function (data) {
       if (data.status == 'ok') {
-        serviceStore.initList();
+        serviceStore.initList(router);
         service.value = {};
         activeForm.value = false;
       }

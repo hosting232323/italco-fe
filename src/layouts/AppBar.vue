@@ -1,5 +1,8 @@
 <template>
-  <v-app-bar :elevation="2">
+  <v-app-bar
+    :color="theme.current.value.primaryColor"
+    :elevation="2"
+  >
     <v-app-bar-title><b>
       Gestionale Italco.mi
     </b></v-app-bar-title>
@@ -7,5 +10,7 @@
 </template>
 
 <script setup>
-//
+import { useTheme } from 'vuetify';
+
+const theme = useTheme();
 </script>

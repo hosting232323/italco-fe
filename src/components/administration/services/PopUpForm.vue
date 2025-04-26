@@ -21,7 +21,7 @@
         />
       </v-col>
     </v-row>
-    <v-btn type="submit" text="Invia" block />
+    <FormButtons @cancel="emits('closeForm');" />
   </v-form>
   <v-alert class="mt-5 mb-5" v-if="message">
     {{ message }}
@@ -29,14 +29,18 @@
 </template>
 
 <script setup>
+import FormButtons from '@/components/FormButtons';
+
 import { ref } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
+import { useRouter } from 'vue-router';
 import { useServiceStore } from '@/stores/service';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
 const object = ref({});
 const message = ref('');
+const router = useRouter();
 const serviceStore = useServiceStore();
 const emits = defineEmits(['closeForm']);
 const isMobile = mobile.setupMobileUtils();
@@ -46,9 +50,9 @@ const { list: users } = storeToRefs(administrationUserStore);
 
 const submitForm = () => {
   message.value = '';
-  serviceStore.createServiceUserRelationships(object.value, function (data) {
+  serviceStore.createServiceUserRelationships(object.value, router, function (data) {
     if (data.status == 'ok') {
-      serviceStore.initList();
+      serviceStore.initList(router);
       service.value.users.push(data.service_user);
       emits('closeForm');
     } else

@@ -27,14 +27,16 @@ import ServicePopUp from '@/components/administration/services/PopUp';
 import ServiceTable from '@/components/administration/services/Table';
 
 import { storeToRefs } from 'pinia';
+import { useRouter } from 'vue-router';
 import { useServiceStore } from '@/stores/service';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
+const router = useRouter();
 const serviceStore = useServiceStore();
 const administrationUserStore = useAdministrationUserStore();
 const { activeForm, element: service } = storeToRefs(serviceStore);
-serviceStore.initList();
-administrationUserStore.initList();
+serviceStore.initList(router);
+administrationUserStore.initList(router);
 
 const openForm = () => {
   service.value = {};

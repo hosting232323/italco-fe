@@ -28,27 +28,32 @@
           label="Ruolo"
           :items="['Operator', 'Customer', 'Delivery']"
         />
-        <v-btn type="submit" text="Invia" block />
+        <FormButtons @cancel="activeForm = false" />
       </v-form>
     </v-card-text>
   </v-card>
 </template>
 
 <script setup>
+import FormButtons from '@/components/FormButtons';
+
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
+import { useRouter } from 'vue-router';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
 const MAX_USERS = 40;
+
+const router = useRouter();
 const isMobile = mobile.setupMobileUtils();
 const administrationUserStore = useAdministrationUserStore();
 const { element: user, list: users, activeForm } = storeToRefs(administrationUserStore);
 
 const submitForm = () => {
-  administrationUserStore.createElement(function (data) {
+  administrationUserStore.createElement(router, function (data) {
     if (data.status == 'ok') {
       user.value = {};
-      administrationUserStore.initList();
+      administrationUserStore.initList(router);
       activeForm.value = false;
     }
   });

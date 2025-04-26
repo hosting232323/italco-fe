@@ -2,7 +2,7 @@
   <v-app v-if="isReady">
     <AdministrationDrawer v-if="role === 'Admin'" />
     <AppBar v-else />
-    <v-main>
+    <v-main :style="{ backgroundColor: theme.current.value.secondaryColor }">
       <router-view />
     </v-main>
   </v-app>
@@ -12,10 +12,12 @@
 import AppBar from '@/layouts/AppBar';
 import AdministrationDrawer from '@/layouts/AdministrationDrawer';
 
+import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { ref, onMounted } from 'vue';
 import { useUserStore } from '@/stores/user';
 
+const theme = useTheme();
 const userStore = useUserStore();
 const { role, userId } = storeToRefs(userStore);
 const isReady = ref(false);

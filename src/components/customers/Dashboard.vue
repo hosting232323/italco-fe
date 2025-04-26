@@ -9,12 +9,10 @@
 import OrderForm from '@/components/customers/Form';
 import PriceList from '@/components/customers/PriceList';
 
-import { storeToRefs } from 'pinia';
-import { useUserStore } from '@/stores/user';
+import { useRouter } from 'vue-router';
 import { useServiceStore } from '@/stores/service';
 
-const userStore = useUserStore();
+const router = useRouter();
 const serviceStore = useServiceStore();
-const { userId } = storeToRefs(userStore);
-serviceStore.initList({ customer_id: userId.value });
+serviceStore.initList(router);
 </script>

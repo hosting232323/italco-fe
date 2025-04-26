@@ -2,7 +2,6 @@
   <AuthManager
     title="Login"
     :secondaryColor="theme.current.value.primaryColor"
-    :primaryColor="theme.current.value.secondaryColor"
     redirectLink="/dashboard"
     :hostname="hostname"
     :signUp="false"

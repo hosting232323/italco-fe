@@ -22,7 +22,12 @@
             v-model="price"
             label="Prezzo"
           />
-          <v-btn text="Associa tutti gli utenti" type="submit" block />
+          <v-btn
+            text="Associa tutti gli utenti"
+            type="submit"
+            block
+            :color="theme.current.value.primaryColor"
+          />
         </v-form>
       </template>
     </v-card-text>
@@ -35,10 +40,15 @@ import PopUpTable from '@/components/administration/services/PopUpTable';
 
 import { ref } from 'vue';
 import http from '@/utils/http';
+import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
+import { useRouter } from 'vue-router';
 import { useServiceStore } from '@/stores/service';
 
 const price = ref(null);
+const theme = useTheme();
+const router = useRouter();
+const loading = ref(false);
 const formFlag = ref(false);
 const serviceStore = useServiceStore();
 const { element: service } = storeToRefs(serviceStore);
@@ -54,8 +64,8 @@ const submitForm = () => {
   }, function (data) {
     if (data.status == 'ok') {
       service.value.users = data.service_users;
-      serviceStore.initList();
+      serviceStore.initList(router);
     }
-  })
+  }, 'GET', router);
 };
 </script>

@@ -21,7 +21,12 @@
             />
           </v-col>
         </v-row>
-        <v-btn type="submit" text="Invia" block />
+        <v-btn
+          type="submit"
+          text="Invia"
+          block
+          :color="theme.current.value.primaryColor"
+        />
       </v-form>
       <v-alert class="mt-10" v-if="message">
         Ordine completato con successo
@@ -32,12 +37,14 @@
 
 <script setup>
 import { ref } from 'vue';
+import { useTheme } from 'vuetify';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import { useOrderStore } from '@/stores/order';
 import { useServiceStore } from '@/stores/service';
 
+const theme = useTheme();
 const message = ref(false);
 const router = useRouter();
 const orderStore = useOrderStore();
