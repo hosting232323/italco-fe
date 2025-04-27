@@ -4,7 +4,8 @@ import { defineStore } from 'pinia';
 export const useOrderStore = defineStore('order', {
   state: () => ({
     element: {},
-    list: []
+    list: [],
+    activeForm: false
   }),
   actions: {
     createElement(router, func) {
@@ -16,18 +17,25 @@ export const useOrderStore = defineStore('order', {
         router
       );
     },
-    updateElement(func) {
+    updateElement(router, func) {
       http.postRequest(
         `order/${this.element.id}`,
         Object.fromEntries(
           Object.entries(this.element).filter(([key]) => !['created_at', 'updated_at'].includes(key))
         ),
         func,
-        'PUT'
+        'PUT',
+        router
       );
     },
-    initList(filter = {}) {
-      http.getRequest('order', filter, this.setList);
+    initList(router) {
+      http.getRequest(
+        'order',
+        {},
+        this.setList,
+        'GET',
+        router
+      );
     },
     setList(data) {
       this.list = data.orders;

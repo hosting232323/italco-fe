@@ -6,27 +6,35 @@
       { title: 'ID', value: 'id' },
       { title: 'Servizio', value: 'service.name' },
       { title: 'Punto Vendita', value: 'user.email' },
-      { title: 'Note Punto Vendita', value: 'customer_note' },
-      { title: 'Note Operatori', value: 'operator_note' },
+      { title: 'Note', value: 'customer_note' },
       { title: 'Data', value: 'created_at' },
       { title: 'Stato', value: 'status' },
-      { title: 'Gruppo Delivery', value: 'delivery_group.name' },
-      { title: 'Motivation', value: 'motivation' }
+      { title: 'Azioni', key: 'actions' }
     ]"
-  />
+  >
+    <template v-slot:item.actions="{ item }">
+      <v-btn
+        icon="mdi-pencil"
+        variant="text"
+        @click="openForm(item)"
+      />
+    </template>
+  </v-data-table>
 </template>
 
 <script setup>
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import { useOrderStore } from '@/stores/order';
 
 const theme = useTheme();
-const router = useRouter();
 const orderStore = useOrderStore();
-const { list: orders } = storeToRefs(orderStore);
-orderStore.initList(router);
+const { list: orders, element: order, activeForm } = storeToRefs(orderStore);
+
+const openForm = (item) => {
+  order.value = item;
+  activeForm.value = true;
+};
 </script>
 
 <style scoped>

@@ -51,7 +51,6 @@ const openForm = (item) => {
   activeForm.value = true;
 };
 
-
 const deleteItem = (item) => {
   addresseesStore.deleteElement(item, router, function() {
     addresseesStore.initList(router);

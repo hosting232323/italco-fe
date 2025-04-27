@@ -1,6 +1,6 @@
 <template>
   <v-app v-if="isReady">
-    <AdministrationDrawer v-if="['Admin', 'Customer'].includes(role)" />
+    <AdministrationDrawer />
     <v-main :style="{ backgroundColor: theme.current.value.secondaryColor }">
       <router-view />
     </v-main>

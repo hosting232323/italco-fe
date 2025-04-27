@@ -10,7 +10,7 @@ export const useDeliveryGroupStore = defineStore('deliveryGroup', {
   actions: {
     createElement(router, func) {
       http.postRequest(
-        'delivery_group',
+        'delivery-group',
         this.element,
         func,
         'POST',
@@ -19,7 +19,7 @@ export const useDeliveryGroupStore = defineStore('deliveryGroup', {
     },
     initList(router) {
       http.getRequest(
-        'delivery_group',
+        'delivery-group',
         {},
         this.setList,
         'GET',
@@ -28,7 +28,7 @@ export const useDeliveryGroupStore = defineStore('deliveryGroup', {
     },
     deleteElement(element, router, func) {
       http.getRequest(
-        `delivery_group/${element.id}`,
+        `delivery-group/${element.id}`,
         {},
         func,
         'DELETE',
@@ -37,7 +37,7 @@ export const useDeliveryGroupStore = defineStore('deliveryGroup', {
     },
     assignUser(userId, router, func, deassign = false) {
       http.postRequest(
-        'delivery_group/user',
+        'delivery-group/user',
         {
           user_id: userId,
           delivery_group_id: deassign ? null : this.element.id

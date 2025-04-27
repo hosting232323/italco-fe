@@ -1,6 +1,8 @@
 <template>
   <v-navigation-drawer expand-on-hover rail :color="theme.current.value.primaryColor" app>
-    <v-list-item title="Gestionale Italco.mi" prepend-icon="mdi-menu" class="mt-6" />
+    <v-list-item prepend-icon="mdi-menu" class="mt-6">
+      <b>Gestionale Italco.mi</b>
+    </v-list-item>
     <v-divider class="mb-4" />
     <v-list-item
       to="/dashboard"

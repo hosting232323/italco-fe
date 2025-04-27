@@ -1,95 +1,16 @@
 <template>
-  <v-card
-    :title="getFormTitle()"
-    class="mt-10 mb-5"
-    v-if="Object.keys(order).length > 0"
-  >
-    <v-card-text>
-      <p class="mb-2">
-        Servizio: {{ order.service }}
-        Note: {{ order.note }}
-      </p>
-      <v-form @submit.prevent="updateOrder">
-        <v-textarea
-          v-if="['Anomaly', 'Cancelled'].includes(action)"
-          v-model="order.motivation"
-          label="Motivazione"
-          rows="3"
-        />
-        <v-file-input
-          accept="image/*"
-          label="Foto"
-        />
-        <v-btn type="submit" text="Invia" block />
-      </v-form>
-      <v-alert class="mt-10" v-if="message">
-        Ordine aggiornato con successo
-      </v-alert>
-    </v-card-text>
-  </v-card>
-  <v-data-table
-    :items="orders"
-    :headers="[
-      { title: 'ID', value: 'id' },
-      { title: 'Servizio', value: 'service' },
-      { title: 'Note', value: 'note' },
-      { title: 'Data', value: 'created_at' },
-      { title: 'Stato', value: 'status' },
-      { title: 'Azioni', key: 'actions' }
-    ]"
-  >
-    <template v-slot:item.actions="{ item }">
-      <v-btn
-        icon="mdi-check-circle"
-        variant="text"
-        @click="openForm(item, 'Completed')"
-      />
-      <v-btn
-        icon="mdi-close-circle"
-        variant="text"
-        @click="openForm(item, 'Cancelled')"
-      />
-      <v-btn
-        icon="mdi-alert-circle"
-        variant="text"
-        @click="openForm(item, 'Anomaly')"
-      />
-    </template>
-  </v-data-table>
+  <DeliveryForm />
+  <DeliveryTable />
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { storeToRefs } from 'pinia';
+import DeliveryForm from '@/components/delivery/Form';
+import DeliveryTable from '@/components/delivery/Table';
+
+import { useRouter } from 'vue-router';
 import { useOrderStore } from '@/stores/order';
 
-const action = ref('');
-const message = ref(false);
+const router = useRouter();
 const orderStore = useOrderStore();
-const { list: orders, element: order } = storeToRefs(orderStore);
-orderStore.initList({status: 'In Progress'});
-
-const openForm = (item, status) => {
-  order.value = item;
-  action.value = status;
-};
-
-const getFormTitle = () => {
-  if (action.value === 'Completed')
-    return `Completa Ordine ${order.value.id}`;
-  else if (action.value === 'Cancelled')
-    return `Annulla Ordine ${order.value.id}`;
-  else if (action.value === 'Anomaly')
-    return `Segnala Anomalia Ordine ${order.value.id}`;
-};
-
-const updateOrder = () => {
-  order.value.status = action.value;
-  orderStore.updateElement(function (data) {
-    if (data.status == 'ok') {
-      message.value = true;
-      order.value = {};
-    }
-  });
-}
+orderStore.initList(router);
 </script>
