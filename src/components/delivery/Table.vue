@@ -6,9 +6,12 @@
       { title: 'ID', value: 'id' },
       { title: 'Servizio', value: 'service.name' },
       { title: 'Punto Vendita', value: 'user.email' },
+      { title: 'Punto di Ritiro', value: 'collection_point.name' },
       { title: 'Note Punto Vendita', value: 'customer_note' },
       { title: 'Note Operatori', value: 'operator_note' },
-      { title: 'Data', value: 'created_at' },
+      { title: 'D.P.C.', value: 'dpc' },
+      { title: 'D.R.C.', value: 'drc' },
+      { title: 'Data Creazione', value: 'created_at' },
       { title: 'Stato', value: 'status' },
       { title: 'Azioni', key: 'actions' }
     ]"
@@ -19,6 +22,7 @@
           <v-btn
             icon="mdi-check-circle"
             variant="text"
+            :color="theme.current.value.primaryColor"
             @click="openForm(item, 'Completed')"
           />
         </v-col>
@@ -26,6 +30,7 @@
           <v-btn
             icon="mdi-close-circle"
             variant="text"
+            :color="theme.current.value.primaryColor"
             @click="openForm(item, 'Cancelled')"
           />
         </v-col>
@@ -33,6 +38,7 @@
           <v-btn
             icon="mdi-alert-circle"
             variant="text"
+            :color="theme.current.value.primaryColor"
             @click="openForm(item, 'Anomaly')"
           />
         </v-col>

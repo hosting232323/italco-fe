@@ -20,12 +20,12 @@ import AddresseeTable from '@/components/customers/addressees/Table';
 
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
-import { useaddresseesStore } from '@/stores/addressees';
+import { useAddresseeStore } from '@/stores/addressees';
 
 const router = useRouter();
-const addresseesStore = useaddresseesStore();
-const { activeForm, element: addressee } = storeToRefs(addresseesStore);
-addresseesStore.initList(router);
+const addresseeStore = useAddresseeStore();
+const { activeForm, element: addressee } = storeToRefs(addresseeStore);
+addresseeStore.initList(router);
 
 const openForm = () => {
   addressee.value = {};

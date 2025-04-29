@@ -6,8 +6,11 @@
       { title: 'ID', value: 'id' },
       { title: 'Servizio', value: 'service.name' },
       { title: 'Punto Vendita', value: 'user.email' },
+      { title: 'Punto di Ritiro', value: 'collection_point.name' },
       { title: 'Note', value: 'customer_note' },
-      { title: 'Data', value: 'created_at' },
+      { title: 'D.P.C.', value: 'dpc' },
+      { title: 'D.R.C.', value: 'drc' },
+      { title: 'Data Creazione', value: 'created_at' },
       { title: 'Stato', value: 'status' },
       { title: 'Azioni', key: 'actions' }
     ]"
@@ -16,6 +19,7 @@
       <v-btn
         icon="mdi-pencil"
         variant="text"
+        :color="theme.current.value.primaryColor"
         @click="openForm(item)"
       />
     </template>

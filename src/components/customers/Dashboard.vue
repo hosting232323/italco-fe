@@ -11,11 +11,14 @@ import PriceList from '@/components/customers/PriceList';
 
 import { useRouter } from 'vue-router';
 import { useServiceStore } from '@/stores/service';
-import { useaddresseesStore } from '@/stores/addressees';
+import { useAddresseeStore } from '@/stores/addressees';
+import { useCollectionPointStore } from '@/stores/collectionPoints';
 
 const router = useRouter();
 const serviceStore = useServiceStore();
-const addresseesStore = useaddresseesStore();
+const addresseeStore = useAddresseeStore();
+const collectionPointStore = useCollectionPointStore();
 serviceStore.initList(router);
-addresseesStore.initList(router);
+addresseeStore.initList(router);
+collectionPointStore.initList(router);
 </script>

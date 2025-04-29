@@ -9,6 +9,11 @@ const routes = [
         path: '',
         name: 'Login',
         component: () => import('@/views/Login.vue')
+      },
+      {
+        path: 'privacy',
+        name: 'Privacy Policy',
+        component: () => import('@/views/PrivacyPolicy.vue')
       }
     ]
   },
@@ -24,17 +29,27 @@ const routes = [
       {
         path: 'services',
         name: 'Servizi',
-        component: () => import('@/views/Services.vue')
+        component: () => import('@/views/administration/Services.vue')
       },
       {
         path: 'users',
         name: 'Utenti',
-        component: () => import('@/views/Users.vue')
+        component: () => import('@/views/administration/Users.vue')
       },
       {
         path: 'addressees',
         name: 'Anagrafiche',
-        component: () => import('@/views/Addressees.vue')
+        component: () => import('@/views/customer/Addressees.vue')
+      },
+      {
+        path: 'orders',
+        name: 'Ordini',
+        component: () => import('@/views/customer/Orders.vue')
+      },
+      {
+        path: 'collection-points',
+        name: 'Punti di ritiro',
+        component: () => import('@/views/customer/CollectionPoints.vue')
       }
     ]
   }

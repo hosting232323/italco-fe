@@ -5,6 +5,7 @@ export const useOrderStore = defineStore('order', {
   state: () => ({
     element: {},
     list: [],
+    filters: {},
     activeForm: false
   }),
   actions: {
@@ -21,7 +22,9 @@ export const useOrderStore = defineStore('order', {
       http.postRequest(
         `order/${this.element.id}`,
         Object.fromEntries(
-          Object.entries(this.element).filter(([key]) => !['created_at', 'updated_at'].includes(key))
+          Object.entries(this.element).filter(([key]) => ![
+            'created_at', 'updated_at', 'delivery_group', 'service', 'user', 'collection_point'
+          ].includes(key))
         ),
         func,
         'PUT',
@@ -29,11 +32,17 @@ export const useOrderStore = defineStore('order', {
       );
     },
     initList(router) {
-      http.getRequest(
-        'order',
-        {},
+      http.postRequest(
+        'order/filter',
+        {filters: Object.keys(this.filters).map(key => {
+          return {
+            value: this.filters[key],
+            model: key.split('.')[0],
+            field: key.split('.')[1]
+          }
+        })},
         this.setList,
-        'GET',
+        'POST',
         router
       );
     },

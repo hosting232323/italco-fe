@@ -23,9 +23,21 @@
     />
     <v-list-item
       v-if="role === 'Customer'"
+      to="/orders"
+      title="Ordini"
+      prepend-icon="mdi-file-table-box-multiple"
+    />
+    <v-list-item
+      v-if="role === 'Customer'"
       to="/addressees"
       title="Anagrafiche"
       prepend-icon="mdi-account-multiple-outline"
+    />
+    <v-list-item
+      v-if="role === 'Customer'"
+      to="/collection-points"
+      title="Punti di Ritiro"
+      prepend-icon="mdi-store"
     />
     <v-divider class="mb-4 mt-4" />
     <v-list-item

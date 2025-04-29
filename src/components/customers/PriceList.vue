@@ -14,7 +14,7 @@
             {{ service.description }}
           </v-list-item-subtitle>
           <template v-slot:append>
-            <b>{{ getPrice(service) }} €</b>
+            <b class="ml-2">{{ getPrice(service) }} €</b>
           </template>
         </v-list-item>
       </v-col>    

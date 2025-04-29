@@ -1,7 +1,7 @@
 import http from '@/utils/http';
 import { defineStore } from 'pinia';
 
-export const useAddresseeStore = defineStore('addressee', {
+export const useCollectionPointStore = defineStore('collectionPoint', {
   state: () => ({
     element: {},
     list: [],
@@ -10,27 +10,16 @@ export const useAddresseeStore = defineStore('addressee', {
   actions: {
     createElement(router, func) {
       http.postRequest(
-        'addressee',
+        'collection-point',
         this.element,
         func,
         'POST',
         router
       );
     },
-    updateElement(router, func) {
-      http.postRequest(
-        `addressee/${this.element.id}`,
-        Object.fromEntries(
-          Object.entries(this.element).filter(([key]) => !['created_at', 'updated_at', 'users'].includes(key))
-        ),
-        func,
-        'PUT',
-        router
-      );
-    },
     initList(router) {
       http.getRequest(
-        'addressee',
+        'collection-point',
         {},
         this.setList,
         'GET',
@@ -39,7 +28,7 @@ export const useAddresseeStore = defineStore('addressee', {
     },
     deleteElement(element, router, func) {
       http.getRequest(
-        `addressee/${element.id}`,
+        `collection-point/${element.id}`,
         {},
         func,
         'DELETE',
@@ -47,7 +36,7 @@ export const useAddresseeStore = defineStore('addressee', {
       );
     },
     setList(data) {
-      this.list = data.addressees;
+      this.list = data.collection_points;
     }
   }
 });

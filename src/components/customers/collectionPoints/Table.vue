@@ -1,6 +1,6 @@
 <template>
   <v-data-table
-    :items="addressees"
+    :items="collectionPoints"
     :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
     :headers="[
       { title: 'ID', value: 'id' },
@@ -39,21 +39,21 @@
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
-import { useAddresseeStore } from '@/stores/addressees';
+import { useCollectionPointStore } from '@/stores/collectionPoints';
 
 const theme = useTheme();
 const router = useRouter();
-const addresseeStore = useAddresseeStore();
-const { list: addressees, element: addressee, activeForm } = storeToRefs(addresseeStore);
+const collectionPointStore = useCollectionPointStore();
+const { list: collectionPoints, element: collectionPoint, activeForm } = storeToRefs(collectionPointStore);
 
 const openForm = (item) => {
-  addressee.value = item;
+  collectionPoint.value = item;
   activeForm.value = true;
 };
 
 const deleteItem = (item) => {
-  addresseeStore.deleteElement(item, router, function() {
-    addresseeStore.initList(router);
+  collectionPointStore.deleteElement(item, router, function() {
+    collectionPointStore.initList(router);
   });
 };
 </script>

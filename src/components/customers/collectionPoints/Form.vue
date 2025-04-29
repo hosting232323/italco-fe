@@ -1,27 +1,27 @@
 <template>
   <v-card
-    :title="addressee.id ? `Modifica Anagrafica ${addressee.id}` : 'Crea Anagrafica'"
+    title="Crea Punto di Ritiro"
     class="mt-10 mb-5"
     v-if="activeForm"
   >
     <v-card-text>
       <v-form @submit.prevent="submitForm">
         <v-text-field
-          v-model="addressee.name"
-          label="Nominativo"
+          v-model="collectionPoint.name"
+          label="Nome"
         />
         <v-row no-gutters>
           <v-col cols="12" md="6">
             <v-text-field
               :class="isMobile ? '' : 'mr-2'"
-              v-model="addressee.address"
+              v-model="collectionPoint.address"
               label="Indirizzo"
             />
           </v-col>
           <v-col cols="12" md="6">
             <v-text-field
               :class="isMobile ? '' : 'ml-2'"
-              v-model="addressee.city"
+              v-model="collectionPoint.city"
               label="Città"
             />
           </v-col>
@@ -30,14 +30,14 @@
           <v-col cols="12" md="6">
             <v-text-field
               :class="isMobile ? '' : 'mr-2'"
-              v-model="addressee.cap"
+              v-model="collectionPoint.cap"
               label="Cap"
             />
           </v-col>
           <v-col cols="12" md="6">
             <v-text-field
               :class="isMobile ? '' : 'ml-2'"
-              v-model="addressee.province"
+              v-model="collectionPoint.province"
               label="Provincia"
             />
           </v-col>
@@ -58,32 +58,22 @@ import { ref } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
-import { useAddresseeStore } from '@/stores/addressees';
+import { useCollectionPointStore } from '@/stores/collectionPoints';
 
 const loading = ref(false);
 const router = useRouter();
 const isMobile = mobile.setupMobileUtils();
-const addresseeStore = useAddresseeStore();
-const { element: addressee, activeForm } = storeToRefs(addresseeStore);
+const collectionPointStore = useCollectionPointStore();
+const { element: collectionPoint, activeForm } = storeToRefs(collectionPointStore);
 
 const submitForm = () => {
   loading.value = true;
-  if (addressee.value.id)
-    addresseeStore.updateElement(router, function (data) {
-      loading.value = false;
-      if (data.status == 'ok') {
-        addressee.value = {};
-        activeForm.value = false;
-      }
-    });
-  else
-    addresseeStore.createElement(router, function (data) {
-      loading.value = false;
-      if (data.status == 'ok') {
-        addressee.value = {};
-        addresseeStore.initList(router);
-        activeForm.value = false;
-      }
-    });
+  collectionPointStore.createElement(router, function (data) {
+    loading.value = false;
+    if (data.status == 'ok') {
+      collectionPoint.value = {};
+      activeForm.value = false;
+    }
+  });
 };
 </script>

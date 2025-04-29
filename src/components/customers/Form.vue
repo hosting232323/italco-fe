@@ -24,6 +24,31 @@
             />
           </v-col>
         </v-row>
+        <v-row no-gutters>
+          <v-col cols="12" md="6">
+            <v-text-field
+              :class="isMobile ? '' : 'mr-2'"
+              v-model="order.dpc"
+              label="Data Promessa al Cliente"
+              type="date"
+            />
+          </v-col>
+          <v-col cols="12" md="6">
+            <v-text-field
+              :class="isMobile ? '' : 'ml-2'"
+              v-model="order.drc"
+              label="Data Richiesta dal Cliente"
+              type="date"
+            />
+          </v-col>
+        </v-row>
+        <v-autocomplete
+          v-model="order.collection_point_id"
+          label="Punto di Ritiro"
+          :items="collectionPoints"
+          item-title="name"
+          item-value="id"
+        />
         <v-textarea
           v-model="order.customer_note"
           label="Note"
@@ -52,7 +77,8 @@ import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import { useOrderStore } from '@/stores/order';
 import { useServiceStore } from '@/stores/service';
-import { useaddresseesStore } from '@/stores/addressees';
+import { useAddresseeStore } from '@/stores/addressees';
+import { useCollectionPointStore } from '@/stores/collectionPoints';
 
 const theme = useTheme();
 const loading = ref(false);
@@ -61,10 +87,12 @@ const router = useRouter();
 const orderStore = useOrderStore();
 const serviceStore = useServiceStore();
 const isMobile = mobile.setupMobileUtils();
-const addresseesStore = useaddresseesStore();
+const addresseeStore = useAddresseeStore();
+const collectionPointStore = useCollectionPointStore();
 const { element: order } = storeToRefs(orderStore);
 const { list: services } = storeToRefs(serviceStore);
-const { list: addressees } = storeToRefs(addresseesStore);
+const { list: addressees } = storeToRefs(addresseeStore);
+const { list: collectionPoints } = storeToRefs(collectionPointStore);
 
 const sendOrder = () => {
   loading.value = true;
