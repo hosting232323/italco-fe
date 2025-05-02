@@ -1,5 +1,5 @@
 <template>
-  <v-form @submit.prevent="submitForm" class="mb-5">
+  <v-form ref="form" @submit.prevent="submitForm" class="mb-5">
     <v-row no-gutters>
       <v-col cols="12" md="6">
         <v-autocomplete
@@ -9,6 +9,7 @@
           :items="users.filter(user => user.role == 'Customer')"
           item-title="email"
           item-value="id"
+          :rules="validation.requiredRules"
         />
       </v-col>
       <v-col cols="12" md="6">
@@ -18,6 +19,7 @@
           v-model="object.price"
           prepend-icon="mdi-currency-eur"
           label="Prezzo"
+          :rules="validation.requiredRules"
         />
       </v-col>
     </v-row>
@@ -38,9 +40,11 @@ import { ref } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
+import validation from '@/utils/validation';
 import { useServiceStore } from '@/stores/service';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
+const form = ref(null);
 const object = ref({});
 const message = ref('');
 const loading = ref(false);
@@ -52,7 +56,9 @@ const administrationUserStore = useAdministrationUserStore();
 const { element: service } = storeToRefs(serviceStore);
 const { list: users } = storeToRefs(administrationUserStore);
 
-const submitForm = () => {
+const submitForm = async () => {
+  if (!(await form.value.validate()).valid) return;
+
   message.value = '';
   loading.value = true;
   serviceStore.createServiceUserRelationships(object.value, router, function (data) {

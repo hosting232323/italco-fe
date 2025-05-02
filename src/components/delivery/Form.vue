@@ -2,27 +2,29 @@
   <v-card
     :title="getFormTitle()"
     class="mt-10 mb-5"
-    v-if="activeForm"
+    v-if="activeSecondForm"
   >
     <v-card-text>
       <p class="mb-2">
-        Servizio: {{ order.service.name }}<br>
+        Servizio: {{ order.services.map(service => service.name).join(', ') }}<br>
         Note Operatore: {{ order.operator_note }}
       </p>
-      <v-form @submit.prevent="submitForm">
+      <v-form ref="form" @submit.prevent="submitForm">
         <v-textarea
           v-if="['Anomaly', 'Cancelled'].includes(order.status)"
           v-model="order.motivation"
           label="Motivazione"
           rows="3"
+          :rules="['Anomaly', 'Cancelled'].includes(order.status) ? validation.requiredRules : []"
         />
         <v-file-input
           accept="image/*"
           label="Foto"
+          :rules="validation.requiredRules"
         />
         <FormButtons
           :loading="loading"
-          @cancel="activeForm = false"
+          @cancel="activeSecondForm = false"
         />
       </v-form>
     </v-card-text>
@@ -35,12 +37,14 @@ import FormButtons from '@/components/FormButtons';
 import { ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
+import validation from '@/utils/validation';
 import { useOrderStore } from '@/stores/order';
 
+const form = ref(null);
 const loading = ref(false);
 const router = useRouter();
 const orderStore = useOrderStore();
-const { element: order, activeForm } = storeToRefs(orderStore);
+const { element: order, activeSecondForm } = storeToRefs(orderStore);
 
 const getFormTitle = () => {
   if (order.value.status === 'Completed')
@@ -51,13 +55,15 @@ const getFormTitle = () => {
     return `Segnala Anomalia Ordine ${order.value.id}`;
 };
 
-const submitForm = () => {
+const submitForm = async () => {
+  if (!(await form.value.validate()).valid) return;
+
   loading.value = true;
   orderStore.updateElement(router, function (data) {
     loading.value = false;
     if (data.status == 'ok') {
       order.value = {};
-      activeForm.value = false;
+      activeSecondForm.value = false;
     }
   });
 }

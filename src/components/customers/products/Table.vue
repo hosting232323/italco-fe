@@ -1,14 +1,11 @@
 <template>
   <v-data-table
-    :items="addressees"
+    :items="products"
     :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
     :headers="[
       { title: 'ID', value: 'id' },
-      { title: 'Nominativo', value: 'name' },
-      { title: 'Indirizzo', value: 'address' },
-      { title: 'Città', value: 'city' },
-      { title: 'Cap', value: 'cap' },
-      { title: 'Provincia', value: 'province' },
+      { title: 'Nome', value: 'name' },
+      { title: 'Indirizzo', value: 'description' },
       { title: 'Azioni', key: 'actions' }
     ]"
   >
@@ -39,21 +36,21 @@
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
-import { useAddresseeStore } from '@/stores/addressee';
+import { useProductStore } from '@/stores/product';
 
 const theme = useTheme();
 const router = useRouter();
-const addresseeStore = useAddresseeStore();
-const { list: addressees, element: addressee, activeForm } = storeToRefs(addresseeStore);
+const productStore = useProductStore();
+const { list: products, element: product, activeForm } = storeToRefs(productStore);
 
 const openForm = (item) => {
-  addressee.value = item;
+  product.value = item;
   activeForm.value = true;
 };
 
 const deleteItem = (item) => {
-  addresseeStore.deleteElement(item, router, function() {
-    addresseeStore.initList(router);
+  productStore.deleteElement(item, router, function() {
+    productStore.initList(router);
   });
 };
 </script>

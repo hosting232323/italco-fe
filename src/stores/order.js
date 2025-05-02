@@ -6,7 +6,8 @@ export const useOrderStore = defineStore('order', {
     element: {},
     list: [],
     filters: {},
-    activeForm: false
+    activeForm: false,
+    activeSecondForm: false
   }),
   actions: {
     createElement(router, func) {

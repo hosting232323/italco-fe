@@ -1,11 +1,12 @@
 <template>
-  <v-form @submit.prevent="submitForm">
+  <v-form ref="form" @submit.prevent="submitForm">
     <v-autocomplete
       v-model="userId"
       label="Utente"
       :items="users.filter(user => user.role == 'Delivery')"
       item-title="email"
       item-value="id"
+      :rules="validation.requiredRules"
     />
     <FormButtons
       :loading="loading"
@@ -20,9 +21,11 @@ import FormButtons from '@/components/FormButtons';
 import { ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
+import validation from '@/utils/validation';
 import { useDeliveryGroupStore } from '@/stores/deliveryGroup';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
+const form = ref(null);
 const userId = ref(null);
 const loading = ref(false);
 const router = useRouter();
@@ -32,7 +35,9 @@ const administrationUserStore = useAdministrationUserStore();
 const { list: users } = storeToRefs(administrationUserStore);
 const { element: deliveryGroup } = storeToRefs(deliveryGroupStore);
 
-const submitForm = () => {
+const submitForm = async () => {
+  if (!(await form.value.validate()).valid) return;
+
   loading.value = true;
   deliveryGroupStore.assignUser(userId.value, router, function (data) {
     loading.value = false;

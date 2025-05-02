@@ -42,7 +42,9 @@ const getPrice = (service) => {
 };
 
 const clickItem = (serviceId) => {
-  order.value.service_id = serviceId;
+  if (!order.value.service_ids)
+    order.value.service_ids = [];
+  order.value.service_ids.push(serviceId);
 }
 </script>
 

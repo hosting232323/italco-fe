@@ -5,13 +5,14 @@
     v-if="activeForm"
   >
     <v-card-text>
-      <v-form @submit.prevent="submitForm">
+      <v-form ref="form" @submit.prevent="submitForm">
         <v-row no-gutters>
           <v-col cols="12" md="6">
             <v-text-field
               :class="isMobile ? '' : 'mr-2'"
               v-model="service.name"
               label="Nome"
+              :rules="validation.requiredRules"
             />
           </v-col>
           <v-col cols="12" md="6">
@@ -38,15 +39,19 @@ import { ref } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
+import validation from '@/utils/validation';
 import { useServiceStore } from '@/stores/service';
 
+const form = ref(null);
 const loading = ref(false);
 const router = useRouter();
 const serviceStore = useServiceStore();
 const isMobile = mobile.setupMobileUtils();
 const { element: service, activeForm } = storeToRefs(serviceStore);
 
-const submitForm = () => {
+const submitForm = async () => {
+  if (!(await form.value.validate()).valid) return;
+
   loading.value = true;
   if (service.value.id)
     serviceStore.updateElement(router, function (data) {

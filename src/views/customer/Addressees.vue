@@ -20,7 +20,7 @@ import AddresseeTable from '@/components/customers/addressees/Table';
 
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
-import { useAddresseeStore } from '@/stores/addressees';
+import { useAddresseeStore } from '@/stores/addressee';
 
 const router = useRouter();
 const addresseeStore = useAddresseeStore();

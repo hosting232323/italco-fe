@@ -1,48 +1,25 @@
 <template>
   <v-card
-    :title="addressee.id ? `Modifica Anagrafica ${addressee.id}` : 'Crea Anagrafica'"
+    :title="product.id ? `Modifica Prodotto ${product.id}` : 'Crea Prodotto'"
     class="mt-10 mb-5"
     v-if="activeForm"
   >
     <v-card-text>
       <v-form ref="form" @submit.prevent="submitForm">
-        <v-text-field
-          v-model="addressee.name"
-          label="Nominativo"
-        />
         <v-row no-gutters>
           <v-col cols="12" md="6">
             <v-text-field
               :class="isMobile ? '' : 'mr-2'"
-              v-model="addressee.address"
-              label="Indirizzo"
+              v-model="product.name"
+              label="Nome"
               :rules="validation.requiredRules"
             />
           </v-col>
           <v-col cols="12" md="6">
             <v-text-field
               :class="isMobile ? '' : 'ml-2'"
-              v-model="addressee.city"
-              label="Città"
-              :rules="validation.requiredRules"
-            />
-          </v-col>
-        </v-row>
-        <v-row no-gutters>
-          <v-col cols="12" md="6">
-            <v-text-field
-              :class="isMobile ? '' : 'mr-2'"
-              v-model="addressee.cap"
-              label="Cap"
-              :rules="validation.requiredRules"
-            />
-          </v-col>
-          <v-col cols="12" md="6">
-            <v-text-field
-              :class="isMobile ? '' : 'ml-2'"
-              v-model="addressee.province"
-              label="Provincia"
-              :rules="validation.requiredRules"
+              v-model="product.description"
+              label="Descrizione"
             />
           </v-col>
         </v-row>
@@ -63,33 +40,33 @@ import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import validation from '@/utils/validation';
-import { useAddresseeStore } from '@/stores/addressee';
+import { useProductStore } from '@/stores/product';
 
 const form = ref(null);
 const loading = ref(false);
 const router = useRouter();
 const isMobile = mobile.setupMobileUtils();
-const addresseeStore = useAddresseeStore();
-const { element: addressee, activeForm } = storeToRefs(addresseeStore);
+const productStore = useProductStore();
+const { element: product, activeForm } = storeToRefs(productStore);
 
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
 
   loading.value = true;
-  if (addressee.value.id)
-    addresseeStore.updateElement(router, function (data) {
+  if (product.value.id)
+    productStore.updateElement(router, function (data) {
       loading.value = false;
       if (data.status == 'ok') {
-        addressee.value = {};
+        product.value = {};
         activeForm.value = false;
       }
     });
   else
-    addresseeStore.createElement(router, function (data) {
+    productStore.createElement(router, function (data) {
       loading.value = false;
       if (data.status == 'ok') {
-        addressee.value = {};
-        addresseeStore.initList(router);
+        product.value = {};
+        productStore.initList(router);
         activeForm.value = false;
       }
     });

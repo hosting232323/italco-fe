@@ -5,10 +5,11 @@
     v-if="activeForm"
   >
     <v-card-text>
-      <v-form @submit.prevent="submitForm">
+      <v-form ref="form" @submit.prevent="submitForm">
         <v-text-field
           v-model="collectionPoint.name"
           label="Nome"
+          :rules="validation.requiredRules"
         />
         <v-row no-gutters>
           <v-col cols="12" md="6">
@@ -16,6 +17,7 @@
               :class="isMobile ? '' : 'mr-2'"
               v-model="collectionPoint.address"
               label="Indirizzo"
+              :rules="validation.requiredRules"
             />
           </v-col>
           <v-col cols="12" md="6">
@@ -23,6 +25,7 @@
               :class="isMobile ? '' : 'ml-2'"
               v-model="collectionPoint.city"
               label="Città"
+              :rules="validation.requiredRules"
             />
           </v-col>
         </v-row>
@@ -32,6 +35,7 @@
               :class="isMobile ? '' : 'mr-2'"
               v-model="collectionPoint.cap"
               label="Cap"
+              :rules="validation.requiredRules"
             />
           </v-col>
           <v-col cols="12" md="6">
@@ -39,6 +43,7 @@
               :class="isMobile ? '' : 'ml-2'"
               v-model="collectionPoint.province"
               label="Provincia"
+              :rules="validation.requiredRules"
             />
           </v-col>
         </v-row>
@@ -58,15 +63,19 @@ import { ref } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
+import validation from '@/utils/validation';
 import { useCollectionPointStore } from '@/stores/collectionPoints';
 
+const form = ref(null);
 const loading = ref(false);
 const router = useRouter();
 const isMobile = mobile.setupMobileUtils();
 const collectionPointStore = useCollectionPointStore();
 const { element: collectionPoint, activeForm } = storeToRefs(collectionPointStore);
 
-const submitForm = () => {
+const submitForm = async () => {
+  if (!(await form.value.validate()).valid) return;
+
   loading.value = true;
   collectionPointStore.createElement(router, function (data) {
     loading.value = false;

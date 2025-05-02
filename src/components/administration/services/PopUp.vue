@@ -15,12 +15,13 @@
       <PopUpForm v-if="formFlag" @closeForm="formFlag = false" />
       <PopUpTable v-if="service.users.length > 0" />
       <template v-else-if="!formFlag">
-        <v-form @submit.prevent="submitForm">
+        <v-form ref="form" @submit.prevent="submitForm">
           <v-text-field
             type="number"
             prepend-icon="mdi-currency-eur"
             v-model="price"
             label="Prezzo"
+            :rules="validation.requiredRules"
           />
           <v-btn
             text="Associa tutti gli utenti"
@@ -44,8 +45,10 @@ import http from '@/utils/http';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
+import validation from '@/utils/validation';
 import { useServiceStore } from '@/stores/service';
 
+const form = ref(null);
 const price = ref(null);
 const theme = useTheme();
 const loading = ref(false);
@@ -54,7 +57,9 @@ const formFlag = ref(false);
 const serviceStore = useServiceStore();
 const { element: service } = storeToRefs(serviceStore);
 
-const submitForm = () => {
+const submitForm = async () => {
+  if (!(await form.value.validate()).valid) return;
+
   loading.value = true;
   http.getRequest('service/set-all-users', {
     service_id: service.value.id,
