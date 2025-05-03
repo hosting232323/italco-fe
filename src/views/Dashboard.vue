@@ -20,7 +20,7 @@
       <OrderForm v-if="role != 'Delivery'" />
       <OperatorForm v-if="role == 'Operator'" />
       <DeliveryForm v-if="role == 'Delivery'" />
-      <DashboardFilters />
+      <OrdersFilters />
       <OrderTable />
     </template>
   </v-container>
@@ -31,9 +31,9 @@ import OrderTable from '@/components/orders/Table';
 import OperatorForm from '@/components/operator/Form';
 import DeliveryForm from '@/components/delivery/Form';
 import CustomersForm from '@/components/customers/Form';
+import OrdersFilters from '@/components/orders/Filters';
 import OrderForm from '@/components/orders/ExternalForm';
 import PriceList from '@/components/customers/PriceList';
-import DashboardFilters from '@/components/DashboardFilters';
 
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';

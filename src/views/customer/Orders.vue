@@ -1,14 +1,14 @@
 <template>
   <v-container>
     <h1>Ordini</h1><hr>
-    <DashboardFilters />
+    <OrdersFilters />
     <OrderTable />
   </v-container>
 </template>
 
 <script setup>
 import OrderTable from '@/components/orders/Table';
-import DashboardFilters from '@/components/DashboardFilters';
+import OrdersFilters from '@/components/orders/Filters';
 
 import { useRouter } from 'vue-router';
 import { useOrderStore } from '@/stores/order';

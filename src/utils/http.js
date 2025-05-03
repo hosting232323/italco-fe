@@ -36,17 +36,17 @@ const postRequestFile = (endpoint, file, func, method = 'POST', router = undefin
 };
 
 
-const getRequest = (endpoint, params, func, method = 'GET', router = undefined) => {
+const getRequest = (endpoint, params, func, method = 'GET', router = undefined, file = false) => {
   const url = new URL(`${hostname}${endpoint}`);
   Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
 
   fetch(url, {
     method: method,
-    headers: createHeader(router)
+    headers: createHeader(router, file)
   }).then(response => {
     if (!response.ok)
       throw new Error(`Errore nella risposta del server: ${response.status} - ${response.statusText}`);
-    return response.json();
+    return file ? response.blob() : response.json();
   }).then(data => {
     sessionHandler(data, func, router);
   }).catch(error => {
