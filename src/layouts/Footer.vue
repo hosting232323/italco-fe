@@ -4,7 +4,7 @@
       <v-row>
         <v-col cols="6">
           {{ new Date().getFullYear() }} —
-          <strong>Gestionale Italco.mi</strong>
+          <strong>Ares Logistics</strong>
           <div>P. IVA IT02735550747</div>
         </v-col>
         <v-col cols="6" class="text-right">

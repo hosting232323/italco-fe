@@ -2,6 +2,7 @@
   <AuthManager
     class="mt-10"
     title="Login"
+    logo="/logo.png"
     :secondaryColor="theme.current.value.primaryColor"
     redirectLink="/dashboard"
     :hostname="hostname"

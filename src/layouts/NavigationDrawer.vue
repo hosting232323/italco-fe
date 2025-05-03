@@ -1,7 +1,7 @@
 <template>
   <v-navigation-drawer expand-on-hover rail :color="theme.current.value.primaryColor" app>
     <v-list-item prepend-icon="mdi-menu" class="mt-2">
-      <b>Gestionale Italco.mi</b>
+      <b>Ares Logistics</b>
       <br>{{ role }}
     </v-list-item>
     <v-divider class="mb-4" />

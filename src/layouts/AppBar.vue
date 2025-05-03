@@ -4,7 +4,7 @@
     :elevation="2"
   >
     <v-app-bar-title><b>
-      Gestionale Italco.mi
+      Ares Logistics
     </b></v-app-bar-title>
   </v-app-bar>
 </template>
