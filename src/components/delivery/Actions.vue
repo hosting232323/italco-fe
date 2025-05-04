@@ -1,5 +1,5 @@
 <template>
-  <v-row no-gutters>
+  <v-row no-gutters v-if="!['Completed', 'Cancelled', 'Anomaly'].includes(item.status)">
     <v-col cols="3">
       <v-btn
         icon="mdi-check-circle"

@@ -27,34 +27,23 @@
     <template v-slot:item.actions="{ item }">
       <OperatorAction :item="item" v-if="role == 'Operator'" />
       <DeliveryAction :item="item" v-if="role == 'Delivery'" />
-      <v-btn
-        v-if="['Admin', 'Operator'].includes(role)"
-        variant="text"
-        icon="mdi-file-export"
-        :loading="loading[item.id]"
-        :color="theme.current.value.primaryColor"
-        @click="exportPdf(item)"
-      />
+      <Action :item="item" v-if="['Admin', 'Operator'].includes(role)" />
     </template>
   </v-data-table>
 </template>
 
 <script setup>
+import Action from '@/components/orders/Actions';
 import DeliveryAction from '@/components/delivery/Actions';
 import OperatorAction from '@/components/operator/Actions';
 
-import { ref } from 'vue';
-import http from '@/utils/http';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import orderUtils from '@/utils/order';
 import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
 
 const theme = useTheme();
-const loading = ref({});
-const router = useRouter();
 const userStore = useUserStore();
 const orderStore = useOrderStore();
 const { role } = storeToRefs(userStore);
@@ -97,21 +86,6 @@ const getHeaders = () => {
     );
   headers.push({ title: 'Azioni', key: 'actions' });
   return headers;
-};
-
-const exportPdf = async (item) => {
-  loading.value[item.id] = true;
-
-  http.getRequest(`export/${item.id}`, {}, function (data) {
-    loading.value[item.id] = false;
-    const blob = new Blob([data], { type: 'application/pdf' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `ordine_${item.id}.pdf`;
-    a.click();
-    window.URL.revokeObjectURL(url);
-  }, 'GET', router, true)
 };
 </script>
 

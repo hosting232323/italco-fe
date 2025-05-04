@@ -1,6 +1,10 @@
 import http from '@/utils/http';
 import { defineStore } from 'pinia';
 
+const EXCLUDED_KEYS = [
+  'created_at', 'updated_at', 'delivery_group', 'services', 'user', 'collection_point', 'products', 'addressee'
+];
+
 export const useOrderStore = defineStore('order', {
   state: () => ({
     element: {},
@@ -23,10 +27,22 @@ export const useOrderStore = defineStore('order', {
       http.postRequest(
         `order/${this.element.id}`,
         Object.fromEntries(
-          Object.entries(this.element).filter(([key]) => ![
-            'created_at', 'updated_at', 'delivery_group', 'service', 'user', 'collection_point'
-          ].includes(key))
+          Object.entries(this.element).filter(([key]) => !EXCLUDED_KEYS.includes(key))
         ),
+        func,
+        'PUT',
+        router
+      );
+    },
+    updateElementWithFormData(router, func) {
+      http.formDataRequest(
+        `order/${this.element.id}`,
+        {
+          data: JSON.stringify(Object.fromEntries(
+            Object.entries(this.element).filter(([key]) => !EXCLUDED_KEYS.concat(['photo']).includes(key))
+          )),
+          photo: this.element.photo
+        },
         func,
         'PUT',
         router

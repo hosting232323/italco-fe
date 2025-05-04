@@ -1,0 +1,66 @@
+<template>
+  <v-dialog max-width="1500">
+    <template v-slot:activator="{ props: activatorProps }">
+      <v-row no-gutters>
+        <v-col cols="6">
+          <v-btn
+            variant="text"
+            icon="mdi-file-export"
+            :loading="loading"
+            :color="theme.current.value.primaryColor"
+            @click="exportPdf(item)"
+          />
+        </v-col>
+        <v-col cols="6">
+          <v-btn
+            icon="mdi-image"
+            variant="text"
+            :color="theme.current.value.primaryColor"
+            v-bind="activatorProps"
+            @click="order = item"
+          />
+        </v-col>
+      </v-row>
+    </template>
+    <template v-slot:default>
+      <v-card :title="`Immagine ordine ${order.id}`">
+        <v-card-text>
+          <v-img
+            :src="`${http.hostname}order/photo/${item.id}`"
+            :alt="`Immagine ordine ${item.id}`"
+            max-width="1500"
+            max-height="1000"
+          />
+        </v-card-text>
+      </v-card>
+    </template>
+  </v-dialog>
+</template>
+
+<script setup>
+import { ref } from 'vue';
+import http from '@/utils/http';
+import { useTheme } from 'vuetify';
+import { useRouter } from 'vue-router';
+
+const order = ref({});
+const theme = useTheme();
+const router = useRouter();
+const loading = ref(false);
+const props = defineProps(['item']);
+
+const exportPdf = async (item) => {
+  loading.value = true;
+
+  http.getRequest(`export/${item.id}`, {}, function (data) {
+    loading.value = false;
+    const blob = new Blob([data], { type: 'application/pdf' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `ordine_${item.id}.pdf`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  }, 'GET', router, true)
+};
+</script>

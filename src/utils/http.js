@@ -16,9 +16,9 @@ const postRequest = (endpoint, body, func, method = 'POST', router = undefined) 
   });
 };
 
-const postRequestFile = (endpoint, file, func, method = 'POST', router = undefined) => {
+const formDataRequest = (endpoint, data, func, method = 'POST', router = undefined) => {
   const formData = new FormData();
-  formData.append('file', file);
+  Object.keys(data).forEach(key => formData.append(key, data[key]));
 
   fetch(`${hostname}${endpoint}`, {
     method: method,
@@ -79,5 +79,6 @@ const sessionHandler = (data, func, router) => {
 export default {
   postRequest,
   getRequest,
-  postRequestFile
+  formDataRequest,
+  hostname
 };

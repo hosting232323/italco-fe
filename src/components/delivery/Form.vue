@@ -11,16 +11,17 @@
       </p>
       <v-form ref="form" @submit.prevent="submitForm">
         <v-textarea
-          v-if="['Anomaly', 'Cancelled'].includes(order.status)"
+          v-if="['Anomaly', 'Cancelled', 'Delay'].includes(order.status)"
           v-model="order.motivation"
           label="Motivazione"
           rows="3"
-          :rules="['Anomaly', 'Cancelled'].includes(order.status) ? validation.requiredRules : []"
+          :rules="['Anomaly', 'Cancelled', 'Delay'].includes(order.status) ? validation.requiredRules : []"
         />
         <v-file-input
           accept="image/*"
           label="Foto"
-          :rules="validation.requiredRules"
+          v-model="order.photo"
+          :rules="['Completed', 'Anomaly'].includes(order.status) ? validation.requiredRules : []"
         />
         <FormButtons
           :loading="loading"
@@ -59,7 +60,7 @@ const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
 
   loading.value = true;
-  orderStore.updateElement(router, function (data) {
+  orderStore.updateElementWithFormData(router, function (data) {
     loading.value = false;
     if (data.status == 'ok') {
       order.value = {};
