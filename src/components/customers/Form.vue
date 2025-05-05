@@ -13,15 +13,31 @@
         />
         <v-row no-gutters>
           <v-col cols="12" md="6">
-            <v-autocomplete multiple
+            <v-select
               :class="isMobile ? '' : 'mr-2'"
-              v-model="order.service_ids"
+              v-model="selectedService"
               label="Servizio"
-              :items="services"
+              :items="services.filter(service => service.users.map(user => user.user_id).includes(order.user_id))"
               item-title="name"
               item-value="id"
               :rules="validation.requiredRules"
-            />
+              menu
+            >
+              <template v-slot:item="{ props }">
+                <v-list-item
+                  v-bind="props"
+                  @click="addService"
+                />
+              </template>
+            </v-select>
+            <v-chip
+              class="mr-2 mb-2"
+              v-for="(serviceId, index) in order.service_ids"
+              closable
+              @click:close="removeService(index)"
+            >
+              {{ services.find(service => service.id == serviceId).name }}
+            </v-chip>
           </v-col>
           <v-col cols="12" md="6">
             <v-autocomplete multiple
@@ -119,6 +135,7 @@ const theme = useTheme();
 const loading = ref(false);
 const message = ref(false);
 const router = useRouter();
+const selectedService = ref(null);
 const isMobile = mobile.setupMobileUtils();
 
 const orderStore = useOrderStore();
@@ -131,6 +148,16 @@ const { list: services } = storeToRefs(serviceStore);
 const { list: products } = storeToRefs(productStore);
 const { list: addressees } = storeToRefs(addresseeStore);
 const { list: collectionPoints } = storeToRefs(collectionPointStore);
+
+const addService = () => {
+  if (!order.value.service_ids)
+    order.value.service_ids = [];
+  order.value.service_ids.push(selectedService.value);
+};
+
+const removeService = (index) => {
+  order.value.service_ids.splice(index, 1);
+};
 
 const sendOrder = async () => {
   if (!(await form.value.validate()).valid) return;
