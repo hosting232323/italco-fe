@@ -2,8 +2,8 @@ const LABELS = {
   Pending: 'In Attesa',
   'In Progress': 'In Consegna',
   Delay: 'Ritardo',
-  Completed: 'Completed',
-  Anomaly: 'Anomaly',
+  Completed: 'Completato',
+  Anomaly: 'Anomalia',
   Cancelled: 'Cancellato'
 };
 

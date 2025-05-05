@@ -1,6 +1,6 @@
 <template>
   <v-row no-gutters v-if="!['Completed', 'Cancelled', 'Anomaly'].includes(item.status)">
-    <v-col cols="3">
+    <v-col cols="6">
       <v-btn
         icon="mdi-check-circle"
         variant="text"
@@ -8,7 +8,7 @@
         @click="openForm(item, 'Completed')"
       />
     </v-col>
-    <v-col cols="3">
+    <v-col cols="6">
       <v-btn
         icon="mdi-clock-time-five"
         variant="text"
@@ -16,7 +16,7 @@
         @click="openForm(item, 'Delay')"
       />
     </v-col>
-    <v-col cols="3">
+    <v-col cols="6">
       <v-btn
         icon="mdi-close-circle"
         variant="text"
@@ -24,7 +24,7 @@
         @click="openForm(item, 'Cancelled')"
       />
     </v-col>
-    <v-col cols="3">
+    <v-col cols="6">
       <v-btn
         icon="mdi-alert-circle"
         variant="text"

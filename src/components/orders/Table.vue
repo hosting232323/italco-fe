@@ -24,8 +24,11 @@
     <template v-slot:item.status="{ item }">
       {{ orderUtils.LABELS[item.status] }}
     </template>
+    <template v-slot:item.price="{ item }">
+      {{ item.price ? item.price.toFixed(2) : '' }}€
+    </template>
     <template v-slot:item.actions="{ item }">
-      <OperatorAction :item="item" v-if="role == 'Operator'" />
+      <OperatorAction :item="item" v-if="role == 'Operator' && item.status == 'Pending'" />
       <DeliveryAction :item="item" v-if="role == 'Delivery'" />
       <Action :item="item" v-if="['Admin', 'Operator'].includes(role)" />
     </template>
@@ -76,6 +79,8 @@ const getHeaders = () => {
   headers.push(
     { title: 'D.P.C.', value: 'dpc' },
     { title: 'D.R.C.', value: 'drc' },
+    { title: 'Data Assegnazione', value: 'assignament_date' },
+    { title: 'Data Consegna', value: 'booking_date' },
     { title: 'Data Creazione', value: 'created_at' },
     { title: 'Stato', value: 'status' }
   );
@@ -84,6 +89,8 @@ const getHeaders = () => {
       { title: 'Gruppo Delivery', value: 'delivery_group.name' },
       { title: 'Motivation', value: 'motivation' }
     );
+  if (role.value == 'Admin')
+    headers.push({ title: 'Prezzo', value: 'price' });
   headers.push({ title: 'Azioni', key: 'actions' });
   return headers;
 };
