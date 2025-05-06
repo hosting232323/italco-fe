@@ -7,7 +7,6 @@ const LABELS = {
   Cancelled: 'Cancellato'
 };
 
-
 const TYPES = [
   {
     title: 'Consegna',
@@ -27,8 +26,18 @@ const TYPES = [
   }
 ];
 
+const formatFilters = (filters) => {
+  return Object.keys(filters).map(key => {
+    return {
+      value: filters[key],
+      model: key.split('.')[0],
+      field: key.split('.')[1]
+    };
+  });
+}
 
 export default {
   LABELS,
-  TYPES
+  TYPES,
+  formatFilters
 };

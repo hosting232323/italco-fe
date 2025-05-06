@@ -1,6 +1,6 @@
 const hostname = import.meta.env.VITE_HOSTNAME;
 
-const postRequest = (endpoint, body, func, method = 'POST', router = undefined) => {
+const postRequest = (endpoint, body, func, method = 'POST', router = undefined, file = false) => {
   fetch(`${hostname}${endpoint}`, {
     method: method,
     headers: createHeader(router),
@@ -8,7 +8,7 @@ const postRequest = (endpoint, body, func, method = 'POST', router = undefined) 
   }).then(response => {
     if (!response.ok)
       throw new Error(`Errore nella risposta del server: ${response.status} - ${response.statusText}`);
-    return response.json();
+    return file ? response.blob() : response.json();
   }).then(data => {
     sessionHandler(data, func, router);
   }).catch(error => {
