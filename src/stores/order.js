@@ -3,7 +3,7 @@ import { defineStore } from 'pinia';
 import orderUtils from '@/utils/order';
 
 const EXCLUDED_KEYS = [
-  'created_at', 'updated_at', 'delivery_group', 'services', 'user', 'collection_point', 'products', 'addressee'
+  'created_at', 'updated_at', 'delivery_group', 'services', 'user', 'collection_point', 'addressee'
 ];
 
 export const useOrderStore = defineStore('order', {
@@ -17,6 +17,7 @@ export const useOrderStore = defineStore('order', {
   }),
   actions: {
     createElement(router, func) {
+      this.element.products = Object.keys(this.element.products).map(key => this.element.products[key]);
       http.postRequest(
         'order',
         this.element,

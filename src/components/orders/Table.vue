@@ -19,7 +19,7 @@
       <p style="font-size: smaller;">{{ getAddress(item.addressee) }}</p>
     </template>
     <template v-slot:item.products="{ item }">
-      {{ item.products ? item.products.map(product => product.name).join(', ') : '' }}
+      {{ item.products ? item.products.join(', ') : '' }}
     </template>
     <template v-slot:item.status="{ item }">
       {{ orderUtils.LABELS[item.status] }}

@@ -50,11 +50,6 @@ const routes = [
         path: 'collection-points',
         name: 'Punti di ritiro',
         component: () => import('@/views/customer/CollectionPoints.vue')
-      },
-      {
-        path: 'products',
-        name: 'Prodotti',
-        component: () => import('@/views/customer/Products.vue')
       }
     ]
   }

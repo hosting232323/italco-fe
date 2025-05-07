@@ -126,7 +126,6 @@ import validation from '@/utils/validation';
 
 import { useOrderStore } from '@/stores/order';
 import { useServiceStore } from '@/stores/service';
-import { useProductStore } from '@/stores/product';
 import { useAddresseeStore } from '@/stores/addressee';
 import { useCollectionPointStore } from '@/stores/collectionPoints';
 
@@ -140,12 +139,10 @@ const isMobile = mobile.setupMobileUtils();
 
 const orderStore = useOrderStore();
 const serviceStore = useServiceStore();
-const productStore = useProductStore();
 const addresseeStore = useAddresseeStore();
 const collectionPointStore = useCollectionPointStore();
 const { element: order } = storeToRefs(orderStore);
 const { list: services } = storeToRefs(serviceStore);
-const { list: products } = storeToRefs(productStore);
 const { list: addressees } = storeToRefs(addresseeStore);
 const { list: collectionPoints } = storeToRefs(collectionPointStore);
 

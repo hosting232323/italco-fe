@@ -30,12 +30,6 @@
     />
     <v-list-item
       v-if="role === 'Customer'"
-      to="/products"
-      title="Prodotti"
-      prepend-icon="mdi-cube"
-    />
-    <v-list-item
-      v-if="role === 'Customer'"
       to="/addressees"
       title="Anagrafiche"
       prepend-icon="mdi-account-multiple-outline"
