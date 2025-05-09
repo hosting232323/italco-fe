@@ -17,7 +17,7 @@
               :class="isMobile ? '' : 'mr-2'"
               v-model="selectedService"
               label="Servizio"
-              :items="services.filter(service => service.users.map(user => user.user_id).includes(order.user_id))"
+              :items="services"
               item-title="name"
               item-value="id"
               :rules="validation.requiredRules"
@@ -40,14 +40,13 @@
             </v-chip>
           </v-col>
           <v-col cols="12" md="6">
-            <v-autocomplete multiple
+            <v-text-field
               :class="isMobile ? '' : 'ml-2'"
-              v-model="order.product_ids"
+              v-for="(_product, index) in order.products?.concat({})"
+              v-model="order.products[index]"
               label="Prodotto"
-              :items="products"
-              item-title="name"
-              item-value="id"
-              :rules="validation.requiredRules"
+              :append-icon="order.products.length > index ? 'mdi-delete' : ''"
+              @click:append="order.products.length > index ? order.products.splice(index, 1) : null"
             />
           </v-col>
         </v-row>
@@ -145,6 +144,7 @@ const { element: order } = storeToRefs(orderStore);
 const { list: services } = storeToRefs(serviceStore);
 const { list: addressees } = storeToRefs(addresseeStore);
 const { list: collectionPoints } = storeToRefs(collectionPointStore);
+if (!order.value.products) order.value.products = [];
 
 const addService = () => {
   if (!order.value.service_ids)
