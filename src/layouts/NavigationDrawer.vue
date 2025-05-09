@@ -24,12 +24,6 @@
     />
     <v-list-item
       v-if="role === 'Customer'"
-      to="/orders"
-      title="Ordini"
-      prepend-icon="mdi-file-table-box-multiple"
-    />
-    <v-list-item
-      v-if="role === 'Customer'"
       to="/addressees"
       title="Anagrafiche"
       prepend-icon="mdi-account-multiple-outline"

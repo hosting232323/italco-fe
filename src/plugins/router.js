@@ -42,11 +42,6 @@ const routes = [
         component: () => import('@/views/customer/Addressees.vue')
       },
       {
-        path: 'orders',
-        name: 'Ordini',
-        component: () => import('@/views/customer/Orders.vue')
-      },
-      {
         path: 'collection-points',
         name: 'Punti di ritiro',
         component: () => import('@/views/customer/CollectionPoints.vue')

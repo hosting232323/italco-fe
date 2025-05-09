@@ -17,6 +17,17 @@ export const useCollectionPointStore = defineStore('collectionPoint', {
         router
       );
     },
+    updateElement(router, func) {
+      http.postRequest(
+        `collection-point/${this.element.id}`,
+        Object.fromEntries(
+          Object.entries(this.element).filter(([key]) => !['created_at', 'updated_at', 'users'].includes(key))
+        ),
+        func,
+        'PUT',
+        router
+      );
+    },
     initList(router) {
       http.getRequest(
         'collection-point',

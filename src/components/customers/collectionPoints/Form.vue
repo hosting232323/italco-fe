@@ -1,6 +1,6 @@
 <template>
   <v-card
-    title="Crea Punto di Ritiro"
+    :title="collectionPoint.id ? `Modifica Punto di Ritiro ${collectionPoint.id}` : 'Crea Punto di Ritiro'"
     class="mt-10 mb-5"
     v-if="activeForm"
   >
@@ -77,12 +77,22 @@ const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
 
   loading.value = true;
-  collectionPointStore.createElement(router, function (data) {
-    loading.value = false;
-    if (data.status == 'ok') {
-      collectionPoint.value = {};
-      activeForm.value = false;
-    }
-  });
+  if (collectionPoint.value.id)
+    collectionPointStore.updateElement(router, function (data) {
+      loading.value = false;
+      if (data.status == 'ok') {
+        collectionPoint.value = {};
+        activeForm.value = false;
+      }
+    });
+  else
+    collectionPointStore.createElement(router, function (data) {
+      loading.value = false;
+      if (data.status == 'ok') {
+        collectionPoint.value = {};
+        collectionPointStore.initList(router);
+        activeForm.value = false;
+      }
+    });
 };
 </script>

@@ -9,20 +9,18 @@
         @click="openForm"
         v-if="['Admin', 'Operator'].includes(role)"
       />
+      <OrderImportation v-if="role == 'Admin'" />
     </h1><hr>
     <template v-if="role == 'Customer'">
       <CustomersForm />
-      <hr class="mt-5 mb-2">
-      <h2>Servizi disponibili</h2>
-      <PriceList />
     </template>
     <template v-else>
       <OrderForm v-if="role != 'Delivery'" />
       <OperatorForm v-if="role == 'Operator'" />
       <DeliveryForm v-if="role == 'Delivery'" />
-      <OrdersFilters />
-      <OrderTable />
     </template>
+    <OrdersFilters />
+    <OrderTable />
   </v-container>
 </template>
 
@@ -33,7 +31,7 @@ import DeliveryForm from '@/components/delivery/Form';
 import CustomersForm from '@/components/customers/Form';
 import OrdersFilters from '@/components/orders/Filters';
 import OrderForm from '@/components/orders/ExternalForm';
-import PriceList from '@/components/customers/PriceList';
+import OrderImportation from '@/components/administration/Importation';
 
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
