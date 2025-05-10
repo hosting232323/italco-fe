@@ -26,10 +26,13 @@ export const useAdministrationUserStore = defineStore('administrationUser', {
         router
       );
     },
-    deleteElement(element, router, func) {
+    deleteElement(force, element, router, func) {
+      const args = {};
+      if (force) args.force = force;
+
       http.getRequest(
-        `user/${element.email}`,
-        {},
+        `user/${element.id}`,
+        args,
         func,
         'DELETE',
         router
