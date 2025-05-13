@@ -12,7 +12,7 @@
         :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
         :headers="getHeaders()"
         :show-select="['Admin', 'Operator'].includes(role)"
-        v-model:selected="selectedOrders"
+        v-model="selectedOrders"
       >
         <template v-slot:item.type="{ item }">
           {{ orderUtils.TYPES.find(type => type.value == item.type)?.title }}
@@ -46,9 +46,9 @@
     <template v-slot:default="{ isActive }">
       <v-card title="Assegna Gruppo Delivery">
         <v-card-text>
-          <v-form ref="form" @submit.prevent="">
+          <v-form ref="form" @submit.prevent="assignDeliveryGroup(isActive)">
             <v-select
-              v-model="selectedOrders"
+              v-model="selectedDeliveryGroup"
               label="Gruppo Delivery"
               :items="deliveryGroups"
               item-title="name"
@@ -57,7 +57,7 @@
             />
             <FormButtons
               :loading="loading"
-              @cancel="isActive = false"
+              @cancel="isActive.value = false"
             />
           </v-form>
         </v-card-text>
@@ -82,12 +82,14 @@ import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
 import { useDeliveryGroupStore } from '@/stores/deliveryGroup';
 
+const form = ref(null);
 const theme = useTheme();
 const loading = ref(false);
 const router = useRouter();
 const selectedOrders = ref([]);
 const userStore = useUserStore();
 const orderStore = useOrderStore();
+const selectedDeliveryGroup = ref(null);
 const deliveryGroupStore = useDeliveryGroupStore();
 const { role } = storeToRefs(userStore);
 const { list: orders } = storeToRefs(orderStore);
@@ -95,6 +97,25 @@ const { list: deliveryGroups } = storeToRefs(deliveryGroupStore);
 
 const getAddress = (item) => {
   return item.address + ', ' + item.city + ', ' + item.province + ', ' + item.cap;
+};
+
+const assignDeliveryGroup = async (isActive) => {
+  console.log(selectedOrders.value);
+  if (!(await form.value.validate()).valid) return;
+
+  loading.value = true;
+  http.postRequest('order/delivery-group', {
+    delivery_group_id: selectedDeliveryGroup.value,
+    order_ids: selectedOrders.value
+  }, function (data) {
+    loading.value = false;
+    if (data.status == 'ok') {
+      orderStore.initList(router);
+      selectedOrders.value = [];
+      selectedDeliveryGroup.value = null;
+      isActive.value = false;
+    }
+  }, 'PUT', router);
 };
 
 const getHeaders = () => {

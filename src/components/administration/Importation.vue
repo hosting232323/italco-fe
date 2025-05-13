@@ -19,7 +19,7 @@
             />
             <FormButtons
               :loading="loading"
-              @cancel="isActive = false"
+              @cancel="isActive.value = false"
             />
           </v-form>
         </v-card-text>

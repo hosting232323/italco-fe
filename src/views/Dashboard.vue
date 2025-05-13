@@ -39,6 +39,7 @@ import { useServiceStore } from '@/stores/service';
 import { useAddresseeStore } from '@/stores/addressee';
 import { useDeliveryGroupStore } from '@/stores/deliveryGroup';
 import { useCollectionPointStore } from '@/stores/collectionPoints';
+import { useAdministrationUserStore } from '@/stores/administrationUser';
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -47,6 +48,7 @@ const serviceStore = useServiceStore();
 const addresseeStore = useAddresseeStore();
 const deliveryGroupStore = useDeliveryGroupStore();
 const collectionPointStore = useCollectionPointStore();
+const administrationUserStore = useAdministrationUserStore();
 const { role, userId } = storeToRefs(userStore);
 orderStore.initList(router);
 serviceStore.initList(router);
@@ -54,6 +56,8 @@ addresseeStore.initList(router);
 deliveryGroupStore.initList(router);
 collectionPointStore.initList(router);
 const { element: order, activeForm } = storeToRefs(orderStore);
+if (role.value != 'Customer')
+  administrationUserStore.initList(router);
 
 const openForm = () => {
   order.value = {};
