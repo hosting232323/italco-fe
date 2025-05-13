@@ -12,7 +12,7 @@
           :class="isMobile ? '' : 'mr-2'"
           v-model="selectedService"
           label="Servizio"
-          :items="services.filter(service => service.users.map(user => user.user_id).includes(order.user_id))"
+          :items="getServices()"
           item-title="name"
           item-value="id"
           :rules="validation.requiredRules"
@@ -51,7 +51,7 @@
           :class="isMobile ? '' : 'mr-2'"
           v-model="order.collection_point_id"
           label="Punto di Ritiro"
-          :items="collectionPoints.filter(collectionPoint => collectionPoint.user_id == order.user_id)"
+          :items="getCollectionPoints()"
           item-title="name"
           item-value="id"
           :rules="validation.requiredRules"
@@ -62,7 +62,7 @@
           :class="isMobile ? '' : 'ml-2'"
           v-model="order.addressee_id"
           label="Anagrafica"
-          :items="addressees.filter(addressee => addressee.user_id == order.user_id)"
+          :items="getAddressees()"
           item-title="name"
           item-value="id"
           :rules="validation.requiredRules"
@@ -90,13 +90,20 @@
       </v-col>
     </v-row>
     <v-textarea
+      v-if="role == 'Customer'"
+      v-model="order.customer_note"
+      label="Note"
+      rows="3"
+    />
+    <v-textarea
+      v-else
       v-model="order.operator_note"
       label="Note"
       rows="3"
     />
     <FormButtons
       :loading="loading"
-      @cancel="emits('goBack')"
+      @cancel="exitFunction"
     />
   </v-form>
 </template>
@@ -111,6 +118,7 @@ import orderUtils from '@/utils/order';
 import { useRouter } from 'vue-router';
 import validation from '@/utils/validation';
 
+import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
 import { useServiceStore } from '@/stores/service';
 import { useAddresseeStore } from '@/stores/addressee';
@@ -119,19 +127,45 @@ import { useCollectionPointStore } from '@/stores/collectionPoints';
 const form = ref(null);
 const loading = ref(false);
 const router = useRouter();
-const selectedService = ref(null);
 const isMobile = mobile.setupMobileUtils();
 const emits = defineEmits(['goBack']);
 
+const userStore = useUserStore();
 const orderStore = useOrderStore();
 const serviceStore = useServiceStore();
 const addresseeStore = useAddresseeStore();
 const collectionPointStore = useCollectionPointStore();
+const { role } = storeToRefs(userStore);
 const { list: services } = storeToRefs(serviceStore);
 const { list: addressees } = storeToRefs(addresseeStore);
 const { element: order, activeForm } = storeToRefs(orderStore);
 const { list: collectionPoints } = storeToRefs(collectionPointStore);
+
+const selectedService = ref(order.value.id ? services.value.find(service => service.id == order.value.service_ids[0]).id : null);
 if (!order.value.products) order.value.products = [];
+
+const getServices = () => {
+  return role.value == 'Customer' ? services.value :
+    services.value.filter(service => service.users.map(user => user.user_id).includes(order.value.user_id));
+};
+
+const getCollectionPoints = () => {
+  return role.value == 'Customer' ? collectionPoints.value :
+    collectionPoints.value.filter(collectionPoint => collectionPoint.user_id == order.value.user_id);
+};
+
+const getAddressees = () => {
+  return role.value == 'Customer' ? addressees.value :
+    addressees.value.filter(addressee => addressee.user_id == order.value.user_id);
+};
+
+const exitFunction = () => {
+  if (order.value.id) {
+    order.value = {};
+    activeForm.value = false;
+  } else
+    emits('goBack');
+};
 
 const addService = () => {
   if (!order.value.service_ids)
@@ -147,13 +181,23 @@ const sendOrder = async () => {
   if (!(await form.value.validate()).valid) return;
 
   loading.value = true;
-  orderStore.createElement(router, function (data) {
-    loading.value = false;
-    if (data.status == 'ok') {
-      order.value = {};
-      orderStore.initList(router);
-      activeForm.value = false;
-    }
-  });
+  if (order.value.id)
+    orderStore.updateElement(router, function (data) {
+      loading.value = false;
+      if (data.status == 'ok') {
+        order.value = {};
+        orderStore.initList(router);
+        activeForm.value = false;
+      }
+    });
+  else
+    orderStore.createElement(router, function (data) {
+      loading.value = false;
+      if (data.status == 'ok') {
+        order.value = {};
+        orderStore.initList(router);
+        activeForm.value = false;
+      }
+    });
 };
 </script>

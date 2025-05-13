@@ -2,7 +2,15 @@
   <v-dialog max-width="1500">
     <template v-slot:activator="{ props: activatorProps }">
       <v-row no-gutters>
-        <v-col cols="6">
+        <v-col cols="4">
+          <v-btn
+            icon="mdi-pencil"
+            variant="text"
+            :color="theme.current.value.primaryColor"
+            @click="openForm(item)"
+          />
+        </v-col>
+        <v-col cols="4">
           <v-btn
             variant="text"
             icon="mdi-file-export"
@@ -11,7 +19,7 @@
             @click="exportPdf(item)"
           />
         </v-col>
-        <v-col cols="6">
+        <v-col cols="4">
           <v-btn
             icon="mdi-image"
             variant="text"
@@ -41,13 +49,24 @@
 import { ref } from 'vue';
 import http from '@/utils/http';
 import { useTheme } from 'vuetify';
+import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
+import { useOrderStore } from '@/stores/order';
 
 const order = ref({});
 const theme = useTheme();
 const router = useRouter();
 const loading = ref(false);
+const orderStore = useOrderStore();
 const props = defineProps(['item']);
+const { element: updatedOrder, activeForm } = storeToRefs(orderStore);
+
+const openForm = (item) => {
+  updatedOrder.value = item;
+  updatedOrder.value.user_id = updatedOrder.value.user.id;
+  updatedOrder.value.service_ids = updatedOrder.value.services.map((service) => service.id);
+  activeForm.value = true;
+};
 
 const exportPdf = async (item) => {
   loading.value = true;

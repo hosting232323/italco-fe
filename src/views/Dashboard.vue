@@ -1,36 +1,34 @@
 <template>
-  <v-container>
-    <h1>
-      Dashboard
-      <v-btn
-        icon="mdi-plus"
-        style="float: right;"
-        variant="text"
-        @click="openForm"
-        v-if="['Admin', 'Operator'].includes(role)"
-      />
-      <OrderImportation v-if="role == 'Admin'" />
-    </h1><hr>
-    <template v-if="role == 'Customer'">
-      <CustomersForm />
+  <v-dialog max-width="1500" v-model="activeForm">
+    <template v-slot:activator>
+      <v-container>
+        <h1>
+          Dashboard
+          <v-btn
+            icon="mdi-plus"
+            style="float: right;"
+            variant="text"
+            @click="openForm"
+            v-if="role != 'Delivery'"
+          />
+          <OrderImportation v-if="role == 'Admin'" />
+        </h1><hr>
+        <OrdersFilters />
+        <OrderTable />
+      </v-container>
     </template>
-    <template v-else>
+    <template v-slot:default>
       <OrderForm v-if="role != 'Delivery'" />
-      <OperatorForm v-if="role == 'Operator'" />
-      <DeliveryForm v-if="role == 'Delivery'" />
+      <!-- <OperatorForm v-if="role == 'Operator'" />
+      <DeliveryForm v-if="role == 'Delivery'" /> -->
     </template>
-    <OrdersFilters />
-    <OrderTable />
-  </v-container>
+  </v-dialog>
 </template>
 
 <script setup>
 import OrderTable from '@/components/orders/Table';
-import OperatorForm from '@/components/operator/Form';
-import DeliveryForm from '@/components/delivery/Form';
-import CustomersForm from '@/components/customers/Form';
 import OrdersFilters from '@/components/orders/Filters';
-import OrderForm from '@/components/orders/ExternalForm';
+import OrderForm from '@/components/orders/FormCard';
 import OrderImportation from '@/components/administration/Importation';
 
 import { storeToRefs } from 'pinia';
@@ -49,7 +47,7 @@ const serviceStore = useServiceStore();
 const addresseeStore = useAddresseeStore();
 const deliveryGroupStore = useDeliveryGroupStore();
 const collectionPointStore = useCollectionPointStore();
-const { role } = storeToRefs(userStore);
+const { role, userId } = storeToRefs(userStore);
 orderStore.initList(router);
 serviceStore.initList(router);
 addresseeStore.initList(router);
@@ -59,6 +57,8 @@ const { element: order, activeForm } = storeToRefs(orderStore);
 
 const openForm = () => {
   order.value = {};
+  if (role.value == 'Customer')
+    order.value.user_id = userId.value;
   activeForm.value = true;
 };
 </script>

@@ -1,56 +1,97 @@
 <template>
-  <v-data-table
-    :items="orders"
-    :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
-    :headers="getHeaders()"
-  >
-    <template v-slot:item.type="{ item }">
-      {{ orderUtils.TYPES.find(type => type.value == item.type)?.title }}
+  <v-dialog max-width="1500">
+    <template v-slot:activator="{ props: activatorProps }">
+      <v-btn
+        v-if="['Admin', 'Operator'].includes(role)"
+        text="Assegna Gruppo Delivery"
+        :color="theme.current.value.primaryColor"
+        v-bind="activatorProps"
+      />
+      <v-data-table
+        :items="orders"
+        :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
+        :headers="getHeaders()"
+        :show-select="['Admin', 'Operator'].includes(role)"
+        v-model:selected="selectedOrders"
+      >
+        <template v-slot:item.type="{ item }">
+          {{ orderUtils.TYPES.find(type => type.value == item.type)?.title }}
+        </template>
+        <template v-slot:item.services="{ item }">
+          {{ item.services ? item.services.map(service => service.name).join(', ') : '' }}
+        </template>
+        <template v-slot:item.collection_point="{ item }">
+          {{ item.collection_point.name }}<br>
+          <p style="font-size: smaller;">{{ getAddress(item.collection_point) }}</p>
+        </template>
+        <template v-slot:item.addressee="{ item }">
+          {{ item.addressee.name }}<br>
+          <p style="font-size: smaller;">{{ getAddress(item.addressee) }}</p>
+        </template>
+        <template v-slot:item.products="{ item }">
+          {{ item.products ? item.products.join(', ') : '' }}
+        </template>
+        <template v-slot:item.status="{ item }">
+          {{ orderUtils.LABELS[item.status] }}
+        </template>
+        <template v-slot:item.price="{ item }">
+          {{ item.price ? item.price.toFixed(2) : '' }}€
+        </template>
+        <template v-slot:item.actions="{ item }">
+          <DeliveryAction :item="item" v-if="role == 'Delivery'" />
+          <Action :item="item" v-if="['Admin', 'Operator'].includes(role)" />
+        </template>
+      </v-data-table>
     </template>
-    <template v-slot:item.services="{ item }">
-      {{ item.services ? item.services.map(service => service.name).join(', ') : '' }}
+    <template v-slot:default="{ isActive }">
+      <v-card title="Assegna Gruppo Delivery">
+        <v-card-text>
+          <v-form ref="form" @submit.prevent="">
+            <v-select
+              v-model="selectedOrders"
+              label="Gruppo Delivery"
+              :items="deliveryGroups"
+              item-title="name"
+              item-value="id"
+              :rules="validation.requiredRules"
+            />
+            <FormButtons
+              :loading="loading"
+              @cancel="isActive = false"
+            />
+          </v-form>
+        </v-card-text>
+      </v-card>
     </template>
-    <template v-slot:item.collection_point="{ item }">
-      {{ item.collection_point.name }}<br>
-      <p style="font-size: smaller;">{{ getAddress(item.collection_point) }}</p>
-    </template>
-    <template v-slot:item.addressee="{ item }">
-      {{ item.addressee.name }}<br>
-      <p style="font-size: smaller;">{{ getAddress(item.addressee) }}</p>
-    </template>
-    <template v-slot:item.products="{ item }">
-      {{ item.products ? item.products.join(', ') : '' }}
-    </template>
-    <template v-slot:item.status="{ item }">
-      {{ orderUtils.LABELS[item.status] }}
-    </template>
-    <template v-slot:item.price="{ item }">
-      {{ item.price ? item.price.toFixed(2) : '' }}€
-    </template>
-    <template v-slot:item.actions="{ item }">
-      <OperatorAction :item="item" v-if="role == 'Operator' && item.status == 'Pending'" />
-      <DeliveryAction :item="item" v-if="role == 'Delivery'" />
-      <Action :item="item" v-if="['Admin', 'Operator'].includes(role)" />
-    </template>
-  </v-data-table>
+  </v-dialog>
 </template>
 
 <script setup>
 import Action from '@/components/orders/Actions';
+import FormButtons from '@/components/FormButtons';
 import DeliveryAction from '@/components/delivery/Actions';
-import OperatorAction from '@/components/operator/Actions';
 
+import { ref } from 'vue';
+import http from '@/utils/http';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import orderUtils from '@/utils/order';
+import { useRouter } from 'vue-router';
+import validation from '@/utils/validation';
 import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
+import { useDeliveryGroupStore } from '@/stores/deliveryGroup';
 
 const theme = useTheme();
+const loading = ref(false);
+const router = useRouter();
+const selectedOrders = ref([]);
 const userStore = useUserStore();
 const orderStore = useOrderStore();
+const deliveryGroupStore = useDeliveryGroupStore();
 const { role } = storeToRefs(userStore);
 const { list: orders } = storeToRefs(orderStore);
+const { list: deliveryGroups } = storeToRefs(deliveryGroupStore);
 
 const getAddress = (item) => {
   return item.address + ', ' + item.city + ', ' + item.province + ', ' + item.cap;
