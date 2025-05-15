@@ -21,7 +21,7 @@
         </v-col>
         <v-col cols="4">
           <v-btn
-            icon="mdi-image"
+            icon="mdi-truck-delivery"
             variant="text"
             :color="theme.current.value.primaryColor"
             v-bind="activatorProps"
@@ -31,14 +31,21 @@
       </v-row>
     </template>
     <template v-slot:default>
-      <v-card :title="`Immagine ordine ${order.id}`">
+      <v-card :title="`Situazione delivery ordine ${order.id}`">
         <v-card-text>
-          <v-img
-            :src="`${http.hostname}order/photo/${item.id}`"
-            :alt="`Immagine ordine ${item.id}`"
-            max-width="1500"
-            max-height="1000"
-          />
+          Motivazione: {{ order.motivation }}<br>
+          <div v-if="order.photos && order.photos.length">
+            <v-img
+              v-for="photo in order.photos"
+              :src="`${http.hostname}order/photo/${photo}`"
+              max-width="1500"
+              max-height="1000"
+              class="mt-4"
+            />
+          </div>
+          <div v-else>
+            Nessuna immagine disponibile.
+          </div>
         </v-card-text>
       </v-card>
     </template>

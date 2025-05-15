@@ -1,35 +1,27 @@
 <template>
-  <v-card
-    :title="getFormTitle()"
-    class="mt-10 mb-5"
-    v-if="activeSecondForm"
-  >
-    <v-card-text>
-      <p class="mb-2">
-        Servizio: {{ order.services.map(service => service.name).join(', ') }}<br>
-        Note Operatore: {{ order.operator_note }}
-      </p>
-      <v-form ref="form" @submit.prevent="submitForm">
-        <v-textarea
-          v-if="['Anomaly', 'Cancelled', 'Delay'].includes(order.status)"
-          v-model="order.motivation"
-          label="Motivazione"
-          rows="3"
-          :rules="['Anomaly', 'Cancelled', 'Delay'].includes(order.status) ? validation.requiredRules : []"
-        />
-        <v-file-input
-          accept="image/*"
-          label="Foto"
-          v-model="order.photo"
-          :rules="['Completed', 'Anomaly'].includes(order.status) ? validation.requiredRules : []"
-        />
-        <FormButtons
-          :loading="loading"
-          @cancel="activeSecondForm = false"
-        />
-      </v-form>
-    </v-card-text>
-  </v-card>
+  <p class="mb-2">
+    Servizio: {{ order.services.map(service => service.name).join(', ') }}<br>
+    Note Operatore: {{ order.operator_note }}
+  </p>
+  <v-form ref="form" @submit.prevent="submitForm">
+    <v-textarea
+      v-if="['Anomaly', 'Cancelled', 'Delay'].includes(order.status)"
+      v-model="order.motivation"
+      label="Motivazione"
+      rows="3"
+      :rules="['Anomaly', 'Cancelled', 'Delay'].includes(order.status) ? validation.requiredRules : []"
+    />
+    <v-file-input multiple
+      accept="image/*"
+      label="Foto"
+      v-model="order.photos"
+      :rules="['Completed', 'Anomaly'].includes(order.status) ? validation.requiredRules : []"
+    />
+    <FormButtons
+      :loading="loading"
+      @cancel="activeForm = false"
+    />
+  </v-form>
 </template>
 
 <script setup>
@@ -45,16 +37,7 @@ const form = ref(null);
 const loading = ref(false);
 const router = useRouter();
 const orderStore = useOrderStore();
-const { element: order, activeSecondForm } = storeToRefs(orderStore);
-
-const getFormTitle = () => {
-  if (order.value.status === 'Completed')
-    return `Completa Ordine ${order.value.id}`;
-  else if (order.value.status === 'Cancelled')
-    return `Annulla Ordine ${order.value.id}`;
-  else if (order.value.status === 'Anomaly')
-    return `Segnala Anomalia Ordine ${order.value.id}`;
-};
+const { element: order, activeForm } = storeToRefs(orderStore);
 
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
@@ -64,7 +47,7 @@ const submitForm = async () => {
     loading.value = false;
     if (data.status == 'ok') {
       order.value = {};
-      activeSecondForm.value = false;
+      activeForm.value = false;
     }
   });
 }

@@ -100,7 +100,6 @@ const getAddress = (item) => {
 };
 
 const assignDeliveryGroup = async (isActive) => {
-  console.log(selectedOrders.value);
   if (!(await form.value.validate()).valid) return;
 
   loading.value = true;
@@ -147,10 +146,7 @@ const getHeaders = () => {
     { title: 'Stato', value: 'status' }
   );
   if (['Admin', 'Operator'].includes(role.value))
-    headers.push(
-      { title: 'Gruppo Delivery', value: 'delivery_group.name' },
-      { title: 'Motivation', value: 'motivation' }
-    );
+    headers.push({ title: 'Gruppo Delivery', value: 'delivery_group.name' });
   if (role.value == 'Admin')
     headers.push({ title: 'Prezzo', value: 'price' });
   headers.push({ title: 'Azioni', key: 'actions' });

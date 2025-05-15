@@ -43,11 +43,13 @@ import { useOrderStore } from '@/stores/order';
 const theme = useTheme();
 const orderStore = useOrderStore();
 const props = defineProps(['item']);
-const { element: order, activeSecondForm } = storeToRefs(orderStore);
+const { element: order, activeForm } = storeToRefs(orderStore);
 
 const openForm = (item, status) => {
   order.value = item;
   order.value.status = status;
-  activeSecondForm.value = true;
+  order.value.user_id = order.value.user.id;
+  order.value.service_ids = order.value.services.map((service) => service.id);
+  activeForm.value = true;
 };
 </script>

@@ -28,6 +28,7 @@ const form = ref(null);
 const loading = ref(false);
 const selectedId = ref(null);
 const orderStore = useOrderStore();
+const emits = defineEmits(['setSubtitle']);
 const administrationUserStore = useAdministrationUserStore();
 const { list: users } = storeToRefs(administrationUserStore);
 const { activeForm, element: order } = storeToRefs(orderStore);
@@ -35,7 +36,7 @@ const { activeForm, element: order } = storeToRefs(orderStore);
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
 
-  subtitle.value = `Punto Vendita: ${users.value.find(user => user.id == selectedId.value).email}`;
   order.value.user_id = selectedId.value;
+  emits('setSubtitle', `Punto Vendita: ${users.value.find(user => user.id == selectedId.value).email}`);
 };
 </script>

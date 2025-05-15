@@ -18,9 +18,7 @@
       </v-container>
     </template>
     <template v-slot:default>
-      <OrderForm v-if="role != 'Delivery'" />
-      <!-- <OperatorForm v-if="role == 'Operator'" />
-      <DeliveryForm v-if="role == 'Delivery'" /> -->
+      <OrderForm />
     </template>
   </v-dialog>
 </template>

@@ -12,8 +12,7 @@ export const useOrderStore = defineStore('order', {
     element: {},
     filters: {},
     dateFilter: {},
-    activeForm: false,
-    activeSecondForm: false
+    activeForm: false
   }),
   actions: {
     createElement(router, func) {
@@ -38,14 +37,13 @@ export const useOrderStore = defineStore('order', {
       );
     },
     updateElementWithFormData(router, func) {
+      const content = {data: JSON.stringify(Object.fromEntries(
+        Object.entries(this.element).filter(([key]) => !EXCLUDED_KEYS.concat(['photo']).includes(key))))};
+      this.element.photos.forEach(element => content[element.name] = element);
+
       http.formDataRequest(
         `order/${this.element.id}`,
-        {
-          data: JSON.stringify(Object.fromEntries(
-            Object.entries(this.element).filter(([key]) => !EXCLUDED_KEYS.concat(['photo']).includes(key))
-          )),
-          photo: this.element.photo
-        },
+        content,
         func,
         'PUT',
         router
