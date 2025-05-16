@@ -24,12 +24,6 @@
     />
     <v-list-item
       v-if="role === 'Customer'"
-      to="/addressees"
-      title="Anagrafiche"
-      prepend-icon="mdi-account-multiple-outline"
-    />
-    <v-list-item
-      v-if="role === 'Customer'"
       to="/collection-points"
       title="Punti di Ritiro"
       prepend-icon="mdi-store"

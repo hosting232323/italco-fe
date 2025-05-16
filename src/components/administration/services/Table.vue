@@ -5,10 +5,14 @@
     :headers="[
       { title: 'ID', value: 'id' },
       { title: 'Nome', value: 'name' },
+      { title:'Tipo', value: 'type' },
       { title: 'Descrizione', value: 'description' },
       { title: 'Azioni', key: 'actions' }
     ]"
   >
+    <template v-slot:item.type="{ item }">
+      {{ orderUtils.TYPES.find(type => type.value == item.type)?.title }}
+    </template>
     <template v-slot:item.actions="{ item }">
       <v-row no-gutters>
         <v-col cols="4">
@@ -44,6 +48,7 @@
 <script setup>
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
+import orderUtils from '@/utils/order';
 import { useRouter } from 'vue-router';
 import { useServiceStore } from '@/stores/service';
 

@@ -6,47 +6,9 @@
       :items="orderUtils.TYPES"
       :rules="validation.requiredRules"
     />
+    <ProductServiceInput />
     <v-row no-gutters>
-      <v-col cols="12" md="6">
-        <v-select
-          :class="isMobile ? '' : 'mr-2'"
-          v-model="selectedService"
-          label="Servizio"
-          :items="getServices()"
-          item-title="name"
-          item-value="id"
-          :rules="validation.requiredRules"
-          menu
-        >
-          <template v-slot:item="{ props }">
-            <v-list-item
-              v-bind="props"
-              @click="addService"
-            />
-          </template>
-        </v-select>
-        <v-chip
-          class="mr-2 mb-2"
-          v-for="(serviceId, index) in order.service_ids"
-          closable
-          @click:close="removeService(index)"
-        >
-          {{ services.find(service => service.id == serviceId).name }}
-        </v-chip>
-      </v-col>
-      <v-col cols="12" md="6">
-        <v-text-field
-          :class="isMobile ? '' : 'ml-2'"
-          v-for="(_product, index) in order.products?.concat({})"
-          v-model="order.products[index]"
-          label="Prodotto"
-          :append-icon="order.products.length > index ? 'mdi-delete' : ''"
-          @click:append="order.products.length > index ? order.products.splice(index, 1) : null"
-        />
-      </v-col>
-    </v-row>
-    <v-row no-gutters>
-      <v-col cols="12" md="6">
+      <v-col cols="12" md="3">
         <v-autocomplete
           :class="isMobile ? '' : 'mr-2'"
           v-model="order.collection_point_id"
@@ -57,14 +19,27 @@
           :rules="validation.requiredRules"
         />
       </v-col>
-      <v-col cols="12" md="6">
-        <v-autocomplete
+      <v-col cols="12" md="4">
+        <v-text-field
+          :class="isMobile ? '' : 'ml-2 mr-2'"
+          v-model="order.addressee"
+          label="Destinatario"
+          :rules="validation.requiredRules"
+        />
+      </v-col>
+      <v-col cols="12" md="4">
+        <v-text-field
+          :class="isMobile ? '' : 'ml-2 mr-2'"
+          v-model="order.address"
+          label="Indirizzo"
+          :rules="validation.requiredRules"
+        />
+      </v-col>
+      <v-col cols="12" md="1">
+        <v-text-field
           :class="isMobile ? '' : 'ml-2'"
-          v-model="order.addressee_id"
-          label="Anagrafica"
-          :items="getAddressees()"
-          item-title="name"
-          item-value="id"
+          v-model="order.cap"
+          label="CAP"
           :rules="validation.requiredRules"
         />
       </v-col>
@@ -110,6 +85,7 @@
 
 <script setup>
 import FormButtons from '@/components/FormButtons';
+import ProductServiceInput from '@/components/orders/ProductServiceInput';
 
 import { ref } from 'vue';
 import mobile from '@/utils/mobile';
@@ -120,43 +96,24 @@ import validation from '@/utils/validation';
 
 import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
-import { useServiceStore } from '@/stores/service';
-import { useAddresseeStore } from '@/stores/addressee';
 import { useCollectionPointStore } from '@/stores/collectionPoints';
 
 const form = ref(null);
 const loading = ref(false);
 const router = useRouter();
-const isMobile = mobile.setupMobileUtils();
 const emits = defineEmits(['goBack']);
+const isMobile = mobile.setupMobileUtils();
 
 const userStore = useUserStore();
 const orderStore = useOrderStore();
-const serviceStore = useServiceStore();
-const addresseeStore = useAddresseeStore();
 const collectionPointStore = useCollectionPointStore();
 const { role } = storeToRefs(userStore);
-const { list: services } = storeToRefs(serviceStore);
-const { list: addressees } = storeToRefs(addresseeStore);
 const { element: order, activeForm } = storeToRefs(orderStore);
 const { list: collectionPoints } = storeToRefs(collectionPointStore);
-
-const selectedService = ref(order.value.id ? services.value.find(service => service.id == order.value.service_ids[0]).id : null);
-if (!order.value.products) order.value.products = [];
-
-const getServices = () => {
-  return role.value == 'Customer' ? services.value :
-    services.value.filter(service => service.users.map(user => user.user_id).includes(order.value.user_id));
-};
 
 const getCollectionPoints = () => {
   return role.value == 'Customer' ? collectionPoints.value :
     collectionPoints.value.filter(collectionPoint => collectionPoint.user_id == order.value.user_id);
-};
-
-const getAddressees = () => {
-  return role.value == 'Customer' ? addressees.value :
-    addressees.value.filter(addressee => addressee.user_id == order.value.user_id);
 };
 
 const exitFunction = () => {
@@ -167,18 +124,9 @@ const exitFunction = () => {
     emits('goBack');
 };
 
-const addService = () => {
-  if (!order.value.service_ids)
-    order.value.service_ids = [];
-  order.value.service_ids.push(selectedService.value);
-};
-
-const removeService = (index) => {
-  order.value.service_ids.splice(index, 1);
-};
-
 const sendOrder = async () => {
   if (!(await form.value.validate()).valid) return;
+  if (!order.value.products || Object.keys(order.value.products).length == 0) return;
 
   loading.value = true;
   if (order.value.id)

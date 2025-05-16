@@ -7,7 +7,7 @@
     <v-card-text>
       <v-form ref="form" @submit.prevent="submitForm">
         <v-row no-gutters>
-          <v-col cols="12" md="6">
+          <v-col cols="12" md="4">
             <v-text-field
               :class="isMobile ? '' : 'mr-2'"
               v-model="service.name"
@@ -15,7 +15,15 @@
               :rules="validation.requiredRules"
             />
           </v-col>
-          <v-col cols="12" md="6">
+          <v-col cols="12" md="4">
+            <v-select
+              v-model="service.type"
+              label="Tipo"
+              :items="orderUtils.TYPES"
+              :rules="validation.requiredRules"
+            />
+          </v-col>
+          <v-col cols="12" md="4">
             <v-text-field
               :class="isMobile ? '' : 'ml-2'"
               v-model="service.description"
@@ -38,6 +46,7 @@ import FormButtons from '@/components/FormButtons';
 import { ref } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
+import orderUtils from '@/utils/order';
 import { useRouter } from 'vue-router';
 import validation from '@/utils/validation';
 import { useServiceStore } from '@/stores/service';

@@ -17,19 +17,20 @@
         <template v-slot:item.type="{ item }">
           {{ orderUtils.TYPES.find(type => type.value == item.type)?.title }}
         </template>
-        <template v-slot:item.services="{ item }">
-          {{ item.services ? item.services.map(service => service.name).join(', ') : '' }}
+        <template v-slot:item.productsServices="{ item }">
+          <template v-for="product in Object.keys(item.products)">
+            <b>{{ product }}</b>:
+            {{ item.products[product].map(service => service.name).join(', ') }}
+            <br>
+          </template>
+        </template>
+        <template v-slot:item.addressee="{ item }">
+          {{ item.addressee }}<br>
+          <p style="font-size: smaller;">{{ item.address }}, {{ item.cap }}</p>
         </template>
         <template v-slot:item.collection_point="{ item }">
           {{ item.collection_point.name }}<br>
           <p style="font-size: smaller;">{{ getAddress(item.collection_point) }}</p>
-        </template>
-        <template v-slot:item.addressee="{ item }">
-          {{ item.addressee.name }}<br>
-          <p style="font-size: smaller;">{{ getAddress(item.addressee) }}</p>
-        </template>
-        <template v-slot:item.products="{ item }">
-          {{ item.products ? item.products.join(', ') : '' }}
         </template>
         <template v-slot:item.status="{ item }">
           {{ orderUtils.LABELS[item.status] }}
@@ -121,29 +122,25 @@ const getHeaders = () => {
   const headers = [
     { title: 'ID', value: 'id' },
     { title:'Tipo', value: 'type' },
-    { title:'Prodotti', value: 'products' }
-  ];
-  if (role.value != 'Customer')
-    headers.push({ title: 'Servizi', value: 'services' });
-  headers.push(
-    { title: 'Punto Vendita', value: 'user.email' },
-    { title: 'Punto di Ritiro', value: 'collection_point' },
-    { title: 'Anagrafica', value: 'addressee' }
-  );
-  if (['Customer', 'Operator'].includes(role.value))
+    { title: 'Stato', value: 'status' },
+    { title:'Prodotti Servizi', value: 'productsServices' },
+    { title: 'Destinatario', value: 'addressee' },
+    { title: 'Punto di Ritiro', value: 'collection_point' }
+];
+  if (role.value == 'Customer')
     headers.push({ title: 'Note', value: 'customer_note' });
   else
     headers.push(
       { title: 'Note Punto Vendita', value: 'customer_note' },
-      { title: 'Note Operatori', value: 'operator_note' }
+      { title: 'Note Operatori', value: 'operator_note' },
+      { title: 'Punto Vendita', value: 'user.email' }
     );
   headers.push(
     { title: 'D.P.C.', value: 'dpc' },
     { title: 'D.R.C.', value: 'drc' },
     { title: 'Data Assegnazione', value: 'assignament_date' },
     { title: 'Data Consegna', value: 'booking_date' },
-    { title: 'Data Creazione', value: 'created_at' },
-    { title: 'Stato', value: 'status' }
+    { title: 'Data Creazione', value: 'created_at' }
   );
   if (['Admin', 'Operator'].includes(role.value))
     headers.push({ title: 'Gruppo Delivery', value: 'delivery_group.name' });
