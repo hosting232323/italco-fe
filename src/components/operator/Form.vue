@@ -46,6 +46,7 @@ import { ref } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
+import storesUtils from '@/utils/stores';
 import validation from '@/utils/validation';
 import { useOrderStore } from '@/stores/order';
 import { useDeliveryGroupStore } from '@/stores/deliveryGroup';
@@ -57,7 +58,7 @@ const orderStore = useOrderStore();
 const isMobile = mobile.setupMobileUtils();
 const deliveryGroupStore = useDeliveryGroupStore();
 const { element: order, activeSecondForm } = storeToRefs(orderStore);
-const { list: deliveryGroups } = storeToRefs(deliveryGroupStore);
+const deliveryGroups = storesUtils.getStoresList(deliveryGroupStore, router);
 
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;

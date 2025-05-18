@@ -40,13 +40,15 @@
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
+import storesUtils from '@/utils/stores';
 import { useDeliveryGroupStore } from '@/stores/deliveryGroup';
 
 const theme = useTheme();
 const router = useRouter();
 const props = defineProps(['activatorProps']);
 const deliveryGroupStore = useDeliveryGroupStore();
-const { list: deliveryGroups, element: deliveryGroup } = storeToRefs(deliveryGroupStore);
+const { element: deliveryGroup } = storeToRefs(deliveryGroupStore);
+const deliveryGroups = storesUtils.getStoresList(deliveryGroupStore, router)
 
 const deleteItem = (item) => {
   deliveryGroupStore.deleteElement(item, router, function() {

@@ -3,8 +3,9 @@ import { defineStore } from 'pinia';
 
 export const useAdministrationUserStore = defineStore('administrationUser', {
   state: () => ({
-    element: {},
     list: [],
+    element: {},
+    ready: false,
     activeForm: false
   }),
   actions: {

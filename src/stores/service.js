@@ -3,8 +3,9 @@ import { defineStore } from 'pinia';
 
 export const useServiceStore = defineStore('service', {
   state: () => ({
-    element: {},
     list: [],
+    element: {},
+    ready: false,
     activeForm: false
   }),
   actions: {

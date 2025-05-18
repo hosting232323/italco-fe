@@ -46,8 +46,8 @@
 <script setup>
 import { ref } from 'vue';
 import { useTheme } from 'vuetify';
-import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
+import storesUtils from '@/utils/stores';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
 const element = ref({});
@@ -56,7 +56,7 @@ const theme = useTheme();
 const dialog = ref(false);
 const router = useRouter();
 const administrationUserStore = useAdministrationUserStore();
-const { list: users } = storeToRefs(administrationUserStore);
+const users = storesUtils.getStoresList(administrationUserStore, router);
 
 const deleteItem = (item, force = false) => {
   administrationUserStore.deleteElement(force, item, router, function(data) {

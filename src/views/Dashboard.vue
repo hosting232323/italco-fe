@@ -30,29 +30,12 @@ import OrderForm from '@/components/orders/FormCard';
 import OrderImportation from '@/components/administration/Importation';
 
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
-import { useServiceStore } from '@/stores/service';
-import { useDeliveryGroupStore } from '@/stores/deliveryGroup';
-import { useCollectionPointStore } from '@/stores/collectionPoints';
-import { useAdministrationUserStore } from '@/stores/administrationUser';
-
-const router = useRouter();
 const userStore = useUserStore();
 const orderStore = useOrderStore();
-const serviceStore = useServiceStore();
-const deliveryGroupStore = useDeliveryGroupStore();
-const collectionPointStore = useCollectionPointStore();
-const administrationUserStore = useAdministrationUserStore();
 const { role, userId } = storeToRefs(userStore);
-orderStore.initList(router);
-serviceStore.initList(router);
-deliveryGroupStore.initList(router);
-collectionPointStore.initList(router);
 const { element: order, activeForm } = storeToRefs(orderStore);
-if (role.value != 'Customer')
-  administrationUserStore.initList(router);
 
 const openForm = () => {
   order.value = {};

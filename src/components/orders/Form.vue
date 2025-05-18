@@ -92,6 +92,7 @@ import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import orderUtils from '@/utils/order';
 import { useRouter } from 'vue-router';
+import storesUtils from '@/utils/stores';
 import validation from '@/utils/validation';
 
 import { useUserStore } from '@/stores/user';
@@ -109,7 +110,7 @@ const orderStore = useOrderStore();
 const collectionPointStore = useCollectionPointStore();
 const { role } = storeToRefs(userStore);
 const { element: order, activeForm } = storeToRefs(orderStore);
-const { list: collectionPoints } = storeToRefs(collectionPointStore);
+const collectionPoints = storesUtils.getStoreList(collectionPointStore, router);
 
 const getCollectionPoints = () => {
   return role.value == 'Customer' ? collectionPoints.value :

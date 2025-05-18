@@ -78,6 +78,7 @@ import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import orderUtils from '@/utils/order';
 import { useRouter } from 'vue-router';
+import storesUtils from '@/utils/stores';
 import validation from '@/utils/validation';
 import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
@@ -93,8 +94,8 @@ const orderStore = useOrderStore();
 const selectedDeliveryGroup = ref(null);
 const deliveryGroupStore = useDeliveryGroupStore();
 const { role } = storeToRefs(userStore);
-const { list: orders } = storeToRefs(orderStore);
-const { list: deliveryGroups } = storeToRefs(deliveryGroupStore);
+const orders = storesUtils.getStoresList(orderStore, router);
+const deliveryGroups = storesUtils.getStoresList(deliveryGroupStore, router);
 
 const getAddress = (item) => {
   return item.address + ', ' + item.city + ', ' + item.province + ', ' + item.cap;

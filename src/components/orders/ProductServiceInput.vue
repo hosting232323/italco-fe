@@ -67,6 +67,7 @@
 import { ref } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
+import storesUtils from '@/utils/stores';
 import validation from '@/utils/validation';
 import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
@@ -79,7 +80,7 @@ const serviceStore = useServiceStore();
 const { role } = storeToRefs(userStore);
 const isMobile = mobile.setupMobileUtils();
 const { element: order } = storeToRefs(orderStore);
-const { list: services } = storeToRefs(serviceStore);
+const services = storesUtils.getStoresList(serviceStore, router);
 
 const selectedServices = ref([]);
 const selectedProduct = ref(null);

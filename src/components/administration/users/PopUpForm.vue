@@ -21,6 +21,7 @@ import FormButtons from '@/components/FormButtons';
 import { ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
+import storesUtils from '@/utils/stores';
 import validation from '@/utils/validation';
 import { useDeliveryGroupStore } from '@/stores/deliveryGroup';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
@@ -32,7 +33,7 @@ const router = useRouter();
 const emits = defineEmits(['closeForm']);
 const deliveryGroupStore = useDeliveryGroupStore();
 const administrationUserStore = useAdministrationUserStore();
-const { list: users } = storeToRefs(administrationUserStore);
+const users = storesUtils.getStoresList(administrationUserStore, router);
 const { element: deliveryGroup } = storeToRefs(deliveryGroupStore);
 
 const submitForm = async () => {

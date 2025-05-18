@@ -19,13 +19,10 @@ import CollectionPointForm from '@/components/customers/collectionPoints/Form';
 import CollectionPointTable from '@/components/customers/collectionPoints/Table';
 
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import { useCollectionPointStore } from '@/stores/collectionPoints';
 
-const router = useRouter();
 const collectionPointStore = useCollectionPointStore();
 const { activeForm, element: collectionPoint } = storeToRefs(collectionPointStore);
-collectionPointStore.initList(router);
 
 const openForm = () => {
   collectionPoint.value = {};

@@ -11,6 +11,7 @@ export const useOrderStore = defineStore('order', {
     list: [],
     element: {},
     filters: {},
+    ready: false,
     dateFilter: {},
     activeForm: false
   }),

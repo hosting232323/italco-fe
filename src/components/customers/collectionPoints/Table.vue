@@ -39,12 +39,14 @@
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
+import storesUtils from '@/utils/stores';
 import { useCollectionPointStore } from '@/stores/collectionPoints';
 
 const theme = useTheme();
 const router = useRouter();
 const collectionPointStore = useCollectionPointStore();
-const { list: collectionPoints, element: collectionPoint, activeForm } = storeToRefs(collectionPointStore);
+const { element: collectionPoint, activeForm } = storeToRefs(collectionPointStore);
+const collectionPoints = storesUtils.getStoresList(collectionPointStore, router);
 
 const openForm = (item) => {
   collectionPoint.value = item;

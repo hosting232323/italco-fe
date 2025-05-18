@@ -121,6 +121,7 @@ import { storeToRefs } from 'pinia';
 import mobile from '@/utils/mobile';
 import orderUtils from '@/utils/order';
 import { useRouter } from 'vue-router';
+import storesUtils from '@/utils/stores';
 import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
 import { useServiceStore } from '@/stores/service';
@@ -139,10 +140,10 @@ const isMobile = mobile.setupMobileUtils();
 const collectionPointStore = useCollectionPointStore();
 const administrationUserStore = useAdministrationUserStore();
 const { role } = storeToRefs(userStore);
-const { list: services } = storeToRefs(serviceStore);
 const { filters, dateFilter } = storeToRefs(orderStore);
-const { list: users } = storeToRefs(administrationUserStore);
-const { list: collectionPoints } = storeToRefs(collectionPointStore);
+const services = storesUtils.getStoresList(serviceStore, router);
+const users = storesUtils.getStoresList(administrationUserStore, router);
+const collectionPoints = storesUtils.getStoresList(collectionPointStore, router);
 
 const filterOrder = async () => {
   if (!(await form.value.validate()).valid) return;

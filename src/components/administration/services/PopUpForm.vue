@@ -40,6 +40,7 @@ import { ref } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
+import storesUtils from '@/utils/stores';
 import validation from '@/utils/validation';
 import { useServiceStore } from '@/stores/service';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
@@ -54,7 +55,7 @@ const emits = defineEmits(['closeForm']);
 const isMobile = mobile.setupMobileUtils();
 const administrationUserStore = useAdministrationUserStore();
 const { element: service } = storeToRefs(serviceStore);
-const { list: users } = storeToRefs(administrationUserStore);
+const users = storesUtils.getStoreList(administrationUserStore, router);
 
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;

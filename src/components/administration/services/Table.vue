@@ -50,13 +50,15 @@ import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import orderUtils from '@/utils/order';
 import { useRouter } from 'vue-router';
+import storesUtils from '@/utils/stores';
 import { useServiceStore } from '@/stores/service';
 
 const theme = useTheme();
 const router = useRouter();
 const serviceStore = useServiceStore();
 const props = defineProps(['activatorProps']);
-const { list: services, element: service, activeForm } = storeToRefs(serviceStore);
+const { element: service, activeForm } = storeToRefs(serviceStore);
+const services = storesUtils.getStoresList(serviceStore, router);
 
 const openForm = (item) => {
   service.value = item;

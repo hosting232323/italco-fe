@@ -20,18 +20,21 @@ import FormButtons from '@/components/FormButtons';
 
 import { ref } from 'vue';
 import { storeToRefs } from 'pinia';
+import { useRouter } from 'vue-router';
+import storesUtils from '@/utils/stores';
 import validation from '@/utils/validation';
 import { useOrderStore } from '@/stores/order';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
 const form = ref(null);
 const loading = ref(false);
+const router = useRouter();
 const selectedId = ref(null);
 const orderStore = useOrderStore();
 const emits = defineEmits(['setSubtitle']);
 const administrationUserStore = useAdministrationUserStore();
-const { list: users } = storeToRefs(administrationUserStore);
 const { activeForm, element: order } = storeToRefs(orderStore);
+const users = storesUtils.getStoresList(administrationUserStore, router);
 
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;

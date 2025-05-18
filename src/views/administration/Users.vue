@@ -40,17 +40,13 @@ import DeliveryGroupForm from '@/components/administration/users/DeliveryGroupFo
 import DeliveryGroupTable from '@/components/administration/users/DeliveryGroupTable';
 
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import { useDeliveryGroupStore } from '@/stores/deliveryGroup';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
-const router = useRouter();
 const deliveryGroupStore = useDeliveryGroupStore();
 const administrationUserStore = useAdministrationUserStore();
 const { activeForm: userForm, element: user } = storeToRefs(administrationUserStore);
 const { activeForm: deliveryGroupForm, element: deliveryGroup } = storeToRefs(deliveryGroupStore);
-deliveryGroupStore.initList(router);
-administrationUserStore.initList(router);
 
 const openUserForm = () => {
   user.value = {};
