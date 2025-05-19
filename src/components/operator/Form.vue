@@ -58,7 +58,7 @@ const orderStore = useOrderStore();
 const isMobile = mobile.setupMobileUtils();
 const deliveryGroupStore = useDeliveryGroupStore();
 const { element: order, activeSecondForm } = storeToRefs(orderStore);
-const deliveryGroups = storesUtils.getStoresList(deliveryGroupStore, router);
+const deliveryGroups = storesUtils.getStoreList(deliveryGroupStore, router);
 
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;

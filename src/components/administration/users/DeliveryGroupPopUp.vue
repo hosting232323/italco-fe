@@ -1,7 +1,7 @@
 <template>
   <v-card
     title="Utenti associati"
-    :subtitle="`Gruppo: ${deliveryGroup.name}`"
+    :subtitle="`Gruppo Delivery: ${deliveryGroup.name}`"
   >
     <template v-slot:append>
       <v-btn
@@ -18,8 +18,8 @@
 </template>
 
 <script setup>
-import PopUpForm from '@/components/administration/users/PopUpForm';
-import PopUpTable from '@/components/administration/users/PopUpTable';
+import PopUpForm from '@/components/administration/users/DeliveryGroupPopUpForm';
+import PopUpTable from '@/components/administration/users/DeliveryGroupPopUpTable';
 
 import { ref } from 'vue';
 import { storeToRefs } from 'pinia';

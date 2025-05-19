@@ -59,7 +59,7 @@ const router = useRouter();
 const isMobile = mobile.setupMobileUtils();
 const administrationUserStore = useAdministrationUserStore();
 const { element: user, activeForm } = storeToRefs(administrationUserStore);
-const users = storesUtils.getStoresList(administrationUserStore, router);
+const users = storesUtils.getStoreList(administrationUserStore, router);
 
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;

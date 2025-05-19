@@ -46,7 +46,7 @@ const theme = useTheme();
 const router = useRouter();
 const collectionPointStore = useCollectionPointStore();
 const { element: collectionPoint, activeForm } = storeToRefs(collectionPointStore);
-const collectionPoints = storesUtils.getStoresList(collectionPointStore, router);
+const collectionPoints = storesUtils.getStoreList(collectionPointStore, router);
 
 const openForm = (item) => {
   collectionPoint.value = item;

@@ -1,16 +1,16 @@
 <template>
   <v-form ref="form" @submit.prevent="submitForm">
     <v-autocomplete
-      v-model="selectedId"
-      label="Punto Vendita"
-      :items="users.filter(user => user.role == 'Customer')"
+      v-model="userId"
+      label="Utente"
+      :items="users.filter(user => user.role == 'Delivery')"
       item-title="email"
       item-value="id"
       :rules="validation.requiredRules"
     />
     <FormButtons
       :loading="loading"
-      @cancel="activeForm = false"
+      @cancel="emits('closeForm');"
     />
   </v-form>
 </template>
@@ -23,23 +23,30 @@ import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import validation from '@/utils/validation';
-import { useOrderStore } from '@/stores/order';
+import { useDeliveryGroupStore } from '@/stores/deliveryGroup';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
 const form = ref(null);
+const userId = ref(null);
 const loading = ref(false);
 const router = useRouter();
-const selectedId = ref(null);
-const orderStore = useOrderStore();
-const emits = defineEmits(['setSubtitle']);
+const emits = defineEmits(['closeForm']);
+const deliveryGroupStore = useDeliveryGroupStore();
 const administrationUserStore = useAdministrationUserStore();
-const { activeForm, element: order } = storeToRefs(orderStore);
 const users = storesUtils.getStoreList(administrationUserStore, router);
+const { element: deliveryGroup } = storeToRefs(deliveryGroupStore);
 
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
 
-  order.value.user_id = selectedId.value;
-  emits('setSubtitle', `Punto Vendita: ${users.value.find(user => user.id == selectedId.value).email}`);
+  loading.value = true;
+  deliveryGroupStore.assignUser(userId.value, router, function (data) {
+    loading.value = false;
+    if (data.status == 'ok') {
+      deliveryGroupStore.initList(router);
+      deliveryGroup.value.users.push(data.user);
+      emits('closeForm');
+    }
+  });
 };
 </script>

@@ -94,8 +94,8 @@ const orderStore = useOrderStore();
 const selectedDeliveryGroup = ref(null);
 const deliveryGroupStore = useDeliveryGroupStore();
 const { role } = storeToRefs(userStore);
-const orders = storesUtils.getStoresList(orderStore, router);
-const deliveryGroups = storesUtils.getStoresList(deliveryGroupStore, router);
+const orders = storesUtils.getStoreList(orderStore, router);
+const deliveryGroups = storesUtils.getStoreList(deliveryGroupStore, router);
 
 const getAddress = (item) => {
   return item.address + ', ' + item.city + ', ' + item.province + ', ' + item.cap;

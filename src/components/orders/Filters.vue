@@ -141,9 +141,9 @@ const collectionPointStore = useCollectionPointStore();
 const administrationUserStore = useAdministrationUserStore();
 const { role } = storeToRefs(userStore);
 const { filters, dateFilter } = storeToRefs(orderStore);
-const services = storesUtils.getStoresList(serviceStore, router);
-const users = storesUtils.getStoresList(administrationUserStore, router);
-const collectionPoints = storesUtils.getStoresList(collectionPointStore, router);
+const services = storesUtils.getStoreList(serviceStore, router);
+const users = storesUtils.getStoreList(administrationUserStore, router);
+const collectionPoints = storesUtils.getStoreList(collectionPointStore, router);
 
 const filterOrder = async () => {
   if (!(await form.value.validate()).valid) return;

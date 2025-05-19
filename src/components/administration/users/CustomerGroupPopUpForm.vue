@@ -3,7 +3,7 @@
     <v-autocomplete
       v-model="userId"
       label="Utente"
-      :items="users.filter(user => user.role == 'Delivery')"
+      :items="users.filter(user => user.role == 'Customer')"
       item-title="email"
       item-value="id"
       :rules="validation.requiredRules"
@@ -23,7 +23,7 @@ import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import validation from '@/utils/validation';
-import { useDeliveryGroupStore } from '@/stores/deliveryGroup';
+import { useCustomerGroupStore } from '@/stores/customerGroup';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
 const form = ref(null);
@@ -31,20 +31,20 @@ const userId = ref(null);
 const loading = ref(false);
 const router = useRouter();
 const emits = defineEmits(['closeForm']);
-const deliveryGroupStore = useDeliveryGroupStore();
+const customerGroupStore = useCustomerGroupStore();
 const administrationUserStore = useAdministrationUserStore();
-const users = storesUtils.getStoresList(administrationUserStore, router);
-const { element: deliveryGroup } = storeToRefs(deliveryGroupStore);
+const users = storesUtils.getStoreList(administrationUserStore, router);
+const { element: customerGroup } = storeToRefs(customerGroupStore);
 
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
 
   loading.value = true;
-  deliveryGroupStore.assignUser(userId.value, router, function (data) {
+  customerGroupStore.assignUser(userId.value, router, function (data) {
     loading.value = false;
     if (data.status == 'ok') {
-      deliveryGroupStore.initList(router);
-      deliveryGroup.value.users.push(data.user);
+      customerGroupStore.initList(router);
+      customerGroup.value.users.push(data.user);
       emits('closeForm');
     }
   });

@@ -1,6 +1,6 @@
 <template>
   <v-data-table
-    :items="deliveryGroups"
+    :items="customerGroups"
     :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
     :headers="[
       { title: 'Nome', value: 'name' },
@@ -26,7 +26,7 @@
             icon="mdi-account-group"
             variant="text"
             :color="theme.current.value.primaryColor"
-            @click="emits('openPopUp', item, 'deliveryGroup')"
+            @click="emits('openPopUp', item, 'customerGroup')"
           />
         </v-col>
       </v-row>
@@ -38,17 +38,17 @@
 import { useTheme } from 'vuetify';
 import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
-import { useDeliveryGroupStore } from '@/stores/deliveryGroup';
+import { useCustomerGroupStore } from '@/stores/customerGroup';
 
 const theme = useTheme();
 const router = useRouter();
-const emits = defineEmits(['activatorProps']);
-const deliveryGroupStore = useDeliveryGroupStore();
-const deliveryGroups = storesUtils.getStoreList(deliveryGroupStore, router)
+const emits = defineEmits(['openPopUp']);
+const customerGroupStore = useCustomerGroupStore();
+const customerGroups = storesUtils.getStoreList(customerGroupStore, router);
 
 const deleteItem = (item) => {
-  deliveryGroupStore.deleteElement(item, router, function() {
-    deliveryGroupStore.initList(router);
+  customerGroupStore.deleteElement(item, router, function() {
+    customerGroupStore.initList(router);
   });
 };
 </script>

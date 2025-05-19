@@ -80,7 +80,7 @@ const serviceStore = useServiceStore();
 const { role } = storeToRefs(userStore);
 const isMobile = mobile.setupMobileUtils();
 const { element: order } = storeToRefs(orderStore);
-const services = storesUtils.getStoresList(serviceStore, router);
+const services = storesUtils.getStoreList(serviceStore, router);
 
 const selectedServices = ref([]);
 const selectedProduct = ref(null);

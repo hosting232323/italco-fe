@@ -58,7 +58,7 @@ const router = useRouter();
 const serviceStore = useServiceStore();
 const props = defineProps(['activatorProps']);
 const { element: service, activeForm } = storeToRefs(serviceStore);
-const services = storesUtils.getStoresList(serviceStore, router);
+const services = storesUtils.getStoreList(serviceStore, router);
 
 const openForm = (item) => {
   service.value = item;

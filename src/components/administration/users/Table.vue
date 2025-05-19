@@ -56,7 +56,7 @@ const theme = useTheme();
 const dialog = ref(false);
 const router = useRouter();
 const administrationUserStore = useAdministrationUserStore();
-const users = storesUtils.getStoresList(administrationUserStore, router);
+const users = storesUtils.getStoreList(administrationUserStore, router);
 
 const deleteItem = (item, force = false) => {
   administrationUserStore.deleteElement(force, item, router, function(data) {
