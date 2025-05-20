@@ -48,14 +48,30 @@
       <v-card title="Assegna Gruppo Delivery">
         <v-card-text>
           <v-form ref="form" @submit.prevent="assignDeliveryGroup(isActive)">
-            <v-select
-              v-model="selectedDeliveryGroup"
-              label="Gruppo Delivery"
-              :items="deliveryGroups"
-              item-title="name"
-              item-value="id"
-              :rules="validation.requiredRules"
-            />
+            <v-row no-gutters>
+              <v-col cols="12" md="6">
+                <v-select
+                  v-model="selectedDeliveryGroup"
+                  :class="isMobile ? '' : 'mr-2'"
+                  label="Gruppo Delivery"
+                  :items="deliveryGroups"
+                  item-title="name"
+                  item-value="id"
+                  :rules="validation.requiredRules"
+                />
+              </v-col>
+              <v-col cols="12" md="6">
+                <v-select
+                  v-model="selectedTransport"
+                  :class="isMobile ? '' : 'ml-2'"
+                  label="Veicolo"
+                  :items="transports"
+                  item-title="name"
+                  item-value="id"
+                  :rules="validation.requiredRules"
+                />
+              </v-col>
+            </v-row>
             <FormButtons
               :loading="loading"
               @cancel="isActive.value = false"
@@ -82,6 +98,7 @@ import storesUtils from '@/utils/stores';
 import validation from '@/utils/validation';
 import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
+import { useTransportStore } from '@/stores/transport';
 import { useDeliveryGroupStore } from '@/stores/deliveryGroup';
 
 const form = ref(null);
@@ -91,10 +108,13 @@ const router = useRouter();
 const selectedOrders = ref([]);
 const userStore = useUserStore();
 const orderStore = useOrderStore();
+const selectedTransport = ref(null);
 const selectedDeliveryGroup = ref(null);
+const transportStore = useTransportStore();
 const deliveryGroupStore = useDeliveryGroupStore();
 const { role } = storeToRefs(userStore);
 const orders = storesUtils.getStoreList(orderStore, router);
+const transports = storesUtils.getStoreList(transportStore, router);
 const deliveryGroups = storesUtils.getStoreList(deliveryGroupStore, router);
 
 const getAddress = (item) => {

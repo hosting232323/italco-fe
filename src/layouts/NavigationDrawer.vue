@@ -11,10 +11,22 @@
       prepend-icon="mdi-view-dashboard"
     />
     <v-list-item
+      v-if="['Admin', 'Operator'].includes(role)"
+      to="/schedules"
+      title="Borderò"
+      prepend-icon="mdi-text-box-multiple-outline"
+    />
+    <v-list-item
       v-if="role === 'Admin'"
       to="/services"
       title="Servizi"
       prepend-icon="mdi-clipboard-list"
+    />
+    <v-list-item
+      v-if="role === 'Admin'"
+      to="/transports"
+      title="Veicoli"
+      prepend-icon="mdi-truck-delivery"
     />
     <v-list-item
       v-if="role === 'Admin'"

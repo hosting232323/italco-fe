@@ -37,6 +37,16 @@ const routes = [
         component: () => import('@/views/administration/Users.vue')
       },
       {
+        path: 'transports',
+        name: 'Veicoli',
+        component: () => import('@/views/administration/Transports.vue')
+      },
+      {
+        path: 'schedules',
+        name: 'Borderò',
+        component: () => import('@/views/operator/Schedules.vue')
+      },
+      {
         path: 'collection-points',
         name: 'Punti di ritiro',
         component: () => import('@/views/customer/CollectionPoints.vue')

@@ -67,6 +67,7 @@
 import { ref } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
+import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import validation from '@/utils/validation';
 import { useUserStore } from '@/stores/user';
@@ -74,6 +75,7 @@ import { useOrderStore } from '@/stores/order';
 import { useServiceStore } from '@/stores/service';
 
 const form = ref(null);
+const router = useRouter();
 const userStore = useUserStore();
 const orderStore = useOrderStore();
 const serviceStore = useServiceStore();
