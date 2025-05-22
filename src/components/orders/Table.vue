@@ -12,7 +12,7 @@
         :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
         :headers="getHeaders()"
         :show-select="['Admin', 'Operator'].includes(role)"
-        v-model="selectedOrders"
+        v-model="schedule.order_ids"
       >
         <template v-slot:item.type="{ item }">
           {{ orderUtils.TYPES.find(type => type.value == item.type)?.title }}
@@ -45,98 +45,36 @@
       </v-data-table>
     </template>
     <template v-slot:default="{ isActive }">
-      <v-card title="Assegna Gruppo Delivery">
-        <v-card-text>
-          <v-form ref="form" @submit.prevent="assignDeliveryGroup(isActive)">
-            <v-row no-gutters>
-              <v-col cols="12" md="6">
-                <v-select
-                  v-model="selectedDeliveryGroup"
-                  :class="isMobile ? '' : 'mr-2'"
-                  label="Gruppo Delivery"
-                  :items="deliveryGroups"
-                  item-title="name"
-                  item-value="id"
-                  :rules="validation.requiredRules"
-                />
-              </v-col>
-              <v-col cols="12" md="6">
-                <v-select
-                  v-model="selectedTransport"
-                  :class="isMobile ? '' : 'ml-2'"
-                  label="Veicolo"
-                  :items="transports"
-                  item-title="name"
-                  item-value="id"
-                  :rules="validation.requiredRules"
-                />
-              </v-col>
-            </v-row>
-            <FormButtons
-              :loading="loading"
-              @cancel="isActive.value = false"
-            />
-          </v-form>
-        </v-card-text>
-      </v-card>
+      <ScheduleForm @cancel="isActive = false" />
     </template>
   </v-dialog>
 </template>
 
 <script setup>
 import Action from '@/components/orders/Actions';
-import FormButtons from '@/components/FormButtons';
 import DeliveryAction from '@/components/delivery/Actions';
+import ScheduleForm from '@/components/operator/schedules/Form';
 
-import { ref } from 'vue';
-import http from '@/utils/http';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import orderUtils from '@/utils/order';
 import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
-import validation from '@/utils/validation';
 import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
-import { useTransportStore } from '@/stores/transport';
-import { useDeliveryGroupStore } from '@/stores/deliveryGroup';
+import { useScheduleStore } from '@/stores/schedule';
 
-const form = ref(null);
 const theme = useTheme();
-const loading = ref(false);
 const router = useRouter();
-const selectedOrders = ref([]);
 const userStore = useUserStore();
 const orderStore = useOrderStore();
-const selectedTransport = ref(null);
-const selectedDeliveryGroup = ref(null);
-const transportStore = useTransportStore();
-const deliveryGroupStore = useDeliveryGroupStore();
+const scheduleStore = useScheduleStore();
 const { role } = storeToRefs(userStore);
+const { element: schedule } = storeToRefs(scheduleStore);
 const orders = storesUtils.getStoreList(orderStore, router);
-const transports = storesUtils.getStoreList(transportStore, router);
-const deliveryGroups = storesUtils.getStoreList(deliveryGroupStore, router);
 
 const getAddress = (item) => {
   return item.address + ', ' + item.city + ', ' + item.province + ', ' + item.cap;
-};
-
-const assignDeliveryGroup = async (isActive) => {
-  if (!(await form.value.validate()).valid) return;
-
-  loading.value = true;
-  http.postRequest('order/delivery-group', {
-    delivery_group_id: selectedDeliveryGroup.value,
-    order_ids: selectedOrders.value
-  }, function (data) {
-    loading.value = false;
-    if (data.status == 'ok') {
-      orderStore.initList(router);
-      selectedOrders.value = [];
-      selectedDeliveryGroup.value = null;
-      isActive.value = false;
-    }
-  }, 'PUT', router);
 };
 
 const getHeaders = () => {
@@ -163,8 +101,6 @@ const getHeaders = () => {
     { title: 'Data Consegna', value: 'booking_date' },
     { title: 'Data Creazione', value: 'created_at' }
   );
-  if (['Admin', 'Operator'].includes(role.value))
-    headers.push({ title: 'Gruppo Delivery', value: 'delivery_group.name' });
   if (role.value == 'Admin')
     headers.push({ title: 'Prezzo', value: 'price' });
   headers.push({ title: 'Azioni', key: 'actions' });
