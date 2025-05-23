@@ -6,30 +6,35 @@
     </v-list-item>
     <v-divider class="mb-4" />
     <v-list-item
+      id="menu-dashboard"
       to="/dashboard"
       title="Dashboard"
       prepend-icon="mdi-view-dashboard"
     />
     <v-list-item
       v-if="['Admin', 'Operator'].includes(role)"
+      id="menu-bordero"
       to="/schedules"
       title="Borderò"
       prepend-icon="mdi-text-box-multiple-outline"
     />
     <v-list-item
       v-if="role === 'Admin'"
+      id="menu-servizi"
       to="/services"
       title="Servizi"
       prepend-icon="mdi-clipboard-list"
     />
     <v-list-item
       v-if="role === 'Admin'"
+      id="menu-veicoli"
       to="/transports"
       title="Veicoli"
       prepend-icon="mdi-truck-delivery"
     />
     <v-list-item
       v-if="role === 'Admin'"
+      id="menu-utenti"
       to="/users"
       title="Utenti"
       prepend-icon="mdi-account-group"
@@ -42,6 +47,7 @@
     />
     <v-list-item
       v-if="role === 'Customer'"
+      id="menu-punti-ritiro"
       to="/collection-points"
       title="Punti di Ritiro"
       prepend-icon="mdi-store"
@@ -50,6 +56,7 @@
     <v-list-item
       @click="handleLogout"
       title="Logout"
+      id="menu-logout"
       prepend-icon="mdi-logout"
     />
   </v-navigation-drawer>
