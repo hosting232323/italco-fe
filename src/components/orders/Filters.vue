@@ -6,19 +6,28 @@
       </v-expansion-panel-title>
       <v-expansion-panel-text class="mt-5">
         <v-form ref="form" @submit.prevent="filterOrder">
-          <v-autocomplete
-            v-if="role != 'Customer'"
-            v-model="filters['ItalcoUser.id']"
-            label="Punto Vendita"
-            :items="users.filter(user => user.role == 'Customer')"
-            item-title="email"
-            item-value="id"
-            clearable
-          />
+          <OperatoreFilters v-if="role != 'Customer'" />
           <v-row no-gutters>
-            <v-col cols="12" md="6">
-              <v-autocomplete
+            <v-col cols="12" md="3">
+              <v-text-field
                 :class="isMobile ? '' : 'mr-2'"
+                v-model="filters['Order.id']"
+                label="ID Ordine"
+                type="number"
+                clearable
+              />
+            </v-col>
+            <v-col cols="12" md="3">
+              <v-text-field
+                :class="isMobile ? '' : 'ml-2 mr-2'"
+                v-model="filters['Order.addressee']"
+                label="Destinatario"
+                clearable
+              />
+            </v-col>
+            <v-col cols="12" md="3">
+              <v-autocomplete
+                :class="isMobile ? '' : 'ml-2 mr-2'"
                 v-model="filters['CollectionPoint.id']"
                 label="Punto di Ritiro"
                 :items="collectionPoints"
@@ -27,7 +36,7 @@
                 clearable
               />
             </v-col>
-            <v-col cols="12" md="6">
+            <v-col cols="12" md="3">
               <v-autocomplete
                 :class="isMobile ? '' : 'ml-2'"
                 v-model="filters['Service.id']"
@@ -93,7 +102,8 @@
   </v-expansion-panels>
   <v-row
     v-if="role == 'Admin' && !panel && filters['ItalcoUser.id'] && dateFilter.start_date && dateFilter.end_date"
-  no-gutters>
+    no-gutters
+  >
     <v-col cols="8" style="font-size: smaller;">
       Punto Vendita: {{ filters['ItalcoUser.id'] }}<br>
       Data di Inizio Intervallo: {{ dateFilter.start_date }}<br>
@@ -113,6 +123,7 @@
 
 <script setup>
 import FormButtons from '@/components/FormButtons';
+import OperatoreFilters from '@/components/operator/Filters';
 
 import { ref } from 'vue';
 import http from '@/utils/http';
@@ -126,7 +137,6 @@ import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
 import { useServiceStore } from '@/stores/service';
 import { useCollectionPointStore } from '@/stores/collectionPoints';
-import { useAdministrationUserStore } from '@/stores/administrationUser';
 
 const form = ref(null);
 const panel = ref(null);
@@ -138,11 +148,9 @@ const orderStore = useOrderStore();
 const serviceStore = useServiceStore();
 const isMobile = mobile.setupMobileUtils();
 const collectionPointStore = useCollectionPointStore();
-const administrationUserStore = useAdministrationUserStore();
 const { role } = storeToRefs(userStore);
 const { filters, dateFilter } = storeToRefs(orderStore);
 const services = storesUtils.getStoreList(serviceStore, router);
-const users = storesUtils.getStoreList(administrationUserStore, router);
 const collectionPoints = storesUtils.getStoreList(collectionPointStore, router);
 
 const filterOrder = async () => {

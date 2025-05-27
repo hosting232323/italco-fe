@@ -27,14 +27,16 @@ const TYPES = [
 ];
 
 const formatFilters = (filters) => {
-  return Object.keys(filters).map(key => {
-    return {
-      value: filters[key],
-      model: key.split('.')[0],
-      field: key.split('.')[1]
-    };
-  });
-}
+  return Object.keys(filters)
+    .filter(key => filters[key] !== null)
+    .map(key => {
+      return {
+        value: filters[key],
+        model: key.split('.')[0],
+        field: key.split('.')[1]
+      };
+    });
+};
 
 export default {
   LABELS,

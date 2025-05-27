@@ -44,7 +44,7 @@ const theme = useTheme();
 const router = useRouter();
 const emits = defineEmits(['activatorProps']);
 const deliveryGroupStore = useDeliveryGroupStore();
-const deliveryGroups = storesUtils.getStoreList(deliveryGroupStore, router)
+const deliveryGroups = storesUtils.getStoreList(deliveryGroupStore, router);
 
 const deleteItem = (item) => {
   deliveryGroupStore.deleteElement(item, router, function() {

@@ -5,6 +5,7 @@
         :items="schedules"
         :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
         :headers="[
+          { title: 'ID', value: 'id' },
           { title: 'Data', value: 'date' },
           { title: 'Gruppo Delivery', value: 'delivery_group.name' },
           { title: 'Veicolo', key: 'transport.name' },
