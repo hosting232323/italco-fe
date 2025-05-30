@@ -50,6 +50,7 @@ export const useDeliveryGroupStore = defineStore('deliveryGroup', {
     },
     setList(data) {
       this.list = data.delivery_groups;
+      this.ready = true;
     }
   }
 });

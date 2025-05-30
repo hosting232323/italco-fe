@@ -49,6 +49,7 @@ export const useTransportStore = defineStore('transport', {
     },
     setList(data) {
       this.list = data.transports;
+      this.ready = true;
     }
   }
 });

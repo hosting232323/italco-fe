@@ -5,6 +5,14 @@ const requiredRules = [
   }
 ];
 
+const arrayRules = [
+  (value) => {
+    if (value.length > 0) return true;
+    return 'Campo obbligatorio';
+  }
+];
+
 export default {
-  requiredRules
+  requiredRules,
+  arrayRules
 };

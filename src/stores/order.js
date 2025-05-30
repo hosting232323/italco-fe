@@ -61,8 +61,18 @@ export const useOrderStore = defineStore('order', {
         router
       );
     },
+    initListDelivery(router) {
+      http.getRequest(
+        'order/delivery',
+        {},
+        this.setList,
+        'GET',
+        router
+      );
+    },
     setList(data) {
       this.list = data.orders;
+      this.ready = true;
     }
   }
 });

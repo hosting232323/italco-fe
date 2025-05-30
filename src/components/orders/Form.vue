@@ -8,20 +8,9 @@
     />
     <ProductServiceInput />
     <v-row no-gutters>
-      <v-col cols="12" md="3">
-        <v-autocomplete
-          :class="isMobile ? '' : 'mr-2'"
-          v-model="order.collection_point_id"
-          label="Punto di Ritiro"
-          :items="getCollectionPoints()"
-          item-title="name"
-          item-value="id"
-          :rules="validation.requiredRules"
-        />
-      </v-col>
       <v-col cols="12" md="4">
         <v-text-field
-          :class="isMobile ? '' : 'ml-2 mr-2'"
+          :class="isMobile ? '' : 'mr-2'"
           v-model="order.addressee"
           label="Destinatario"
           :rules="validation.requiredRules"
@@ -37,24 +26,42 @@
       </v-col>
       <v-col cols="12" md="1">
         <v-text-field
-          :class="isMobile ? '' : 'ml-2'"
+          :class="isMobile ? '' : 'ml-2 mr-2'"
           v-model="order.cap"
           label="CAP"
           :rules="validation.requiredRules"
         />
       </v-col>
+      <v-col cols="12" md="3">
+        <v-text-field
+          :class="isMobile ? '' : 'ml-2'"
+          v-model="order.addressee_contact"
+          label="Recapito"
+        />
+      </v-col>
     </v-row>
     <v-row no-gutters>
-      <v-col cols="12" md="6">
-        <v-text-field
+      <v-col cols="12" md="4">
+        <v-autocomplete
           :class="isMobile ? '' : 'mr-2'"
+          v-model="order.collection_point_id"
+          label="Punto di Ritiro"
+          :items="getCollectionPoints()"
+          item-title="name"
+          item-value="id"
+          :rules="validation.requiredRules"
+        />
+      </v-col>
+      <v-col cols="12" md="4">
+        <v-text-field
+          :class="isMobile ? '' : 'ml-2 mr-2'"
           v-model="order.dpc"
           label="Data Promessa al Cliente"
           type="date"
           :rules="validation.requiredRules"
         />
       </v-col>
-      <v-col cols="12" md="6">
+      <v-col cols="12" md="4">
         <v-text-field
           :class="isMobile ? '' : 'ml-2'"
           v-model="order.drc"
