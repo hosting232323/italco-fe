@@ -50,6 +50,7 @@ export const useCustomerGroupStore = defineStore('customerGroup', {
     },
     setList(data) {
       this.list = data.customer_groups;
+      this.ready = true;
     }
   }
 });

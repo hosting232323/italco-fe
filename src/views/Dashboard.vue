@@ -13,8 +13,11 @@
           />
           <OrderImportation v-if="role == 'Admin'" />
         </h1><hr>
-        <OrdersFilters />
-        <OrderTable />
+        <template v-if="role != 'Delivery'">
+          <OrdersFilters />
+          <OrderTable />
+        </template>
+        <DeliveryDashboard v-else />
       </v-container>
     </template>
     <template v-slot:default>
@@ -25,13 +28,15 @@
 
 <script setup>
 import OrderTable from '@/components/orders/Table';
-import OrdersFilters from '@/components/orders/Filters';
+import DeliveryDashboard from '@/components/delivery/Dashboard';
 import OrderForm from '@/components/orders/FormCard';
+import OrdersFilters from '@/components/orders/Filters';
 import OrderImportation from '@/components/administration/Importation';
 
 import { storeToRefs } from 'pinia';
 import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
+
 const userStore = useUserStore();
 const orderStore = useOrderStore();
 const { role, userId } = storeToRefs(userStore);

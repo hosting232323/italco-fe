@@ -49,6 +49,7 @@ export const useCollectionPointStore = defineStore('collectionPoint', {
     },
     setList(data) {
       this.list = data.collection_points;
+      this.ready = true;
     }
   }
 });

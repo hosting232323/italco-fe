@@ -1,11 +1,11 @@
 <template>
-  <v-dialog max-width="1500">
-    <template v-slot:activator="{ props: activatorProps }">
+  <v-dialog max-width="1500" v-model="dialog">
+    <template v-slot:activator>
       <v-btn
         v-if="['Admin', 'Operator'].includes(role)"
         text="Assegna Gruppo Delivery"
         :color="theme.current.value.primaryColor"
-        v-bind="activatorProps"
+        @click="dialog = true"
       />
       <v-data-table
         :items="orders"
@@ -39,22 +39,21 @@
           {{ item.price ? item.price.toFixed(2) : '' }}€
         </template>
         <template v-slot:item.actions="{ item }">
-          <DeliveryAction :item="item" v-if="role == 'Delivery'" />
           <Action :item="item" v-if="['Admin', 'Operator'].includes(role)" />
         </template>
       </v-data-table>
     </template>
-    <template v-slot:default="{ isActive }">
-      <ScheduleForm @cancel="isActive = false" />
+    <template v-slot:default>
+      <ScheduleForm @cancel="dialog = false" />
     </template>
   </v-dialog>
 </template>
 
 <script setup>
 import Action from '@/components/orders/Actions';
-import DeliveryAction from '@/components/delivery/Actions';
 import ScheduleForm from '@/components/operator/schedules/Form';
 
+import { ref } from 'vue';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import orderUtils from '@/utils/order';
@@ -65,6 +64,7 @@ import { useOrderStore } from '@/stores/order';
 import { useScheduleStore } from '@/stores/schedule';
 
 const theme = useTheme();
+const dialog = ref(false);
 const router = useRouter();
 const userStore = useUserStore();
 const orderStore = useOrderStore();
@@ -80,10 +80,11 @@ const getAddress = (item) => {
 const getHeaders = () => {
   const headers = [
     { title: 'ID', value: 'id' },
-    { title:'Tipo', value: 'type' },
+    { title: 'Tipo', value: 'type' },
     { title: 'Stato', value: 'status' },
-    { title:'Prodotti Servizi', value: 'productsServices' },
+    { title: 'Prodotti Servizi', value: 'productsServices' },
     { title: 'Destinatario', value: 'addressee' },
+    { title: 'Recapito', value: 'addressee_contact' },
     { title: 'Punto di Ritiro', value: 'collection_point' }
 ];
   if (role.value == 'Customer')

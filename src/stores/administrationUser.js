@@ -41,6 +41,7 @@ export const useAdministrationUserStore = defineStore('administrationUser', {
     },
     setList(data) {
       this.list = data.users;
+      this.ready = true;
     }
   }
 });

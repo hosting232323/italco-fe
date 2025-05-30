@@ -68,6 +68,7 @@ export const useServiceStore = defineStore('service', {
     },
     setList(data) {
       this.list = data.services;
+      this.ready = true;
     }
   }
 });
