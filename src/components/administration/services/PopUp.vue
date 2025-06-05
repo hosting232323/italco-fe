@@ -21,6 +21,7 @@
             prepend-icon="mdi-currency-eur"
             v-model="price"
             label="Prezzo"
+            id="price"
             :rules="validation.requiredRules"
           />
           <v-btn
