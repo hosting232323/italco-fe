@@ -33,6 +33,7 @@
               <v-btn
                 icon="mdi-file-export"
                 variant="text"
+                :loading="loading"
                 :color="theme.current.value.primaryColor"
                 @click="exportElement(item)"
               />
@@ -44,6 +45,7 @@
 </template>
 
 <script setup>
+import { ref } from 'vue';
 import http from '@/utils/http';
 import { useTheme } from 'vuetify';
 import { useRouter } from 'vue-router';
@@ -53,6 +55,7 @@ import { useScheduleStore } from '@/stores/schedule';
 
 const theme = useTheme();
 const router = useRouter();
+const loading = ref(false);
 const orderStore = useOrderStore();
 const emits = defineEmits(['openPopUp']);
 const scheduleStore = useScheduleStore();
@@ -66,7 +69,10 @@ const deleteItem = (item) => {
 };
 
 const exportElement = async (item) => {
-  http.postRequest(`export/schedule/${item.id}`, {}, function (data) {
+  loading.value = true;
+
+  http.getRequest(`export/schedule/${item.id}`, {}, function (data) {
+    loading.value = false;
     const blob = new Blob([data], { type: 'application/pdf' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -74,7 +80,7 @@ const exportElement = async (item) => {
     a.download = `bordero_${item.id}.pdf`;
     a.click();
     window.URL.revokeObjectURL(url);
-  }, 'POST', router, true)
+  }, 'GET', router, true)
 }
 </script>
 
