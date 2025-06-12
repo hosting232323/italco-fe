@@ -33,7 +33,7 @@
               <v-btn
                 icon="mdi-file-export"
                 variant="text"
-                :loading="loading"
+                :loading="!!loadingMap[item.id]"
                 :color="theme.current.value.primaryColor"
                 @click="exportElement(item)"
               />
@@ -45,7 +45,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, reactive } from 'vue';
 import http from '@/utils/http';
 import { useTheme } from 'vuetify';
 import { useRouter } from 'vue-router';
@@ -60,6 +60,7 @@ const orderStore = useOrderStore();
 const emits = defineEmits(['openPopUp']);
 const scheduleStore = useScheduleStore();
 const schedules = storesUtils.getStoreList(scheduleStore, router);
+const loadingMap = reactive({});
 
 const deleteItem = (item) => {
   scheduleStore.deleteElement(item, router, function() {
@@ -69,10 +70,10 @@ const deleteItem = (item) => {
 };
 
 const exportElement = async (item) => {
-  loading.value = true;
+  loadingMap[item.id] = true;
 
   http.getRequest(`export/schedule/${item.id}`, {}, function (data) {
-    loading.value = false;
+    loadingMap[item.id] = false;
     const blob = new Blob([data], { type: 'application/pdf' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
