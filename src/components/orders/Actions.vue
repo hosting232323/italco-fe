@@ -82,7 +82,7 @@ const openForm = (item) => {
 const exportPdf = async (item) => {
   loading.value = true;
 
-  http.getRequest(`export/${item.id}`, {}, function (data) {
+  http.getRequest(`export/order/${item.id}`, {}, function (data) {
     loading.value = false;
     const blob = new Blob([data], { type: 'application/pdf' });
     const url = window.URL.createObjectURL(blob);

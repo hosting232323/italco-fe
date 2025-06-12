@@ -33,7 +33,9 @@
               <v-btn
                 icon="mdi-file-export"
                 variant="text"
+                :loading="!!loadingMap[item.id]"
                 :color="theme.current.value.primaryColor"
+                @click="exportElement(item)"
               />
             </v-col>
           </v-row>
@@ -43,6 +45,8 @@
 </template>
 
 <script setup>
+import { ref, reactive } from 'vue';
+import http from '@/utils/http';
 import { useTheme } from 'vuetify';
 import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
@@ -55,6 +59,7 @@ const orderStore = useOrderStore();
 const emits = defineEmits(['openPopUp']);
 const scheduleStore = useScheduleStore();
 const schedules = storesUtils.getStoreList(scheduleStore, router);
+const loadingMap = reactive({});
 
 const deleteItem = (item) => {
   scheduleStore.deleteElement(item, router, function() {
@@ -62,6 +67,21 @@ const deleteItem = (item) => {
     scheduleStore.initList(router);
   });
 };
+
+const exportElement = async (item) => {
+  loadingMap[item.id] = true;
+
+  http.getRequest(`export/schedule/${item.id}`, {}, function (data) {
+    loadingMap[item.id] = false;
+    const blob = new Blob([data], { type: 'application/pdf' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `bordero_${item.id}.pdf`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  }, 'GET', router, true)
+}
 </script>
 
 <style scoped>
