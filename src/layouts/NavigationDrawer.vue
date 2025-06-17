@@ -35,6 +35,12 @@
       prepend-icon="mdi-account-group"
     />
     <v-list-item
+      v-if="role === 'Admin'"
+      to="/customer-points"
+      title="Punti Vendita"
+      prepend-icon="mdi-store-marker"
+    />
+    <v-list-item
       v-if="role === 'Customer'"
       to="/collection-points"
       title="Punti di Ritiro"
