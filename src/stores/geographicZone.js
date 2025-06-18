@@ -1,7 +1,7 @@
 import http from '@/utils/http';
 import { defineStore } from 'pinia';
 
-export const useGeographicZoneStore = defineStore('customerGroup', {
+export const useGeographicZoneStore = defineStore('geographicZone', {
   state: () => ({
     list: [],
     element: {},
@@ -11,7 +11,7 @@ export const useGeographicZoneStore = defineStore('customerGroup', {
   actions: {
     createElement(router, func) {
       http.postRequest(
-        'customer-group',
+        'geograpich-zone',
         this.element,
         func,
         'POST',
@@ -20,7 +20,7 @@ export const useGeographicZoneStore = defineStore('customerGroup', {
     },
     initList(router) {
       http.getRequest(
-        'customer-group',
+        'geograpich-zone',
         {},
         this.setList,
         'GET',
@@ -29,22 +29,10 @@ export const useGeographicZoneStore = defineStore('customerGroup', {
     },
     deleteElement(element, router, func) {
       http.getRequest(
-        `customer-group/${element.id}`,
+        `geograpich-zone/${element.id}`,
         {},
         func,
         'DELETE',
-        router
-      );
-    },
-    assignUser(userId, router, func, deassign = false) {
-      http.postRequest(
-        'customer-group/user',
-        {
-          user_id: userId,
-          customer_group_id: deassign ? null : this.element.id
-        },
-        func,
-        'PATCH',
         router
       );
     },
