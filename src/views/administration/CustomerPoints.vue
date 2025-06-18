@@ -30,7 +30,7 @@
     </template>
     <template v-slot:default>
       <CustomerGroupPopUp v-if="popUpType == 'customerGroup'" />
-      <GeographicZonePopUp v-if="popUpType == 'customerGroup'" />
+      <GeographicZonePopUp v-if="popUpType == 'geographicZone'" />
     </template>
   </v-dialog>
 </template>
@@ -60,6 +60,8 @@ const openPopUp = (item, type) => {
   popUpType.value = type;
   if (type == 'customerGroup')
     customerGroup.value = item;
+  else if(type == 'geographicZone')
+    geographicZone.value = item;
 };
 
 const openCustomerGroupForm = () => {

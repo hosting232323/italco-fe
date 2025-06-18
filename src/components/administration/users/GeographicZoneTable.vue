@@ -4,12 +4,23 @@
     :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
     :headers="[
       { title: 'Nome', value: 'name' },
-      { title: 'Vincoli', value: 'constraint' }
+      { title: 'Provincia', value: 'province' },
+      { title: 'Vincoli', value: 'constraint' },
+      { title: 'Azioni', key: 'actions' }
     ]"
   >
-    <template v-slot:item.users="{ item }">
-      {{ item.users.map(user => user.email).join(', ') }}
+    <template v-slot:item.constraint="{ item }">
+
+      <div v-if="item.constraint">
+        <div v-for="(constraint, index) in item.constraint" :key="index">
+          {{ constraint.day_of_week }}: {{ constraint.max_orders }} ordini max
+        </div>
+      </div>
+      <div v-else>
+        Nessun vincolo
+      </div>
     </template>
+
     <template v-slot:item.actions="{ item }">
       <v-row no-gutters>
         <v-col cols="6">
@@ -25,7 +36,7 @@
             icon="mdi-account-group"
             variant="text"
             :color="theme.current.value.primaryColor"
-            @click="emits('openPopUp', item, 'customerGroup')"
+            @click="emits('openPopUp', item, 'geographicZone')"
           />
         </v-col>
       </v-row>
@@ -45,11 +56,11 @@ const emits = defineEmits(['openPopUp']);
 const geographicZoneStore = useGeographicZoneStore();
 const geographicZones = storesUtils.getStoreList(geographicZoneStore, router);
 
-// const deleteItem = (item) => {
-//   customerGroupStore.deleteElement(item, router, function() {
-//     customerGroupStore.initList(router);
-//   });
-// };
+const deleteItem = (item) => {
+  geographicZoneStore.deleteElement(item, router, function() {
+    geographicZoneStore.initList(router);
+  });
+};
 </script>
 
 <style scoped>

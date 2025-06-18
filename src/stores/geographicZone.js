@@ -11,7 +11,7 @@ export const useGeographicZoneStore = defineStore('geographicZone', {
   actions: {
     createElement(router, func) {
       http.postRequest(
-        'geograpich-zone',
+        'geographic-zone',
         this.element,
         func,
         'POST',
@@ -20,7 +20,7 @@ export const useGeographicZoneStore = defineStore('geographicZone', {
     },
     initList(router) {
       http.getRequest(
-        'geograpich-zone',
+        'geographic-zone',
         {},
         this.setList,
         'GET',
@@ -29,7 +29,7 @@ export const useGeographicZoneStore = defineStore('geographicZone', {
     },
     deleteElement(element, router, func) {
       http.getRequest(
-        `geograpich-zone/${element.id}`,
+        `geographic-zone/${element.id}`,
         {},
         func,
         'DELETE',
@@ -37,7 +37,7 @@ export const useGeographicZoneStore = defineStore('geographicZone', {
       );
     },
     setList(data) {
-      this.list = data.customer_groups;
+      this.list = data.geographic_zones;
       this.ready = true;
     }
   }
