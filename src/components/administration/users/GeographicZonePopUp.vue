@@ -12,7 +12,7 @@
     </template>
     <v-card-text>
       <PopUpForm v-if="formFlag" @closeForm="formFlag = false" />
-      <PopUpTable v-if="geographicZone.constraint.length > 0" />
+      <PopUpTable v-if="constraints.length > 0" />
     </v-card-text>
   </v-card>
 </template>
@@ -27,5 +27,5 @@ import { useGeographicZoneStore } from '@/stores/geographicZone';
 
 const formFlag = ref(false);
 const geographicZoneStore = useGeographicZoneStore();
-const { element: geographicZone } = storeToRefs(geographicZoneStore);
+const { element: geographicZone, constraints } = storeToRefs(geographicZoneStore);
 </script>

@@ -36,10 +36,16 @@
       <v-list-item
         v-for="(item, index) in constraints"
         :key="index"
-        :title="`${item.day}: ${item.maxOrders} ordini max`"
-        append-icon="mdi-delete"
-        @click:append="removeConstraint(index)"
-      />
+        :title="`${item.day_of_week}: ${item.max_orders} ordini max`"
+      >
+        <template #append>
+          <v-btn
+            icon="mdi-delete"
+            variant="text"
+            @click.stop="removeConstraint(index)"
+          />
+        </template>
+      </v-list-item>
     </v-list>
 
     <FormButtons
@@ -51,56 +57,58 @@
 
 <script setup>
 import FormButtons from '@/components/FormButtons';
+import { storeToRefs } from 'pinia';
 import { ref } from 'vue';
 import validation from '@/utils/validation';
 import mobile from '@/utils/mobile';
+import { useRouter } from 'vue-router';
+import { useGeographicZoneStore } from '@/stores/geographicZone';
+
+const router = useRouter();
+
+const geographicZoneStore = useGeographicZoneStore();
+const { constraints, element: geographicZone, activeForm } = storeToRefs(geographicZoneStore);
 
 const isMobile = mobile.setupMobileUtils();
-
-
 const form = ref(null);
 const loading = ref(false);
 const emits = defineEmits(['closeForm', 'saveConstraints']);
 
-// Campi del form
 const day = ref('');
 const maxOrders = ref('');
-const constraints = ref([]); // lista dei vincoli salvati
 
 const weekDays = [
   'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì',
   'Venerdì', 'Sabato', 'Domenica'
 ];
 
-// Aggiunge un vincolo alla lista
 function addConstraint() {
   if (!day.value || !maxOrders.value) return;
 
   constraints.value.push({
-    day: day.value,
-    maxOrders: Number(maxOrders.value),
+    day_of_week: day.value,
+    max_orders: Number(maxOrders.value),
   });
 
-  // Reset dei campi
   day.value = '';
   maxOrders.value = '';
 }
 
-// Rimuove un vincolo dalla lista
 function removeConstraint(index) {
   constraints.value.splice(index, 1);
 }
 
-// Submit finale del form
-async function submitForm() {
-  if (!(await form.value.validate()).valid || constraints.value.length === 0) return;
+const submitForm = async () => {
+  if (constraints.value.length == 0) return;
 
   loading.value = true;
-
-  // Qui puoi mandare constraints.value al backend o a uno store
-  console.log('Salvo i vincoli:', constraints.value);
-
-  loading.value = false;
-  emits('closeForm');
+  geographicZoneStore.createConstraint(router, function (data) {
+    loading.value = false;
+    if (data.status == 'ok') {
+      geographicZoneStore.initList(router);
+      geographicZone.value = {};
+      activeForm.value = false;
+    }
+  })
 }
 </script>
