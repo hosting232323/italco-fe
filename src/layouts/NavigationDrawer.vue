@@ -1,5 +1,5 @@
 <template>
-  <v-navigation-drawer permanent rail :color="theme.current.value.primaryColor" app>
+  <v-navigation-drawer permanent expand-on-hover rail :color="theme.current.value.primaryColor" app>
     <v-list-item prepend-icon="mdi-menu" class="mt-2">
       <b>Ares Logistics</b>
       <br>{{ role }}
