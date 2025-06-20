@@ -1,5 +1,5 @@
 <template>
-  <v-navigation-drawer expand-on-hover rail :color="theme.current.value.primaryColor" app>
+  <v-navigation-drawer permanent expand-on-hover rail :color="theme.current.value.primaryColor" app>
     <v-list-item prepend-icon="mdi-menu" class="mt-2">
       <b>Ares Logistics</b>
       <br>{{ role }}
@@ -33,6 +33,12 @@
       to="/users"
       title="Utenti"
       prepend-icon="mdi-account-group"
+    />
+    <v-list-item
+      v-if="role === 'Admin'"
+      to="/customer-points"
+      title="Punti Vendita"
+      prepend-icon="mdi-store-marker"
     />
     <v-list-item
       v-if="role === 'Customer'"

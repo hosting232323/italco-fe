@@ -18,8 +18,8 @@
 </template>
 
 <script setup>
-import PopUpForm from '@/components/administration/users/CustomerGroupPopUpForm';
-import PopUpTable from '@/components/administration/users/CustomerGroupPopUpTable';
+import PopUpForm from '@/components/administration/sellingPoints/CustomerGroupPopUpForm';
+import PopUpTable from '@/components/administration/sellingPoints/CustomerGroupPopUpTable';
 
 import { ref } from 'vue';
 import { storeToRefs } from 'pinia';

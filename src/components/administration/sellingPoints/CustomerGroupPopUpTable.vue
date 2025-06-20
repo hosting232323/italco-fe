@@ -30,8 +30,10 @@ const { element: customerGroup } = storeToRefs(customerGroupStore);
 
 const deleteItem = (item) => {
   customerGroupStore.assignUser(item.id, router, function() {
-    customerGroup.value.users = customerGroup.value.users.filter(user => user.id !== item.id);
     customerGroupStore.initList(router);
+    customerGroup.value.users = customerGroup.value.users.filter(
+      user => user.id !== item.id
+    );
   }, true);
 };
 </script>
