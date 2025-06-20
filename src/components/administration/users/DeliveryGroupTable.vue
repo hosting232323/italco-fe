@@ -26,7 +26,7 @@
             icon="mdi-account-group"
             variant="text"
             :color="theme.current.value.primaryColor"
-            @click="emits('openPopUp', item, 'deliveryGroup')"
+            @click="emits('openPopUp', item)"
           />
         </v-col>
       </v-row>
@@ -42,7 +42,7 @@ import { useDeliveryGroupStore } from '@/stores/deliveryGroup';
 
 const theme = useTheme();
 const router = useRouter();
-const emits = defineEmits(['activatorProps']);
+const emits = defineEmits(['openPopUp']);
 const deliveryGroupStore = useDeliveryGroupStore();
 const deliveryGroups = storesUtils.getStoreList(deliveryGroupStore, router);
 
