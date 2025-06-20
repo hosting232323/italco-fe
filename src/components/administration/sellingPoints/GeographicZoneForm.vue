@@ -11,11 +11,6 @@
           label="Nome"
           :rules="validation.requiredRules"
         />
-        <v-text-field
-          v-model="geographicZone.province"
-          label="Provincia"
-          :rules="validation.requiredRules"
-        />
         <FormButtons
           :loading="loading"
           @cancel="activeForm = false"

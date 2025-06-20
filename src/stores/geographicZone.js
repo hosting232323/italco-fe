@@ -5,7 +5,6 @@ export const useGeographicZoneStore = defineStore('geographicZone', {
   state: () => ({
     list: [],
     element: {},
-    constraints: [],
     ready: false,
     activeForm: false
   }),
@@ -14,19 +13,6 @@ export const useGeographicZoneStore = defineStore('geographicZone', {
       http.postRequest(
         'geographic-zone',
         this.element,
-        func,
-        'POST',
-        router
-      );
-    },
-    createConstraint(router, func) {
-      const payload = {
-        zone_id: this.element.id,
-        constraints: this.constraints
-      };
-      http.postRequest(
-        'geographic-zone/constraint',
-        payload,
         func,
         'POST',
         router
@@ -44,6 +30,27 @@ export const useGeographicZoneStore = defineStore('geographicZone', {
     deleteElement(element, router, func) {
       http.getRequest(
         `geographic-zone/${element.id}`,
+        {},
+        func,
+        'DELETE',
+        router
+      );
+    },
+    createEntity(data, entity, router, func) {
+      http.postRequest(
+        `geographic-zone/${entity}`,
+        {
+          ...data,
+          zone_id: this.element.id
+        },
+        func,
+        'POST',
+        router
+      );
+    },
+    deleteEntity(data, entity, router, func) {
+      http.getRequest(
+        `geographic-zone/${entity}/${data.id}`,
         {},
         func,
         'DELETE',

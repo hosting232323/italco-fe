@@ -1,6 +1,6 @@
 <template>
   <v-card
-    title="Vincoli associati"
+    title="CAP aggiunti o rimossi"
     :subtitle="`Area: ${geographicZone.name}`"
   >
     <template v-slot:append>
@@ -12,14 +12,14 @@
     </template>
     <v-card-text>
       <PopUpForm v-if="formFlag" @closeForm="formFlag = false" />
-      <PopUpTable v-if="constraints.length > 0" />
+      <PopUpTable v-if="geographicZone.codes.length > 0" />
     </v-card-text>
   </v-card>
 </template>
 
 <script setup>
-import PopUpForm from '@/components/administration/users/GeographicZonePopUpForm';
-import PopUpTable from '@/components/administration/users/GeographicZonePopUpTable';
+import PopUpForm from '@/components/administration/sellingPoints/GeographicCodePopUpForm';
+import PopUpTable from '@/components/administration/sellingPoints/GeographicCodePopUpTable';
 
 import { ref } from 'vue';
 import { storeToRefs } from 'pinia';
@@ -27,5 +27,5 @@ import { useGeographicZoneStore } from '@/stores/geographicZone';
 
 const formFlag = ref(false);
 const geographicZoneStore = useGeographicZoneStore();
-const { element: geographicZone, constraints } = storeToRefs(geographicZoneStore);
+const { element: geographicZone } = storeToRefs(geographicZoneStore);
 </script>

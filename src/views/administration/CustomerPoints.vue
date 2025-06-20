@@ -30,18 +30,20 @@
     </template>
     <template v-slot:default>
       <CustomerGroupPopUp v-if="popUpType == 'customerGroup'" />
-      <GeographicZonePopUp v-if="popUpType == 'geographicZone'" />
+      <ConstraintPopUp v-if="popUpType == 'constraint'" />
+      <GeographicCodePopUp v-if="popUpType == 'geographicCode'" />
     </template>
   </v-dialog>
 </template>
 
 <script setup>
-import CustomerGroupForm from '@/components/administration/users/CustomerGroupForm';
-import CustomerGroupPopUp from '@/components/administration/users/CustomerGroupPopUp';
-import CustomerGroupTable from '@/components/administration/users/CustomerGroupTable';
-import GeographicZoneForm from '@/components/administration/users/GeographicZoneForm';
-import GeographicZonePopUp from '@/components/administration/users/GeographicZonePopUp';
-import GeographicZoneTable from '@/components/administration/users/GeographicZoneTable';
+import ConstraintPopUp from '@/components/administration/sellingPoints/ConstraintPopUp';
+import CustomerGroupForm from '@/components/administration/sellingPoints/CustomerGroupForm';
+import CustomerGroupPopUp from '@/components/administration/sellingPoints/CustomerGroupPopUp';
+import CustomerGroupTable from '@/components/administration/sellingPoints/CustomerGroupTable';
+import GeographicZoneForm from '@/components/administration/sellingPoints/GeographicZoneForm';
+import GeographicZoneTable from '@/components/administration/sellingPoints/GeographicZoneTable';
+import GeographicCodePopUp from '@/components/administration/sellingPoints/GeographicCodePopUp';
 
 import { ref } from 'vue';
 import { storeToRefs } from 'pinia';
@@ -60,7 +62,7 @@ const openPopUp = (item, type) => {
   popUpType.value = type;
   if (type == 'customerGroup')
     customerGroup.value = item;
-  else if(type == 'geographicZone')
+  else if(['constraint', 'geographicCode'].includes(type))
     geographicZone.value = item;
 };
 

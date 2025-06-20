@@ -1,11 +1,15 @@
 <template>
-  <!-- <v-data-table
-    :items="geographicZone.users"
+  <v-data-table
+    :items="geographicZone.codes"
     :headers="[
-      { title: 'Nickname', value: 'email' },
+      { title: 'CAP', value: 'code' },
+      { title: 'Tipo', value: 'type' },
       { title: 'Azioni', key: 'actions' }
     ]"
   >
+    <template v-slot:item.type="{ item }">
+      {{ item.type ? 'Aggiunto' : 'Rimosso' }}
+    </template>
     <template v-slot:item.actions="{ item }">
       <v-btn
         icon="mdi-delete"
@@ -14,8 +18,7 @@
         :color="theme.current.value.primaryColor"
       />
     </template>
-  </v-data-table> -->
-  a
+  </v-data-table>
 </template>
 
 <script setup>
@@ -30,9 +33,11 @@ const geographicZoneStore = useGeographicZoneStore();
 const { element: geographicZone } = storeToRefs(geographicZoneStore);
 
 const deleteItem = (item) => {
-  geographicZoneStore.assignUser(item.id, router, function() {
-    geographicZone.value.users = geographicZone.value.users.filter(user => user.id !== item.id);
+  geographicZoneStore.deleteEntity(item, 'code', router, function() {
     geographicZoneStore.initList(router);
+    geographicZone.value.codes = geographicZone.value.codes.filter(
+      code => code.id !== item.id
+    );
   }, true);
 };
 </script>

@@ -27,7 +27,7 @@
       </v-container>
     </template>
     <template v-slot:default>
-      <DeliveryGroupPopUp v-if="popUpType == 'deliveryGroup'" />
+      <DeliveryGroupPopUp />
     </template>
   </v-dialog>
 </template>
@@ -45,17 +45,14 @@ import { useDeliveryGroupStore } from '@/stores/deliveryGroup';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
 const popUp = ref(false);
-const popUpType = ref('');
 const deliveryGroupStore = useDeliveryGroupStore();
 const administrationUserStore = useAdministrationUserStore();
 const { activeForm: userForm, element: user } = storeToRefs(administrationUserStore);
 const { activeForm: deliveryGroupForm, element: deliveryGroup } = storeToRefs(deliveryGroupStore);
 
-const openPopUp = (item, type) => {
+const openPopUp = (item) => {
   popUp.value = true;
-  popUpType.value = type;
-  if (type == 'deliveryGroup')
-    deliveryGroup.value = item;
+  deliveryGroup.value = item;
 };
 
 const openUserForm = () => {
