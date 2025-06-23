@@ -38,7 +38,7 @@ import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
-import { useCollectionPointStore } from '@/stores/collectionPoint';
+import { useCollectionPointStore } from '@/stores/collectionPoints';
 
 const theme = useTheme();
 const router = useRouter();

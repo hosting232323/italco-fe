@@ -19,7 +19,7 @@ import CollectionPointForm from '@/components/customers/collectionPoints/Form';
 import CollectionPointTable from '@/components/customers/collectionPoints/Table';
 
 import { storeToRefs } from 'pinia';
-import { useCollectionPointStore } from '@/stores/collectionPoint';
+import { useCollectionPointStore } from '@/stores/collectionPoints';
 
 const collectionPointStore = useCollectionPointStore();
 const { activeForm, element: collectionPoint } = storeToRefs(collectionPointStore);
