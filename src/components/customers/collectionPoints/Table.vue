@@ -40,7 +40,7 @@ import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
-import { useCollectionPointStore } from '@/stores/collectionPoints';
+import { useCollectionPointStore } from '@/stores/collectionPoint';
 
 const theme = useTheme();
 const router = useRouter();

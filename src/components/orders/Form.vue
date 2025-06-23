@@ -104,7 +104,7 @@ import validation from '@/utils/validation';
 
 import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
-import { useCollectionPointStore } from '@/stores/collectionPoints';
+import { useCollectionPointStore } from '@/stores/collectionPoint';
 
 const form = ref(null);
 const loading = ref(false);
