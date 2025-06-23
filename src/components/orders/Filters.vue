@@ -136,7 +136,7 @@ import storesUtils from '@/utils/stores';
 import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
 import { useServiceStore } from '@/stores/service';
-import { useCollectionPointStore } from '@/stores/collectionPoints';
+import { useCollectionPointStore } from '@/stores/collectionPoint';
 
 const form = ref(null);
 const panel = ref(null);

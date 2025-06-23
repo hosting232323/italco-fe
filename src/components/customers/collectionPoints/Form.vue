@@ -64,7 +64,7 @@ import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import validation from '@/utils/validation';
-import { useCollectionPointStore } from '@/stores/collectionPoints';
+import { useCollectionPointStore } from '@/stores/collectionPoint';
 
 const form = ref(null);
 const loading = ref(false);

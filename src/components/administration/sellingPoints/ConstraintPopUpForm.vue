@@ -5,7 +5,7 @@
         <v-select
           v-model="day"
           label="Giorno della settimana"
-          :items="weekDays"
+          :items="days.weekDays"
           :rules="validation.requiredRules"
           :class="isMobile ? '' : 'mr-2'"
         />
@@ -32,6 +32,7 @@
 import FormButtons from '@/components/FormButtons';
 
 import { ref } from 'vue';
+import days from '@/utils/days';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
@@ -48,10 +49,6 @@ const { element: geographicZone } = storeToRefs(geographicZoneStore);
 
 const day = ref('');
 const maxOrders = ref('');
-const weekDays = [
-  'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì',
-  'Venerdì', 'Sabato', 'Domenica'
-];
 
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
