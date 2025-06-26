@@ -61,13 +61,13 @@ import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/user';
 
-
 const theme = useTheme();
 const router = useRouter();
 const userStore = useUserStore();
 const { role } = storeToRefs(userStore);
 
 const handleLogout = () => {
-  userStore.logout(router);
+  userStore.logout();
+  router.push('/');
 };
 </script>

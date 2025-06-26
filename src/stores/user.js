@@ -16,7 +16,7 @@ export const useUserStore = defineStore('user', {
     userId: 0
   }),
   actions: {
-    logout(router) {
+    logout() {
       this.$reset();
       useOrderStore().$reset();
       useServiceStore().$reset();
@@ -28,7 +28,6 @@ export const useUserStore = defineStore('user', {
       useGeographicZoneStore().$reset();
       useCollectionPointStore().$reset();
       useAdministrationUserStore().$reset();
-      router.push('/');
     }
   }
 });
