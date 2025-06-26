@@ -12,7 +12,15 @@ const arrayRules = [
   }
 ];
 
+const capRules = [
+  (value) => {
+    if (value && value.length === 5) return true;
+    return 'Il CAP deve essere di 5 caratteri';
+  }
+];
+
 export default {
   requiredRules,
-  arrayRules
+  arrayRules,
+  capRules
 };

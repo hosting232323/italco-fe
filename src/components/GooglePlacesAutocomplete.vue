@@ -2,7 +2,7 @@
   <v-text-field
     :id="inputId"
     :label="label"
-    class="wooffy-text-field box-shadow"
+    :class="class"
     v-model="localValue"
     :rules="computedRules"
     @input="handleInput"
@@ -30,6 +30,7 @@ const props = defineProps({
   rules: Array,
   isCameback: Boolean,
   showOtherLocation: Boolean,
+  class: String
 });
 
 const emit = defineEmits(['update:modelValue', 'update:isValid', 'update:showOtherLocation', 'addressComponents']);
@@ -80,13 +81,13 @@ const initAutocomplete = async () => {
 
       const addressComponents = {
         address: '',
-        city: '',
-        cap: '',
-        province: ''
+        cap: ''
       };
 
       let route = '';
       let streetNumber = '';
+      let city = '';
+      let provnce = '';
 
       place.address_components.forEach((component) => {
         const types = component.types;
@@ -97,16 +98,16 @@ const initAutocomplete = async () => {
             streetNumber = component.long_name;
           }
           if (types.includes('locality')) {
-            addressComponents.city = component.long_name;
+            city = component.long_name;
           }
           if (types.includes('postal_code')) {
             addressComponents.cap = component.long_name;
           }
           if (types.includes('administrative_area_level_2')) {
-            addressComponents.province = component.short_name;
+            provnce = component.short_name;
           }
-          addressComponents.address = route + (streetNumber ? ' ' + streetNumber : '');
       })
+      addressComponents.address =  (route ?  streetNumber + ', ': '') + (streetNumber ? ' ' + streetNumber : '') + city + ', ' + provnce;
       emit('addressComponents', addressComponents);
     }
   });

@@ -16,6 +16,7 @@ import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { ref, onMounted } from 'vue';
 import { useUserStore } from '@/stores/user';
+import { loadGoogleMapsScript } from '@/utils/googleMapsScript';
 
 const theme = useTheme();
 const userStore = useUserStore();
@@ -26,5 +27,6 @@ onMounted(() => {
   role.value = localStorage.getItem('user_role');
   userId.value = localStorage.getItem('user_id');
   isReady.value = true;
+  loadGoogleMapsScript();
 });
 </script>

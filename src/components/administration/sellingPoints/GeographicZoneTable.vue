@@ -33,10 +33,10 @@
       <v-row no-gutters>
         <v-col cols="4">
           <v-btn
-            icon="mdi-delete"
+            icon="mdi-map-marker-outline"
             variant="text"
             :color="theme.current.value.primaryColor"
-            @click="deleteItem(item)"
+            @click="emits('openPopUp', item, 'geographicCode')"
           />
         </v-col>
         <v-col cols="4">
@@ -49,10 +49,10 @@
         </v-col>
         <v-col cols="4">
           <v-btn
-            icon="mdi-map-marker-outline"
+            icon="mdi-delete"
             variant="text"
             :color="theme.current.value.primaryColor"
-            @click="emits('openPopUp', item, 'geographicCode')"
+            @click="deleteItem(item)"
           />
         </v-col>
       </v-row>

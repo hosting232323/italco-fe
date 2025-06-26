@@ -17,11 +17,13 @@
         />
       </v-col>
       <v-col cols="12" md="4">
-        <v-text-field
-          :class="isMobile ? '' : 'ml-2 mr-2'"
+        <GooglePlacesAutocomplete
           v-model="order.address"
+          :class="isMobile ? '' : 'ml-2 mr-2'"
           label="Indirizzo"
           :rules="validation.requiredRules"
+          @update:isValid="isLocationValid = $event"
+          @addressComponents="handleAddressComponents"
         />
       </v-col>
       <v-col cols="12" md="1">
@@ -29,7 +31,7 @@
           :class="isMobile ? '' : 'ml-2 mr-2'"
           v-model="order.cap"
           label="CAP"
-          :rules="validation.requiredRules"
+          :rules="[...validation.requiredRules, ...validation.capRules]"
         />
       </v-col>
       <v-col cols="12" md="3">
@@ -94,7 +96,7 @@
 import FormButtons from '@/components/FormButtons';
 import ProductServiceInput from '@/components/orders/ProductServiceInput';
 
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import orderUtils from '@/utils/order';
@@ -106,6 +108,9 @@ import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
 import { useCollectionPointStore } from '@/stores/collectionPoint';
 
+import GooglePlacesAutocomplete from '@/components/GooglePlacesAutocomplete.vue';
+
+const isLocationValid = ref(false);
 const form = ref(null);
 const loading = ref(false);
 const router = useRouter();
@@ -125,7 +130,7 @@ const getCollectionPoints = () => {
 };
 
 const exitFunction = () => {
-  if (order.value.id) {
+  if (order.value.id || role.value == 'Customer') {
     order.value = {};
     activeForm.value = false;
   } else
@@ -155,5 +160,10 @@ const sendOrder = async () => {
         activeForm.value = false;
       }
     });
+};
+
+const handleAddressComponents = (components) => {
+  order.value.address = components.address;
+  order.value.cap = components.cap;
 };
 </script>
