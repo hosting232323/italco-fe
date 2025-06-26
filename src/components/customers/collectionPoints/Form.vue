@@ -13,12 +13,19 @@
         />
         <v-row no-gutters>
           <v-col cols="12" md="6">
-            <v-text-field
+            <GooglePlacesAutocomplete
+              v-model="collectionPoint.address"
+              label="Indirizzo"
+              :rules="validation.requiredRules"
+              @update:isValid="isFromLocationValid = $event"
+              @addressComponents="handleAddressComponents"
+            />
+            <!-- <v-text-field
               :class="isMobile ? '' : 'mr-2'"
               v-model="collectionPoint.address"
               label="Indirizzo"
               :rules="validation.requiredRules"
-            />
+            /> -->
           </v-col>
           <v-col cols="12" md="6">
             <v-text-field
@@ -59,12 +66,16 @@
 <script setup>
 import FormButtons from '@/components/FormButtons';
 
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import validation from '@/utils/validation';
 import { useCollectionPointStore } from '@/stores/collectionPoint';
+import GooglePlacesAutocomplete from '@/components/GooglePlacesAutocomplete.vue';
+import { loadGoogleMapsScript } from '@/utils/googleMapsScript';
+
+
 
 const form = ref(null);
 const loading = ref(false);
@@ -72,6 +83,9 @@ const router = useRouter();
 const isMobile = mobile.setupMobileUtils();
 const collectionPointStore = useCollectionPointStore();
 const { element: collectionPoint, activeForm } = storeToRefs(collectionPointStore);
+
+const isFromLocationValid = ref(false);
+
 
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
@@ -95,4 +109,15 @@ const submitForm = async () => {
       }
     });
 };
+
+const handleAddressComponents = (components) => {
+  collectionPoint.value.address = components.address;
+  collectionPoint.value.city = components.city;
+  collectionPoint.value.cap = components.cap;
+  collectionPoint.value.province = components.province;
+};
+
+onMounted(() => {
+  loadGoogleMapsScript();
+});
 </script>
