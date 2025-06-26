@@ -48,7 +48,7 @@
     />
     <v-divider class="mb-4 mt-4" />
     <v-list-item
-      to="/"
+      @click="handleLogout"
       title="Logout"
       prepend-icon="mdi-logout"
     />
@@ -58,9 +58,16 @@
 <script setup>
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
+import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/user';
 
 const theme = useTheme();
+const router = useRouter();
 const userStore = useUserStore();
 const { role } = storeToRefs(userStore);
+
+const handleLogout = () => {
+  userStore.logout();
+  router.push('/');
+};
 </script>
