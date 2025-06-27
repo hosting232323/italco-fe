@@ -7,8 +7,6 @@
     :rules="computedRules"
     @input="handleInput"
     clearable
-    :append-inner-icon="isCameback ? (showOtherLocation ? 'mdi-minus' : 'mdi-plus') : ''"
-    @click:append-inner="toggleOtherLocation"
   />
 </template>
 
@@ -21,20 +19,16 @@ import {
   defineEmits,
   nextTick,
   computed,
-  getCurrentInstance,
 } from 'vue';
 
 const props = defineProps({
   modelValue: String,
   label: String,
   rules: Array,
-  isCameback: Boolean,
-  showOtherLocation: Boolean,
   customClass: String
 });
 
-const emit = defineEmits(['update:modelValue', 'update:isValid', 'update:showOtherLocation', 'addressComponents']);
-const instance = getCurrentInstance();
+const emit = defineEmits(['update:isValid', 'addressComponents']);
 const localValue = ref(props.modelValue);
 const inputId = ref(
   `google-autocomplete-${Math.random().toString(36).substr(2, 9)}`
@@ -45,11 +39,6 @@ const isValidAddress = ref(true);
 const handleInput = (event) => {
   isValidAddress.value = false;
   emit('update:isValid', false);
-  emit('update:modelValue', event.target.value);
-};
-
-const toggleOtherLocation = () => {
-  emit('update:showOtherLocation', !props.showOtherLocation);
 };
 
 const initAutocomplete = async () => {
@@ -77,7 +66,6 @@ const initAutocomplete = async () => {
 
       isValidAddress.value = true;
       emit('update:isValid', true);
-      emit('update:modelValue', localValue.value);
 
       const addressComponents = {
         address: '',

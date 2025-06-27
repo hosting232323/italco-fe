@@ -96,7 +96,7 @@
 import FormButtons from '@/components/FormButtons';
 import ProductServiceInput from '@/components/orders/ProductServiceInput';
 
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import orderUtils from '@/utils/order';
@@ -112,8 +112,8 @@ import GooglePlacesAutocomplete from '@/components/GooglePlacesAutocomplete.vue'
 
 const form = ref(null);
 const loading = ref(false);
-const isLocationValid = ref(false);
 const router = useRouter();
+const isLocationValid = ref(false);
 const emits = defineEmits(['goBack']);
 const isMobile = mobile.setupMobileUtils();
 

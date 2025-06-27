@@ -15,6 +15,7 @@
           <v-col cols="12" md="6">
             <GooglePlacesAutocomplete
               v-model="collectionPoint.address"
+              :customClass="isMobile ? '' : 'mr-2'"
               label="Indirizzo"
               :rules="validation.requiredRules"
               @update:isValid="isLocationValid = $event"
@@ -42,7 +43,7 @@
 <script setup>
 import FormButtons from '@/components/FormButtons';
 
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
@@ -52,8 +53,8 @@ import GooglePlacesAutocomplete from '@/components/GooglePlacesAutocomplete.vue'
 
 const form = ref(null);
 const loading = ref(false);
-const isLocationValid = ref(false);
 const router = useRouter();
+const isLocationValid = ref(false);
 const isMobile = mobile.setupMobileUtils();
 const collectionPointStore = useCollectionPointStore();
 const { element: collectionPoint, activeForm } = storeToRefs(collectionPointStore);
