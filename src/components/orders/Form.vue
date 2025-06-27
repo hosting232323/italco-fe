@@ -19,7 +19,7 @@
       <v-col cols="12" md="4">
         <GooglePlacesAutocomplete
           v-model="order.address"
-          :class="isMobile ? '' : 'ml-2 mr-2'"
+          :customClass="isMobile ? '' : 'ml-2 mr-2'"
           label="Indirizzo"
           :rules="validation.requiredRules"
           @update:isValid="isLocationValid = $event"

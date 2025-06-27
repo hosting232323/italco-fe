@@ -2,7 +2,7 @@
   <v-text-field
     :id="inputId"
     :label="label"
-    :class="class"
+    :class="customClass"
     v-model="localValue"
     :rules="computedRules"
     @input="handleInput"
@@ -30,7 +30,7 @@ const props = defineProps({
   rules: Array,
   isCameback: Boolean,
   showOtherLocation: Boolean,
-  class: String
+  customClass: String
 });
 
 const emit = defineEmits(['update:modelValue', 'update:isValid', 'update:showOtherLocation', 'addressComponents']);
@@ -107,7 +107,7 @@ const initAutocomplete = async () => {
             provnce = component.short_name;
           }
       })
-      addressComponents.address =  (route ?  streetNumber + ', ': '') + (streetNumber ? ' ' + streetNumber : '') + city + ', ' + provnce;
+      addressComponents.address =  (route ?  route + ', ': '') + (streetNumber ? ' ' + streetNumber + ', ' : '') + city + ', ' + provnce;
       emit('addressComponents', addressComponents);
     }
   });
