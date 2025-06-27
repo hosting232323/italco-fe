@@ -52,13 +52,11 @@ import GooglePlacesAutocomplete from '@/components/GooglePlacesAutocomplete.vue'
 
 const form = ref(null);
 const loading = ref(false);
+const isLocationValid = ref(false);
 const router = useRouter();
 const isMobile = mobile.setupMobileUtils();
 const collectionPointStore = useCollectionPointStore();
 const { element: collectionPoint, activeForm } = storeToRefs(collectionPointStore);
-
-const isLocationValid = ref(false);
-
 
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;

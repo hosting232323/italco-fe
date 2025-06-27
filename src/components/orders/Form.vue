@@ -110,9 +110,9 @@ import { useCollectionPointStore } from '@/stores/collectionPoint';
 
 import GooglePlacesAutocomplete from '@/components/GooglePlacesAutocomplete.vue';
 
-const isLocationValid = ref(false);
 const form = ref(null);
 const loading = ref(false);
+const isLocationValid = ref(false);
 const router = useRouter();
 const emits = defineEmits(['goBack']);
 const isMobile = mobile.setupMobileUtils();
