@@ -6,9 +6,7 @@
       { title: 'ID', value: 'id' },
       { title: 'Nominativo', value: 'name' },
       { title: 'Indirizzo', value: 'address' },
-      { title: 'Città', value: 'city' },
       { title: 'Cap', value: 'cap' },
-      { title: 'Provincia', value: 'province' },
       { title: 'Azioni', key: 'actions' }
     ]"
   >
