@@ -15,18 +15,18 @@
       <v-row no-gutters>
         <v-col cols="6">
           <v-btn
-            icon="mdi-delete"
-            variant="text"
-            :color="theme.current.value.primaryColor"
-            @click="deleteItem(item)"
-          />
-        </v-col>
-        <v-col cols="6">
-          <v-btn
             icon="mdi-account-group"
             variant="text"
             :color="theme.current.value.primaryColor"
             @click="emits('openPopUp', item, 'customerGroup')"
+          />
+        </v-col>
+        <v-col cols="6">
+          <v-btn
+            icon="mdi-delete"
+            variant="text"
+            :color="theme.current.value.primaryColor"
+            @click="deleteItem(item)"
           />
         </v-col>
       </v-row>
