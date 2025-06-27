@@ -6,7 +6,7 @@
           v-model="code"
           label="CAP"
           type="number"
-          :rules="validation.requiredRules"
+          :rules="validation.capRules"
           :class="isMobile ? '' : 'mr-2'"
         />
       </v-col>
