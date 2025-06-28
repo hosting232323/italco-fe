@@ -55,20 +55,20 @@
         />
       </v-col>
       <v-col cols="12" md="4">
-        <v-text-field
-          :class="isMobile ? '' : 'ml-2 mr-2'"
+        <DateField 
           v-model="order.dpc"
           label="Data Promessa al Cliente"
-          type="date"
+          :classStyle="isMobile ? '' : 'ml-2 mr-2'"
+          :allowedDates="allowedDpcDates"
           :rules="validation.requiredRules"
         />
       </v-col>
       <v-col cols="12" md="4">
-        <v-text-field
-          :class="isMobile ? '' : 'ml-2'"
+        <DateField 
           v-model="order.drc"
           label="Data Richiesta dal Cliente"
-          type="date"
+          :classStyle="isMobile ? '' : 'ml-2'"
+          :allowedDates="allowedDrcDates"
           :rules="validation.requiredRules"
         />
       </v-col>
@@ -95,6 +95,7 @@
 <script setup>
 import FormButtons from '@/components/FormButtons';
 import ProductServiceInput from '@/components/orders/ProductServiceInput';
+import DateField from '@/components/DateField';
 
 import { ref } from 'vue';
 import mobile from '@/utils/mobile';
@@ -124,9 +125,29 @@ const { role } = storeToRefs(userStore);
 const { element: order, activeForm } = storeToRefs(orderStore);
 const collectionPoints = storesUtils.getStoreList(collectionPointStore, router);
 
+const dpcMenu = ref(false);
+const drcMenu = ref(false);
+
 const getCollectionPoints = () => {
   return role.value == 'Customer' ? collectionPoints.value :
     collectionPoints.value.filter(collectionPoint => collectionPoint.user_id == order.value.user_id);
+};
+
+const allowedDpcDates = (date) => {
+  const d = new Date(date);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+  return (
+    d >= tomorrow &&
+    d.getDay() !== 0 &&
+    d.getDay() !== 6
+  );
+};
+
+const allowedDrcDates = (date) => {
+  return allowedDpcDates(date);
 };
 
 const exitFunction = () => {
@@ -139,27 +160,23 @@ const exitFunction = () => {
 
 const sendOrder = async () => {
   if (!(await form.value.validate()).valid) return;
-  if (!order.value.products || Object.keys(order.value.products).length == 0) return;
+   if (!order.value.products || Object.keys(order.value.products).length === 0) return;
 
   loading.value = true;
-  if (order.value.id)
-    orderStore.updateElement(router, function (data) {
-      loading.value = false;
-      if (data.status == 'ok') {
-        order.value = {};
-        orderStore.initList(router);
-        activeForm.value = false;
-      }
-    });
-  else
-    orderStore.createElement(router, function (data) {
-      loading.value = false;
-      if (data.status == 'ok') {
-        order.value = {};
-        orderStore.initList(router);
-        activeForm.value = false;
-      }
-    });
+  const callback = (data) => {
+    loading.value = false;
+    if (data.status === 'ok') {
+      order.value = {};
+      orderStore.initList(router);
+      activeForm.value = false;
+    }
+  };
+
+  if (order.value.id) {
+    orderStore.updateElement(router, callback);
+  } else {
+    orderStore.createElement(router, callback);
+  }
 };
 
 const handleAddressComponents = (components) => {
