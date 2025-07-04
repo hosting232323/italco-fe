@@ -10,7 +10,8 @@
   >
     <template v-slot:item.rules="{ item }">
       <div v-for="(rules, index) in item.rules" :key="index">
-        <b>{{ rules.day_of_week }}</b>: {{ rules.max_orders }}
+          <b>{{ days.getDayByValue(rules.day_of_week) }}</b>:
+        {{ rules.max_orders }}
       </div>
     </template>
     <template v-slot:item.actions="{ item }">
@@ -25,6 +26,7 @@
 </template>
 
 <script setup>
+import days from '@/utils/days';
 import { useTheme } from 'vuetify';
 import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';

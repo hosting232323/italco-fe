@@ -22,6 +22,8 @@
             @click="openGeographicZoneForm"
           />
         </h1><hr class="mt-2">
+        Attenzione: Se non vengono configurate regole per una certa area geografica,
+        i punti vendita non potranno effettuare ordini per i clienti di quella zona.
         <GeographicZoneForm />
         <GeographicZoneTable @openPopUp="openPopUp" />
         <h1>

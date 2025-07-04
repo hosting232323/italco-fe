@@ -22,7 +22,8 @@
     <template v-slot:item.constraints="{ item }">
       <div v-if="item.constraints.length > 0">
         <div v-for="(constraint, index) in item.constraints" :key="index">
-          <b>{{ constraint.day_of_week }}</b>: {{ constraint.max_orders }}
+          <b>{{ days.getDayByValue(constraint.day_of_week) }}</b>:
+          {{ constraint.max_orders }}
         </div>
       </div>
       <div v-else>
@@ -61,6 +62,7 @@
 </template>
 
 <script setup>
+import days from '@/utils/days';
 import { useTheme } from 'vuetify';
 import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';

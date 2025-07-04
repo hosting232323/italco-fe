@@ -14,7 +14,7 @@
         <v-select
           v-model="type"
           label="Tipo"
-          :items="['Aggiuni', 'Sottrai']"
+          :items="['Aggiungi', 'Sottrai']"
           :rules="validation.requiredRules"
           :class="isMobile ? '' : 'mr-2'"
         />
@@ -54,7 +54,7 @@ const submitForm = async () => {
   loading.value = true;
   geographicZoneStore.createEntity({
     code: code.value,
-    type: type.value == 'Aggiuni'
+    type: type.value == 'Aggiungi'
   }, 'code', router, function (data) {
     loading.value = false;
     if (data.status == 'ok') {

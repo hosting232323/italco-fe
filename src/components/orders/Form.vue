@@ -68,7 +68,6 @@
           v-model="order.drc"
           label="Data Richiesta dal Cliente"
           :classStyle="isMobile ? '' : 'ml-2'"
-          :allowedDates="allowedDrcDates"
           :rules="validation.requiredRules"
         />
       </v-col>
@@ -93,11 +92,13 @@
 </template>
 
 <script setup>
+import DateField from '@/components/DateField';
 import FormButtons from '@/components/FormButtons';
 import ProductServiceInput from '@/components/orders/ProductServiceInput';
-import DateField from '@/components/DateField';
+import GooglePlacesAutocomplete from '@/components/GooglePlacesAutocomplete';
 
 import { ref } from 'vue';
+import http from '@/utils/http';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import orderUtils from '@/utils/order';
@@ -109,11 +110,10 @@ import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
 import { useCollectionPointStore } from '@/stores/collectionPoint';
 
-import GooglePlacesAutocomplete from '@/components/GooglePlacesAutocomplete.vue';
-
 const form = ref(null);
 const loading = ref(false);
 const router = useRouter();
+const allowedDpcDates = ref([]);
 const isLocationValid = ref(false);
 const emits = defineEmits(['goBack']);
 const isMobile = mobile.setupMobileUtils();
@@ -125,29 +125,16 @@ const { role } = storeToRefs(userStore);
 const { element: order, activeForm } = storeToRefs(orderStore);
 const collectionPoints = storesUtils.getStoreList(collectionPointStore, router);
 
-const dpcMenu = ref(false);
-const drcMenu = ref(false);
+http.getRequest('check-constraints', {
+  province: 'Bari'
+}, (data) => {
+  if (data.status === 'ok')
+    allowedDpcDates.value = data.dates;
+}, 'GET', router);
 
 const getCollectionPoints = () => {
   return role.value == 'Customer' ? collectionPoints.value :
     collectionPoints.value.filter(collectionPoint => collectionPoint.user_id == order.value.user_id);
-};
-
-const allowedDpcDates = (date) => {
-  const d = new Date(date);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const tomorrow = new Date(today);
-  tomorrow.setDate(today.getDate() + 1);
-  return (
-    d >= tomorrow &&
-    d.getDay() !== 0 &&
-    d.getDay() !== 6
-  );
-};
-
-const allowedDrcDates = (date) => {
-  return allowedDpcDates(date);
 };
 
 const exitFunction = () => {

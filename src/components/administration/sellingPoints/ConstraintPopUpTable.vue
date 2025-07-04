@@ -7,6 +7,9 @@
       { title: 'Azioni', key: 'actions' }
     ]"
   >
+    <template v-slot:item.day_of_week="{ item }">
+      {{ days.getDayByValue(item.day_of_week) }}
+    </template>
     <template v-slot:item.actions="{ item }">
       <v-btn
         icon="mdi-delete"
@@ -19,6 +22,7 @@
 </template>
 
 <script setup>
+import days from '@/utils/days';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';

@@ -48,7 +48,7 @@ const props = defineProps({
 const emits = defineEmits(['update:modelValue']);
 
 const menu = ref(false);
-const innerValue = ref(props.modelValue);
+const innerValue = ref(props.modelValue ? new Date(props.modelValue) : null);
 
 const formattedValue = ref(formatDate(innerValue.value));
 
@@ -60,6 +60,14 @@ function formatDate(date) {
   const month = String(d.getMonth() + 1).padStart(2, '0');
   const year = d.getFullYear();
   return `${day}/${month}/${year}`;
+}
+
+function toISODateString(date) {
+  if (!(date instanceof Date) || isNaN(date)) return null;
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 function parseDate(str) {
@@ -77,11 +85,11 @@ function parseDate(str) {
 
 watch(innerValue, val => {
   formattedValue.value = formatDate(val);
-  emits('update:modelValue', val);
+  emits('update:modelValue', toISODateString(val));
 });
 
 watch(() => props.modelValue, val => {
-  innerValue.value = val;
+  innerValue.value = val ? new Date(val) : null;
 });
 
 watch(formattedValue, val => {
