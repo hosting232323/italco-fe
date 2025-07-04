@@ -55,7 +55,7 @@
                   <v-text-field
                     :class="isMobile ? '' : 'mr-2'"
                     v-model="filters['Order.dpc']"
-                    label="Data Promessa al Cliente"
+                    label="Data Prevista dal Cliente"
                     type="date"
                   />
                 </v-col>

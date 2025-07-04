@@ -3,7 +3,7 @@ import { defineStore } from 'pinia';
 import orderUtils from '@/utils/order';
 
 const EXCLUDED_KEYS = [
-  'created_at', 'updated_at', 'delivery_group', 'services', 'user', 'collection_point'
+  'created_at', 'updated_at', 'delivery_group', 'services', 'user', 'collection_point', 'dates_form'
 ];
 
 export const useOrderStore = defineStore('order', {

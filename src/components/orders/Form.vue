@@ -1,5 +1,5 @@
 <template>
-  <v-form ref="form" @submit.prevent="sendOrder">
+  <v-form ref="form" @submit.prevent="submitForm">
     <v-select
       v-model="order.type"
       label="Tipo"
@@ -8,7 +8,7 @@
     />
     <ProductServiceInput />
     <v-row no-gutters>
-      <v-col cols="12" md="4">
+      <v-col cols="12" md="6">
         <v-text-field
           :class="isMobile ? '' : 'mr-2'"
           v-model="order.addressee"
@@ -26,48 +26,31 @@
           @addressComponents="handleAddressComponents"
         />
       </v-col>
-      <v-col cols="12" md="1">
+      <v-col cols="12" md="2">
         <v-text-field
-          :class="isMobile ? '' : 'ml-2 mr-2'"
+          :class="isMobile ? '' : 'ml-2'"
           v-model="order.cap"
           label="CAP"
           :rules="validation.capRules"
         />
       </v-col>
-      <v-col cols="12" md="3">
+    </v-row>
+    <v-row no-gutters>
+      <v-col cols="12" md="6">
         <v-text-field
-          :class="isMobile ? '' : 'ml-2'"
+          :class="isMobile ? '' : 'mr-2'"
           v-model="order.addressee_contact"
           label="Recapito"
         />
       </v-col>
-    </v-row>
-    <v-row no-gutters>
-      <v-col cols="12" md="4">
+      <v-col cols="12" md="6">
         <v-autocomplete
-          :class="isMobile ? '' : 'mr-2'"
+          :class="isMobile ? '' : 'ml-2'"
           v-model="order.collection_point_id"
           label="Punto di Ritiro"
           :items="getCollectionPoints()"
           item-title="name"
           item-value="id"
-          :rules="validation.requiredRules"
-        />
-      </v-col>
-      <v-col cols="12" md="4">
-        <DateField 
-          v-model="order.dpc"
-          label="Data Promessa al Cliente"
-          :classStyle="isMobile ? '' : 'ml-2 mr-2'"
-          :allowedDates="allowedDpcDates"
-          :rules="validation.requiredRules"
-        />
-      </v-col>
-      <v-col cols="12" md="4">
-        <DateField 
-          v-model="order.drc"
-          label="Data Richiesta dal Cliente"
-          :classStyle="isMobile ? '' : 'ml-2'"
           :rules="validation.requiredRules"
         />
       </v-col>
@@ -84,21 +67,20 @@
       label="Note"
       rows="3"
     />
+    <p v-if="errorMsg">{{ errorMsg }}</p>
     <FormButtons
-      :loading="loading"
+      :loading="false"
       @cancel="exitFunction"
     />
   </v-form>
 </template>
 
 <script setup>
-import DateField from '@/components/DateField';
 import FormButtons from '@/components/FormButtons';
 import ProductServiceInput from '@/components/orders/ProductServiceInput';
 import GooglePlacesAutocomplete from '@/components/GooglePlacesAutocomplete';
 
 import { ref } from 'vue';
-import http from '@/utils/http';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import orderUtils from '@/utils/order';
@@ -111,11 +93,9 @@ import { useOrderStore } from '@/stores/order';
 import { useCollectionPointStore } from '@/stores/collectionPoint';
 
 const form = ref(null);
-const loading = ref(false);
+const errorMsg = ref('');
 const router = useRouter();
-const allowedDpcDates = ref([]);
 const isLocationValid = ref(false);
-const emits = defineEmits(['goBack']);
 const isMobile = mobile.setupMobileUtils();
 
 const userStore = useUserStore();
@@ -124,13 +104,6 @@ const collectionPointStore = useCollectionPointStore();
 const { role } = storeToRefs(userStore);
 const { element: order, activeForm } = storeToRefs(orderStore);
 const collectionPoints = storesUtils.getStoreList(collectionPointStore, router);
-
-http.getRequest('check-constraints', {
-  province: 'Bari'
-}, (data) => {
-  if (data.status === 'ok')
-    allowedDpcDates.value = data.dates;
-}, 'GET', router);
 
 const getCollectionPoints = () => {
   return role.value == 'Customer' ? collectionPoints.value :
@@ -142,28 +115,19 @@ const exitFunction = () => {
     order.value = {};
     activeForm.value = false;
   } else
-    emits('goBack');
+    order.value = {};
 };
 
-const sendOrder = async () => {
+const submitForm = async () => {
+  errorMsg.value = '';
   if (!(await form.value.validate()).valid) return;
-   if (!order.value.products || Object.keys(order.value.products).length === 0) return;
 
-  loading.value = true;
-  const callback = (data) => {
-    loading.value = false;
-    if (data.status === 'ok') {
-      order.value = {};
-      orderStore.initList(router);
-      activeForm.value = false;
-    }
-  };
-
-  if (order.value.id) {
-    orderStore.updateElement(router, callback);
-  } else {
-    orderStore.createElement(router, callback);
+  if (!order.value.products || Object.keys(order.value.products).length === 0) {
+    errorMsg.value = 'Devi aggiungere almeno un prodotto o servizio all\'ordine.';
+    return;
   }
+
+  order.value.dates_form = true;
 };
 
 const handleAddressComponents = (components) => {
