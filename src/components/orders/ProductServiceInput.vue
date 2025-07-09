@@ -18,18 +18,23 @@
   </v-list>
   <v-form ref="form">
     <v-row no-gutters v-if="order.type">
-      <v-col cols="12" md="6">
+      <v-col cols="12" md="6" class="d-flex">
         <v-text-field
-          :class="isMobile ? '' : 'mr-2'"
+          class="flex-grow-1"
           v-model="selectedProduct"
           label="Prodotto"
-          append-icon="mdi-plus"
-          @click:append="addProduct"
           :rules="validation.requiredRules"
+        />
+        <v-btn
+          variant="text"
+          style="margin: 5px 0 0 2px;"
+          icon="mdi-plus"
+          @click="addProduct"
+          :disabled="!selectedProduct"
         />
       </v-col>
       <v-col cols="12" md="6">
-        <v-select
+        <v-autocomplete
           :class="isMobile ? '' : 'ml-2'"
           v-model="selectedService"
           label="Servizio"
@@ -38,14 +43,7 @@
           item-value="id"
           :rules="validation.requiredRules"
           menu
-        >
-          <template v-slot:item="{ props }">
-            <v-list-item
-              v-bind="props"
-              @click="selectedServices.push(selectedService)"
-            />
-          </template>
-        </v-select>
+        />
       </v-col>
     </v-row>
     <template v-else>

@@ -19,6 +19,7 @@
           <v-text-field
             type="number"
             prepend-icon="mdi-currency-eur"
+            id="price"
             v-model="price"
             label="Prezzo"
             :rules="validation.requiredRules"
