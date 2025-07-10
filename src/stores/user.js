@@ -17,28 +17,17 @@ export const useUserStore = defineStore('user', {
   }),
   actions: {
     logout() {
-      const orderStore = useOrderStore(this.$pinia);
-      const serviceStore = useServiceStore(this.$pinia);
-      const scheduleStore = useScheduleStore(this.$pinia);
-      const transportStore = useTransportStore(this.$pinia);
-      const customerRuleStore = useCustomerRuleStore(this.$pinia);
-      const customerGroupStore = useCustomerGroupStore(this.$pinia);
-      const deliveryGroupStore = useDeliveryGroupStore(this.$pinia);
-      const geographicZoneStore = useGeographicZoneStore(this.$pinia);
-      const collectionPointStore = useCollectionPointStore(this.$pinia);
-      const administrationUserStore = useAdministrationUserStore(this.$pinia);
-
       this.$reset();
-      orderStore.$reset();
-      serviceStore.$reset();
-      scheduleStore.$reset();
-      transportStore.$reset();
-      customerRuleStore.$reset();
-      customerGroupStore.$reset();
-      deliveryGroupStore.$reset();
-      geographicZoneStore.$reset();
-      collectionPointStore.$reset();
-      administrationUserStore.$reset();
+      useOrderStore(this.$pinia).$reset();
+      useServiceStore(this.$pinia).$reset();
+      useScheduleStore(this.$pinia).$reset();
+      useTransportStore(this.$pinia).$reset();
+      useCustomerRuleStore(this.$pinia).$reset();
+      useCustomerGroupStore(this.$pinia).$reset();
+      useDeliveryGroupStore(this.$pinia).$reset();
+      useGeographicZoneStore(this.$pinia).$reset();
+      useCollectionPointStore(this.$pinia).$reset();
+      useAdministrationUserStore(this.$pinia).$reset();
 
       localStorage.removeItem('token');
       localStorage.removeItem('user_id');
