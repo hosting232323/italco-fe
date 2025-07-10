@@ -17,17 +17,32 @@ export const useUserStore = defineStore('user', {
   }),
   actions: {
     logout() {
+      const orderStore = useOrderStore(this.$pinia);
+      const serviceStore = useServiceStore(this.$pinia);
+      const scheduleStore = useScheduleStore(this.$pinia);
+      const transportStore = useTransportStore(this.$pinia);
+      const customerRuleStore = useCustomerRuleStore(this.$pinia);
+      const customerGroupStore = useCustomerGroupStore(this.$pinia);
+      const deliveryGroupStore = useDeliveryGroupStore(this.$pinia);
+      const geographicZoneStore = useGeographicZoneStore(this.$pinia);
+      const collectionPointStore = useCollectionPointStore(this.$pinia);
+      const administrationUserStore = useAdministrationUserStore(this.$pinia);
+
       this.$reset();
-      useOrderStore().$reset();
-      useServiceStore().$reset();
-      useScheduleStore().$reset();
-      useTransportStore().$reset();
-      useCustomerRuleStore().$reset();
-      useCustomerGroupStore().$reset();
-      useDeliveryGroupStore().$reset();
-      useGeographicZoneStore().$reset();
-      useCollectionPointStore().$reset();
-      useAdministrationUserStore().$reset();
+      orderStore.$reset();
+      serviceStore.$reset();
+      scheduleStore.$reset();
+      transportStore.$reset();
+      customerRuleStore.$reset();
+      customerGroupStore.$reset();
+      deliveryGroupStore.$reset();
+      geographicZoneStore.$reset();
+      collectionPointStore.$reset();
+      administrationUserStore.$reset();
+
+      localStorage.removeItem('token');
+      localStorage.removeItem('user_id');
+      localStorage.removeItem('user_role');
     }
   }
 });
