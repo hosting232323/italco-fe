@@ -47,12 +47,15 @@ const orderStore = useOrderStore();
 const isMobile = mobile.setupMobileUtils();
 const { element: order, activeForm } = storeToRefs(orderStore);
 
-http.getRequest('check-constraints', {
-  cap: order.value.cap
+console.log(order.value);
+
+http.postRequest('check-constraints', {
+  cap: order.value.cap,
+  products: order.value.products
 }, (data) => {
   if (data.status === 'ok')
     allowedDpcDates.value = data.dates;
-}, 'GET', router);
+}, 'POST', router);
 
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
