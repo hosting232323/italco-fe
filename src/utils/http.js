@@ -66,10 +66,14 @@ const createHeader = (router, file = false) => {
   return headers;
 };
 
+import { useUserStore } from '@/stores/user';
 
 const sessionHandler = (data, func, router) => {
+  const userStore = useUserStore();
+
   if (data.status == 'session') {
     alert('Sessione scaduta');
+    userStore.logout();
     router.push('/');
   } else
     func(data);
