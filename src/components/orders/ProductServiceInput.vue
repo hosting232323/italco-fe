@@ -31,6 +31,7 @@
           icon="mdi-plus"
           @click="addProduct"
           :disabled="!selectedProduct"
+          id="button-plus"
         />
       </v-col>
       <v-col cols="12" md="6">
