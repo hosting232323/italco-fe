@@ -47,11 +47,12 @@ const orderStore = useOrderStore();
 const isMobile = mobile.setupMobileUtils();
 const { element: order, activeForm } = storeToRefs(orderStore);
 
-console.log(order.value);
+
+const servicesId = [...new Set(Object.values(order.value.products).flat())];
 
 http.postRequest('check-constraints', {
   cap: order.value.cap,
-  products: order.value.products
+  services_id: servicesId
 }, (data) => {
   if (data.status === 'ok')
     allowedDpcDates.value = data.dates;
