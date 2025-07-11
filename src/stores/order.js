@@ -19,7 +19,9 @@ export const useOrderStore = defineStore('order', {
     createElement(router, func) {
       http.postRequest(
         'order',
-        this.element,
+        Object.fromEntries(
+          Object.entries(this.element).filter(([key]) => !EXCLUDED_KEYS.includes(key))
+        ),
         func,
         'POST',
         router

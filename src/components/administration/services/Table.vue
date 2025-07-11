@@ -7,6 +7,7 @@
       { title: 'Nome', value: 'name' },
       { title:'Tipo', value: 'type' },
       { title: 'Descrizione', value: 'description' },
+      { title: 'Max Giornaieri', value: 'max_services' },
       { title: 'Azioni', key: 'actions' }
     ]"
   >
