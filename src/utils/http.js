@@ -1,3 +1,5 @@
+import logoutModule from '@/utils/logout';
+
 const hostname = import.meta.env.VITE_HOSTNAME;
 
 const postRequest = (endpoint, body, func, method = 'POST', router = undefined, file = false) => {
@@ -66,11 +68,10 @@ const createHeader = (router, file = false) => {
   return headers;
 };
 
-
 const sessionHandler = (data, func, router) => {
   if (data.status == 'session') {
     alert('Sessione scaduta');
-    router.push('/');
+    logoutModule.logout(router);
   } else
     func(data);
 };
