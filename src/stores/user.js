@@ -18,16 +18,20 @@ export const useUserStore = defineStore('user', {
   actions: {
     logout() {
       this.$reset();
-      useOrderStore().$reset();
-      useServiceStore().$reset();
-      useScheduleStore().$reset();
-      useTransportStore().$reset();
-      useCustomerRuleStore().$reset();
-      useCustomerGroupStore().$reset();
-      useDeliveryGroupStore().$reset();
-      useGeographicZoneStore().$reset();
-      useCollectionPointStore().$reset();
-      useAdministrationUserStore().$reset();
+      useOrderStore(this.$pinia).$reset();
+      useServiceStore(this.$pinia).$reset();
+      useScheduleStore(this.$pinia).$reset();
+      useTransportStore(this.$pinia).$reset();
+      useCustomerRuleStore(this.$pinia).$reset();
+      useCustomerGroupStore(this.$pinia).$reset();
+      useDeliveryGroupStore(this.$pinia).$reset();
+      useGeographicZoneStore(this.$pinia).$reset();
+      useCollectionPointStore(this.$pinia).$reset();
+      useAdministrationUserStore(this.$pinia).$reset();
+
+      localStorage.removeItem('token');
+      localStorage.removeItem('user_id');
+      localStorage.removeItem('user_role');
     }
   }
 });
