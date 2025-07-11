@@ -6,31 +6,40 @@
   >
     <v-card-text>
       <v-form ref="form" @submit.prevent="submitForm">
-        <v-row no-gutters>
-          <v-col cols="12" md="4">
-            <v-text-field
-              :class="isMobile ? '' : 'mr-2'"
-              v-model="service.name"
-              label="Nome"
-              :rules="validation.requiredRules"
-            />
-          </v-col>
-          <v-col cols="12" md="4">
-            <v-select
-              v-model="service.type"
-              label="Tipo"
-              :items="orderUtils.TYPES"
-              :rules="validation.requiredRules"
-            />
-          </v-col>
-          <v-col cols="12" md="4">
-            <v-text-field
-              :class="isMobile ? '' : 'ml-2'"
-              v-model="service.description"
-              label="Descrizione"
-            />
-          </v-col>
-        </v-row>
+          <v-row no-gutters>
+            <v-col cols="12" md="6">
+              <v-text-field
+                :class="isMobile ? '' : 'mr-2'"
+                v-model="service.name"
+                label="Nome"
+                :rules="validation.requiredRules"
+              />
+            </v-col>
+            <v-col cols="12" md="6">
+              <v-select
+                v-model="service.type"
+                label="Tipo"
+                :items="orderUtils.TYPES"
+                :rules="validation.requiredRules"
+              />
+            </v-col>
+          </v-row>
+          <v-row no-gutters>
+            <v-col cols="12" md="6">
+              <v-text-field
+                :class="isMobile ? '' : 'mr-2'"
+                v-model="service.description"
+                label="Descrizione"
+              />
+            </v-col>
+            <v-col cols="12" md="6">
+              <v-text-field
+                v-model="service.max_services"
+                label="Max Servizi Giornalieri (opzionale)"
+                type="number"
+              />
+            </v-col>
+          </v-row>
         <FormButtons
           :loading="loading"
           @cancel="activeForm = false"

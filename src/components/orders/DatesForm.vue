@@ -1,5 +1,8 @@
 <template>
-  <v-form ref="form" @submit.prevent="submitForm">
+  <div class="loading-wrapper" v-if="loadingDates">
+    Loading<span class="dots"></span>
+  </div>
+  <v-form v-else ref="form" @submit.prevent="submitForm">
     Seleziona le date per l'ordine:
     <v-row no-gutters class="mt-2">
       <v-col cols="12" md="6">
@@ -41,18 +44,24 @@ import { useOrderStore } from '@/stores/order';
 
 const form = ref(null);
 const loading = ref(false);
+const loadingDates = ref(true);
 const router = useRouter();
 const allowedDpcDates = ref([]);
 const orderStore = useOrderStore();
 const isMobile = mobile.setupMobileUtils();
 const { element: order, activeForm } = storeToRefs(orderStore);
 
-http.getRequest('check-constraints', {
-  cap: order.value.cap
+
+const servicesId = [...new Set(Object.values(order.value.products).flat())];
+
+http.postRequest('check-constraints', {
+  cap: order.value.cap,
+  services_id: servicesId
 }, (data) => {
   if (data.status === 'ok')
     allowedDpcDates.value = data.dates;
-}, 'GET', router);
+  loadingDates.value = false;
+}, 'POST', router);
 
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
@@ -73,3 +82,37 @@ const submitForm = async () => {
     orderStore.createElement(router, callback);
 };
 </script>
+
+<style scoped>
+.loading-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  color: #555;
+  user-select: none;
+}
+
+.dots::after {
+  content: '';
+  animation: dots 1.5s steps(4, end) infinite;
+  display: inline-block;
+  width: 1em;
+  text-align: left;
+}
+
+@keyframes dots {
+  0%, 20% {
+    content: '';
+  }
+  40% {
+    content: '.';
+  }
+  60% {
+    content: '..';
+  }
+  80%, 100% {
+    content: '...';
+  }
+}
+</style>
