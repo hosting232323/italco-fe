@@ -7,11 +7,12 @@
     "serve": "node server.js"
   },
   "dependencies": {
-    "generic-module": "git+https://github.com/hosting232323/generic-module.git",
     "@mdi/font": "7.0.96",
     "core-js": "^3.29.0",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "generic-module": "git+https://github.com/hosting232323/generic-module.git",
+    "hashids": "^2.3.0",
     "pinia": "^2.1.7",
     "roboto-fontface": "*",
     "vue": "^3.3.4",
