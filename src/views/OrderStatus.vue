@@ -10,24 +10,24 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, onMounted } from 'vue';
 import { decodeId } from '@/utils/hashids';
 
-export default {
-  props: ['orderId'],
-  data() {
-    return {
-      orderIdNumeric: null,
-    };
-  },
-  mounted() {
-    this.orderIdNumeric = decodeId(this.orderId);
-    if (this.orderIdNumeric === null) {
-      console.error('ID ordine non valido o corrotto');
-    } else {
-      // Qui puoi chiamare API o logica con orderIdNumeric
-      console.log('ID ordine reale:', this.orderIdNumeric);
-    }
-  },
-};
+const props = defineProps({
+  orderId: String,
+});
+
+const orderIdNumeric = ref(null);
+
+onMounted(() => {
+  const decoded = decodeId(props.orderId);
+  if (decoded === null) {
+    console.error('ID ordine non valido o corrotto');
+  } else {
+    orderIdNumeric.value = decoded;
+    console.log('ID ordine reale:', decoded);
+    // Puoi eseguire ulteriori operazioni qui
+  }
+});
 </script>

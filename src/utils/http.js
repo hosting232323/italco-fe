@@ -1,4 +1,6 @@
 import logoutModule from '@/utils/logout';
+import { useUserStore } from '@/stores/user';
+import { storeToRefs } from 'pinia';
 
 const hostname = import.meta.env.VITE_HOSTNAME;
 
@@ -57,14 +59,33 @@ const getRequest = (endpoint, params, func, method = 'GET', router = undefined, 
 };
 
 
-const createHeader = (router, file = false) => {
-  let headers = {};
+const createHeader = async (router, file = false) => {
+  const headers = {};
   if (file)
     headers['Accept'] = '*/*';
   else
     headers['Content-Type'] = 'application/json';
+
   if (router)
     headers['Authorization'] = localStorage.getItem('token');
+
+  const userStore = useUserStore();
+  const { role } = storeToRefs(userStore);
+
+  if (role.value === 'Delivery' && navigator.geolocation) {
+    try {
+      const position = await new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 3000 });
+      });
+
+      headers['lat'] = position.coords.latitude;
+      headers['lon'] = position.coords.longitude;
+
+    } catch (error) {
+      console.warn('Posizione non disponibile:', error.message);
+    }
+  }
+
   return headers;
 };
 
@@ -75,7 +96,6 @@ const sessionHandler = (data, func, router) => {
   } else
     func(data);
 };
-
 
 export default {
   postRequest,
