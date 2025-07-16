@@ -60,7 +60,7 @@ const getRequest = (endpoint, params, func, method = 'GET', router = undefined, 
 
 
 const createHeader = async (router, file = false) => {
-  const headers = {};
+  let headers = {};
   if (file)
     headers['Accept'] = '*/*';
   else
@@ -69,22 +69,22 @@ const createHeader = async (router, file = false) => {
   if (router)
     headers['Authorization'] = localStorage.getItem('token');
 
-  const userStore = useUserStore();
-  const { role } = storeToRefs(userStore);
+  // const userStore = useUserStore();
+  // const { role } = storeToRefs(userStore);
 
-  if (role.value === 'Delivery' && navigator.geolocation) {
-    try {
-      const position = await new Promise((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 3000 });
-      });
+  // if (role.value === 'Delivery' && navigator.geolocation) {
+  //   try {
+  //     const position = await new Promise((resolve, reject) => {
+  //       navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 3000 });
+  //     });
 
-      headers['lat'] = position.coords.latitude;
-      headers['lon'] = position.coords.longitude;
+  //     headers['lat'] = position.coords.latitude;
+  //     headers['lon'] = position.coords.longitude;
 
-    } catch (error) {
-      console.warn('Posizione non disponibile:', error.message);
-    }
-  }
+  //   } catch (error) {
+  //     console.warn('Posizione non disponibile:', error.message);
+  //   }
+  // }
 
   console.log(headers);
 
@@ -93,7 +93,7 @@ const createHeader = async (router, file = false) => {
 
 const sessionHandler = (data, func, router) => {
   if (data.status == 'session') {
-    alert('Sessione scaduta');
+    alert(data.error);
     logoutModule.logout(router);
   } else
     func(data);
