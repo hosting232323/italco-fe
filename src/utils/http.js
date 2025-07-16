@@ -86,6 +86,8 @@ const createHeader = async (router, file = false) => {
     }
   }
 
+  console.log(headers);
+
   return headers;
 };
 
