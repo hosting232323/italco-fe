@@ -98,6 +98,7 @@ const sessionHandler = (data, func, router) => {
     func(data);
 };
 
+
 export default {
   postRequest,
   getRequest,
