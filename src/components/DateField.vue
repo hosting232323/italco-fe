@@ -57,7 +57,6 @@ function allowedDatesFunction(date) {
   return props.allowedDates.includes(dateStr);
 }
 
-
 function formatDate(date) {
   if (!date) return '';
   const d = new Date(date);
