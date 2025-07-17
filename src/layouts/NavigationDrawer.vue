@@ -59,8 +59,8 @@
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
-import { useUserStore } from '@/stores/user';
 import logoutModule from '@/utils/logout';
+import { useUserStore } from '@/stores/user';
 
 const theme = useTheme();
 const router = useRouter();

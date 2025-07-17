@@ -20,6 +20,7 @@
           label="Data Richiesta dal Cliente"
           :classStyle="isMobile ? '' : 'ml-2'"
           :rules="validation.requiredRules"
+          :allowedDates="nextTwoMonths"
         />
       </v-col>
     </v-row>
@@ -40,30 +41,55 @@ import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import validation from '@/utils/validation';
+import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
 
 const form = ref(null);
+const router = useRouter();
 const loading = ref(false);
 const loadingDates = ref(true);
-const router = useRouter();
 const allowedDpcDates = ref([]);
+const userStore = useUserStore();
 const orderStore = useOrderStore();
 const isMobile = mobile.setupMobileUtils();
+const { role } = storeToRefs(userStore);
 const { element: order, activeForm } = storeToRefs(orderStore);
-
 
 const servicesId = [...new Set(Object.values(order.value.products).flat())];
 
-http.postRequest('check-constraints', {
-  cap: order.value.cap,
-  services_id: servicesId
-}, (data) => {
-    if (data.status === 'ok')
-      allowedDpcDates.value = data.dates; 
-    else 
-      allowedDpcDates.value = []; 
+const getDateRangeArray = () => {
+  const result = [];
+  const today = new Date();
+  const endDate = new Date(today);
+  endDate.setMonth(endDate.getMonth() + 2);
+
+  for (let date = new Date(today); date <= endDate; date.setDate(date.getDate() + 1)) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // mesi da 0 a 11
+    const day = String(date.getDate()).padStart(2, '0');
+    result.push(`${year}-${month}-${day}`);
+  }
+
+  return result;
+}
+
+const nextTwoMonths = getDateRangeArray();
+
+if (role.value == 'Customer')
+  http.postRequest('check-constraints', {
+    cap: order.value.cap,
+    services_id: servicesId
+  }, (data) => {
+      if (data.status === 'ok')
+        allowedDpcDates.value = data.dates; 
+      else 
+        allowedDpcDates.value = []; 
+    loadingDates.value = false;
+  }, 'POST', router);
+else {
+  allowedDpcDates.value = nextTwoMonths;
   loadingDates.value = false;
-}, 'POST', router);
+}
 
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
