@@ -58,8 +58,10 @@ http.postRequest('check-constraints', {
   cap: order.value.cap,
   services_id: servicesId
 }, (data) => {
-  if (data.status === 'ok')
-    allowedDpcDates.value = data.dates;
+    if (data.status === 'ok')
+      allowedDpcDates.value = data.dates; 
+    else 
+      allowedDpcDates.value = []; 
   loadingDates.value = false;
 }, 'POST', router);
 
