@@ -94,8 +94,11 @@ const sessionHandler = (data, func, router) => {
   if (data.status == 'session') {
     alert(data.error);
     logoutModule.logout(router);
-  } else
+  } else {
+    if (data.new_token)
+      localStorage.setItem('token', data.new_token);
     func(data);
+  }
 };
 
 
