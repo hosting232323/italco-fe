@@ -25,7 +25,7 @@
     </template>
     <v-date-picker
       v-model="innerValue"
-      :allowed-dates="allowedDates"
+      :allowed-dates="allowedDatesFunction"
       @change="closeMenu"
     >
       <template #title></template>
@@ -40,7 +40,7 @@ import { ref, watch } from 'vue';
 const props = defineProps({
   modelValue: [String, Date],
   label: String,
-  allowedDates: Function,
+  allowedDates: Array,
   rules: Array,
   classStyle: String
 });
@@ -49,8 +49,14 @@ const emits = defineEmits(['update:modelValue']);
 
 const menu = ref(false);
 const innerValue = ref(props.modelValue ? new Date(props.modelValue) : null);
-
 const formattedValue = ref(formatDate(innerValue.value));
+
+function allowedDatesFunction(date) {
+  if (!props.allowedDates || props.allowedDates.length === 0) return false;
+  const dateStr = toISODateString(date);
+  return props.allowedDates.includes(dateStr);
+}
+
 
 function formatDate(date) {
   if (!date) return '';

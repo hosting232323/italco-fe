@@ -10,7 +10,7 @@
           v-model="order.dpc"
           label="Data Prevista dal Cliente"
           :classStyle="isMobile ? '' : 'ml-2 mr-2'"
-          :allowedDates="allowedDatesFunction"
+          :allowedDates="allowedDpcDates"
           :rules="validation.requiredRules"
         />
       </v-col>
@@ -58,25 +58,12 @@ http.postRequest('check-constraints', {
   cap: order.value.cap,
   services_id: servicesId
 }, (data) => {
-    if (data.status === 'ok' && data.dates.length > 0)
-      allowedDpcDates.value = data.dates; 
-    else 
-      allowedDpcDates.value = []; 
+    // if (data.status === 'ok' && data.dates.length > 0)
+    //   allowedDpcDates.value = data.dates; 
+    // else 
+      allowedDpcDates.value = ['2025-07-17']; 
   loadingDates.value = false;
 }, 'POST', router);
-
-function formatDateLocal(date) {
-  const year = date.getFullYear();
-  const month = (date.getMonth() + 1).toString().padStart(2, '0');
-  const day = date.getDate().toString().padStart(2, '0');
-  return `${year}-${month}-${day}`;
-}
-
-function allowedDatesFunction(date) {
-  if (!allowedDpcDates.value || allowedDpcDates.value.length === 0) return false;
-  const dateStr = formatDateLocal(date);
-  return allowedDpcDates.value.includes(dateStr);
-}
 
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
