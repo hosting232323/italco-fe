@@ -14,7 +14,13 @@ const routes = [
         path: 'privacy',
         name: 'Privacy Policy',
         component: () => import('@/views/PrivacyPolicy.vue')
-      }
+      },
+      {
+        path: '/order/:orderId',
+        name: 'OrderStatus',
+        component: () => import('@/views/OrderStatus.vue'),
+        props: true,
+      },
     ]
   },
   {
@@ -57,13 +63,7 @@ const routes = [
         component: () => import('@/views/customer/CollectionPoints.vue')
       }
     ]
-  },
-  {
-    path: '/order/:orderId',
-    name: 'OrderStatus',
-    component: () => import('@/views/OrderStatus.vue'),
-    props: true,
-  },
+  }
 ];
 
 const router = createRouter({
