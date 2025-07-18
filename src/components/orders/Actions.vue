@@ -2,7 +2,7 @@
   <v-dialog max-width="1500">
     <template v-slot:activator="{ props: activatorProps }">
       <v-row no-gutters>
-        <v-col cols="3">
+        <v-col cols="6">
           <v-btn
             icon="mdi-pencil"
             variant="text"
@@ -10,7 +10,7 @@
             @click="openForm(item)"
           />
         </v-col>
-        <v-col cols="3">
+        <v-col cols="6">
           <v-btn
             variant="text"
             icon="mdi-file-export"
@@ -19,7 +19,9 @@
             @click="exportPdf(item)"
           />
         </v-col>
-        <v-col cols="3">
+      </v-row>
+      <v-row no-gutters>
+        <v-col cols="6">
           <v-btn
             icon="mdi-truck-delivery"
             variant="text"
@@ -28,7 +30,7 @@
             @click="order = item"
           />
         </v-col>
-        <v-col cols="3">
+        <v-col cols="6">
           <v-btn
             icon="mdi-link-variant"
             variant="text"
@@ -67,8 +69,8 @@ import http from '@/utils/http';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
-import { useOrderStore } from '@/stores/order';
 import { encodeId } from '@/utils/hashids';
+import { useOrderStore } from '@/stores/order';
 
 const order = ref({});
 const theme = useTheme();
@@ -105,8 +107,7 @@ const exportPdf = async (item) => {
 };
 
 const copyOrderLink = (id) => {
-  const encodedId = encodeId(id);
-  const url = `${window.location.origin}/order/${encodedId}`;
+  const url = `${window.location.origin}/order/${encodeId(id)}`;
   navigator.clipboard.writeText(url).then(() => {
     alert('Link ordine copiato negli appunti:\n' + url);
   }).catch(() => {

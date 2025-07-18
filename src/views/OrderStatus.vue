@@ -91,7 +91,7 @@
     <div class="table-box">
 
     <h3>Stato Ordine</h3>
-    <v-timeline direction="horizontal" line-inset="12">
+    <v-timeline direction="horizontal">
       <v-timeline-item
         v-for="step in orderHistory"
         :key="step.id"
