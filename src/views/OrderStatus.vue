@@ -4,11 +4,11 @@
 
     <div class="table-wrapper">
       <div class="table-box">
-        <h3>Cliente</h3>
+        <h3>Punto vendita</h3>
         <table class="info-table">
           <tbody>
             <tr>
-              <td class="label">Punto vendita</td>
+              <td class="label">Nome</td>
               <td>{{ order.user.email }}</td>
             </tr>
             <tr>
@@ -59,10 +59,6 @@
           <tr>
             <td class="label">Data consegna effettiva</td>
             <td>{{ order.booking_date ?? '/' }}</td>
-          </tr>
-          <tr>
-            <td class="label">Note aggiuntive</td>
-            <td>{{ order.customer_note ?? '/' }}</td>
           </tr>
         </tbody>
       </table>
