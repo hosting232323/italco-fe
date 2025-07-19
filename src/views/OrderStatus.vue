@@ -89,23 +89,21 @@
     </div>
 
     <div class="table-box">
-
-    <h3>Stato Ordine</h3>
-    <v-timeline direction="horizontal">
-      <v-timeline-item
-        v-for="step in orderHistory"
-        :key="step.id"
-        :color="isStepCompleted(step) ? 'green' : 'grey lighten-1'"
-        :fill-dot="isStepCompleted(step)"
-      >
-        <template v-slot:opposite>
-          {{ step.label }}
-        </template>
-      </v-timeline-item>
-    </v-timeline>
+      <h3>Stato Ordine</h3>
+      <v-timeline direction="horizontal">
+        <v-timeline-item
+          v-for="step in orderHistory"
+          :key="step.id"
+          :dot-color="isStepCompleted(step) ? 'green' : 'grey lighten-1'"
+        >
+          <template v-slot:opposite>
+            {{ step.label }}
+          </template>
+        </v-timeline-item>
+      </v-timeline>
     </div>
 
-
+    <Map :lat="order.lat" :lon="order.lon" />
   </v-container>
 </template>
 
@@ -113,6 +111,7 @@
 import { ref, onMounted } from 'vue';
 import { decodeId } from '@/utils/hashids';
 import http from '@/utils/http';
+import Map from '@/components/Map.vue';
 
 const props = defineProps({
   orderId: String,
@@ -132,7 +131,8 @@ const orderHistory = [
 function isStepCompleted(step) {
   if (!order.value.status) return false;
   const currentIndex = orderHistory.findIndex(s => s.label === order.value.status);
-  return step.id <= currentIndex + 1;
+  console.log(step.id <= currentIndex);
+  return step.id <= currentIndex;
 }
 
 onMounted(() => {
