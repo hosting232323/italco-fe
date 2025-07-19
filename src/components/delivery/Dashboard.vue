@@ -1,5 +1,5 @@
 <template>
-  <div v-if="ready">
+  <div v-if="!locationError && ready">
     <br><b>
       Totale ordini: {{ Object.values(orders).reduce((sum, arr) => sum + arr.length, 0) }}
     </b><br><br>
@@ -27,10 +27,17 @@
     </v-item-group>
     <Table :keyName="selectedCard" />
   </div>
+
+  <div v-else-if="locationError" class="text-center mt-10">
+    <v-alert type="error" border="start" color="red" prominent>
+      ⚠️ Per usare questa funzionalità devi <strong>abilitare la geolocalizzazione</strong>.<br>
+      Ricarica la pagina e consenti i permessi quando richiesto.
+    </v-alert>
+  </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
@@ -38,13 +45,12 @@ import { useOrderStore } from '@/stores/order';
 
 import Table from '@/components/delivery/Table';
 
+const locationError = ref(false); 
 const selectedCard = ref('In Progress');
 const theme = useTheme();
 const router = useRouter();
 const orderStore = useOrderStore();
 const { list: orders, ready } = storeToRefs(orderStore);
-
-if (!ready.value) orderStore.initListDelivery(router);
 
 const cards = [
   {
@@ -64,6 +70,22 @@ const cards = [
     key: 'Delay'
   }
 ];
+
+onMounted(() => {
+  if (!navigator.geolocation) {
+    locationError.value = true;
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    position => {
+      if (!ready.value) orderStore.initListDelivery(router);
+    },
+    error => {
+      locationError.value = true;
+    }
+  );
+});
 </script>
 
 <style scoped>

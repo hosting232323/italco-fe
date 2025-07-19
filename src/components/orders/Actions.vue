@@ -2,7 +2,7 @@
   <v-dialog max-width="1500">
     <template v-slot:activator="{ props: activatorProps }">
       <v-row no-gutters>
-        <v-col cols="4">
+        <v-col cols="6">
           <v-btn
             icon="mdi-pencil"
             variant="text"
@@ -10,7 +10,7 @@
             @click="openForm(item)"
           />
         </v-col>
-        <v-col cols="4">
+        <v-col cols="6">
           <v-btn
             variant="text"
             icon="mdi-file-export"
@@ -19,13 +19,24 @@
             @click="exportPdf(item)"
           />
         </v-col>
-        <v-col cols="4">
+      </v-row>
+      <v-row no-gutters>
+        <v-col cols="6">
           <v-btn
             icon="mdi-truck-delivery"
             variant="text"
             :color="theme.current.value.primaryColor"
             v-bind="activatorProps"
             @click="order = item"
+          />
+        </v-col>
+        <v-col cols="6">
+          <v-btn
+            icon="mdi-link-variant"
+            variant="text"
+            :color="theme.current.value.primaryColor"
+            @click="copyOrderLink(item.id)"
+            title="Copia link ordine"
           />
         </v-col>
       </v-row>
@@ -58,6 +69,7 @@ import http from '@/utils/http';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
+import { encodeId } from '@/utils/hashids';
 import { useOrderStore } from '@/stores/order';
 
 const order = ref({});
@@ -92,5 +104,14 @@ const exportPdf = async (item) => {
     a.click();
     window.URL.revokeObjectURL(url);
   }, 'GET', router, true)
+};
+
+const copyOrderLink = (id) => {
+  const url = `${window.location.origin}/order/${encodeId(id)}`;
+  navigator.clipboard.writeText(url).then(() => {
+    alert('Link ordine copiato negli appunti:\n' + url);
+  }).catch(() => {
+    alert('Errore nel copiare il link');
+  });
 };
 </script>
