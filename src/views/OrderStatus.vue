@@ -108,14 +108,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { decodeId } from '@/utils/hashids';
-import http from '@/utils/http';
 import Map from '@/components/Map.vue';
 
-const props = defineProps({
-  orderId: String,
-});
+import http from '@/utils/http';
+import { ref, onMounted } from 'vue';
+import { decodeId } from '@/utils/hashids';
+
+const props = defineProps({ orderId: String });
 
 const order = ref({});
 const show = ref(false);
@@ -130,9 +129,7 @@ const orderHistory = [
 
 function isStepCompleted(step) {
   if (!order.value.status) return false;
-  const currentIndex = orderHistory.findIndex(s => s.label === order.value.status);
-  console.log(step.id <= currentIndex);
-  return step.id <= currentIndex;
+  return step.id <= orderHistory.findIndex(s => s.label === order.value.status);
 }
 
 onMounted(() => {

@@ -1,6 +1,6 @@
+import { storeToRefs } from 'pinia';
 import logoutModule from '@/utils/logout';
 import { useUserStore } from '@/stores/user';
-import { storeToRefs } from 'pinia';
 
 const hostname = import.meta.env.VITE_HOSTNAME;
 
@@ -69,12 +69,8 @@ const createHeader = async (router, file = false) => {
   if (router)
     headers['Authorization'] = localStorage.getItem('token');
 
-  headers['X-Lat'] = '';
-  headers['X-Lon'] = '';
-
   const userStore = useUserStore();
   const { role } = storeToRefs(userStore);
-
   if (role.value === 'Delivery' && navigator.geolocation) {
     try {
       const position = await new Promise((resolve, reject) =>

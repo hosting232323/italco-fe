@@ -71,7 +71,7 @@ const cards = [
   }
 ];
 
-const requestGeolocation = () => {
+onMounted(() => {
   if (!navigator.geolocation) {
     locationError.value = true;
     return;
@@ -85,10 +85,6 @@ const requestGeolocation = () => {
       locationError.value = true;
     }
   );
-};
-
-onMounted(() => {
-  requestGeolocation();
 });
 </script>
 

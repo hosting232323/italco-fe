@@ -11,16 +11,16 @@ const routes = [
         component: () => import('@/views/Login.vue')
       },
       {
-        path: 'privacy',
-        name: 'Privacy Policy',
-        component: () => import('@/views/PrivacyPolicy.vue')
-      },
-      {
-        path: '/order/:orderId',
+        path: 'order/:orderId',
         name: 'OrderStatus',
         component: () => import('@/views/OrderStatus.vue'),
         props: true,
       },
+      {
+        path: 'privacy',
+        name: 'Privacy Policy',
+        component: () => import('@/views/PrivacyPolicy.vue')
+      }
     ]
   },
   {
