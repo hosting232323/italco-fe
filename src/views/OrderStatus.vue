@@ -97,7 +97,7 @@
           :dot-color="isStepCompleted(step) ? 'green' : 'grey lighten-1'"
         >
           <template v-slot:icon>
-            <v-icon :size="19">{{ step.icon }}</v-icon>
+            <v-icon :size="18">{{ step.icon }}</v-icon>
           </template>
           <template v-slot:opposite>
             <p style="margin: 10px 0 -17px !important;" v-if="!isMobile">
