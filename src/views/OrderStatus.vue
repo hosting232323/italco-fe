@@ -90,14 +90,22 @@
 
     <div class="table-box">
       <h3>Stato Ordine</h3>
-      <v-timeline direction="horizontal">
+      <v-timeline :direction="isMobile ? 'vertical' : 'horizontal'" :side="isMobile ? 'start' : 'end'">
         <v-timeline-item
           v-for="step in orderHistory"
           :key="step.id"
           :dot-color="isStepCompleted(step) ? 'green' : 'grey lighten-1'"
         >
+          <template v-slot:icon>
+            <v-icon :size="18">{{ step.icon }}</v-icon>
+          </template>
           <template v-slot:opposite>
-            {{ step.label }}
+            <p style="margin: 10px 0 -17px !important;" v-if="!isMobile">
+              {{ step.label }}
+            </p>
+            <p v-else>
+              {{ step.label }}
+            </p>
           </template>
         </v-timeline-item>
       </v-timeline>
@@ -109,22 +117,24 @@
 
 <script setup>
 import Map from '@/components/Map.vue';
+import mobile from '@/utils/mobile';
 
 import http from '@/utils/http';
 import { ref, onMounted } from 'vue';
 import { decodeId } from '@/utils/hashids';
 
 const props = defineProps({ orderId: String });
+const isMobile = mobile.setupMobileUtils();
 
 const order = ref({});
 const show = ref(false);
 const orderIdNumeric = ref(null);
 
 const orderHistory = [
-  { id: 0, label: 'Pending' },
-  { id: 1, label: 'In Progress' },
-  { id: 2, label: 'On Board' },
-  { id: 3, label: 'Completed' }
+  { id: 0, label: 'Pending', icon: 'mdi-timer-sand' },
+  { id: 1, label: 'In Progress', icon: 'mdi-progress-clock' },
+  { id: 2, label: 'On Board', icon: 'mdi-truck-delivery' },
+  { id: 3, label: 'Completed', icon: 'mdi-check-circle-outline' }
 ];
 
 function isStepCompleted(step) {
@@ -183,4 +193,5 @@ th {
   font-weight: bold;
   width: 30%;
 }
+
 </style>
