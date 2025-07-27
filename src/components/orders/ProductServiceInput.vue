@@ -35,7 +35,7 @@
         />
       </v-col>
       <v-col cols="12" md="6">
-        <v-autocomplete
+        <v-select
           :class="isMobile ? '' : 'ml-2'"
           v-model="selectedService"
           label="Servizio"
@@ -44,7 +44,14 @@
           item-value="id"
           :rules="validation.requiredRules"
           menu
-        />
+        >
+          <template v-slot:item="{ props }">
+            <v-list-item
+              v-bind="props"
+              @click="selectedServices.push(selectedService)"
+            />
+          </template>
+        </v-select>
       </v-col>
     </v-row>
     <template v-else>
