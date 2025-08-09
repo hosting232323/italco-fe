@@ -51,10 +51,27 @@
             />
           </v-col>
         </v-row>
-        <FormButtons
-          :loading="loading"
-          @cancel="emits('cancel')"
-        />
+        <draggable v-model="schedule.order_ids" item-key="id" class="mb-4" handle=".drag-handle">
+          <template #item="{ element, index }">
+            <div class="d-flex align-center order-item">
+              <div class="drag-handle" style="cursor: grab;">
+                <v-icon>mdi-drag</v-icon>
+              </div>
+              <div class="d-flex justify-space-between align-center" style="width: 100%;">
+                <p>Ordine #{{ element }}</p>
+                <v-text-field 
+                  v-model="element.time_slot" 
+                  label="Time Slot" type="date"
+                  :rules="validation.requiredRules" 
+                  dense 
+                  hide-details 
+                  max-width="320px" 
+                />
+              </div>
+            </div>
+          </template>
+        </draggable>
+        <FormButtons :loading="loading" @cancel="emits('cancel')" />
       </v-form>
     </v-card-text>
   </v-card>
@@ -73,6 +90,7 @@ import { useOrderStore } from '@/stores/order';
 import { useScheduleStore } from '@/stores/schedule';
 import { useTransportStore } from '@/stores/transport';
 import { useDeliveryGroupStore } from '@/stores/deliveryGroup';
+import draggable from 'vuedraggable';
 
 const form = ref(null);
 const router = useRouter();
@@ -103,3 +121,16 @@ const assignDeliveryGroup = async () => {
   });
 };
 </script>
+
+<style scoped>
+.order-item {
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+}
+.order-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+</style>
