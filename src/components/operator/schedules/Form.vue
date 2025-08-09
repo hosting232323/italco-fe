@@ -51,6 +51,26 @@
             />
           </v-col>
         </v-row>
+
+        <draggable
+          v-model="selectedOrders"
+          item-key="id"
+          class="my-4"
+          ghost-class="ghost"
+          handle=".handle"
+        >
+          <template #item="{element, index}">
+
+            <div class="d-flex align-center">
+              <v-icon small class="drag-handle" style="cursor: grab; margin-right: 8px;">mdi-drag</v-icon>
+
+              Ordine #{{ element.id }}
+
+            </div>
+
+          </template>
+        </draggable>
+
         <FormButtons
           :loading="loading"
           @cancel="emits('cancel')"
@@ -63,7 +83,7 @@
 <script setup>
 import FormButtons from '@/components/FormButtons';
 
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
@@ -73,6 +93,7 @@ import { useOrderStore } from '@/stores/order';
 import { useScheduleStore } from '@/stores/schedule';
 import { useTransportStore } from '@/stores/transport';
 import { useDeliveryGroupStore } from '@/stores/deliveryGroup';
+import draggable from 'vuedraggable';
 
 const form = ref(null);
 const router = useRouter();
@@ -87,6 +108,12 @@ const { element: schedule } = storeToRefs(scheduleStore);
 const orders = storesUtils.getStoreList(orderStore, router);
 const transports = storesUtils.getStoreList(transportStore, router);
 const deliveryGroups = storesUtils.getStoreList(deliveryGroupStore, router);
+
+const selectedOrders = computed(() =>
+  schedule.value.order_ids
+    ? schedule.value.order_ids.map(id => orders.value.find(o => o.id === id))
+    : []
+);
 
 const assignDeliveryGroup = async () => {
   if (!(await form.value.validate()).valid) return;

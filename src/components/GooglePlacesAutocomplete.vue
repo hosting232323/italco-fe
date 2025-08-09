@@ -15,7 +15,6 @@ import {
   ref,
   watch,
   onMounted,
-  defineProps,
   defineEmits,
   nextTick,
   computed,
