@@ -51,17 +51,24 @@
             />
           </v-col>
         </v-row>
-        <draggable v-model="schedule.order_ids" item-key="id" class="mb-4" handle=".drag-handle">
-          <template #item="{ element, index }">
+
+        <draggable
+          v-model="schedule.orders"
+          item-key="id"
+          class="mb-4"
+          handle=".drag-handle"
+        >
+          <template #item="{ element }">
             <div class="d-flex align-center order-item">
               <div class="drag-handle" style="cursor: grab;">
                 <v-icon>mdi-drag</v-icon>
               </div>
               <div class="d-flex justify-space-between align-center" style="width: 100%;">
-                <p>Ordine #{{ element }}</p>
+                <p>Ordine #{{ element.id }}</p>
                 <v-text-field 
                   v-model="element.time_slot" 
-                  label="Time Slot" type="date"
+                  label="Time Slot"
+                  type="date"
                   :rules="validation.requiredRules" 
                   dense 
                   hide-details 
@@ -79,8 +86,7 @@
 
 <script setup>
 import FormButtons from '@/components/FormButtons';
-
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
@@ -105,6 +111,48 @@ const { element: schedule } = storeToRefs(scheduleStore);
 const orders = storesUtils.getStoreList(orderStore, router);
 const transports = storesUtils.getStoreList(transportStore, router);
 const deliveryGroups = storesUtils.getStoreList(deliveryGroupStore, router);
+
+if (!schedule.value.orders) {
+  schedule.value.orders = [];
+}
+
+const syncOrders = () => {
+  const existingMap = Object.fromEntries(
+    schedule.value.orders.map(o => [o.id, o])
+  );
+
+  schedule.value.orders = schedule.value.order_ids.map((id, index) => {
+    const existing = existingMap[id];
+    if (existing) 
+      return { ...existing, schedule_index: index };
+    else 
+      return {
+        id,
+        time_slot: '',
+        schedule_index: index
+      };
+  });
+};
+
+syncOrders();
+
+watch(
+  () => schedule.value.order_ids,
+  () => {
+    syncOrders();
+  },
+  { deep: true }
+);
+
+watch(
+  () => schedule.value.orders,
+  (newOrders) => {
+    newOrders.forEach((o, i) => {
+      o.schedule_index = i;
+    });
+  },
+  { deep: true }
+);
 
 const assignDeliveryGroup = async () => {
   if (!(await form.value.validate()).valid) return;
