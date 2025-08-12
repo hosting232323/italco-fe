@@ -63,7 +63,7 @@
               <div class="drag-handle" style="cursor: grab;">
                 <v-icon>mdi-drag</v-icon>
               </div>
-              <div class="d-flex justify-space-between align-center" style="width: 100%;">
+              <div :class="['d-flex', 'justify-space-between', isMobile ? '' : 'align-center', isMobile ? 'flex-column' : '']" style="width: 100%;">
                 <p>Ordine #{{ element.id }}</p>
                 <v-text-field 
                   v-model="element.time_slot" 
@@ -72,7 +72,7 @@
                   :rules="validation.requiredRules" 
                   dense 
                   hide-details 
-                  max-width="320px" 
+                  :style="isMobile ? {}: { maxWidth: '320px' }"
                 />
               </div>
             </div>
