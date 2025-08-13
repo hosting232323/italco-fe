@@ -51,10 +51,34 @@
             />
           </v-col>
         </v-row>
-        <FormButtons
-          :loading="loading"
-          @cancel="emits('cancel')"
-        />
+
+        <draggable
+          v-model="schedule.orders"
+          item-key="id"
+          class="mb-4"
+          handle=".drag-handle"
+        >
+          <template #item="{ element }">
+            <div class="d-flex align-center order-item">
+              <div class="drag-handle" style="cursor: grab;">
+                <v-icon>mdi-drag</v-icon>
+              </div>
+              <div :class="['d-flex', 'justify-space-between', isMobile ? '' : 'align-center', isMobile ? 'flex-column' : '']" style="width: 100%;">
+                <p>Ordine #{{ element.id }}</p>
+                <v-text-field 
+                  v-model="element.time_slot" 
+                  label="Time Slot"
+                  type="time"
+                  :rules="validation.requiredRules" 
+                  dense 
+                  hide-details 
+                  :style="isMobile ? {}: { maxWidth: '320px' }"
+                />
+              </div>
+            </div>
+          </template>
+        </draggable>
+        <FormButtons :loading="loading" @cancel="emits('cancel')" />
       </v-form>
     </v-card-text>
   </v-card>
@@ -63,9 +87,10 @@
 <script setup>
 import FormButtons from '@/components/FormButtons';
 
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
+import draggable from 'vuedraggable';
 import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import validation from '@/utils/validation';
@@ -88,6 +113,40 @@ const orders = storesUtils.getStoreList(orderStore, router);
 const transports = storesUtils.getStoreList(transportStore, router);
 const deliveryGroups = storesUtils.getStoreList(deliveryGroupStore, router);
 
+if (!schedule.value.orders) schedule.value.orders = [];
+
+const syncOrders = () => {
+  const existingMap = Object.fromEntries(
+    schedule.value.orders.map(o => [o.id, o])
+  );
+
+  schedule.value.orders = schedule.value.order_ids.map((id, index) => {
+    const existing = existingMap[id];
+    if (existing) 
+      return { ...existing, schedule_index: index };
+    else 
+      return {
+        id,
+        time_slot: '',
+        schedule_index: index
+      };
+  });
+};
+
+syncOrders();
+
+watch(
+  () => schedule.value.order_ids,
+  () => syncOrders(),
+  { deep: true }
+);
+
+watch(
+  () => schedule.value.orders,
+  (newOrders) => newOrders.forEach((o, i) => o.schedule_index = i),
+  { deep: true }
+);
+
 const assignDeliveryGroup = async () => {
   if (!(await form.value.validate()).valid) return;
 
@@ -103,3 +162,16 @@ const assignDeliveryGroup = async () => {
   });
 };
 </script>
+
+<style scoped>
+.order-item {
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+}
+.order-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+</style>
