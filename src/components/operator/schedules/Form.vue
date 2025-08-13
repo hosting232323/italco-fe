@@ -68,7 +68,7 @@
                 <v-text-field 
                   v-model="element.time_slot" 
                   label="Time Slot"
-                  type="date"
+                  type="time"
                   :rules="validation.requiredRules" 
                   dense 
                   hide-details 
@@ -86,9 +86,11 @@
 
 <script setup>
 import FormButtons from '@/components/FormButtons';
+
 import { ref, watch } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
+import draggable from 'vuedraggable';
 import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import validation from '@/utils/validation';
@@ -96,7 +98,6 @@ import { useOrderStore } from '@/stores/order';
 import { useScheduleStore } from '@/stores/schedule';
 import { useTransportStore } from '@/stores/transport';
 import { useDeliveryGroupStore } from '@/stores/deliveryGroup';
-import draggable from 'vuedraggable';
 
 const form = ref(null);
 const router = useRouter();
@@ -112,9 +113,7 @@ const orders = storesUtils.getStoreList(orderStore, router);
 const transports = storesUtils.getStoreList(transportStore, router);
 const deliveryGroups = storesUtils.getStoreList(deliveryGroupStore, router);
 
-if (!schedule.value.orders) {
-  schedule.value.orders = [];
-}
+if (!schedule.value.orders) schedule.value.orders = [];
 
 const syncOrders = () => {
   const existingMap = Object.fromEntries(
@@ -138,19 +137,13 @@ syncOrders();
 
 watch(
   () => schedule.value.order_ids,
-  () => {
-    syncOrders();
-  },
+  () => syncOrders(),
   { deep: true }
 );
 
 watch(
   () => schedule.value.orders,
-  (newOrders) => {
-    newOrders.forEach((o, i) => {
-      o.schedule_index = i;
-    });
-  },
+  (newOrders) => newOrders.forEach((o, i) => o.schedule_index = i),
   { deep: true }
 );
 
