@@ -14,14 +14,14 @@
       >
         <template v-slot:item.password="{ item }">
           <span :class="{ 'blur-password': !visiblePasswords[item.id] }">
-            {{ item.password }}
+            {{ visiblePasswords[item.id] ? decryptedPasswords[item.id] : '••••••••••••••••••••••••••••••••••••••••••••••••' }}
           </span>
           <v-btn
             :icon="visiblePasswords[item.id] ? 'mdi-eye' : 'mdi-eye-off'"
             variant="text"
-            style="font-size: 13px;"
+            style="font-size: 13px; margin-left: 15px;"
             :color="theme.current.value.primaryColor"
-            @click="togglePassword(item.id)"
+            @click="togglePassword(item.id, item.password)"
           />
         </template>
         <template v-slot:item.actions="{ item }">
@@ -61,7 +61,9 @@ import { useTheme } from 'vuetify';
 import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
-import { encryptPassword, decryptPassword } from 'generic-module';
+import { decryptPassword } from 'generic-module';
+
+const secretKey = import.meta.env.VITE_SECRET_KEY;
 
 const element = ref({});
 const message = ref('');
@@ -72,12 +74,18 @@ const administrationUserStore = useAdministrationUserStore();
 const users = storesUtils.getStoreList(administrationUserStore, router);
 
 const visiblePasswords = reactive({});
+const decryptedPasswords = reactive({});
 
-const togglePassword = (id) => {
+const togglePassword = (id, encrypted) => {
+  if (!visiblePasswords[id]) {
+    try {
+      decryptedPasswords[id] = decryptPassword(encrypted, secretKey);
+    } catch (e) {
+      decryptedPasswords[id] = '[ERRORE DECIFRATURA]';
+    }
+  }
   visiblePasswords[id] = !visiblePasswords[id];
 };
-
-console.log(decryptPassword('dW5kZWZpbmVk4NWOv2Of1hCY7cc6a6r1yw==', 'ate'));
 
 const deleteItem = (item, force = false) => {
   administrationUserStore.deleteElement(force, item, router, function(data) {

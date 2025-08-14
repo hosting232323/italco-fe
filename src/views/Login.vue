@@ -5,8 +5,10 @@
     logo="/logo.png"
     :secondaryColor="theme.current.value.primaryColor"
     redirectLink="/dashboard"
-    :hostname="hostname"
     :signUp="false"
+    :hostname="hostname"
+    :iv="iv"
+    :secretkey="secretkey"
   />
 </template>
 
@@ -16,5 +18,7 @@ import { AuthManager } from 'generic-module';
 import { useTheme } from 'vuetify';
 
 const theme = useTheme();
+const iv = import.meta.env.VITE_IV;
+const secretkey = import.meta.env.VITE_SECRET_KEY;
 const hostname = import.meta.env.VITE_HOSTNAME;
 </script>

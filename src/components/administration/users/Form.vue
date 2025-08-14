@@ -50,6 +50,10 @@ import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import validation from '@/utils/validation';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
+import { encryptPassword } from 'generic-module';
+
+const iv = import.meta.env.VITE_IV;
+const secretKey = import.meta.env.VITE_SECRET_KEY;
 
 const MAX_USERS = 40;
 
@@ -64,6 +68,7 @@ const users = storesUtils.getStoreList(administrationUserStore, router);
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
 
+  user.value.password = encryptPassword(user.value.password, secretKey, iv);
   loading.value = true;
   administrationUserStore.createElement(router, function (data) {
     loading.value = false;
