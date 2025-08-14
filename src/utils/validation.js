@@ -20,8 +20,16 @@ const capRules = [
   }
 ];
 
+const phoneRules = [
+  (value) => {
+    if (!value || /^\+39\d{10}$/.test(value)) return true;
+    return 'Il numero di telefono deve essere nel formato +39XXXXXXXXXX';
+  }
+];
+
 export default {
   requiredRules,
   arrayRules,
-  capRules
+  capRules,
+  phoneRules
 };

@@ -41,6 +41,7 @@
           :class="isMobile ? '' : 'mr-2'"
           v-model="order.addressee_contact"
           label="Recapito"
+          :rules="validation.phoneRules"
         />
       </v-col>
       <v-col cols="12" md="6">
