@@ -13,9 +13,8 @@
 </template>
 
 <script setup>
-import { AuthManager } from 'generic-module';
-
 import { useTheme } from 'vuetify';
+import { AuthManager } from 'generic-module';
 
 const theme = useTheme();
 const iv = import.meta.env.VITE_IV;
