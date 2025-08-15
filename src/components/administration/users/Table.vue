@@ -13,16 +13,17 @@
         ]"
       >
         <template v-slot:item.password="{ item }">
-          <span :class="{ 'blur-password': !visiblePasswords[item.id] }">
-            {{ visiblePasswords[item.id] ? decryptedPasswords[item.id] : '••••••••••••••••••••••••••••••••••••••••••••••••' }}
-          </span>
-          <v-btn
-            :icon="visiblePasswords[item.id] ? 'mdi-eye' : 'mdi-eye-off'"
-            variant="text"
-            style="font-size: 13px; margin-left: 15px;"
-            :color="theme.current.value.primaryColor"
-            @click="togglePassword(item.id, item.password)"
-          />
+          <template v-if="item.role != 'Admin'">
+            <v-btn
+              :icon="visiblePasswords[item.id] ? 'mdi-eye' : 'mdi-eye-off'"
+              variant="text"
+              :color="theme.current.value.primaryColor"
+              @click="togglePassword(item.id, item.password)"
+            />
+            <span :class="{ 'blur-password': !visiblePasswords[item.id] }">
+              {{ visiblePasswords[item.id] ? decryptedPasswords[item.id] : '••••••••••••••••••••••••••••••••••••••••••••••••' }}
+            </span>
+          </template>
         </template>
         <template v-slot:item.actions="{ item }">
           <v-btn
