@@ -12,6 +12,19 @@
           { title: 'Azioni', key: 'actions' }
         ]"
       >
+        <template v-slot:item.password="{ item }">
+          <template v-if="item.role != 'Admin'">
+            <v-btn
+              :icon="visiblePasswords[item.id] ? 'mdi-eye' : 'mdi-eye-off'"
+              variant="text"
+              :color="theme.current.value.primaryColor"
+              @click="togglePassword(item.id, item.password)"
+            />
+            <span :class="{ 'blur-password': !visiblePasswords[item.id] }">
+              {{ visiblePasswords[item.id] ? decryptedPasswords[item.id] : '••••••••••••••••••••••••••••••••••••••••••••••••' }}
+            </span>
+          </template>
+        </template>
         <template v-slot:item.actions="{ item }">
           <v-btn
             v-if="item.role !== 'Admin'"
@@ -44,11 +57,14 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, reactive  } from 'vue';
 import { useTheme } from 'vuetify';
 import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
+import { decryptPassword } from 'generic-module';
+
+const secretKey = import.meta.env.VITE_SECRET_KEY;
 
 const element = ref({});
 const message = ref('');
@@ -57,6 +73,20 @@ const dialog = ref(false);
 const router = useRouter();
 const administrationUserStore = useAdministrationUserStore();
 const users = storesUtils.getStoreList(administrationUserStore, router);
+
+const visiblePasswords = reactive({});
+const decryptedPasswords = reactive({});
+
+const togglePassword = (id, encrypted) => {
+  if (!visiblePasswords[id]) {
+    try {
+      decryptedPasswords[id] = decryptPassword(encrypted, secretKey);
+    } catch (e) {
+      decryptedPasswords[id] = '[ERRORE DECIFRATURA]';
+    }
+  }
+  visiblePasswords[id] = !visiblePasswords[id];
+};
 
 const deleteItem = (item, force = false) => {
   administrationUserStore.deleteElement(force, item, router, function(data) {
@@ -77,5 +107,9 @@ const deleteItem = (item, force = false) => {
 <style scoped>
 .v-table {
   background-color: var(--item-bg-color);
+}
+
+.blur-password {
+  filter: blur(6px);
 }
 </style>
