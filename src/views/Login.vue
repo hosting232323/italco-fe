@@ -8,7 +8,7 @@
     :signUp="false"
     :hostname="hostname"
     :iv="iv"
-    :secretkey="secretkey"
+    :secretKey="secretKey"
   />
 </template>
 
@@ -18,6 +18,6 @@ import { AuthManager } from 'generic-module';
 
 const theme = useTheme();
 const iv = import.meta.env.VITE_IV;
-const secretkey = import.meta.env.VITE_SECRET_KEY;
 const hostname = import.meta.env.VITE_HOSTNAME;
+const secretKey = import.meta.env.VITE_SECRET_KEY;
 </script>
