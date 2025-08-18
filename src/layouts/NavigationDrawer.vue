@@ -50,7 +50,6 @@
     <v-list-item
       @click="logoutModule.logout(router)"
       title="Logout"
-      id="menu-logout"
       prepend-icon="mdi-logout"
     />
   </v-navigation-drawer>
