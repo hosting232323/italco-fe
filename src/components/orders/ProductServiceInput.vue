@@ -18,20 +18,14 @@
   </v-list>
   <v-form ref="form">
     <v-row no-gutters v-if="order.type">
-      <v-col cols="12" md="6" class="d-flex">
+      <v-col cols="12" md="6">
         <v-text-field
-          class="flex-grow-1"
+          :class="isMobile ? '' : 'mr-2'"
           v-model="selectedProduct"
           label="Prodotto"
+          append-icon="mdi-plus"
+          @click:append="addProduct"
           :rules="validation.requiredRules"
-        />
-        <v-btn
-          variant="text"
-          style="margin: 5px 0 0 2px;"
-          icon="mdi-plus"
-          @click="addProduct"
-          :disabled="!selectedProduct"
-          id="button-plus"
         />
       </v-col>
       <v-col cols="12" md="6">
