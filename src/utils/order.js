@@ -2,9 +2,8 @@ const LABELS = [
   { value: 'Pending', title: 'In Attesa' },
   { value: 'In Progress', title: 'In Consegna' },
   { value: 'On Board', title: 'A Bordo' },
-  { value: 'Delay', title: 'Ritardo' },
+  { value: 'At Warehouse', title: 'In Magazzino' },
   { value: 'Completed', title: 'Completato' },
-  { value: 'Anomaly', title: 'Anomalia' },
   { value: 'Cancelled', title: 'Cancellato' }
 ];
 
