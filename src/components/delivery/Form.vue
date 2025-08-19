@@ -8,7 +8,7 @@
           :rules="validation.requiredRules"
           :items="STATUS_MAP[actualStatus].map(status => ({
             value: status,
-            title: orderUtils.LABELS[status]
+            title: orderUtils.LABELS.find(label => label.value == status).title
           }))"
         />
         <v-textarea
