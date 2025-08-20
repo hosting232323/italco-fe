@@ -79,7 +79,7 @@
                     v-model="element.end_time_slot" 
                     label="Time Slot End"
                     type="time"
-                    :rules="validation.requiredRules" 
+                    :rules="validation.futureTime(element)" 
                     dense 
                     hide-details 
                     :style="isMobile ? { width: '' }: { width: '200px' }"

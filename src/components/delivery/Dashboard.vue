@@ -9,7 +9,7 @@
       v-model="selectedCard"
     >
       <v-row>
-        <v-col cols="6" v-for="card in cards">
+        <v-col cols="6" v-for="card in cards" :key="card.key">
           <v-item v-slot="{ selectedClass, toggle }" :value="card.key">
             <v-card
               @click="toggle"
@@ -17,8 +17,7 @@
               height="100"
             >
               <v-card-text style="font-size: larger;">
-                {{ card.title }}:
-                <b>{{ orders[card.key] ? orders[card.key].length : 0 }}</b>
+                {{ card.title }}: <b>{{ cardCounts[card.key] }}</b>
               </v-card-text>
             </v-card>
           </v-item>
@@ -37,7 +36,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
@@ -51,6 +50,7 @@ const theme = useTheme();
 const router = useRouter();
 const orderStore = useOrderStore();
 const { list: orders, ready } = storeToRefs(orderStore);
+
 
 const cards = [
   {
@@ -71,6 +71,26 @@ const cards = [
   }
 ];
 
+const cardCounts = computed(() => {
+  const anomalyOrders = [];
+  const delayOrders = [];
+  
+  for (const key of ['In Progress', 'On Board']) {
+    const list = orders.value[key] || [];
+    list.forEach(order => {
+      if (order.anomaly) anomalyOrders.push(order);
+      if (order.delay) delayOrders.push(order);
+    });
+  }
+
+  return {
+    'In Progress': orders.value['In Progress']?.length || 0,
+    'On Board': orders.value['On Board']?.length || 0,
+    'Anomaly': anomalyOrders.length,
+    'Delay': delayOrders.length
+  };
+});
+
 onMounted(() => {
   if (!navigator.geolocation) {
     locationError.value = true;
@@ -78,10 +98,10 @@ onMounted(() => {
   }
 
   navigator.geolocation.getCurrentPosition(
-    position => {
+    () => {
       if (!ready.value) orderStore.initListDelivery(router);
     },
-    error => {
+    () => {
       locationError.value = true;
     }
   );
