@@ -1,7 +1,7 @@
 <template>
   <v-form ref="form" @submit.prevent="submitForm">
     <v-row no-gutters>
-      <v-col cols="12" md="6">
+      <v-col cols="12" :md="order.id ? 6 : 12">
         <v-select
           v-model="order.type"
           label="Tipo"
@@ -12,10 +12,10 @@
       </v-col>
       <v-col cols="12" md="6">
         <v-select 
-          v-if="role != 'Delivery' && order.id"
+          v-if="order.id"
           v-model="order.status"
           label="Stato"
-          :items="orderUtils.LABELS"
+          :items="orderUtils.LABELS.filter(label => label.value != 'Pending')"
           :rules="validation.requiredRules"
           :class="isMobile ? '' : 'ml-2'"
         />
