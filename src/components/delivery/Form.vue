@@ -74,9 +74,6 @@ const STATUS_MAP = {
 };
 const actualStatus = order.value.status;
 
-if (order.value.delay === undefined) order.value.delay = false;
-if (order.value.anomaly === undefined) order.value.anomaly = false;
-
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
 
