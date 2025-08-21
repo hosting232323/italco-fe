@@ -33,7 +33,7 @@
           <p style="font-size: smaller;">{{ getAddress(item.collection_point) }}</p>
         </template>
         <template v-slot:item.status="{ item }">
-          {{ orderUtils.LABELS[item.status] }}
+          {{ orderUtils.LABELS.find(label => label.value == item.status).title }}
         </template>
         <template v-slot:item.price="{ item }">
           {{ item.price ? item.price.toFixed(2) : '' }}€

@@ -1,12 +1,11 @@
-const LABELS = {
-  Pending: 'In Attesa',
-  'In Progress': 'In Consegna',
-  'On Board': 'A Bordo',
-  Delay: 'Ritardo',
-  Completed: 'Completato',
-  Anomaly: 'Anomalia',
-  Cancelled: 'Cancellato'
-};
+const LABELS = [
+  { value: 'Pending', title: 'In Attesa' },
+  { value: 'In Progress', title: 'In Consegna' },
+  { value: 'On Board', title: 'A Bordo' },
+  { value: 'At Warehouse', title: 'In Magazzino' },
+  { value: 'Completed', title: 'Completato' },
+  { value: 'Cancelled', title: 'Cancellato' }
+];
 
 const TYPES = [
   {

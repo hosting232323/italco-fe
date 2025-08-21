@@ -65,15 +65,27 @@
               </div>
               <div :class="['d-flex', 'justify-space-between', isMobile ? '' : 'align-center', isMobile ? 'flex-column' : '']" style="width: 100%;">
                 <p>Ordine #{{ element.id }}</p>
-                <v-text-field 
-                  v-model="element.time_slot" 
-                  label="Time Slot"
-                  type="time"
-                  :rules="validation.requiredRules" 
-                  dense 
-                  hide-details 
-                  :style="isMobile ? {}: { maxWidth: '320px' }"
-                />
+                <div :class="['d-flex', isMobile ? 'flex-column' : '']">
+                  <v-text-field 
+                    v-model="element.start_time_slot" 
+                    label="Time Slot Start"
+                    type="time"
+                    :rules="validation.requiredRules" 
+                    dense 
+                    hide-details 
+                    :style="isMobile ? { margin: '15px 0', width: '' }: { width: '200px', marginRight: '15px' }"
+                  />
+                  <v-text-field 
+                    v-model="element.end_time_slot" 
+                    label="Time Slot End"
+                    type="time"
+                    :rules="validation.futureTime(element)" 
+                    dense 
+                    hide-details 
+                    :style="isMobile ? { width: '' }: { width: '200px' }"
+                  />
+                </div>
+                
               </div>
             </div>
           </template>
@@ -127,7 +139,8 @@ const syncOrders = () => {
     else 
       return {
         id,
-        time_slot: '',
+        start_time_slot: '',
+        end_time_slot: '',
         schedule_index: index
       };
   });

@@ -1,11 +1,26 @@
 <template>
   <v-form ref="form" @submit.prevent="submitForm">
-    <v-select
-      v-model="order.type"
-      label="Tipo"
-      :items="orderUtils.TYPES"
-      :rules="validation.requiredRules"
-    />
+    <v-row no-gutters>
+      <v-col cols="12" :md="order.id && order.status != 'Pending' ? 6 : 12">
+        <v-select
+          v-model="order.type"
+          label="Tipo"
+          :items="orderUtils.TYPES"
+          :rules="validation.requiredRules"
+          :class="isMobile ? '' : 'mr-2'"
+        />
+      </v-col>
+      <v-col cols="12" md="6">
+        <v-select 
+          v-if="order.id && order.status != 'Pending'"
+          v-model="order.status"
+          label="Stato"
+          :items="orderUtils.LABELS.filter(label => label.value != 'Pending')"
+          :rules="validation.requiredRules"
+          :class="isMobile ? '' : 'ml-2'"
+        />
+      </v-col>
+    </v-row>
     <ProductServiceInput />
     <v-row no-gutters>
       <v-col cols="12" md="6">
