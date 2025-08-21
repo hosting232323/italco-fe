@@ -8,23 +8,39 @@
           :rules="validation.requiredRules"
           :items="STATUS_MAP[actualStatus].map(status => ({
             value: status,
-            title: orderUtils.LABELS[status]
+            title: orderUtils.LABELS.find(label => label.value == status).title
           }))"
         />
         <v-textarea
-          v-if="['Anomaly', 'Cancelled', 'Delay'].includes(status)"
+          v-if="['Cancelled'].includes(status)"
           v-model="order.motivation"
           label="Motivazione"
           rows="3"
           :rules="validation.requiredRules"
         />
         <v-file-input multiple
-          v-if="['Completed', 'Anomaly', 'Cancelled', 'Delay'].includes(status)"
+          v-if="['Completed', 'Cancelled'].includes(status)"
           accept="image/*"
           label="Foto"
           v-model="order.photos"
-          :rules="['Completed', 'Anomaly'].includes(status) ? validation.arrayRules : []"
+          :rules="['Completed'].includes(status) ? validation.arrayRules : []"
         />
+        <v-row >
+          <v-col cols="6">
+            <v-radio-group v-model="order.delay">
+              <label class="mr-2">In ritardo</label>
+              <v-radio label="Sì" :value="true"></v-radio>
+              <v-radio label="No" :value="false"></v-radio>
+            </v-radio-group>
+          </v-col>
+          <v-col cols="6">
+            <v-radio-group v-model="order.anomaly">
+              <label class="mr-2">Anomalia</label>
+              <v-radio label="Sì" :value="true"></v-radio>
+              <v-radio label="No" :value="false"></v-radio>
+            </v-radio-group>
+          </v-col>
+        </v-row>
         <FormButtons
           :loading="loading"
           @cancel="emits('cancel')"
@@ -53,9 +69,8 @@ const emits = defineEmits(['cancel']);
 const { element: order } = storeToRefs(orderStore);
 
 const STATUS_MAP = {
-  'In Progress': ['On Board', 'Anomaly', 'Cancelled'],
-  'On Board': ['Completed', 'Anomaly', 'Cancelled', 'Delay'],
-  'Delay': ['Completed', 'Anomaly', 'Cancelled']
+  'In Progress': ['On Board', 'Cancelled'],
+  'On Board': ['Completed', 'Cancelled'],
 };
 const actualStatus = order.value.status;
 
@@ -68,6 +83,7 @@ const submitForm = async () => {
   orderStore.updateElementWithFormData(router, function (data) {
     loading.value = false;
     if (data.status == 'ok') {
+      orderStore.initList(router);
       order.value = {};
       emits('cancel');
     }
