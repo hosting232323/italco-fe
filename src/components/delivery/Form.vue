@@ -12,18 +12,18 @@
           }))"
         />
         <v-textarea
-          v-if="['Cancelled'].includes(status)"
+          v-if="status === 'Cancelled' || order.delay || order.anomaly"
           v-model="order.motivation"
           label="Motivazione"
           rows="3"
           :rules="validation.requiredRules"
         />
         <v-file-input multiple
-          v-if="['Completed', 'Cancelled'].includes(status)"
+          v-if="['Completed', 'Cancelled'].includes(status) || order.delay || order.anomaly"
           accept="image/*"
           label="Foto"
           v-model="order.photos"
-          :rules="['Completed'].includes(status) ? validation.arrayRules : []"
+          :rules="(status === 'Completed' || order.anomaly) ? validation.arrayRules : []"
         />
         <v-row >
           <v-col cols="6">
