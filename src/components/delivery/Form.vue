@@ -5,7 +5,6 @@
         <v-select
           label="Stato"
           v-model="status"
-          :rules="validation.requiredRules"
           :items="STATUS_MAP[actualStatus].map(status => ({
             value: status,
             title: orderUtils.LABELS.find(label => label.value == status).title
@@ -79,7 +78,7 @@ const submitForm = async () => {
 
   loading.value = true;
   order.value.user_id = order.value.user.id;
-  order.value.status = status.value;
+  if (status.value) order.value.status = status.value;
   orderStore.updateElementWithFormData(router, function (data) {
     loading.value = false;
     if (data.status == 'ok') {
