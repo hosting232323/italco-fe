@@ -9,15 +9,15 @@
             style="float: right;"
             variant="text"
             @click="openForm"
-            v-if="role != 'Delivery'"
+            v-if="role && role != 'Delivery'"
           />
           <OrderImportation v-if="role == 'Admin'" />
         </h1><hr>
-        <template v-if="role != 'Delivery'">
+        <template v-if="role && role != 'Delivery'">
           <OrdersFilters />
           <OrderTable />
         </template>
-        <DeliveryDashboard v-else />
+        <DeliveryDashboard v-else-if="role == 'Delivery'" />
       </v-container>
     </template>
     <template v-slot:default>
