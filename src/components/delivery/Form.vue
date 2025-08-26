@@ -83,7 +83,7 @@ const submitForm = async () => {
   orderStore.updateElementWithFormData(router, function (data) {
     loading.value = false;
     if (data.status == 'ok') {
-      orderStore.initList(router);
+      orderStore.initListDelivery(router);
       order.value = {};
       emits('cancel');
     }
