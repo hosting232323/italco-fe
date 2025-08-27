@@ -9,7 +9,7 @@
       v-model="selectedCard"
     >
       <v-row>
-        <v-col cols="4" v-for="card in cards" :key="card.key">
+        <v-col :cols="(card.key === 'Delay' || card.key === 'Anomaly') ? 2 : 4" v-for="card in cards" :key="card.key">
           <v-item v-slot="{ selectedClass, toggle }" :value="card.key">
             <v-card
               @click="toggle"
@@ -62,27 +62,32 @@ const cards = [
     key: 'On Board'
   },
   {
-    title: 'Con anomalia',
+    title: 'Anomalia',
     key: 'Anomaly'
+  },
+  {
+    title: 'Ritardo',
+    key: 'Delay'
   },
   {
     title: 'Completato',
     key: 'Completed'
   },
   {
-    title: 'Cancellato',
+    title: 'Non Consegnato',
     key: 'Cancelled'
   },
   {
-    title: 'In ritardo',
-    key: 'Delay'
+    title: 'In Magazzino',
+    key: 'At Warehouse'
   },
 ];
 
 const cardCounts = computed(() => {
   const anomalyOrders = [];
   const delayOrders = [];
-  
+
+
   for (const key of ['In Progress', 'On Board']) {
     const list = orders.value[key] || [];
     list.forEach(order => {
@@ -91,11 +96,13 @@ const cardCounts = computed(() => {
     });
   }
 
+
   return {
     'In Progress': orders.value['In Progress']?.length || 0,
     'On Board': orders.value['On Board']?.length || 0,
     'Completed': orders.value['Completed']?.length || 0,
     'Cancelled': orders.value['Cancelled']?.length || 0,
+    'At Warehouse': orders.value['At Warehouse']?.length || 0,
     'Anomaly': anomalyOrders.length,
     'Delay': delayOrders.length
   };
