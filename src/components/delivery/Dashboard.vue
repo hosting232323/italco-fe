@@ -9,7 +9,7 @@
       v-model="selectedCard"
     >
       <v-row>
-        <v-col cols="6" v-for="card in cards" :key="card.key">
+        <v-col cols="4" v-for="card in cards" :key="card.key">
           <v-item v-slot="{ selectedClass, toggle }" :value="card.key">
             <v-card
               @click="toggle"
@@ -66,9 +66,17 @@ const cards = [
     key: 'Anomaly'
   },
   {
+    title: 'Completato',
+    key: 'Completed'
+  },
+  {
+    title: 'Cancellato',
+    key: 'Cancelled'
+  },
+  {
     title: 'In ritardo',
     key: 'Delay'
-  }
+  },
 ];
 
 const cardCounts = computed(() => {
@@ -86,6 +94,8 @@ const cardCounts = computed(() => {
   return {
     'In Progress': orders.value['In Progress']?.length || 0,
     'On Board': orders.value['On Board']?.length || 0,
+    'Completed': orders.value['Completed']?.length || 0,
+    'Cancelled': orders.value['Cancelled']?.length || 0,
     'Anomaly': anomalyOrders.length,
     'Delay': delayOrders.length
   };
