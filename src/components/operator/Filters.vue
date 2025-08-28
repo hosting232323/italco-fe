@@ -13,7 +13,7 @@
       <v-autocomplete
         :class="isMobile ? '' : 'ml-2 mr-2'"
         v-model="filters['CustomerGroup.id']"
-        label="Gruppo Clienti"
+        label="GDO"
         :items="customerGroups"
         item-title="name"
         item-value="id"
