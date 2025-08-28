@@ -87,7 +87,6 @@ const cardCounts = computed(() => {
   const anomalyOrders = [];
   const delayOrders = [];
 
-
   for (const key of ['In Progress', 'On Board']) {
     const list = orders.value[key] || [];
     list.forEach(order => {
@@ -95,7 +94,6 @@ const cardCounts = computed(() => {
       if (order.delay) delayOrders.push(order);
     });
   }
-
 
   return {
     'In Progress': orders.value['In Progress']?.length || 0,
