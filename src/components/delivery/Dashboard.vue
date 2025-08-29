@@ -62,12 +62,8 @@ const cards = [
     key: 'On Board'
   },
   {
-    title: 'Anomalia',
-    key: 'Anomaly'
-  },
-  {
-    title: 'Ritardo',
-    key: 'Delay'
+    title: 'In Magazzino',
+    key: 'At Warehouse'
   },
   {
     title: 'Completato',
@@ -78,8 +74,12 @@ const cards = [
     key: 'Cancelled'
   },
   {
-    title: 'In Magazzino',
-    key: 'At Warehouse'
+    title: 'Anomalia',
+    key: 'Anomaly'
+  },
+  {
+    title: 'Ritardo',
+    key: 'Delay'
   },
 ];
 

@@ -68,8 +68,9 @@ const emits = defineEmits(['cancel']);
 const { element: order } = storeToRefs(orderStore);
 
 const STATUS_MAP = {
-  'In Progress': ['On Board', 'Cancelled'],
-  'On Board': ['Completed', 'Cancelled'],
+  'In Progress': ['On Board', 'Cancelled', 'At Warehouse'],
+  'On Board': ['Completed', 'Cancelled', 'At Warehouse'],
+  'At Warehouse': ['On Board']
 };
 const actualStatus = order.value.status;
 
