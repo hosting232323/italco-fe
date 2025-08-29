@@ -25,7 +25,7 @@
               <v-btn
                 icon="mdi-file-export"
                 variant="text"
-                :loading="!!loadingMap[item.id]"
+                :loading="!!exportLoading[item.id]"
                 :color="theme.current.value.primaryColor"
                 @click="exportElement(item)"
               />
@@ -34,6 +34,7 @@
               <v-btn
                 icon="mdi-delete"
                 variant="text"
+                :loading="!!deleteLoading[item.id]"
                 :color="theme.current.value.primaryColor"
                 @click="deleteItem(item)"
               />
@@ -59,20 +60,24 @@ const orderStore = useOrderStore();
 const emits = defineEmits(['openPopUp']);
 const scheduleStore = useScheduleStore();
 const schedules = storesUtils.getStoreList(scheduleStore, router);
-const loadingMap = reactive({});
+const deleteLoading = reactive({});
+const exportLoading = reactive({});
 
 const deleteItem = (item) => {
+  deleteLoading[item.id] = true;
+
   scheduleStore.deleteElement(item, router, function() {
     orderStore.initList(router);
     scheduleStore.initList(router);
+    deleteLoading[item.id] = false;
   });
 };
 
 const exportElement = async (item) => {
-  loadingMap[item.id] = true;
+  exportLoading[item.id] = true;
 
   http.getRequest(`export/schedule/${item.id}`, {}, function (data) {
-    loadingMap[item.id] = false;
+    exportLoading[item.id] = false;
     const blob = new Blob([data], { type: 'application/pdf' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');

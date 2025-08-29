@@ -30,6 +30,7 @@
             v-if="item.role !== 'Admin'"
             icon="mdi-delete"
             variant="text"
+            :loading="deleteLoading[item.id]"
             :color="theme.current.value.primaryColor"
             @click="deleteItem(item)"
           />
@@ -74,6 +75,7 @@ const router = useRouter();
 const administrationUserStore = useAdministrationUserStore();
 const users = storesUtils.getStoreList(administrationUserStore, router);
 
+const deleteLoading = reactive({});
 const visiblePasswords = reactive({});
 const decryptedPasswords = reactive({});
 
@@ -89,6 +91,7 @@ const togglePassword = (id, encrypted) => {
 };
 
 const deleteItem = (item, force = false) => {
+  deleteLoading[item.id] = true;
   administrationUserStore.deleteElement(force, item, router, function(data) {
     if (data.status == 'ko') {
       dialog.value = true;
@@ -100,6 +103,7 @@ const deleteItem = (item, force = false) => {
       dialog.value = false;
       administrationUserStore.initList(router);
     }
+    deleteLoading[item.id] = false;
   });
 };
 </script>

@@ -25,6 +25,7 @@
           <v-btn
             icon="mdi-delete"
             variant="text"
+            :loading="deleteLoading[item.id]"
             :color="theme.current.value.primaryColor"
             @click="deleteItem(item)"
           />
@@ -35,6 +36,7 @@
 </template>
 
 <script setup>
+import { reactive } from 'vue';
 import { useTheme } from 'vuetify';
 import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
@@ -45,10 +47,13 @@ const router = useRouter();
 const emits = defineEmits(['openPopUp']);
 const deliveryGroupStore = useDeliveryGroupStore();
 const deliveryGroups = storesUtils.getStoreList(deliveryGroupStore, router);
+const deleteLoading = reactive({});
 
 const deleteItem = (item) => {
+  deleteLoading[item.id] = true;
   deliveryGroupStore.deleteElement(item, router, function() {
     deliveryGroupStore.initList(router);
+    deleteLoading[item.id] = false;
   });
 };
 </script>
