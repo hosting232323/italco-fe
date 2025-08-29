@@ -10,6 +10,7 @@
       <v-btn
         icon="mdi-delete"
         variant="text"
+        :loading="deleteLoading[item.id]"
         @click="deleteItem(item)"
         :color="theme.current.value.primaryColor"
       />
@@ -18,6 +19,7 @@
 </template>
 
 <script setup>
+import { reactive } from 'vue';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
@@ -27,13 +29,16 @@ const theme = useTheme();
 const router = useRouter();
 const customerGroupStore = useCustomerGroupStore();
 const { element: customerGroup } = storeToRefs(customerGroupStore);
+const deleteLoading = reactive({});
 
 const deleteItem = (item) => {
+  deleteLoading[item.id] = true;
   customerGroupStore.assignUser(item.id, router, function() {
     customerGroupStore.initList(router);
     customerGroup.value.users = customerGroup.value.users.filter(
       user => user.id !== item.id
     );
+    deleteLoading[item.id] = false;
   }, true);
 };
 </script>

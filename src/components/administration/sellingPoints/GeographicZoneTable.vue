@@ -52,6 +52,7 @@
           <v-btn
             icon="mdi-delete"
             variant="text"
+            :loading="deleteLoading[item.id]"
             :color="theme.current.value.primaryColor"
             @click="deleteItem(item)"
           />
@@ -62,6 +63,7 @@
 </template>
 
 <script setup>
+import { reactive } from 'vue';
 import days from '@/utils/days';
 import { useTheme } from 'vuetify';
 import { useRouter } from 'vue-router';
@@ -73,10 +75,13 @@ const router = useRouter();
 const emits = defineEmits(['openPopUp']);
 const geographicZoneStore = useGeographicZoneStore();
 const geographicZones = storesUtils.getStoreList(geographicZoneStore, router);
+const deleteLoading = reactive({});
 
 const deleteItem = (item) => {
+  deleteLoading[item.id] = true;
   geographicZoneStore.deleteElement(item, router, function() {
     geographicZoneStore.initList(router);
+    deleteLoading[item.id] = false;
   });
 };
 </script>

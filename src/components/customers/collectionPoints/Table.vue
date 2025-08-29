@@ -24,6 +24,7 @@
           <v-btn
             icon="mdi-delete"
             variant="text"
+            :loading="deleteLoading[item.id]"
             :color="theme.current.value.primaryColor"
             @click="deleteItem(item)"
           />
@@ -34,6 +35,7 @@
 </template>
 
 <script setup>
+import { reactive } from 'vue';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
@@ -45,6 +47,7 @@ const router = useRouter();
 const collectionPointStore = useCollectionPointStore();
 const { element: collectionPoint, activeForm } = storeToRefs(collectionPointStore);
 const collectionPoints = storesUtils.getStoreList(collectionPointStore, router);
+const deleteLoading = reactive({});
 
 const openForm = (item) => {
   collectionPoint.value = item;
@@ -52,8 +55,10 @@ const openForm = (item) => {
 };
 
 const deleteItem = (item) => {
+  deleteLoading[item.id] = true;
   collectionPointStore.deleteElement(item, router, function() {
     collectionPointStore.initList(router);
+    deleteLoading[item.id] = false;
   });
 };
 </script>
