@@ -1,7 +1,8 @@
 <template>
   <v-form ref="form" @submit.prevent="submitForm">
+    {{ role }}
     <v-row no-gutters>
-      <v-col cols="12" :md="order.id && order.status != 'Pending' ? 6 : 12">
+      <v-col cols="12" :md="order.id && order.status != 'Pending' && role != 'Operator' ? 6 : 12">
         <v-select
           v-model="order.type"
           label="Tipo"
@@ -12,13 +13,43 @@
       </v-col>
       <v-col cols="12" md="6">
         <v-select 
-          v-if="order.id && order.status != 'Pending'"
+          v-if="order.id && order.status != 'Pending' && role != 'Operator'"
           v-model="order.status"
           label="Stato"
           :items="orderUtils.LABELS.filter(label => label.value != 'Pending')"
           :rules="validation.requiredRules"
           :class="isMobile ? '' : 'ml-2'"
         />
+      </v-col>
+    </v-row>
+    <v-textarea
+      v-if="status === 'Cancelled' || order.delay || order.anomaly && role != 'Operator'"
+      v-model="order.motivation"
+      label="Motivazione"
+      rows="3"
+      :rules="validation.requiredRules"
+    />
+    <v-file-input multiple
+      v-if="['Completed', 'Cancelled'].includes(status) || order.delay || order.anomaly && role != 'Operator'"
+      accept="image/*"
+      label="Foto"
+      v-model="order.photos"
+      :rules="(status === 'Completed' || order.anomaly) ? validation.arrayRules : []"
+    />
+    <v-row no-gutters v-if="order.id && role != 'Operator'">
+      <v-col cols="6">
+        <v-radio-group v-model="order.delay">
+          <label class="mr-2">In ritardo</label>
+          <v-radio label="Sì" :value="true"></v-radio>
+          <v-radio label="No" :value="false"></v-radio>
+        </v-radio-group>
+      </v-col>
+      <v-col cols="6">
+        <v-radio-group v-model="order.anomaly">
+          <label class="mr-2">Con Anomalia</label>
+          <v-radio label="Sì" :value="true"></v-radio>
+          <v-radio label="No" :value="false"></v-radio>
+        </v-radio-group>
       </v-col>
     </v-row>
     <ProductServiceInput />

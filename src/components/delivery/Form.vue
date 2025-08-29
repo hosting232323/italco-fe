@@ -3,6 +3,7 @@
     <v-card-text>
       <v-form ref="form" @submit.prevent="submitForm">
         <v-select
+          v-if="!['Completed', 'Cancelled'].includes(actualStatus)"
           label="Stato"
           v-model="status"
           :items="STATUS_MAP[actualStatus].map(status => ({
@@ -24,7 +25,7 @@
           v-model="order.photos"
           :rules="(status === 'Completed' || order.anomaly) ? validation.arrayRules : []"
         />
-        <v-row >
+        <v-row>
           <v-col cols="6">
             <v-radio-group v-model="order.delay">
               <label class="mr-2">In ritardo</label>
@@ -34,7 +35,7 @@
           </v-col>
           <v-col cols="6">
             <v-radio-group v-model="order.anomaly">
-              <label class="mr-2">Anomalia</label>
+              <label class="mr-2">Con Anomalia</label>
               <v-radio label="Sì" :value="true"></v-radio>
               <v-radio label="No" :value="false"></v-radio>
             </v-radio-group>
