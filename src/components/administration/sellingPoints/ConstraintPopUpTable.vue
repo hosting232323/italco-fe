@@ -14,6 +14,7 @@
       <v-btn
         icon="mdi-delete"
         variant="text"
+        :loading="deleteLoading[item.id]"
         @click="deleteItem(item)"
         :color="theme.current.value.primaryColor"
       />
@@ -22,6 +23,7 @@
 </template>
 
 <script setup>
+import { reactive } from 'vue';
 import days from '@/utils/days';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
@@ -32,13 +34,16 @@ const theme = useTheme();
 const router = useRouter();
 const geographicZoneStore = useGeographicZoneStore();
 const { element: geographicZone } = storeToRefs(geographicZoneStore);
+const deleteLoading = reactive({});
 
 const deleteItem = (item) => {
+  deleteLoading[item.id] = true;
   geographicZoneStore.deleteEntity(item, 'constraint', router, function() {
     geographicZoneStore.initList(router);
     geographicZone.value.constraints = geographicZone.value.constraints.filter(
       constraint => constraint.id !== item.id
     );
+    deleteLoading[item.id] = false;
   }, true);
 };
 </script>

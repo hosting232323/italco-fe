@@ -111,7 +111,7 @@
       </v-timeline>
     </div>
 
-    <Map :lat="order.lat" :lon="order.lon" />
+    <Map v-if="order.status === 'On Board'" :lat="order.lat" :lon="order.lon" />
   </v-container>
 </template>
 
