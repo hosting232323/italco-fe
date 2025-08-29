@@ -6,7 +6,7 @@
       :title="product"
       append-icon="mdi-delete"
       @click:append="addProduct"
-      :subtitle="order.products[product].map(serviceId => services.find(service => service.id == serviceId).name).join(', ')"
+      :subtitle="order.products[product].map(service => service.name).join(', ')"
     >
     <template #append>
       <v-icon
@@ -33,11 +33,12 @@
           :class="isMobile ? '' : 'ml-2'"
           v-model="selectedService"
           label="Servizio"
-          :items="services.filter(service => service.type == order.type && (role == 'Customer' || service.users.map(user => user.user_id).includes(order.user_id)))"
+          :items="services.filter(service => service.type == order.type &&
+            (role == 'Customer' || service.users.map(user => user.user_id).includes(order.user_id)))"
           item-title="name"
-          item-value="id"
           :rules="validation.requiredRules"
           menu
+          return-object
         >
           <template v-slot:item="{ props }">
             <v-list-item
@@ -54,11 +55,11 @@
     </template>
     <v-chip
       class="mr-2 mb-5"
-      v-for="(serviceId, index) in selectedServices"
-      closable
-      @click:close="selectedServices.splice(index, 1)"
+      v-for="service in selectedServices"
+      @click="selectedServices.splice(index, 1)"
+      append-icon="mdi-close-circle"
     >
-      {{ services.find(service => service.id == serviceId).name }}
+      {{ service.name }}
     </v-chip>
   </v-form>
 </template>

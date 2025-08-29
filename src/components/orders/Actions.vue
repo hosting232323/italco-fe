@@ -83,11 +83,6 @@ const { element: updatedOrder, activeForm } = storeToRefs(orderStore);
 const openForm = (item) => {
   updatedOrder.value = item;
   updatedOrder.value.user_id = updatedOrder.value.user.id;
-  Object.keys(updatedOrder.value.products).forEach(
-    product => updatedOrder.value.products[product] = updatedOrder.value.products[product].map(
-      service => service.id
-    )
-  );
   activeForm.value = true;
 };
 
