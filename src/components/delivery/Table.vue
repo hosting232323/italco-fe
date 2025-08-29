@@ -34,7 +34,7 @@
         </template>
         <template v-slot:item.collection_point="{ item }">
           {{ item.collection_point.name }}<br>
-          <p style="font-size: smaller;">{{ getAddress(item.collection_point) }}</p>
+          <p style="font-size: smaller;">{{ item.collection_point.address }}, {{ item.collection_point.cap }}</p>
         </template>
         <template v-slot:item.actions="{ item }">
           <v-btn
@@ -65,10 +65,6 @@ const dialog = ref(false);
 const orderStore = useOrderStore();
 const { keyName } = defineProps(['keyName']);
 const { list: orders, element: order } = storeToRefs(orderStore);
-
-const getAddress = (item) => {
-  return `${item.address}, ${item.city}, ${item.province}, ${item.cap}`;
-};
 
 const filteredOrders = computed(() => {
   if (keyName === 'Anomaly') {

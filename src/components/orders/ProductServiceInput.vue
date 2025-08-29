@@ -56,7 +56,7 @@
     <v-chip
       class="mr-2 mb-5"
       v-for="service in selectedServices"
-      @click:append="selectedServices.splice(index, 1)"
+      @click="selectedServices.splice(index, 1)"
       append-icon="mdi-close-circle"
     >
       {{ service.name }}

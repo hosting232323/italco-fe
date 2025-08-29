@@ -30,7 +30,7 @@
         </template>
         <template v-slot:item.collection_point="{ item }">
           {{ item.collection_point.name }}<br>
-          <p style="font-size: smaller;">{{ getAddress(item.collection_point) }}</p>
+          <p style="font-size: smaller;">{{ item.collection_point.address }}, {{ item.collection_point.cap }}</p>
         </template>
         <template v-slot:item.status="{ item }">
           {{ orderUtils.LABELS.find(label => label.value == item.status).title }}
@@ -72,10 +72,6 @@ const scheduleStore = useScheduleStore();
 const { role } = storeToRefs(userStore);
 const { element: schedule } = storeToRefs(scheduleStore);
 const orders = storesUtils.getStoreList(orderStore, router);
-
-const getAddress = (item) => {
-  return item.address + ', ' + item.city + ', ' + item.province + ', ' + item.cap;
-};
 
 const getHeaders = () => {
   const headers = [
