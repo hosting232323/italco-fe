@@ -1,148 +1,77 @@
 <template>
   <v-form ref="form" @submit.prevent="submitForm">
-    {{ role }}
-    <v-row no-gutters>
-      <v-col cols="12" :md="order.id && order.status != 'Pending' && role != 'Operator' ? 6 : 12">
-        <v-select
-          v-model="order.type"
-          label="Tipo"
-          :items="orderUtils.TYPES"
-          :rules="validation.requiredRules"
-          :class="isMobile ? '' : 'mr-2'"
-        />
-      </v-col>
-      <v-col cols="12" md="6">
-        <v-select 
-          v-if="order.id && order.status != 'Pending' && role != 'Operator'"
-          v-model="order.status"
-          label="Stato"
-          :items="orderUtils.LABELS.filter(label => label.value != 'Pending')"
-          :rules="validation.requiredRules"
-          :class="isMobile ? '' : 'ml-2'"
-        />
-      </v-col>
-    </v-row>
-    <v-textarea
-      v-if="status === 'Cancelled' || order.delay || order.anomaly && role != 'Operator'"
-      v-model="order.motivation"
-      label="Motivazione"
-      rows="3"
-      :rules="validation.requiredRules"
-    />
-    <v-file-input multiple
-      v-if="['Completed', 'Cancelled'].includes(status) || order.delay || order.anomaly && role != 'Operator'"
-      accept="image/*"
-      label="Foto"
-      v-model="order.photos"
-      :rules="(status === 'Completed' || order.anomaly) ? validation.arrayRules : []"
-    />
-    <v-row no-gutters v-if="order.id && role != 'Operator'">
-      <v-col cols="6" :class="isMobile ? 'd-flex flex-column' : 'd-flex justify-center align-center'">
-        <v-radio-group v-model="order.delay">
-          <label class="mr-2">In ritardo</label>
-          <v-radio label="Sì" :value="true"></v-radio>
-          <v-radio label="No" :value="false"></v-radio>
-        </v-radio-group>
-          <div
-            :style="isMobile ? { width: '100%' } : { width: '50%', height: '100%' }"
-            :class="isMobile ? 'd-flex flex-column' : 'd-flex justify-center align-center'"
-            v-if="order.delay"
-          >
-          <v-text-field 
-            v-model="order.start_time_slot" 
-            label="Time Slot Start"
-            type="time"
-            :rules="validation.requiredRules" 
-            dense 
-            hide-details 
-            :style="isMobile ? { margin: '15px 0', width: '100%'  } : { maxWidth: '115px', marginRight: '15px' }"
-          />
-          <v-text-field 
-            v-model="order.end_time_slot" 
-            label="Time Slot End"
-            type="time"
-            :rules="validation.futureTime(order)" 
-            dense 
-            hide-details 
-            :style="isMobile ? { width: '100%' }: { maxWidth: '115px'}"
-          />
-        </div>
-      </v-col>
-      <v-col cols="6">
-        <v-radio-group v-model="order.anomaly">
-          <label class="mr-2">Con Anomalia</label>
-          <v-radio label="Sì" :value="true"></v-radio>
-          <v-radio label="No" :value="false"></v-radio>
-        </v-radio-group>
-      </v-col>
-    </v-row>
-    <ProductServiceInput />
-    <v-row no-gutters>
-      <v-col cols="12" md="6">
-        <v-text-field
-          :class="isMobile ? '' : 'mr-2'"
-          v-model="order.addressee"
-          label="Destinatario"
-          :rules="validation.requiredRules"
-        />
-      </v-col>
-      <v-col cols="12" md="4">
-        <GooglePlacesAutocomplete
-          v-model="order.address"
-          :customClass="isMobile ? '' : 'ml-2 mr-2'"
-          label="Indirizzo"
-          :rules="validation.requiredRules"
-          @update:isValid="isLocationValid = $event"
-          @addressComponents="handleAddressComponents"
-        />
-      </v-col>
-      <v-col cols="12" md="2">
-        <v-text-field
-          :class="isMobile ? '' : 'ml-2'"
-          v-model="order.cap"
-          label="CAP"
-          :rules="validation.capRules"
-        />
-      </v-col>
-    </v-row>
-    <v-row no-gutters>
-      <v-col cols="12" md="6">
-        <v-text-field
-          :class="isMobile ? '' : 'mr-2'"
-          v-model="order.addressee_contact"
-          label="Recapito"
-          :rules="validation.phoneRules"
-        />
-      </v-col>
-      <v-col cols="12" md="6">
-        <v-autocomplete
-          :class="isMobile ? '' : 'ml-2'"
-          v-model="order.collection_point_id"
-          label="Punto di Ritiro"
-          :items="getCollectionPoints()"
-          item-title="name"
-          item-value="id"
-          :rules="validation.requiredRules"
-        />
-      </v-col>
-    </v-row>
-    <v-textarea
-      v-if="role == 'Customer'"
-      v-model="order.customer_note"
-      label="Note"
-      rows="3"
-    />
-    <v-textarea
-      v-else
-      v-model="order.operator_note"
-      label="Note"
-      rows="3"
-    />
+
+    <v-tabs v-model="activeTab" background-color="primary" dark grow class="mb-3">
+      <v-tab>Operator</v-tab>
+      <v-tab v-if="role != 'Operator'">Delivery</v-tab>
+    </v-tabs>
+
+    <div v-show="activeTab === 0">
+      <v-select v-model="order.type" label="Tipo" :items="orderUtils.TYPES" :rules="validation.requiredRules" />
+
+      <ProductServiceInput />
+      <v-row no-gutters>
+        <v-col cols="12" md="6">
+          <v-text-field :class="isMobile ? '' : 'mr-2'" v-model="order.addressee" label="Destinatario"
+            :rules="validation.requiredRules" />
+        </v-col>
+        <v-col cols="12" md="4">
+          <GooglePlacesAutocomplete v-model="order.address" :customClass="isMobile ? '' : 'ml-2 mr-2'" label="Indirizzo"
+            :rules="validation.requiredRules" @update:isValid="isLocationValid = $event"
+            @addressComponents="handleAddressComponents" />
+        </v-col>
+        <v-col cols="12" md="2">
+          <v-text-field :class="isMobile ? '' : 'ml-2'" v-model="order.cap" label="CAP" :rules="validation.capRules" />
+        </v-col>
+      </v-row>
+      <v-row no-gutters>
+        <v-col cols="12" md="6">
+          <v-text-field :class="isMobile ? '' : 'mr-2'" v-model="order.addressee_contact" label="Recapito"
+            :rules="validation.phoneRules" />
+        </v-col>
+        <v-col cols="12" md="6">
+          <v-autocomplete :class="isMobile ? '' : 'ml-2'" v-model="order.collection_point_id" label="Punto di Ritiro"
+            :items="getCollectionPoints()" item-title="name" item-value="id" :rules="validation.requiredRules" />
+        </v-col>
+      </v-row>
+      <v-textarea v-if="role == 'Customer'" v-model="order.customer_note" label="Note" rows="3" />
+      <v-textarea v-else v-model="order.operator_note" label="Note" rows="3" />
+    </div>
+
+    <div v-show="activeTab === 1">
+      <v-select v-if="order.id && order.status != 'Pending' && role != 'Operator'" v-model="order.status" label="Stato"
+        :items="orderUtils.LABELS.filter(label => label.value != 'Pending')" :rules="validation.requiredRules" />
+
+      <v-textarea v-if="role != 'Operator'" v-model="order.motivation" label="Motivazione" rows="3" />
+      <v-file-input multiple v-if="role != 'Operator'" accept="image/*" label="Foto" v-model="order.photos" />
+      <v-row no-gutters v-if="order.id && role != 'Operator'">
+        <v-col cols="6" :class="isMobile ? 'd-flex flex-column' : 'd-flex justify-center align-center'">
+          <v-radio-group v-model="order.delay">
+            <label class="mr-2">In ritardo</label>
+            <v-radio label="Sì" :value="true"></v-radio>
+            <v-radio label="No" :value="false"></v-radio>
+          </v-radio-group>
+          <div :style="isMobile ? { width: '100%' } : { width: '50%', height: '100%' }"
+            :class="isMobile ? 'd-flex flex-column' : 'd-flex justify-center align-center'" v-if="order.delay">
+            <v-text-field v-model="order.start_time_slot" label="Time Slot Start" type="time"
+              :rules="validation.requiredRules" dense hide-details
+              :style="isMobile ? { margin: '15px 0', width: '100%' } : { maxWidth: '115px', marginRight: '15px' }" />
+            <v-text-field v-model="order.end_time_slot" label="Time Slot End" type="time"
+              :rules="validation.futureTime(order)" dense hide-details
+              :style="isMobile ? { width: '100%' } : { maxWidth: '115px' }" />
+          </div>
+        </v-col>
+        <v-col cols="6">
+          <v-radio-group v-model="order.anomaly">
+            <label class="mr-2">Con Anomalia</label>
+            <v-radio label="Sì" :value="true"></v-radio>
+            <v-radio label="No" :value="false"></v-radio>
+          </v-radio-group>
+        </v-col>
+      </v-row>
+    </div>
     <p v-if="errorMsg">{{ errorMsg }}</p>
-    <FormButtons
-      :loading="false"
-      @cancel="exitFunction"
-    />
+    <FormButtons :loading="false" @cancel="exitFunction" />
   </v-form>
 </template>
 
@@ -164,6 +93,7 @@ import { useOrderStore } from '@/stores/order';
 import { useCollectionPointStore } from '@/stores/collectionPoint';
 
 const form = ref(null);
+const activeTab = ref(0);
 const errorMsg = ref('');
 const router = useRouter();
 const isLocationValid = ref(false);
