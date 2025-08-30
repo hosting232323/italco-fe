@@ -9,7 +9,11 @@
       v-model="selectedCard"
     >
       <v-row>
-        <v-col :cols="(card.key === 'Delay' || card.key === 'Anomaly') ? 2 : 4" v-for="card in cards" :key="card.key">
+        <v-col
+          v-for="card in cards" :key="card.key"
+          :cols="isMobile ? 6 :
+            ((card.key === 'Delay' || card.key === 'Anomaly') ? 2 : 4)"
+        >
           <v-item v-slot="{ selectedClass, toggle }" :value="card.key">
             <v-card
               @click="toggle"
@@ -36,11 +40,12 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
+import mobile from '@/utils/mobile';
 import { useRouter } from 'vue-router';
 import { useOrderStore } from '@/stores/order';
+import { ref, computed, onMounted } from 'vue';
 
 import Table from '@/components/delivery/Table';
 
@@ -50,6 +55,7 @@ const theme = useTheme();
 const router = useRouter();
 const orderStore = useOrderStore();
 const { list: orders, ready } = storeToRefs(orderStore);
+const isMobile = mobile.setupMobileUtils();
 
 
 const cards = [
