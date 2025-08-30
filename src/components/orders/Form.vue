@@ -1,14 +1,11 @@
 <template>
   <v-form ref="form" @submit.prevent="submitForm">
-
-    <v-tabs v-model="activeTab" background-color="primary" dark grow class="mb-3">
+    <v-tabs v-if="role == 'Admin' && order.id" v-model="activeTab" background-color="primary" dark grow class="mb-3">
       <v-tab>Operator</v-tab>
-      <v-tab v-if="role != 'Operator'">Delivery</v-tab>
+      <v-tab>Delivery</v-tab>
     </v-tabs>
-
     <div v-show="activeTab === 0">
       <v-select v-model="order.type" label="Tipo" :items="orderUtils.TYPES" :rules="validation.requiredRules" />
-
       <ProductServiceInput />
       <v-row no-gutters>
         <v-col cols="12" md="6">
@@ -37,11 +34,9 @@
       <v-textarea v-if="role == 'Customer'" v-model="order.customer_note" label="Note" rows="3" />
       <v-textarea v-else v-model="order.operator_note" label="Note" rows="3" />
     </div>
-
     <div v-show="activeTab === 1">
       <v-select v-if="order.id && order.status != 'Pending' && role != 'Operator'" v-model="order.status" label="Stato"
         :items="orderUtils.LABELS.filter(label => label.value != 'Pending')" :rules="validation.requiredRules" />
-
       <v-textarea v-if="role != 'Operator'" v-model="order.motivation" label="Motivazione" rows="3" />
       <v-file-input multiple v-if="role != 'Operator'" accept="image/*" label="Foto" v-model="order.photos" />
       <v-row no-gutters v-if="order.id && role != 'Operator'">
@@ -71,7 +66,10 @@
       </v-row>
     </div>
     <p v-if="errorMsg">{{ errorMsg }}</p>
-    <FormButtons :loading="false" @cancel="exitFunction" />
+    <FormButtons
+      :loading="false"
+      @cancel="exitFunction"
+    />
   </v-form>
 </template>
 

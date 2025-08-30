@@ -63,12 +63,12 @@
 import FormButtons from '@/components/FormButtons';
 
 import { ref } from 'vue';
+import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import orderUtils from '@/utils/order';
 import { useRouter } from 'vue-router';
 import validation from '@/utils/validation';
 import { useOrderStore } from '@/stores/order';
-import mobile from '@/utils/mobile';
 
 const form = ref(null);
 const status = ref(null);
@@ -76,8 +76,8 @@ const loading = ref(false);
 const router = useRouter();
 const orderStore = useOrderStore();
 const emits = defineEmits(['cancel']);
-const { element: order } = storeToRefs(orderStore);
 const isMobile = mobile.setupMobileUtils();
+const { element: order } = storeToRefs(orderStore);
 
 const STATUS_MAP = {
   'In Progress': ['On Board', 'Cancelled', 'At Warehouse'],
