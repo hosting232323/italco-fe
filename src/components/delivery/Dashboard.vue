@@ -8,8 +8,8 @@
       :style="{ '--item-bg-color': theme.current.value.primaryColor }"
       v-model="selectedCard"
     >
-      <v-row>
-        <v-col :cols="(card.key === 'Delay' || card.key === 'Anomaly') ? 2 : 4" v-for="card in cards" :key="card.key">
+      <v-row >
+        <v-col :cols="isMobile ? 6 : ((card.key === 'Delay' || card.key === 'Anomaly') ? 2 : 4)" v-for="card in cards" :key="card.key">
           <v-item v-slot="{ selectedClass, toggle }" :value="card.key">
             <v-card
               @click="toggle"
@@ -41,6 +41,7 @@ import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import { useOrderStore } from '@/stores/order';
+import mobile from '@/utils/mobile';
 
 import Table from '@/components/delivery/Table';
 
@@ -50,6 +51,7 @@ const theme = useTheme();
 const router = useRouter();
 const orderStore = useOrderStore();
 const { list: orders, ready } = storeToRefs(orderStore);
+const isMobile = mobile.setupMobileUtils();
 
 
 const cards = [
