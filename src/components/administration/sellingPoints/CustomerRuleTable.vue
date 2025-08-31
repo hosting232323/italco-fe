@@ -1,5 +1,12 @@
 <template>
+  <v-skeleton-loader
+    v-if="!ready"
+    type="table"
+    :color="theme.current.value.secondaryColor"
+    class="mt-5"
+  />
   <v-data-table
+    v-else
     :items="customerRules"
     :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
     :headers="[
@@ -30,6 +37,7 @@
 import { reactive } from 'vue';
 import days from '@/utils/days';
 import { useTheme } from 'vuetify';
+import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import { useCustomerRuleStore } from '@/stores/customerRule';
@@ -37,6 +45,7 @@ import { useCustomerRuleStore } from '@/stores/customerRule';
 const theme = useTheme();
 const router = useRouter();
 const customerRuleStore = useCustomerRuleStore();
+const { ready } = storeToRefs(customerRuleStore);
 const customerRules = storesUtils.getStoreList(customerRuleStore, router);
 const deleteLoading = reactive({});
 

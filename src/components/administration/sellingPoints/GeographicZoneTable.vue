@@ -1,5 +1,12 @@
 <template>
+  <v-skeleton-loader
+    v-if="!ready"
+    type="table"
+    :color="theme.current.value.secondaryColor"
+    class="mt-5"
+  />
   <v-data-table
+    v-else
     :items="geographicZones"
     :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
     :headers="[
@@ -66,6 +73,7 @@
 import { reactive } from 'vue';
 import days from '@/utils/days';
 import { useTheme } from 'vuetify';
+import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import { useGeographicZoneStore } from '@/stores/geographicZone';
@@ -74,6 +82,7 @@ const theme = useTheme();
 const router = useRouter();
 const emits = defineEmits(['openPopUp']);
 const geographicZoneStore = useGeographicZoneStore();
+const { ready } = storeToRefs(geographicZoneStore);
 const geographicZones = storesUtils.getStoreList(geographicZoneStore, router);
 const deleteLoading = reactive({});
 

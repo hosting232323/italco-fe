@@ -2,6 +2,7 @@
   <v-dialog max-width="1500" v-model="dialog">
     <template v-slot:activator>
       <v-data-table
+        v-if="ready"
         class="mt-5"
         :items="filteredOrders"
         :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
@@ -64,7 +65,7 @@ const theme = useTheme();
 const dialog = ref(false);
 const orderStore = useOrderStore();
 const { keyName } = defineProps(['keyName']);
-const { list: orders, element: order } = storeToRefs(orderStore);
+const { list: orders, element: order, ready } = storeToRefs(orderStore);
 
 const filteredOrders = computed(() => {
   if (keyName === 'Anomaly') {

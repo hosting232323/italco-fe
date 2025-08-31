@@ -1,5 +1,12 @@
 <template>
+  <v-skeleton-loader
+    v-if="!ready"
+    type="table"
+    :color="theme.current.value.secondaryColor"
+    class="mt-5"
+  />
   <v-data-table
+    v-else
     :items="transports"
     :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
     :headers="[
@@ -44,7 +51,7 @@ import { useTransportStore } from '@/stores/transport';
 const theme = useTheme();
 const router = useRouter();
 const transportStore = useTransportStore();
-const { element: transport, activeForm } = storeToRefs(transportStore);
+const { element: transport, activeForm, ready } = storeToRefs(transportStore);
 const transports = storesUtils.getStoreList(transportStore, router);
 const deleteLoading = reactive({});
 

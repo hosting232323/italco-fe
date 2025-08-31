@@ -1,7 +1,14 @@
 <template>
   <v-container>
     <h1>Borderò</h1><hr>
+      <v-skeleton-loader
+        v-if="!ready"
+        type="table"
+        :color="theme.current.value.secondaryColor"
+        class="mt-5"
+      />
       <v-data-table
+        v-else
         :items="schedules"
         :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
         :headers="[
@@ -46,9 +53,10 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue';
+import { reactive } from 'vue';
 import http from '@/utils/http';
 import { useTheme } from 'vuetify';
+import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import { useOrderStore } from '@/stores/order';
@@ -59,6 +67,7 @@ const router = useRouter();
 const orderStore = useOrderStore();
 const emits = defineEmits(['openPopUp']);
 const scheduleStore = useScheduleStore();
+const { ready } = storeToRefs(scheduleStore);
 const schedules = storesUtils.getStoreList(scheduleStore, router);
 const deleteLoading = reactive({});
 const exportLoading = reactive({});

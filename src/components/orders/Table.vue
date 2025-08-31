@@ -7,7 +7,14 @@
         :color="theme.current.value.primaryColor"
         @click="dialog = true"
       />
+      <v-skeleton-loader
+        v-if="!ready"
+        type="table"
+        :color="theme.current.value.secondaryColor"
+        class="mt-5"
+      />
       <v-data-table
+        v-else
         :items="orders"
         :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
         :headers="getHeaders()"
@@ -70,6 +77,7 @@ const userStore = useUserStore();
 const orderStore = useOrderStore();
 const scheduleStore = useScheduleStore();
 const { role } = storeToRefs(userStore);
+const { ready } = storeToRefs(orderStore);
 const { element: schedule } = storeToRefs(scheduleStore);
 const orders = storesUtils.getStoreList(orderStore, router);
 

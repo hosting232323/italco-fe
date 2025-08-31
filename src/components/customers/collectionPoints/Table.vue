@@ -1,5 +1,12 @@
 <template>
+  <v-skeleton-loader
+    v-if="!ready"
+    type="table"
+    :color="theme.current.value.secondaryColor"
+    class="mt-5"
+  />
   <v-data-table
+    v-else
     :items="collectionPoints"
     :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
     :headers="[
@@ -45,7 +52,7 @@ import { useCollectionPointStore } from '@/stores/collectionPoint';
 const theme = useTheme();
 const router = useRouter();
 const collectionPointStore = useCollectionPointStore();
-const { element: collectionPoint, activeForm } = storeToRefs(collectionPointStore);
+const { element: collectionPoint, activeForm, ready } = storeToRefs(collectionPointStore);
 const collectionPoints = storesUtils.getStoreList(collectionPointStore, router);
 const deleteLoading = reactive({});
 

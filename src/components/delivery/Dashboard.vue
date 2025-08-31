@@ -1,33 +1,41 @@
 <template>
-  <div v-if="!locationError && ready">
-    <br><b>
-      Totale ordini: {{ Object.values(orders).reduce((sum, arr) => sum + arr.length, 0) }}
-    </b><br><br>
-    <v-item-group
-      selected-class="selected"
-      :style="{ '--item-bg-color': theme.current.value.primaryColor }"
-      v-model="selectedCard"
-    >
-      <v-row>
-        <v-col
-          v-for="card in cards" :key="card.key"
-          :cols="isMobile ? 6 :
-            ((card.key === 'Delay' || card.key === 'Anomaly') ? 2 : 4)"
-        >
-          <v-item v-slot="{ selectedClass, toggle }" :value="card.key">
-            <v-card
-              @click="toggle"
-              :class="['d-flex align-center', selectedClass]"
-              height="100"
-            >
-              <v-card-text style="font-size: larger;">
-                {{ card.title }}: <b>{{ cardCounts[card.key] }}</b>
-              </v-card-text>
-            </v-card>
-          </v-item>
-        </v-col>
-      </v-row>
-    </v-item-group>
+  <div v-if="!locationError">
+    <v-skeleton-loader
+      v-if="!ready"
+      type="table"
+      :color="theme.current.value.secondaryColor"
+      class="mt-5"
+    />
+    <div v-else>
+      <br><b>
+        Totale ordini: {{ Object.values(orders).reduce((sum, arr) => sum + arr.length, 0) }}
+      </b><br><br>
+      <v-item-group
+        selected-class="selected"
+        :style="{ '--item-bg-color': theme.current.value.primaryColor }"
+        v-model="selectedCard"
+      >
+        <v-row>
+          <v-col
+            v-for="card in cards" :key="card.key"
+            :cols="isMobile ? 6 :
+              ((card.key === 'Delay' || card.key === 'Anomaly') ? 2 : 4)"
+          >
+            <v-item v-slot="{ selectedClass, toggle }" :value="card.key">
+              <v-card
+                @click="toggle"
+                :class="['d-flex align-center', selectedClass]"
+                height="100"
+              >
+                <v-card-text style="font-size: larger;">
+                  {{ card.title }}: <b>{{ cardCounts[card.key] }}</b>
+                </v-card-text>
+              </v-card>
+            </v-item>
+          </v-col>
+        </v-row>
+      </v-item-group>
+    </div>
     <Table :keyName="selectedCard" />
   </div>
 

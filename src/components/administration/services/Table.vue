@@ -1,5 +1,12 @@
 <template>
+  <v-skeleton-loader
+    v-if="!ready"
+    type="table"
+    :color="theme.current.value.secondaryColor"
+    class="mt-5"
+  />
   <v-data-table
+    v-else
     :items="services"
     :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
     :headers="[
@@ -60,7 +67,7 @@ const theme = useTheme();
 const router = useRouter();
 const serviceStore = useServiceStore();
 const props = defineProps(['activatorProps']);
-const { element: service, activeForm } = storeToRefs(serviceStore);
+const { element: service, activeForm, ready } = storeToRefs(serviceStore);
 const services = storesUtils.getStoreList(serviceStore, router);
 const deleteLoading = reactive({});
 
