@@ -71,18 +71,18 @@
                     label="Time Slot Start"
                     type="time"
                     :rules="validation.requiredRules" 
-                    dense 
-                    hide-details 
+                    dense hide-details 
                     :style="isMobile ? { margin: '15px 0', width: '' }: { width: '200px', marginRight: '15px' }"
+                    step="60"
                   />
                   <v-text-field 
                     v-model="element.end_time_slot" 
                     label="Time Slot End"
                     type="time"
                     :rules="validation.futureTime(element)" 
-                    dense 
-                    hide-details 
+                    dense hide-details 
                     :style="isMobile ? { width: '' }: { width: '200px' }"
+                    step="60"
                   />
                 </div>
                 
