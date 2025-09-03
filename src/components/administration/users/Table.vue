@@ -45,7 +45,7 @@
       </v-data-table>
     </template>
     <template v-slot:default>
-      <v-card title="Attenzione!" :text="message">
+      <v-card title="Attenzione!">
         <v-card-text>
           <p>Stai per cancellare l'utente: <strong>{{ element.email }}</strong></p>
           <ul style="margin-left: 20px;">
@@ -95,7 +95,6 @@ import http from '@/utils/http';
 const secretKey = import.meta.env.VITE_SECRET_KEY;
 
 const element = ref({});
-const message = ref('');
 const theme = useTheme();
 const dialog = ref(false);
 const router = useRouter();
@@ -120,16 +119,12 @@ const togglePassword = (id, encrypted) => {
 
 const deleteItem = (item, force = false) => {
   deleteLoading[item.id] = true;
-  http.getRequest(`user/${item.id}/dependencies`, {}, (data) => {
-    element.value = { ...item, ...data };
-  }, 'GET', router)
   administrationUserStore.deleteElement(force, item, router, function(data) {
     if (data.status == 'ko') {
       dialog.value = true;
       element.value = item;
-      message.value = data.error;
+      element.value = { ...item, ...data.dependencies };
     } else {
-      message.value = '';
       element.value = {};
       dialog.value = false;
       administrationUserStore.initList(router);
