@@ -91,14 +91,8 @@ const getHeaders = () => {
     { title: 'Recapito', value: 'addressee_contact' },
     { title: 'Punto di Ritiro', value: 'collection_point' }
 ];
-  if (role.value == 'Customer')
-    headers.push({ title: 'Note', value: 'customer_note' });
-  else
-    headers.push(
-      { title: 'Note Punto Vendita', value: 'customer_note' },
-      { title: 'Note Operatori', value: 'operator_note' },
-      { title: 'Punto Vendita', value: 'user.email' }
-    );
+  if (role.value != 'Customer')
+    headers.push({ title: 'Punto Vendita', value: 'user.email' });
   headers.push(
     { title: 'D.P.C.', value: 'dpc' },
     { title: 'D.R.C.', value: 'drc' },
