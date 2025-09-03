@@ -103,8 +103,9 @@ const submitForm = async () => {
       activeForm.value = false;
     }
   };
-
-  if (order.value.id)
+  if (order.value.id && order.value.photos && order.value.photos.length > 0)
+    orderStore.updateElementWithFormData(router, callback);
+  else if (order.value.id)
     orderStore.updateElement(router, callback);
   else
     orderStore.createElement(router, callback);

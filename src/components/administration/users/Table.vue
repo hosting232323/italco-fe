@@ -45,7 +45,18 @@
       </v-data-table>
     </template>
     <template v-slot:default>
-      <v-card title="Attenzione!" :text="message">
+      <v-card title="Attenzione!">
+        <v-card-text>
+          <p>Stai per cancellare l'utente: <strong>{{ element.email }}</strong></p>
+          <ul style="margin-left: 20px;">
+            <li>Verranno rimossi {{ element.serviceUsers }} servizi collegati</li>
+            <li>Verranno rimosse {{ element.customerRules }} regole personalizzate</li>
+            <li>Verranno rimossi {{ element.collectionPoints }} punti di ritiro</li>
+            <li v-if="element.blockedOrders > 0">
+              Non sarà possibile cancellare l'utente perché ci sono {{ element.blockedOrders }} ordini attivi
+            </li>
+          </ul>
+        </v-card-text>
         <v-card-actions>
           <v-btn
             text="Annulla"
@@ -57,6 +68,7 @@
             text="Conferma"
             :color="theme.current.value.primaryColor"
             @click="deleteItem(element, true)"
+            :disabled="element.blockedOrders > 0"
           />
         </v-card-actions>
       </v-card>
@@ -76,7 +88,6 @@ import { decryptPassword } from 'generic-module';
 const secretKey = import.meta.env.VITE_SECRET_KEY;
 
 const element = ref({});
-const message = ref('');
 const theme = useTheme();
 const dialog = ref(false);
 const router = useRouter();
@@ -104,10 +115,8 @@ const deleteItem = (item, force = false) => {
   administrationUserStore.deleteElement(force, item, router, function(data) {
     if (data.status == 'ko') {
       dialog.value = true;
-      element.value = item;
-      message.value = data.error;
+      element.value = { ...item, ...data.dependencies };
     } else {
-      message.value = '';
       element.value = {};
       dialog.value = false;
       administrationUserStore.initList(router);
