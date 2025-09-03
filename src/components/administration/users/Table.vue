@@ -122,7 +122,6 @@ const deleteItem = (item, force = false) => {
   administrationUserStore.deleteElement(force, item, router, function(data) {
     if (data.status == 'ko') {
       dialog.value = true;
-      element.value = item;
       element.value = { ...item, ...data.dependencies };
     } else {
       element.value = {};
