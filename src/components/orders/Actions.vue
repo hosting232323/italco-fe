@@ -14,7 +14,7 @@
           <v-btn
             variant="text"
             icon="mdi-file-export"
-            :loading="loading"
+            :loading="loadingExport"
             :color="theme.current.value.primaryColor"
             @click="exportPdf(item)"
           />
@@ -27,7 +27,7 @@
             variant="text"
             :color="theme.current.value.primaryColor"
             v-bind="activatorProps"
-            @click="order = item"
+            @click="openPopUp(item)"
           />
         </v-col>
         <v-col cols="6">
@@ -45,17 +45,21 @@
       <v-card :title="`Situazione delivery ordine ${order.id}`">
         <v-card-text>
           Motivazione: {{ order.motivation }}<br>
-          <div v-if="order.photos && order.photos.length">
-            <v-img
-              v-for="photo in order.photos"
-              :src="`${http.hostname}order/photo/${photo}`"
-              max-width="1500"
-              max-height="1000"
-              class="mt-4"
-            />
-          </div>
+          Note Operatore: {{ order.operator_note }}<br>
+          Note Punto Vendita: {{ order.customer_note }}<br><br>
+          <v-skeleton-loader type="image" v-if="loadingPhoto" />
           <div v-else>
-            Nessuna immagine disponibile.
+            <div v-if="photos && photos.length" v-for="photo in photos">
+              <v-skeleton-loader type="image" v-if="!imageLoading[photo]" />
+              <v-img
+                :src="`${http.hostname}order/photo/${photo}`"
+                max-width="1500"
+                max-height="1000"
+                class="mt-4"
+                @load="imageLoading[photo] = true"
+              />
+            </div>
+            <div v-else>Nessuna immagine disponibile.</div>
           </div>
         </v-card-text>
       </v-card>
@@ -64,21 +68,34 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
 import http from '@/utils/http';
 import { useTheme } from 'vuetify';
+import { ref, reactive } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import { encodeId } from '@/utils/hashids';
 import { useOrderStore } from '@/stores/order';
 
 const order = ref({});
+const photos = ref([]);
 const theme = useTheme();
 const router = useRouter();
-const loading = ref(false);
+const loadingPhoto = ref(false);
+const loadingExport = ref(false);
 const orderStore = useOrderStore();
 const props = defineProps(['item']);
 const { element: updatedOrder, activeForm } = storeToRefs(orderStore);
+const imageLoading = reactive({});
+
+const openPopUp = (item) => {
+  order.value = item;
+  loadingPhoto.value = true;
+
+  http.getRequest(`order/get-photos/${item.id}`, {}, function (data) {
+    photos.value = data.photos;
+    loadingPhoto.value = false;
+  }, 'GET', router);
+};
 
 const openForm = (item) => {
   updatedOrder.value = item;
@@ -87,10 +104,10 @@ const openForm = (item) => {
 };
 
 const exportPdf = async (item) => {
-  loading.value = true;
+  loadingExport.value = true;
 
   http.getRequest(`export/order/${item.id}`, {}, function (data) {
-    loading.value = false;
+    loadingExport.value = false;
     const blob = new Blob([data], { type: 'application/pdf' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -98,7 +115,7 @@ const exportPdf = async (item) => {
     a.download = `ordine_${item.id}.pdf`;
     a.click();
     window.URL.revokeObjectURL(url);
-  }, 'GET', router, true)
+  }, 'GET', router, true);
 };
 
 const copyOrderLink = (id) => {

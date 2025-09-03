@@ -6,7 +6,7 @@
           v-model="day"
           label="Giorno della settimana"
           :items="days.weekDays"
-          :rules="validation.requiredRules"
+          :rules="[(value) => !!value || value === 0 || 'Seleziona un giorno']"
           :class="isMobile ? '' : 'mr-2'"
         />
       </v-col>
