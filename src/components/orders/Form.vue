@@ -55,7 +55,6 @@
               :rules="validation.requiredRules"
               dense hide-details
               :style="isMobile ? { margin: '15px 0', width: '100%' } : { maxWidth: '115px', marginRight: '15px' }"
-              step="60"
             />
             <v-text-field
               v-model="order.end_time_slot"
@@ -64,7 +63,6 @@
               :rules="validation.futureTime(order)"
               dense hide-details
               :style="isMobile ? { width: '100%' } : { maxWidth: '115px' }" 
-              step="60"
             />
           </div>
         </v-col>

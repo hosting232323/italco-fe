@@ -90,7 +90,8 @@
 
     <div class="table-box">
       <h3>Stato Ordine</h3>
-      <v-timeline :direction="isMobile ? 'vertical' : 'horizontal'" :side="isMobile ? 'start' : 'end'">
+      <h3 v-if="order.status == 'Cancelled'">Non consegnato</h3>
+      <v-timeline v-else :direction="isMobile ? 'vertical' : 'horizontal'" :side="isMobile ? 'start' : 'end'">
         <v-timeline-item
           v-for="step in orderHistory"
           :key="step.id"
