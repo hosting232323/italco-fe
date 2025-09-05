@@ -43,7 +43,7 @@ be_dependencies:
     - cd italco-be
     - pip install -r requirements.txt
     - git clone https://$CI_GENERIC_TEST_USERNAME:$CI_GENERIC_TEST_TOKEN@gitlab.com/generic-lab/generics/generic-test.git
-    - cd ../generic-test
+    - cd generic-test
     - pip install -r ./requirements.txt
   artifacts:
     paths:
