@@ -48,6 +48,9 @@
         <template v-slot:item.actions="{ item }">
           <Action :item="item" v-if="['Admin', 'Operator'].includes(role)" />
         </template>
+        <template v-slot:item.created_at="{ item }">
+          {{ createdAt(item.created_at) }}
+        </template>
       </v-data-table>
     </template>
     <template v-slot:default>
@@ -104,6 +107,12 @@ const getHeaders = () => {
     headers.push({ title: 'Prezzo', value: 'price' });
   headers.push({ title: 'Azioni', key: 'actions' });
   return headers;
+};
+
+const createdAt = (input) => {
+  const [datePart, _timePart] = input.split(' ');
+  const [day, month, year] = datePart.split('/');
+  return `${year}-${month}-${day}`;
 };
 </script>
 
