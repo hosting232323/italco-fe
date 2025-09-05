@@ -1,9 +1,7 @@
 stages:
   - prepare
   - test
-
 image: python:3.11
-
 variables:
   POSTGRES_DB: mydb
   POSTGRES_USER: myuser
@@ -21,7 +19,7 @@ before_script:
   - export VITE_HOSTNAME=http://$(hostname -I | tr ' ' '\n' | grep -m1 '^[0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+$'):8080/
   - export VITE_HOSTNAME_ITALCO_FE=http://$(hostname -I | tr ' ' '\n' | grep -m1 '^[0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+$'):3000/
 
-fe_build:
+fe_dependencies:
   stage: prepare
   image: node:20
   script:
@@ -33,7 +31,7 @@ fe_build:
       - node_modules
     expire_in: 1h
 
-be_build:
+be_dependencies:
   stage: prepare
   script:
     - python -m venv venv
@@ -55,9 +53,9 @@ be_build:
 test_end_to_end:
   stage: test
   needs:
-    - job: fe_build
+    - job: fe_dependencies
       artifacts: true
-    - job: be_build
+    - job: be_dependencies
       artifacts: true
   services:
     - name: postgres:15
