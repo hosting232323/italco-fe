@@ -16,8 +16,7 @@ variables:
   GITLAB_PIPELINE: 'true'
 
 before_script:
-  - export VITE_HOSTNAME=http://$(hostname -I | tr ' ' '\n' | grep -m1 '^[0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+$'):8080/
-  - export VITE_HOSTNAME_ITALCO_FE=http://$(hostname -I | tr ' ' '\n' | grep -m1 '^[0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+$'):3000/
+
 
 fe_dependencies:
   stage: prepare
@@ -69,6 +68,8 @@ test_end_to_end:
       alias: selenium
   script:
     - cd italco-be
+    - export VITE_HOSTNAME=http://$(hostname -I | tr ' ' '\n' | grep -m1 '^[0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+$'):8080/
+    - export VITE_HOSTNAME_ITALCO_FE=http://$(hostname -I | tr ' ' '\n' | grep -m1 '^[0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+$'):3000/
     - source venv/bin/activate
     - alembic upgrade heads
     - python -m src &
