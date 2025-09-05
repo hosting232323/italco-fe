@@ -30,6 +30,8 @@ fe_dependencies:
       - dist
       - node_modules
     expire_in: 1h
+  tags:
+    - linux
 
 be_dependencies:
   stage: prepare
@@ -49,6 +51,8 @@ be_dependencies:
       - generic-test
       - venv
     expire_in: 1h
+  tags:
+    - linux
 
 test_end_to_end:
   stage: test
@@ -80,3 +84,14 @@ test_end_to_end:
     paths:
       - generic-test/screenshots/
     expire_in: 1 week
+  tags:
+    - linux
+
+lint_backend:
+  stage: test
+  script:
+    - pip install ruff
+    - ruff check ./src --exit-non-zero-on-fix
+    - ruff format ./src --exit-non-zero-on-fix
+  tags:
+    - linux
