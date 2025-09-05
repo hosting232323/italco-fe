@@ -37,7 +37,7 @@ be_dependencies:
     - python -m venv venv
     - source venv/bin/activate
     - pip install --upgrade pip
-    - git clone https://$CI_FE_USERNAME:$CI_FE_TOKEN@gitlab.com/generic-lab/italco/italco-be.git
+    - git clone https://$CI_BE_USERNAME:$CI_BE_TOKEN@gitlab.com/generic-lab/italco/italco-be.git
     - cd italco-be
     - pip install -r requirements.txt
     - git clone https://$CI_GENERIC_TEST_USERNAME:$CI_GENERIC_TEST_TOKEN@gitlab.com/generic-lab/generics/generic-test.git
