@@ -38,6 +38,7 @@ be_dependencies:
     - git clone https://$CI_BE_USERNAME:$CI_BE_TOKEN@gitlab.com/generic-lab/italco/italco-be.git
     - cd italco-be
     - pip install -r requirements.txt
+    - cd ..
     - git clone https://$CI_GENERIC_TEST_USERNAME:$CI_GENERIC_TEST_TOKEN@gitlab.com/generic-lab/generics/generic-test.git
     - cd generic-test
     - pip install -r requirements.txt
