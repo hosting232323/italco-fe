@@ -41,7 +41,8 @@ export const useOrderStore = defineStore('order', {
     updateElementWithFormData(router, func) {
       const content = {data: JSON.stringify(Object.fromEntries(
         Object.entries(this.element).filter(([key]) => !EXCLUDED_KEYS.concat(['photo']).includes(key))))};
-      this.element.photos.forEach(element => content[element.name] = element);
+      if (this.element.photos)
+        this.element.photos.forEach(element => content[element.name] = element);
 
       http.formDataRequest(
         `order/${this.element.id}`,
