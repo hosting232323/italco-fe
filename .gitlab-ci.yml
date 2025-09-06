@@ -15,9 +15,6 @@ variables:
 
   GITLAB_PIPELINE: 'true'
 
-before_script:
-
-
 fe_dependencies:
   stage: prepare
   image: node:20
@@ -43,11 +40,10 @@ be_dependencies:
     - pip install -r requirements.txt
     - git clone https://$CI_GENERIC_TEST_USERNAME:$CI_GENERIC_TEST_TOKEN@gitlab.com/generic-lab/generics/generic-test.git
     - cd generic-test
-    - pip install -r ./requirements.txt
-    - cd ..
+    - pip install -r requirements.txt
   artifacts:
     paths:
-      - generic-be
+      - italco-be
       - generic-test
       - venv
     expire_in: 1h
