@@ -1,13 +1,19 @@
 <template>
   <v-card
+    v-if="activeForm"
     title="Crea Regola"
     class="mt-10 mb-5"
-    v-if="activeForm"
   >
     <v-card-text>
-      <v-form ref="form" @submit.prevent="submitForm">
+      <v-form
+        ref="form"
+        @submit.prevent="submitForm"
+      >
         <v-row no-gutters>
-          <v-col cols="12" md="6">
+          <v-col
+            cols="12"
+            md="6"
+          >
             <v-select
               v-model="customerRule.day_of_week"
               label="Giorno della settimana"
@@ -16,7 +22,10 @@
               :class="isMobile ? '' : 'mr-2'"
             />
           </v-col>
-          <v-col cols="12" md="6">
+          <v-col
+            cols="12"
+            md="6"
+          >
             <v-text-field
               v-model="customerRule.max_orders"
               label="Massimo ordini"

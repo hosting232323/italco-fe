@@ -1,18 +1,24 @@
 <template>
   <v-row no-gutters>
-    <v-col cols="12" md="3">
+    <v-col
+      cols="12"
+      md="3"
+    >
       <v-text-field
-        :class="isMobile ? '' : 'mr-2'"
         v-model="filters['Schedule.id']"
+        :class="isMobile ? '' : 'mr-2'"
         label="ID Borderò"
         type="number"
         clearable
       />
     </v-col>
-    <v-col cols="12" md="3">
+    <v-col
+      cols="12"
+      md="3"
+    >
       <v-autocomplete
-        :class="isMobile ? '' : 'ml-2 mr-2'"
         v-model="filters['CustomerGroup.id']"
+        :class="isMobile ? '' : 'ml-2 mr-2'"
         label="GDO"
         :items="customerGroups"
         item-title="name"
@@ -20,10 +26,13 @@
         clearable
       />
     </v-col>
-    <v-col cols="12" md="3">
+    <v-col
+      cols="12"
+      md="3"
+    >
       <v-autocomplete
-        :class="isMobile ? '' : 'ml-2 mr-2'"
         v-model="filters['ItalcoUser.id']"
+        :class="isMobile ? '' : 'ml-2 mr-2'"
         label="Punto Vendita"
         :items="users.filter(user => user.role == 'Customer')"
         item-title="email"
@@ -31,10 +40,13 @@
         clearable
       />
     </v-col>
-    <v-col cols="12" md="3">
+    <v-col
+      cols="12"
+      md="3"
+    >
       <v-autocomplete
-        :class="isMobile ? '' : 'ml-2'"
         v-model="filters['DeliveryGroup.id']"
+        :class="isMobile ? '' : 'ml-2'"
         label="Gruppi Consegna"
         :items="deliveryGroups"
         item-title="name"

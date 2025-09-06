@@ -1,11 +1,14 @@
 <template>
   <v-card :title="`ID Ordine: ${order.id}`">
     <v-card-text>
-      <v-form ref="form" @submit.prevent="submitForm">
+      <v-form
+        ref="form"
+        @submit.prevent="submitForm"
+      >
         <v-select
           v-if="!['Completed', 'Cancelled'].includes(actualStatus)"
-          label="Stato"
           v-model="status"
+          label="Stato"
           :items="STATUS_MAP[actualStatus].map(status => ({
             value: status,
             title: orderUtils.LABELS.find(label => label.value == status).title
@@ -18,28 +21,42 @@
           rows="3"
           :rules="validation.requiredRules"
         />
-        <v-file-input multiple
+        <v-file-input
           v-if="['Completed', 'Cancelled'].includes(status) || order.delay || order.anomaly"
+          v-model="order.photos"
+          multiple
           accept="image/*"
           label="Foto"
-          v-model="order.photos"
           :rules="(status === 'Completed' || order.anomaly) ? validation.arrayRules : []"
         />
         <v-row>
-          <v-col cols="6" :class="isMobile ? 'd-flex flex-column' : 'd-flex justify-center align-center'">
+          <v-col
+            cols="6"
+            :class="isMobile ? 'd-flex flex-column' : 'd-flex justify-center align-center'"
+          >
             <v-radio-group v-model="order.delay">
               <label class="mr-2">In ritardo</label>
-              <v-radio label="Sì" :value="true"></v-radio>
-              <v-radio label="No" :value="false"></v-radio>
+              <v-radio
+                label="Sì"
+                :value="true"
+              />
+              <v-radio
+                label="No"
+                :value="false"
+              />
             </v-radio-group>
-            <div :style="isMobile ? { width: '100%' } : { width: '50%', height: '100%' }"
-              :class="isMobile ? 'd-flex flex-column' : 'd-flex justify-center align-center'" v-if="order.delay">
+            <div
+              v-if="order.delay"
+              :style="isMobile ? { width: '100%' } : { width: '50%', height: '100%' }"
+              :class="isMobile ? 'd-flex flex-column' : 'd-flex justify-center align-center'"
+            >
               <v-text-field
                 v-model="order.start_time_slot"
                 label="Time Slot Start"
                 type="time"
                 :rules="validation.requiredRules"
-                dense hide-details
+                dense
+                hide-details
                 :style="isMobile ? { margin: '15px 0', width: '100%' } : { maxWidth: '115px', marginRight: '15px' }"
               />
               <v-text-field
@@ -47,7 +64,8 @@
                 label="Time Slot End"
                 type="time"
                 :rules="validation.futureTime(order)"
-                dense hide-details
+                dense
+                hide-details
                 :style="isMobile ? { width: '100%' } : { maxWidth: '115px' }"
               />
             </div>
@@ -55,8 +73,14 @@
           <v-col cols="6">
             <v-radio-group v-model="order.anomaly">
               <label class="mr-2">Con Anomalia</label>
-              <v-radio label="Sì" :value="true"></v-radio>
-              <v-radio label="No" :value="false"></v-radio>
+              <v-radio
+                label="Sì"
+                :value="true"
+              />
+              <v-radio
+                label="No"
+                :value="false"
+              />
             </v-radio-group>
           </v-col>
         </v-row>
@@ -110,5 +134,5 @@ const submitForm = async () => {
       emits('cancel');
     }
   });
-}
+};
 </script>

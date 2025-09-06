@@ -1,11 +1,14 @@
 <template>
   <v-card
+    v-if="activeForm"
     title="Crea Gruppo Delivery"
     class="mt-10 mb-5"
-    v-if="activeForm"
   >
     <v-card-text>
-      <v-form ref="form" @submit.prevent="submitForm">
+      <v-form
+        ref="form"
+        @submit.prevent="submitForm"
+      >
         <v-text-field
           v-model="deliveryGroup.name"
           label="Nome"

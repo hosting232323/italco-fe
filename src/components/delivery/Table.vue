@@ -1,6 +1,9 @@
 <template>
-  <v-dialog max-width="1500" v-model="dialog">
-    <template v-slot:activator>
+  <v-dialog
+    v-model="dialog"
+    max-width="1500"
+  >
+    <template #activator>
       <v-data-table
         v-if="ready"
         class="mt-5"
@@ -19,25 +22,32 @@
           { title: 'Azioni', key: 'actions' }
         ]"
       >
-        <template v-slot:item.type="{ item }">
+        <template #item.type="{ item }">
           {{ orderUtils.TYPES.find(type => type.value == item.type)?.title }}
         </template>
-        <template v-slot:item.productsServices="{ item }">
-          <template v-for="product in Object.keys(item.products)" :key="product">
+        <template #item.productsServices="{ item }">
+          <template
+            v-for="product in Object.keys(item.products)"
+            :key="product"
+          >
             <b>{{ product }}</b>:
             {{ item.products[product].map(service => service.name).join(', ') }}
             <br>
           </template>
         </template>
-        <template v-slot:item.addressee="{ item }">
+        <template #item.addressee="{ item }">
           {{ item.addressee }}<br>
-          <p style="font-size: smaller;">{{ item.address }}, {{ item.cap }}</p>
+          <p style="font-size: smaller;">
+            {{ item.address }}, {{ item.cap }}
+          </p>
         </template>
-        <template v-slot:item.collection_point="{ item }">
+        <template #item.collection_point="{ item }">
           {{ item.collection_point.name }}<br>
-          <p style="font-size: smaller;">{{ item.collection_point.address }}, {{ item.collection_point.cap }}</p>
+          <p style="font-size: smaller;">
+            {{ item.collection_point.address }}, {{ item.collection_point.cap }}
+          </p>
         </template>
-        <template v-slot:item.actions="{ item }">
+        <template #item.actions="{ item }">
           <v-btn
             icon="mdi-pencil"
             variant="text"
@@ -47,7 +57,7 @@
         </template>
       </v-data-table>
     </template>
-    <template v-slot:default>
+    <template #default>
       <Form @cancel="dialog = false" />
     </template>
   </v-dialog>

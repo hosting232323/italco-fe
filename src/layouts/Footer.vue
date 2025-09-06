@@ -1,5 +1,8 @@
 <template>
-  <v-footer :color="theme.current.value.primaryColor" style="max-height: 100px;">
+  <v-footer
+    :color="theme.current.value.primaryColor"
+    style="max-height: 100px;"
+  >
     <v-container :class="{tiny_text: isMobile}">
       <v-row>
         <v-col cols="6">
@@ -7,13 +10,23 @@
           <strong>Ares Logistics</strong>
           <div>P. IVA IT02735550747</div>
         </v-col>
-        <v-col cols="6" class="text-right">
-          <router-link to="/privacy" class="footer-link">
+        <v-col
+          cols="6"
+          class="text-right"
+        >
+          <router-link
+            to="/privacy"
+            class="footer-link"
+          >
             Privacy Policy
           </router-link>
           <div>
             Powered by 
-            <a href="https://fastsite.it" class="fast-site-link" target="_blank">
+            <a
+              href="https://fastsite.it"
+              class="fast-site-link"
+              target="_blank"
+            >
               Fast-Site <v-icon right>mdi-web</v-icon>
             </a>
           </div>

@@ -7,14 +7,14 @@ module.exports = {
   },
   extends: [
     'eslint:recommended',
-    'plugin:vue/vue3-recommended', // o vue2 se usi Vue 2
+    'plugin:vue/vue3-recommended'
   ],
   rules: {
-    quotes: ['error', 'single'], // obbliga le virgolette singole
-    semi: ['error', 'always'],   // obbliga il punto e virgola
-    indent: ['error', 2],        // rientro di 2 spazi
-    'vue/html-indent': ['error', 2], // rientro HTML nei template Vue
-    'no-console': 'warn',        // console.log segnalato come warning
-    'no-unused-vars': 'warn',    // segnala variabili non usate
+    quotes: ['error', 'single'],
+    semi: ['error', 'always'],
+    indent: ['error', 2],
+    'vue/html-indent': ['error', 2],
+    'no-console': 'warn',
+    'no-unused-vars': 'warn',
   },
 };

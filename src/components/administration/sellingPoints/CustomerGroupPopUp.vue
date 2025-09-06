@@ -3,15 +3,18 @@
     title="Utenti associati"
     :subtitle="`GDO: ${customerGroup.name}`"
   >
-    <template v-slot:append>
+    <template #append>
       <v-btn
         icon="mdi-plus"
-        @click="formFlag = true"
         variant="text"
+        @click="formFlag = true"
       />
     </template>
     <v-card-text>
-      <PopUpForm v-if="formFlag" @closeForm="formFlag = false" />
+      <PopUpForm
+        v-if="formFlag"
+        @close-form="formFlag = false"
+      />
       <PopUpTable v-if="customerGroup.users.length > 0" />
     </v-card-text>
   </v-card>

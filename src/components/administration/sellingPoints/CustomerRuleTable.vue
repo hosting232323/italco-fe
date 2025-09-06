@@ -15,13 +15,16 @@
       { title: 'Azioni', key: 'actions' }
     ]"
   >
-    <template v-slot:item.rules="{ item }">
-      <div v-for="(rules, index) in item.rules" :key="index">
-          <b>{{ days.getDayByValue(rules.day_of_week) }}</b>:
+    <template #item.rules="{ item }">
+      <div
+        v-for="(rules, index) in item.rules"
+        :key="index"
+      >
+        <b>{{ days.getDayByValue(rules.day_of_week) }}</b>:
         {{ rules.max_orders }}
       </div>
     </template>
-    <template v-slot:item.actions="{ item }">
+    <template #item.actions="{ item }">
       <v-btn
         icon="mdi-delete"
         variant="text"

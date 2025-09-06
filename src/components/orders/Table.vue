@@ -1,6 +1,9 @@
 <template>
-  <v-dialog max-width="1500" v-model="dialog">
-    <template v-slot:activator>
+  <v-dialog
+    v-model="dialog"
+    max-width="1500"
+  >
+    <template #activator>
       <v-btn
         v-if="['Admin', 'Operator'].includes(role)"
         text="Assegna Gruppo Delivery"
@@ -15,45 +18,52 @@
       />
       <v-data-table
         v-else
+        v-model="schedule.order_ids"
         :items="orders"
         :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
         :headers="getHeaders()"
         :show-select="['Admin', 'Operator'].includes(role)"
-        v-model="schedule.order_ids"
       >
-        <template v-slot:item.type="{ item }">
+        <template #item.type="{ item }">
           {{ orderUtils.TYPES.find(type => type.value == item.type)?.title }}
         </template>
-        <template v-slot:item.productsServices="{ item }">
+        <template #item.productsServices="{ item }">
           <template v-for="product in Object.keys(item.products)">
             <b>{{ product }}</b>:
             {{ item.products[product].map(service => service.name).join(', ') }}
             <br>
           </template>
         </template>
-        <template v-slot:item.addressee="{ item }">
+        <template #item.addressee="{ item }">
           {{ item.addressee }}<br>
-          <p style="font-size: smaller;">{{ item.address }}, {{ item.cap }}</p>
+          <p style="font-size: smaller;">
+            {{ item.address }}, {{ item.cap }}
+          </p>
         </template>
-        <template v-slot:item.collection_point="{ item }">
+        <template #item.collection_point="{ item }">
           {{ item.collection_point.name }}<br>
-          <p style="font-size: smaller;">{{ item.collection_point.address }}, {{ item.collection_point.cap }}</p>
+          <p style="font-size: smaller;">
+            {{ item.collection_point.address }}, {{ item.collection_point.cap }}
+          </p>
         </template>
-        <template v-slot:item.status="{ item }">
+        <template #item.status="{ item }">
           {{ orderUtils.LABELS.find(label => label.value == item.status).title }}
         </template>
-        <template v-slot:item.price="{ item }">
+        <template #item.price="{ item }">
           {{ item.price ? item.price.toFixed(2) : '' }}€
         </template>
-        <template v-slot:item.actions="{ item }">
-          <Action :item="item" v-if="['Admin', 'Operator'].includes(role)" />
+        <template #item.actions="{ item }">
+          <Action
+            v-if="['Admin', 'Operator'].includes(role)"
+            :item="item"
+          />
         </template>
-        <template v-slot:item.created_at="{ item }">
+        <template #item.created_at="{ item }">
           {{ createdAt(item.created_at) }}
         </template>
       </v-data-table>
     </template>
-    <template v-slot:default>
+    <template #default>
       <ScheduleForm @cancel="dialog = false" />
     </template>
   </v-dialog>
@@ -93,7 +103,7 @@ const getHeaders = () => {
     { title: 'Destinatario', value: 'addressee' },
     { title: 'Recapito', value: 'addressee_contact' },
     { title: 'Punto di Ritiro', value: 'collection_point' }
-];
+  ];
   if (role.value != 'Customer')
     headers.push({ title: 'Punto Vendita', value: 'user.email' });
   headers.push(

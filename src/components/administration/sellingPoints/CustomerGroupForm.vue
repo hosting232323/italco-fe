@@ -1,11 +1,14 @@
 <template>
   <v-card
+    v-if="activeForm"
     title="Crea GDO"
     class="mt-10 mb-5"
-    v-if="activeForm"
   >
     <v-card-text>
-      <v-form ref="form" @submit.prevent="submitForm">
+      <v-form
+        ref="form"
+        @submit.prevent="submitForm"
+      >
         <v-text-field
           v-model="customerGroup.name"
           label="Nome"

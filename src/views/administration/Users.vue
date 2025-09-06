@@ -1,6 +1,9 @@
 <template>
-  <v-dialog max-width="1500" v-model="popUp">
-    <template v-slot:activator>
+  <v-dialog
+    v-model="popUp"
+    max-width="1500"
+  >
+    <template #activator>
       <v-container>
         <h1>
           Gestione Utenti
@@ -23,10 +26,10 @@
           />
         </h1><hr class="mt-2">
         <DeliveryGroupForm />
-        <DeliveryGroupTable @openPopUp="openPopUp" />
+        <DeliveryGroupTable @open-pop-up="openPopUp" />
       </v-container>
     </template>
-    <template v-slot:default>
+    <template #default>
       <DeliveryGroupPopUp />
     </template>
   </v-dialog>

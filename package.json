@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "vite",
-    "lint": "eslint \"src/**/*.{js,vue}\"",
+    "lint": "eslint \"src/**/*.{js,vue}\" --fix",
     "build": "vite build",
     "serve": "node server.js"
   },

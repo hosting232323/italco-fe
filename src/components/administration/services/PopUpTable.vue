@@ -7,13 +7,13 @@
       { title: 'Azioni', key: 'actions' }
     ]"
   >
-    <template v-slot:item.actions="{ item }">
+    <template #item.actions="{ item }">
       <v-btn
         icon="mdi-delete"
         variant="text"
         :loading="deleteLoading[item.id]"
-        @click="deleteItem(item)"
         :color="theme.current.value.primaryColor"
+        @click="deleteItem(item)"
       />
     </template>
   </v-data-table>

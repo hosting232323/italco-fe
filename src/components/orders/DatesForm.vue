@@ -1,26 +1,42 @@
 <template>
-  <div class="loading-wrapper" v-if="loadingDates">
-    Loading<span class="dots"></span>
+  <div
+    v-if="loadingDates"
+    class="loading-wrapper"
+  >
+    Loading<span class="dots" />
   </div>
-  <v-form v-else ref="form" @submit.prevent="submitForm">
+  <v-form
+    v-else
+    ref="form"
+    @submit.prevent="submitForm"
+  >
     Seleziona le date per l'ordine:
-    <v-row no-gutters class="mt-2">
-      <v-col cols="12" md="6">
+    <v-row
+      no-gutters
+      class="mt-2"
+    >
+      <v-col
+        cols="12"
+        md="6"
+      >
         <DateField 
           v-model="order.dpc"
           label="Data Prevista dal Cliente"
-          :classStyle="isMobile ? '' : 'ml-2 mr-2'"
-          :allowedDates="allowedDpcDates"
+          :class-style="isMobile ? '' : 'ml-2 mr-2'"
+          :allowed-dates="allowedDpcDates"
           :rules="validation.requiredRules"
         />
       </v-col>
-      <v-col cols="12" md="6">
+      <v-col
+        cols="12"
+        md="6"
+      >
         <DateField 
           v-model="order.drc"
           label="Data Richiesta dal Cliente"
-          :classStyle="isMobile ? '' : 'ml-2'"
+          :class-style="isMobile ? '' : 'ml-2'"
           :rules="validation.requiredRules"
-          :allowedDates="nextTwoMonths"
+          :allowed-dates="nextTwoMonths"
         />
       </v-col>
     </v-row>
@@ -71,7 +87,7 @@ const getDateRangeArray = () => {
   }
 
   return result;
-}
+};
 
 const nextTwoMonths = getDateRangeArray();
 
@@ -80,10 +96,10 @@ if (role.value == 'Customer')
     cap: order.value.cap,
     services_id: servicesId
   }, (data) => {
-      if (data.status === 'ok')
-        allowedDpcDates.value = data.dates; 
-      else 
-        allowedDpcDates.value = []; 
+    if (data.status === 'ok')
+      allowedDpcDates.value = data.dates; 
+    else 
+      allowedDpcDates.value = []; 
     loadingDates.value = false;
   }, 'POST', router);
 else {

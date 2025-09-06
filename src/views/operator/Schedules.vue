@@ -1,54 +1,54 @@
 <template>
   <v-container>
     <h1>Borderò</h1><hr>
-      <v-skeleton-loader
-        v-if="!ready"
-        type="table"
-        :color="theme.current.value.secondaryColor"
-        class="mt-5"
-      />
-      <v-data-table
-        v-else
-        :items="schedules"
-        :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
-        :headers="[
-          { title: 'ID', value: 'id' },
-          { title: 'Data', value: 'date' },
-          { title: 'Gruppo Delivery', value: 'delivery_group.name' },
-          { title: 'Veicolo', key: 'transport.name' },
-          { title: 'Ordini', key: 'orders' },
-          { title: 'Azioni', key: 'actions' }
-        ]"
-      >
-        <template v-slot:item.orders="{ item }">
-          <div v-for="order in item.orders">
-            ID: <b>{{ order.id }}</b>
-            Destinatario: <b>{{ order.addressee }}</b>
-          </div>
-        </template>
-        <template v-slot:item.actions="{ item }">
-          <v-row no-gutters>
-            <v-col cols="6">
-              <v-btn
-                icon="mdi-file-export"
-                variant="text"
-                :loading="!!exportLoading[item.id]"
-                :color="theme.current.value.primaryColor"
-                @click="exportElement(item)"
-              />
-            </v-col>
-            <v-col cols="6">
-              <v-btn
-                icon="mdi-delete"
-                variant="text"
-                :loading="!!deleteLoading[item.id]"
-                :color="theme.current.value.primaryColor"
-                @click="deleteItem(item)"
-              />
-            </v-col>
-          </v-row>
-        </template>
-      </v-data-table>
+    <v-skeleton-loader
+      v-if="!ready"
+      type="table"
+      :color="theme.current.value.secondaryColor"
+      class="mt-5"
+    />
+    <v-data-table
+      v-else
+      :items="schedules"
+      :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
+      :headers="[
+        { title: 'ID', value: 'id' },
+        { title: 'Data', value: 'date' },
+        { title: 'Gruppo Delivery', value: 'delivery_group.name' },
+        { title: 'Veicolo', key: 'transport.name' },
+        { title: 'Ordini', key: 'orders' },
+        { title: 'Azioni', key: 'actions' }
+      ]"
+    >
+      <template #item.orders="{ item }">
+        <div v-for="order in item.orders">
+          ID: <b>{{ order.id }}</b>
+          Destinatario: <b>{{ order.addressee }}</b>
+        </div>
+      </template>
+      <template #item.actions="{ item }">
+        <v-row no-gutters>
+          <v-col cols="6">
+            <v-btn
+              icon="mdi-file-export"
+              variant="text"
+              :loading="!!exportLoading[item.id]"
+              :color="theme.current.value.primaryColor"
+              @click="exportElement(item)"
+            />
+          </v-col>
+          <v-col cols="6">
+            <v-btn
+              icon="mdi-delete"
+              variant="text"
+              :loading="!!deleteLoading[item.id]"
+              :color="theme.current.value.primaryColor"
+              @click="deleteItem(item)"
+            />
+          </v-col>
+        </v-row>
+      </template>
+    </v-data-table>
   </v-container>
 </template>
 
@@ -94,8 +94,8 @@ const exportElement = async (item) => {
     a.download = `bordero_${item.id}.pdf`;
     a.click();
     window.URL.revokeObjectURL(url);
-  }, 'GET', router, true)
-}
+  }, 'GET', router, true);
+};
 </script>
 
 <style scoped>
