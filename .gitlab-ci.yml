@@ -69,3 +69,12 @@ test_end_to_end:
     expire_in: 1 week
   tags:
     - linux
+
+lint_frontend:
+  stage: test
+  image: node:18
+  script:
+    - npm ci
+    - npx eslint "src/**/*.{js,vue}"
+  tags:
+    - linux
