@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "vite",
+    "lint": "eslint \"src/**/*.{js,vue}\" --fix",
     "build": "vite build",
     "serve": "node server.js"
   },
@@ -23,8 +24,8 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.3",
-    "eslint": "^8.37.0",
-    "eslint-plugin-vue": "^9.3.0",
+    "eslint": "^8.57.1",
+    "eslint-plugin-vue": "^9.33.0",
     "sass": "^1.60.0",
     "unplugin-fonts": "^1.1.1",
     "vite": "^6.2.5",

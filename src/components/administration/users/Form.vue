@@ -1,25 +1,34 @@
 <template>
   <v-card
+    v-if="activeForm"
     title="Crea Utente"
     :subtitle="`Utenti disponibili: ${MAX_USERS - users.length}`"
     class="mt-10 mb-5"
-    v-if="activeForm"
   >
     <v-card-text v-if="MAX_USERS - users.length > 0">
-      <v-form ref="form" @submit.prevent="submitForm">
+      <v-form
+        ref="form"
+        @submit.prevent="submitForm"
+      >
         <v-row no-gutters>
-          <v-col cols="12" md="6">
+          <v-col
+            cols="12"
+            md="6"
+          >
             <v-text-field
-              :class="isMobile ? '' : 'mr-2'"
               v-model="user.email"
+              :class="isMobile ? '' : 'mr-2'"
               label="Nickname"
               :rules="validation.requiredRules"
             />
           </v-col>
-          <v-col cols="12" md="6">
+          <v-col
+            cols="12"
+            md="6"
+          >
             <v-text-field
-              :class="isMobile ? '' : 'ml-2'"
               v-model="user.password"
+              :class="isMobile ? '' : 'ml-2'"
               label="Password"
               :rules="validation.requiredRules"
             />

@@ -1,9 +1,9 @@
 <template>
   <v-card
+    v-if="activeForm"
     :title="order.id ? `Modifica Ordine ${order.id}` : 'Crea Ordine'"
     :subtitle="subtitle"
     class="mt-10"
-    v-if="activeForm"
   >
     <v-card-text v-if="order.dates_form">
       <DatesForm />
@@ -13,7 +13,7 @@
       <DeliveryForm v-else />
     </v-card-text>
     <v-card-text v-else>
-      <CustomerForm @setSubtitle="setSubtitle" />
+      <CustomerForm @set-subtitle="setSubtitle" />
     </v-card-text>
   </v-card>
 </template>

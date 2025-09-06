@@ -4,22 +4,28 @@
     :subtitle="`Servizio: ${service.name}`"
     class="mt-10 mb-5"
   >
-    <template v-slot:append>
+    <template #append>
       <v-btn
         icon="mdi-plus"
-        @click="formFlag = true"
         variant="text"
+        @click="formFlag = true"
       />
     </template>
     <v-card-text>
-      <PopUpForm v-if="formFlag" @closeForm="formFlag = false" />
+      <PopUpForm
+        v-if="formFlag"
+        @close-form="formFlag = false"
+      />
       <PopUpTable v-if="service.users.length > 0" />
       <template v-else-if="!formFlag">
-        <v-form ref="form" @submit.prevent="submitForm">
+        <v-form
+          ref="form"
+          @submit.prevent="submitForm"
+        >
           <v-text-field
+            v-model="price"
             type="number"
             prepend-icon="mdi-currency-eur"
-            v-model="price"
             label="Prezzo"
             :rules="validation.requiredRules"
           />

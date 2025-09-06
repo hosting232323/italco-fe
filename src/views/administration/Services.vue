@@ -1,6 +1,6 @@
 <template>
   <v-dialog max-width="1500">
-    <template v-slot:activator="{ props: activatorProps }">
+    <template #activator="{ props: activatorProps }">
       <v-container>
         <h1>
           Gestione Servizi
@@ -12,10 +12,10 @@
           />
         </h1><hr>
         <ServiceForm />
-        <ServiceTable :activatorProps="activatorProps" />
+        <ServiceTable :activator-props="activatorProps" />
       </v-container>
     </template>
-    <template v-slot:default>
+    <template #default>
       <ServicePopUp />
     </template>
   </v-dialog>

@@ -1,34 +1,49 @@
 <template>
-  <v-expansion-panels class="mt-10 mb-5" v-model="panel">
+  <v-expansion-panels
+    v-model="panel"
+    class="mt-10 mb-5"
+  >
     <v-expansion-panel :color="theme.current.value.primaryColor">
       <v-expansion-panel-title>
         <h3>Filtri</h3>
       </v-expansion-panel-title>
       <v-expansion-panel-text class="mt-5">
-        <v-form ref="form" @submit.prevent="filterOrder">
+        <v-form
+          ref="form"
+          @submit.prevent="filterOrder"
+        >
           <OperatoreFilters v-if="role != 'Customer'" />
           <v-row no-gutters>
-            <v-col cols="12" md="3">
+            <v-col
+              cols="12"
+              md="3"
+            >
               <v-text-field
-                :class="isMobile ? '' : 'mr-2'"
                 v-model="filters['Order.id']"
+                :class="isMobile ? '' : 'mr-2'"
                 label="ID Ordine"
                 type="number"
                 clearable
               />
             </v-col>
-            <v-col cols="12" md="3">
+            <v-col
+              cols="12"
+              md="3"
+            >
               <v-text-field
-                :class="isMobile ? '' : 'ml-2 mr-2'"
                 v-model="filters['Order.addressee']"
+                :class="isMobile ? '' : 'ml-2 mr-2'"
                 label="Destinatario"
                 clearable
               />
             </v-col>
-            <v-col cols="12" md="3">
+            <v-col
+              cols="12"
+              md="3"
+            >
               <v-autocomplete
-                :class="isMobile ? '' : 'ml-2 mr-2'"
                 v-model="filters['CollectionPoint.id']"
+                :class="isMobile ? '' : 'ml-2 mr-2'"
                 label="Punto di Ritiro"
                 :items="collectionPoints"
                 item-title="name"
@@ -36,10 +51,13 @@
                 clearable
               />
             </v-col>
-            <v-col cols="12" md="3">
+            <v-col
+              cols="12"
+              md="3"
+            >
               <v-autocomplete
-                :class="isMobile ? '' : 'ml-2'"
                 v-model="filters['Service.id']"
+                :class="isMobile ? '' : 'ml-2'"
                 label="Servizio"
                 :items="services"
                 item-title="name"
@@ -49,41 +67,59 @@
             </v-col>
           </v-row>
           <v-row no-gutters>
-            <v-col cols="12" md="6">
+            <v-col
+              cols="12"
+              md="6"
+            >
               <v-row no-gutters>
-                <v-col cols="12" md="6">
+                <v-col
+                  cols="12"
+                  md="6"
+                >
                   <v-text-field
-                    :class="isMobile ? '' : 'mr-2'"
                     v-model="filters['Order.dpc']"
+                    :class="isMobile ? '' : 'mr-2'"
                     label="Data Prevista dal Cliente"
                     type="date"
                   />
                 </v-col>
-                <v-col cols="12" md="6">
+                <v-col
+                  cols="12"
+                  md="6"
+                >
                   <v-text-field
-                    :class="isMobile ? '' : 'ml-2 mr-2'"
                     v-model="filters['Order.drc']"
+                    :class="isMobile ? '' : 'ml-2 mr-2'"
                     label="Data Richiesta dal Cliente"
                     type="date"
                   />
                 </v-col>
               </v-row>
             </v-col>
-            <v-col cols="12" md="6">
+            <v-col
+              cols="12"
+              md="6"
+            >
               <v-row no-gutters>
-                <v-col cols="12" md="6">
+                <v-col
+                  cols="12"
+                  md="6"
+                >
                   <v-text-field
-                    :class="isMobile ? '' : 'mr-2 ml-2'"
                     v-model="dateFilter.start_date"
+                    :class="isMobile ? '' : 'mr-2 ml-2'"
                     :rules="intervallRules('end_date')"
                     label="Inizio Intervallo Data Consegna"
                     type="date"
                   />
                 </v-col>
-                <v-col cols="12" md="6">
+                <v-col
+                  cols="12"
+                  md="6"
+                >
                   <v-text-field
-                    :class="isMobile ? '' : 'ml-2'"
                     v-model="dateFilter.end_date"
+                    :class="isMobile ? '' : 'ml-2'"
                     :rules="intervallRules('start_date')"
                     label="Fine Intervallo Data Consegna"
                     type="date"
@@ -104,7 +140,10 @@
     v-if="role == 'Admin' && !panel && filters['ItalcoUser.id'] && dateFilter.start_date && dateFilter.end_date"
     no-gutters
   >
-    <v-col cols="8" style="font-size: smaller;">
+    <v-col
+      cols="8"
+      style="font-size: smaller;"
+    >
       Punto Vendita: {{ filters['ItalcoUser.id'] }}<br>
       Data di Inizio Intervallo: {{ dateFilter.start_date }}<br>
       Data di Fine Intervallo: {{ dateFilter.end_date }}
@@ -114,8 +153,8 @@
         style="float: right;"
         text="Esporta"
         :color="theme.current.value.primaryColor"
-        @click="exportInvoice"
         :loading="loading"
+        @click="exportInvoice"
       />
     </v-col>
   </v-row>
@@ -184,6 +223,6 @@ const exportInvoice = async () => {
     a.download = `ordini_${dateFilter.value.start_date}_${dateFilter.value.end_date}.pdf`;
     a.click();
     window.URL.revokeObjectURL(url);
-  }, 'POST', router, true)
+  }, 'POST', router, true);
 };
 </script>

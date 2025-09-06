@@ -1,12 +1,12 @@
 <template>
   <v-text-field
     :id="inputId"
+    v-model="localValue"
     :label="label"
     :class="customClass"
-    v-model="localValue"
     :rules="computedRules"
-    @input="handleInput"
     clearable
+    @input="handleInput"
   />
 </template>
 
@@ -77,22 +77,22 @@ const initAutocomplete = async () => {
 
       place.address_components.forEach((component) => {
         const types = component.types;
-          if (types.includes('route')) {
-            route = component.long_name;
-          }
-          if (types.includes('street_number')) {
-            streetNumber = component.long_name;
-          }
-          if (types.includes('locality')) {
-            city = component.long_name;
-          }
-          if (types.includes('postal_code')) {
-            addressComponents.cap = component.long_name;
-          }
-          if (types.includes('administrative_area_level_2')) {
-            provnce = component.short_name;
-          }
-      })
+        if (types.includes('route')) {
+          route = component.long_name;
+        }
+        if (types.includes('street_number')) {
+          streetNumber = component.long_name;
+        }
+        if (types.includes('locality')) {
+          city = component.long_name;
+        }
+        if (types.includes('postal_code')) {
+          addressComponents.cap = component.long_name;
+        }
+        if (types.includes('administrative_area_level_2')) {
+          provnce = component.short_name;
+        }
+      });
       addressComponents.address =  (route ?  route + ', ': '') + (streetNumber ? ' ' + streetNumber + ', ' : '') + city + ', ' + provnce;
       emit('addressComponents', addressComponents);
     }

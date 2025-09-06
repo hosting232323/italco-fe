@@ -1,31 +1,40 @@
 <template>
   <v-card
+    v-if="activeForm"
     :title="collectionPoint.id ? `Modifica Punto di Ritiro ${collectionPoint.id}` : 'Crea Punto di Ritiro'"
     class="mt-10 mb-5"
-    v-if="activeForm"
   >
     <v-card-text>
-      <v-form ref="form" @submit.prevent="submitForm">
+      <v-form
+        ref="form"
+        @submit.prevent="submitForm"
+      >
         <v-text-field
           v-model="collectionPoint.name"
           label="Nome"
           :rules="validation.requiredRules"
         />
         <v-row no-gutters>
-          <v-col cols="12" md="6">
+          <v-col
+            cols="12"
+            md="6"
+          >
             <GooglePlacesAutocomplete
               v-model="collectionPoint.address"
-              :customClass="isMobile ? '' : 'mr-2'"
+              :custom-class="isMobile ? '' : 'mr-2'"
               label="Indirizzo"
               :rules="validation.requiredRules"
-              @update:isValid="isLocationValid = $event"
-              @addressComponents="handleAddressComponents"
+              @update:is-valid="isLocationValid = $event"
+              @address-components="handleAddressComponents"
             />
           </v-col>
-          <v-col cols="12" md="6">
-             <v-text-field
-              :class="isMobile ? '' : 'ml-2'"
+          <v-col
+            cols="12"
+            md="6"
+          >
+            <v-text-field
               v-model="collectionPoint.cap"
+              :class="isMobile ? '' : 'ml-2'"
               label="Cap"
               :rules="validation.capRules"
             />

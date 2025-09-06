@@ -1,24 +1,33 @@
 <template>
   <v-card
+    v-if="activeForm"
     :title="transport.id ? `Modifica Veicolo ${transport.id}` : 'Crea Veicolo'"
     class="mt-10 mb-5"
-    v-if="activeForm"
   >
     <v-card-text>
-      <v-form ref="form" @submit.prevent="submitForm">
+      <v-form
+        ref="form"
+        @submit.prevent="submitForm"
+      >
         <v-row no-gutters>
-          <v-col cols="12" md="6">
+          <v-col
+            cols="12"
+            md="6"
+          >
             <v-text-field
-              :class="isMobile ? '' : 'mr-2'"
               v-model="transport.name"
+              :class="isMobile ? '' : 'mr-2'"
               label="Nome"
               :rules="validation.requiredRules"
             />
           </v-col>
-          <v-col cols="12" md="6">
+          <v-col
+            cols="12"
+            md="6"
+          >
             <v-text-field
-              :class="isMobile ? '' : 'ml-2'"
               v-model="transport.plate"
+              :class="isMobile ? '' : 'ml-2'"
               label="Targa"
               :rules="validation.requiredRules"
             />

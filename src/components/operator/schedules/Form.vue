@@ -17,9 +17,15 @@
     :subtitle="`Ordini: ${schedule.order_ids.join(', ')}`"
   >
     <v-card-text>
-      <v-form ref="form" @submit.prevent="assignDeliveryGroup">
+      <v-form
+        ref="form"
+        @submit.prevent="assignDeliveryGroup"
+      >
         <v-row no-gutters>
-          <v-col cols="12" md="4">
+          <v-col
+            cols="12"
+            md="4"
+          >
             <v-select
               v-model="schedule.delivery_group_id"
               :class="isMobile ? '' : 'mr-2'"
@@ -30,7 +36,10 @@
               :rules="validation.requiredRules"
             />
           </v-col>
-          <v-col cols="12" md="4">
+          <v-col
+            cols="12"
+            md="4"
+          >
             <v-select
               v-model="schedule.transport_id"
               :class="isMobile ? '' : 'ml-2 mr-2'"
@@ -41,10 +50,13 @@
               :rules="validation.requiredRules"
             />
           </v-col>
-          <v-col cols="12" md="4">
+          <v-col
+            cols="12"
+            md="4"
+          >
             <v-text-field
-              type="date"
               v-model="schedule.date"
+              type="date"
               :class="isMobile ? '' : 'ml-2'"
               label="Data"
               :rules="validation.requiredRules"
@@ -60,10 +72,16 @@
         >
           <template #item="{ element }">
             <div class="d-flex align-center order-item">
-              <div class="drag-handle" style="cursor: grab;">
+              <div
+                class="drag-handle"
+                style="cursor: grab;"
+              >
                 <v-icon>mdi-drag</v-icon>
               </div>
-              <div :class="['d-flex', 'justify-space-between', isMobile ? '' : 'align-center', isMobile ? 'flex-column' : '']" style="width: 100%;">
+              <div
+                :class="['d-flex', 'justify-space-between', isMobile ? '' : 'align-center', isMobile ? 'flex-column' : '']"
+                style="width: 100%;"
+              >
                 <p>Ordine #{{ element.id }}</p>
                 <div :class="['d-flex', isMobile ? 'flex-column' : '']">
                   <v-text-field 
@@ -71,7 +89,8 @@
                     label="Time Slot Start"
                     type="time"
                     :rules="validation.requiredRules" 
-                    dense hide-details 
+                    dense
+                    hide-details 
                     :style="isMobile ? { margin: '15px 0', width: '' }: { width: '200px', marginRight: '15px' }"
                   />
                   <v-text-field 
@@ -79,16 +98,19 @@
                     label="Time Slot End"
                     type="time"
                     :rules="validation.futureTime(element)" 
-                    dense hide-details 
+                    dense
+                    hide-details 
                     :style="isMobile ? { width: '' }: { width: '200px' }"
                   />
                 </div>
-                
               </div>
             </div>
           </template>
         </draggable>
-        <FormButtons :loading="loading" @cancel="emits('cancel')" />
+        <FormButtons
+          :loading="loading"
+          @cancel="emits('cancel')"
+        />
       </v-form>
     </v-card-text>
   </v-card>

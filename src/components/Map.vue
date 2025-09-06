@@ -2,7 +2,10 @@
   <v-container>
     <v-card elevation="20">
       <v-container>
-        <div ref="mapContainer" style="width: 100%; height: 400px;" />
+        <div
+          ref="mapContainer"
+          style="width: 100%; height: 400px;"
+        />
       </v-container>
     </v-card>
   </v-container>
