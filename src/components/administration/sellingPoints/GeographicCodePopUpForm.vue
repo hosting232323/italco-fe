@@ -1,7 +1,13 @@
 <template>
-  <v-form ref="form" @submit.prevent="submitForm">
+  <v-form
+    ref="form"
+    @submit.prevent="submitForm"
+  >
     <v-row no-gutters>
-      <v-col cols="12" md="6">
+      <v-col
+        cols="12"
+        md="6"
+      >
         <v-text-field
           v-model="code"
           label="CAP"
@@ -10,7 +16,10 @@
           :class="isMobile ? '' : 'mr-2'"
         />
       </v-col>
-      <v-col cols="12" md="6">
+      <v-col
+        cols="12"
+        md="6"
+      >
         <v-select
           v-model="type"
           label="Tipo"
@@ -62,6 +71,6 @@ const submitForm = async () => {
       geographicZone.value.codes.push(data.entity);
       emits('closeForm');
     }
-  })
-}
+  });
+};
 </script>

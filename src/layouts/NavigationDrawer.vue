@@ -1,6 +1,15 @@
 <template>
-  <v-navigation-drawer permanent expand-on-hover rail :color="theme.current.value.primaryColor" app>
-    <v-list-item prepend-icon="mdi-menu" class="mt-2">
+  <v-navigation-drawer
+    permanent
+    expand-on-hover
+    rail
+    :color="theme.current.value.primaryColor"
+    app
+  >
+    <v-list-item
+      prepend-icon="mdi-menu"
+      class="mt-2"
+    >
       <b>Ares Logistics</b>
       <br>{{ role }}
     </v-list-item>
@@ -48,9 +57,9 @@
     />
     <v-divider class="mb-4 mt-4" />
     <v-list-item
-      @click="logoutModule.logout(router)"
       title="Logout"
       prepend-icon="mdi-logout"
+      @click="logoutModule.logout(router)"
     />
   </v-navigation-drawer>
 </template>

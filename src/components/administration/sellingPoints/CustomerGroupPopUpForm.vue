@@ -1,5 +1,8 @@
 <template>
-  <v-form ref="form" @submit.prevent="submitForm">
+  <v-form
+    ref="form"
+    @submit.prevent="submitForm"
+  >
     <v-autocomplete
       v-model="userId"
       label="Utente"

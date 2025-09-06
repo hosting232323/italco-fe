@@ -3,12 +3,12 @@
     class="mt-10"
     title="Login"
     logo="/logo.png"
-    :secondaryColor="theme.current.value.primaryColor"
-    redirectLink="/dashboard"
-    :signUp="false"
+    :secondary-color="theme.current.value.primaryColor"
+    redirect-link="/dashboard"
+    :sign-up="false"
     :hostname="hostname"
     :iv="iv"
-    :secretKey="secretKey"
+    :secret-key="secretKey"
   />
 </template>
 

@@ -1,6 +1,9 @@
 <template>
-  <v-dialog max-width="1500" v-model="dialog">
-    <template v-slot:activator>
+  <v-dialog
+    v-model="dialog"
+    max-width="1500"
+  >
+    <template #activator>
       <v-skeleton-loader
         v-if="!ready"
         type="table"
@@ -19,7 +22,7 @@
           { title: 'Azioni', key: 'actions' }
         ]"
       >
-        <template v-slot:item.password="{ item }">
+        <template #item.password="{ item }">
           <template v-if="item.role != 'Admin'">
             <v-btn
               :icon="visiblePasswords[item.id] ? 'mdi-eye' : 'mdi-eye-off'"
@@ -32,7 +35,7 @@
             </span>
           </template>
         </template>
-        <template v-slot:item.actions="{ item }">
+        <template #item.actions="{ item }">
           <v-btn
             v-if="item.role !== 'Admin'"
             icon="mdi-delete"
@@ -44,7 +47,7 @@
         </template>
       </v-data-table>
     </template>
-    <template v-slot:default>
+    <template #default>
       <v-card title="Attenzione!">
         <v-card-text>
           <p>Stai per cancellare l'utente: <strong>{{ element.email }}</strong></p>
@@ -67,8 +70,8 @@
           <v-btn
             text="Conferma"
             :color="theme.current.value.primaryColor"
-            @click="deleteItem(element, true)"
             :disabled="element.blockedOrders > 0"
+            @click="deleteItem(element, true)"
           />
         </v-card-actions>
       </v-card>

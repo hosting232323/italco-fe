@@ -8,11 +8,15 @@
         <table class="info-table">
           <tbody>
             <tr>
-              <td class="label">Nome</td>
+              <td class="label">
+                Nome
+              </td>
               <td>{{ order.user.email }}</td>
             </tr>
             <tr>
-              <td class="label">Punto di ritiro</td>
+              <td class="label">
+                Punto di ritiro
+              </td>
               <td>
                 {{ order.collection_point.name }}<br>
                 {{ order.collection_point.address }}<br>
@@ -28,15 +32,21 @@
         <table class="info-table">
           <tbody>
             <tr>
-              <td class="label">Nome</td>
+              <td class="label">
+                Nome
+              </td>
               <td>{{ order.addressee }}</td>
             </tr>
             <tr>
-              <td class="label">Indirizzo</td>
+              <td class="label">
+                Indirizzo
+              </td>
               <td>{{ order.address }}</td>
             </tr>
             <tr>
-              <td class="label">Recapito</td>
+              <td class="label">
+                Recapito
+              </td>
               <td>{{ order.addressee_contact ?? '/' }}</td>
             </tr>
           </tbody>
@@ -49,15 +59,21 @@
       <table class="info-table">
         <tbody>
           <tr>
-            <td class="label">Data prevista consegna</td>
+            <td class="label">
+              Data prevista consegna
+            </td>
             <td>{{ order.dpc ?? '/' }}</td>
           </tr>
           <tr>
-            <td class="label">Data richiesta consegna</td>
+            <td class="label">
+              Data richiesta consegna
+            </td>
             <td>{{ order.drc ?? '/' }}</td>
           </tr>
           <tr>
-            <td class="label">Data consegna effettiva</td>
+            <td class="label">
+              Data consegna effettiva
+            </td>
             <td>{{ order.booking_date ?? '/' }}</td>
           </tr>
         </tbody>
@@ -69,16 +85,26 @@
       <table class="info-table">
         <thead>
           <tr>
-            <th class="label">Prodotto</th>
-            <th class="label">Servizi associati</th>
+            <th class="label">
+              Prodotto
+            </th>
+            <th class="label">
+              Servizi associati
+            </th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(services, product_name) in order.products" :key="product_name">
+          <tr
+            v-for="(services, product_name) in order.products"
+            :key="product_name"
+          >
             <td>{{ product_name }}</td>
             <td>
               <ul style="padding-left: 15px;">
-                <li v-for="(service, index) in services" :key="index">
+                <li
+                  v-for="(service, index) in services"
+                  :key="index"
+                >
                   {{ service.name }} - {{ service.type }}
                 </li>
               </ul>
@@ -90,18 +116,29 @@
 
     <div class="table-box">
       <h3>Stato Ordine</h3>
-      <h3 v-if="order.status == 'Cancelled'">Non consegnato</h3>
-      <v-timeline v-else :direction="isMobile ? 'vertical' : 'horizontal'" :side="isMobile ? 'start' : 'end'">
+      <h3 v-if="order.status == 'Cancelled'">
+        Non consegnato
+      </h3>
+      <v-timeline
+        v-else
+        :direction="isMobile ? 'vertical' : 'horizontal'"
+        :side="isMobile ? 'start' : 'end'"
+      >
         <v-timeline-item
           v-for="step in orderHistory"
           :key="step.id"
           :dot-color="isStepCompleted(step) ? 'green' : 'grey lighten-1'"
         >
-          <template v-slot:icon>
-            <v-icon :size="18">{{ step.icon }}</v-icon>
+          <template #icon>
+            <v-icon :size="18">
+              {{ step.icon }}
+            </v-icon>
           </template>
-          <template v-slot:opposite>
-            <p style="margin: 10px 0 -17px !important;" v-if="!isMobile">
+          <template #opposite>
+            <p
+              v-if="!isMobile"
+              style="margin: 10px 0 -17px !important;"
+            >
               {{ step.label }}
             </p>
             <p v-else>
@@ -112,7 +149,11 @@
       </v-timeline>
     </div>
 
-    <Map v-if="order.status === 'On Board'" :lat="order.lat" :lon="order.lon" />
+    <Map
+      v-if="order.status === 'On Board'"
+      :lat="order.lat"
+      :lon="order.lon"
+    />
   </v-container>
 </template>
 

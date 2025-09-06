@@ -1,10 +1,17 @@
 <template>
-  <v-form ref="form" @submit.prevent="submitForm" class="mb-5">
+  <v-form
+    ref="form"
+    class="mb-5"
+    @submit.prevent="submitForm"
+  >
     <v-row no-gutters>
-      <v-col cols="12" md="6">
+      <v-col
+        cols="12"
+        md="6"
+      >
         <v-autocomplete
-          :class="isMobile ? '' : 'mr-2'"
           v-model="object.user_id"
+          :class="isMobile ? '' : 'mr-2'"
           label="Utente"
           :items="users.filter(user => user.role == 'Customer')"
           item-title="email"
@@ -12,11 +19,14 @@
           :rules="validation.requiredRules"
         />
       </v-col>
-      <v-col cols="12" md="6">
+      <v-col
+        cols="12"
+        md="6"
+      >
         <v-text-field
+          v-model="object.price"
           type="number"
           :class="isMobile ? '' : 'ml-2'"
-          v-model="object.price"
           prepend-icon="mdi-currency-eur"
           label="Prezzo"
           :rules="validation.requiredRules"
@@ -28,7 +38,10 @@
       @cancel="emits('closeForm');"
     />
   </v-form>
-  <v-alert class="mt-5 mb-5" v-if="message">
+  <v-alert
+    v-if="message"
+    class="mt-5 mb-5"
+  >
     {{ message }}
   </v-alert>
 </template>

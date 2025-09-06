@@ -18,10 +18,10 @@
       { title: 'Azioni', key: 'actions' }
     ]"
   >
-    <template v-slot:item.type="{ item }">
+    <template #item.type="{ item }">
       {{ orderUtils.TYPES.find(type => type.value == item.type)?.title }}
     </template>
-    <template v-slot:item.actions="{ item }">
+    <template #item.actions="{ item }">
       <v-row no-gutters>
         <v-col cols="4">
           <v-btn
@@ -36,8 +36,8 @@
             icon="mdi-label"
             variant="text"
             :color="theme.current.value.primaryColor"
-            @click="openPopUp(item)"
             v-bind="activatorProps"
+            @click="openPopUp(item)"
           />
         </v-col>
         <v-col cols="4">

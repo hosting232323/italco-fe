@@ -11,21 +11,25 @@
         Totale ordini: {{ Object.values(orders).reduce((sum, arr) => sum + arr.length, 0) }}
       </b><br><br>
       <v-item-group
+        v-model="selectedCard"
         selected-class="selected"
         :style="{ '--item-bg-color': theme.current.value.primaryColor }"
-        v-model="selectedCard"
       >
         <v-row>
           <v-col
-            v-for="card in cards" :key="card.key"
+            v-for="card in cards"
+            :key="card.key"
             :cols="isMobile ? 6 :
               ((card.key === 'Delay' || card.key === 'Anomaly') ? 2 : 4)"
           >
-            <v-item v-slot="{ selectedClass, toggle }" :value="card.key">
+            <v-item
+              v-slot="{ selectedClass, toggle }"
+              :value="card.key"
+            >
               <v-card
-                @click="toggle"
                 :class="['d-flex align-center', selectedClass]"
                 height="100"
+                @click="toggle"
               >
                 <v-card-text style="font-size: larger;">
                   {{ card.title }}: <b>{{ cardCounts[card.key] }}</b>
@@ -36,11 +40,19 @@
         </v-row>
       </v-item-group>
     </div>
-    <Table :keyName="selectedCard" />
+    <Table :key-name="selectedCard" />
   </div>
 
-  <div v-else-if="locationError" class="text-center mt-10">
-    <v-alert type="error" border="start" color="red" prominent>
+  <div
+    v-else-if="locationError"
+    class="text-center mt-10"
+  >
+    <v-alert
+      type="error"
+      border="start"
+      color="red"
+      prominent
+    >
       ⚠️ Per usare questa funzionalità devi <strong>abilitare la geolocalizzazione</strong>.<br>
       Ricarica la pagina e consenti i permessi quando richiesto.
     </v-alert>

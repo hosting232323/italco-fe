@@ -1,15 +1,18 @@
 <template>
-  <v-dialog max-width="1500" v-model="activeForm">
-    <template v-slot:activator>
+  <v-dialog
+    v-model="activeForm"
+    max-width="1500"
+  >
+    <template #activator>
       <v-container>
         <h1>
           Dashboard
           <v-btn
+            v-if="role && role != 'Delivery'"
             icon="mdi-plus"
             style="float: right;"
             variant="text"
             @click="openForm"
-            v-if="role && role != 'Delivery'"
           />
           <OrderImportation v-if="role == 'Admin'" />
         </h1><hr>
@@ -20,7 +23,7 @@
         <DeliveryDashboard v-else-if="role == 'Delivery'" />
       </v-container>
     </template>
-    <template v-slot:default>
+    <template #default>
       <OrderForm />
     </template>
   </v-dialog>

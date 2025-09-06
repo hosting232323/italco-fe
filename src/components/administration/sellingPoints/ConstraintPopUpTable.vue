@@ -7,16 +7,16 @@
       { title: 'Azioni', key: 'actions' }
     ]"
   >
-    <template v-slot:item.day_of_week="{ item }">
+    <template #item.day_of_week="{ item }">
       {{ days.getDayByValue(item.day_of_week) }}
     </template>
-    <template v-slot:item.actions="{ item }">
+    <template #item.actions="{ item }">
       <v-btn
         icon="mdi-delete"
         variant="text"
         :loading="deleteLoading[item.id]"
-        @click="deleteItem(item)"
         :color="theme.current.value.primaryColor"
+        @click="deleteItem(item)"
       />
     </template>
   </v-data-table>

@@ -1,37 +1,46 @@
 <template>
   <v-list>
     <v-list-item
-      v-if="order.products"
       v-for="product in Object.keys(order.products)"
+      v-if="order.products"
       :title="product"
       append-icon="mdi-delete"
-      @click:append="addProduct"
       :subtitle="order.products[product].map(service => service.name).join(', ')"
+      @click:append="addProduct"
     >
-    <template #append>
-      <v-icon
-        icon="mdi-delete"
-        @click.stop="delete order.products[product]"
-      />
-    </template>
-  </v-list-item>
+      <template #append>
+        <v-icon
+          icon="mdi-delete"
+          @click.stop="delete order.products[product]"
+        />
+      </template>
+    </v-list-item>
   </v-list>
   <v-form ref="form">
-    <v-row no-gutters v-if="order.type">
-      <v-col cols="12" md="6">
+    <v-row
+      v-if="order.type"
+      no-gutters
+    >
+      <v-col
+        cols="12"
+        md="6"
+      >
         <v-text-field
-          :class="isMobile ? '' : 'mr-2'"
           v-model="selectedProduct"
+          :class="isMobile ? '' : 'mr-2'"
           label="Prodotto"
           append-icon="mdi-plus"
-          @click:append="addProduct"
           :rules="validation.requiredRules"
+          @click:append="addProduct"
         />
       </v-col>
-      <v-col cols="12" md="6">
+      <v-col
+        cols="12"
+        md="6"
+      >
         <v-select
-          :class="isMobile ? '' : 'ml-2'"
           v-model="selectedService"
+          :class="isMobile ? '' : 'ml-2'"
           label="Servizio"
           :items="services.filter(service => service.type == order.type &&
             (role == 'Customer' || service.users.map(user => user.user_id).includes(order.user_id)))"
@@ -40,7 +49,7 @@
           menu
           return-object
         >
-          <template v-slot:item="{ props }">
+          <template #item="{ props }">
             <v-list-item
               v-bind="props"
               @click="selectedServices.push(selectedService)"
@@ -51,13 +60,13 @@
     </v-row>
     <template v-else>
       Seleziona un tipo di ordine
-    <br><br>
+      <br><br>
     </template>
     <v-chip
-      class="mr-2 mb-5"
       v-for="service in selectedServices"
-      @click="selectedServices.splice(index, 1)"
+      class="mr-2 mb-5"
       append-icon="mdi-close-circle"
+      @click="selectedServices.splice(index, 1)"
     >
       {{ service.name }}
     </v-chip>

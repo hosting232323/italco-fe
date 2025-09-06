@@ -1,6 +1,6 @@
 <template>
   <v-dialog max-width="1500">
-    <template v-slot:activator="{ props: activatorProps }">
+    <template #activator="{ props: activatorProps }">
       <v-btn
         icon="mdi-import"
         style="float: right;"
@@ -8,10 +8,13 @@
         v-bind="activatorProps"
       />
     </template>
-    <template v-slot:default="{ isActive }">
+    <template #default="{ isActive }">
       <v-card title="Importa Ordini">
         <v-card-text>
-          <v-form ref="form" @submit.prevent="submitForm(isActive)">
+          <v-form
+            ref="form"
+            @submit.prevent="submitForm(isActive)"
+          >
             <v-file-input
               v-model="file"
               label="File Excel"

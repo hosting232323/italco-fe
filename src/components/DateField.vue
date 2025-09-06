@@ -15,8 +15,8 @@
         :class="classStyle"
         readonly
         clearable
-        @click:clear="clearDate"
         :rules="rules"
+        @click:clear="clearDate"
       >
         <template #append-inner>
           <v-icon>mdi-calendar</v-icon>
@@ -28,8 +28,8 @@
       :allowed-dates="allowedDatesFunction"
       @change="closeMenu"
     >
-      <template #title></template>
-      <template #header></template>
+      <template #title />
+      <template #header />
     </v-date-picker>
   </v-menu>
 </template>

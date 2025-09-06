@@ -16,9 +16,12 @@
       { title: 'Azioni', key: 'actions' }
     ]"
   >
-    <template v-slot:item.codes="{ item }">
+    <template #item.codes="{ item }">
       <div v-if="item.codes.length > 0">
-        <div v-for="(code, index) in item.codes" :key="index">
+        <div
+          v-for="(code, index) in item.codes"
+          :key="index"
+        >
           <b>{{ code.code }}</b>: {{ code.type ? 'Aggiunto' : 'Rimosso' }}
         </div>
       </div>
@@ -26,9 +29,12 @@
         Nessun CAP speciale
       </div>
     </template>
-    <template v-slot:item.constraints="{ item }">
+    <template #item.constraints="{ item }">
       <div v-if="item.constraints.length > 0">
-        <div v-for="(constraint, index) in item.constraints" :key="index">
+        <div
+          v-for="(constraint, index) in item.constraints"
+          :key="index"
+        >
           <b>{{ days.getDayByValue(constraint.day_of_week) }}</b>:
           {{ constraint.max_orders }}
         </div>
@@ -37,7 +43,7 @@
         Nessun vincolo
       </div>
     </template>
-    <template v-slot:item.actions="{ item }">
+    <template #item.actions="{ item }">
       <v-row no-gutters>
         <v-col cols="4">
           <v-btn

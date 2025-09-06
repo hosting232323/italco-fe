@@ -15,10 +15,10 @@
       { title: 'Azioni', key: 'actions' }
     ]"
   >
-    <template v-slot:item.users="{ item }">
+    <template #item.users="{ item }">
       {{ item.users.map(user => user.email).join(', ') }}
     </template>
-    <template v-slot:item.actions="{ item }">
+    <template #item.actions="{ item }">
       <v-row no-gutters>
         <v-col cols="6">
           <v-btn

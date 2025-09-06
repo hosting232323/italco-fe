@@ -1,13 +1,17 @@
 <template>
   <v-card
+    v-if="activeForm"
     title="Crea Aree Geografica"
     class="mt-10 mb-5"
-    v-if="activeForm"
   >
     <v-card-text>
-      <v-form ref="form" @submit.prevent="submitForm">
+      <v-form
+        ref="form"
+        @submit.prevent="submitForm"
+      >
         <v-autocomplete
           v-model="geographicZone.name"
+          v-model:search="search"
           :items="filteredProvinces"
           item-title="name"
           label="Provincia"
@@ -15,7 +19,6 @@
           clearable
           hide-no-data
           hide-selected
-          v-model:search="search"
           return-object
         />
         <FormButtons

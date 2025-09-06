@@ -1,6 +1,6 @@
 <template>
   <v-dialog max-width="1500">
-    <template v-slot:activator="{ props: activatorProps }">
+    <template #activator="{ props: activatorProps }">
       <v-row no-gutters>
         <v-col cols="6">
           <v-btn
@@ -35,22 +35,31 @@
             icon="mdi-link-variant"
             variant="text"
             :color="theme.current.value.primaryColor"
-            @click="copyOrderLink(item.id)"
             title="Copia link ordine"
+            @click="copyOrderLink(item.id)"
           />
         </v-col>
       </v-row>
     </template>
-    <template v-slot:default>
+    <template #default>
       <v-card :title="`Situazione delivery ordine ${order.id}`">
         <v-card-text>
           Motivazione: {{ order.motivation }}<br>
           Note Operatore: {{ order.operator_note }}<br>
           Note Punto Vendita: {{ order.customer_note }}<br><br>
-          <v-skeleton-loader type="image" v-if="loadingPhoto" />
+          <v-skeleton-loader
+            v-if="loadingPhoto"
+            type="image"
+          />
           <div v-else>
-            <div v-if="photos && photos.length" v-for="photo in photos">
-              <v-skeleton-loader type="image" v-if="!imageLoading[photo]" />
+            <div
+              v-for="photo in photos"
+              v-if="photos && photos.length"
+            >
+              <v-skeleton-loader
+                v-if="!imageLoading[photo]"
+                type="image"
+              />
               <v-img
                 :src="`${http.hostname}order/photo/${photo}`"
                 max-width="1500"
@@ -59,7 +68,9 @@
                 @load="imageLoading[photo] = true"
               />
             </div>
-            <div v-else>Nessuna immagine disponibile.</div>
+            <div v-else>
+              Nessuna immagine disponibile.
+            </div>
           </div>
         </v-card-text>
       </v-card>

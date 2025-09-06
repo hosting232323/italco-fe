@@ -1,6 +1,9 @@
 <template>
-  <v-dialog max-width="1500" v-model="popUp">
-    <template v-slot:activator>
+  <v-dialog
+    v-model="popUp"
+    max-width="1500"
+  >
+    <template #activator>
       <v-container>
         <h1>
           Gestione GDO
@@ -12,7 +15,7 @@
           />
         </h1><hr class="mt-2">
         <CustomerGroupForm />
-        <CustomerGroupTable @openPopUp="openPopUp" />
+        <CustomerGroupTable @open-pop-up="openPopUp" />
         <h1>
           Gestione Aree Geografiche
           <v-btn
@@ -25,7 +28,7 @@
         Attenzione: Se non vengono configurate regole per una certa area geografica,
         i punti vendita non potranno effettuare ordini per i clienti di quella zona.
         <GeographicZoneForm />
-        <GeographicZoneTable @openPopUp="openPopUp" />
+        <GeographicZoneTable @open-pop-up="openPopUp" />
         <h1>
           Gestione Regole Punti Vendita
           <v-btn
@@ -39,7 +42,7 @@
         <CustomerRuleTable />
       </v-container>
     </template>
-    <template v-slot:default>
+    <template #default>
       <CustomerGroupPopUp v-if="popUpType == 'customerGroup'" />
       <ConstraintPopUp v-if="popUpType == 'constraint'" />
       <GeographicCodePopUp v-if="popUpType == 'geographicCode'" />

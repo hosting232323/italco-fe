@@ -35,7 +35,7 @@ const futureTime = (element) => [
     const [endH, endM] = value.split(':').map(Number);
     const startMinutes = startH * 60 + startM;
     const endMinutes = endH * 60 + endM;
-    return endMinutes > startMinutes ? true : "L'orario di fine deve essere maggiore di quello di inizio";
+    return endMinutes > startMinutes ? true : 'L\'orario di fine deve essere maggiore di quello di inizio';
   }
 ];
 
