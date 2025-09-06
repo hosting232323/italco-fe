@@ -15,20 +15,6 @@ variables:
 
   GITLAB_PIPELINE: 'true'
 
-fe_dependencies:
-  stage: prepare
-  image: node:20
-  script:
-    - npm ci
-    - npm run build
-  artifacts:
-    paths:
-      - dist
-      - node_modules
-    expire_in: 1h
-  tags:
-    - linux
-
 be_dependencies:
   stage: prepare
   script:
@@ -54,8 +40,6 @@ be_dependencies:
 test_end_to_end:
   stage: test
   needs:
-    - job: fe_dependencies
-      artifacts: true
     - job: be_dependencies
       artifacts: true
   services:
@@ -64,13 +48,15 @@ test_end_to_end:
     - name: selenium/standalone-chromium:latest
       alias: selenium
   script:
+    - export VITE_HOSTNAME=http://$(hostname -I | tr ' ' '\n' | grep -m1 '^[0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+$'):8080/
+    - export VITE_HOSTNAME_ITALCO_FE=http://$(hostname -I | tr ' ' '\n' | grep -m1 '^[0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+$'):3000/
+    - npm ci
+    - npm run build
     - apt-get update && apt-get install -y npm
     - npm run serve &
 
-    - export VITE_HOSTNAME=http://$(hostname -I | tr ' ' '\n' | grep -m1 '^[0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+$'):8080/
-    - export VITE_HOSTNAME_ITALCO_FE=http://$(hostname -I | tr ' ' '\n' | grep -m1 '^[0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+$'):3000/
-    - cd italco-be
     - source venv/bin/activate
+    - cd italco-be
     - alembic upgrade heads
     - python -m src &
 
