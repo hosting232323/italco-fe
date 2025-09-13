@@ -30,64 +30,31 @@
           :rules="(status === 'Completed' || order.anomaly) ? validation.arrayRules : []"
         />
         <v-row>
-          <v-col
-            cols="6"
-            :class="isMobile ? 'd-flex flex-column' : 'd-flex justify-center align-center'"
-          >
+          <v-col cols="6" :class="isMobile ? 'd-flex flex-column' : 'd-flex justify-center align-center'">
             <v-radio-group v-model="order.delay">
               <label class="mr-2">In ritardo</label>
-              <v-radio
-                label="Sì"
-                :value="true"
-              />
-              <v-radio
-                label="No"
-                :value="false"
-              />
+              <v-radio label="Sì" :value="true" />
+              <v-radio label="No" :value="false" />
             </v-radio-group>
-            <div
-              v-if="order.delay"
-              :style="isMobile ? { width: '100%' } : { width: '50%', height: '100%' }"
-              :class="isMobile ? 'd-flex flex-column' : 'd-flex justify-center align-center'"
-            >
-              <v-text-field
-                v-model="order.start_time_slot"
-                label="Time Slot Start"
-                type="time"
-                :rules="validation.requiredRules"
-                dense
-                hide-details
-                :style="isMobile ? { margin: '15px 0', width: '100%' } : { maxWidth: '115px', marginRight: '15px' }"
-              />
-              <v-text-field
-                v-model="order.end_time_slot"
-                label="Time Slot End"
-                type="time"
-                :rules="validation.futureTime(order)"
-                dense
-                hide-details
-                :style="isMobile ? { width: '100%' } : { maxWidth: '115px' }"
-              />
+            <div v-if="order.delay && !isMobile" style="width: 50%; height: 100%;" class="d-flex justify-center align-center">
+              <v-text-field v-model="order.start_time_slot" label="Time Slot Start" type="time" :rules="validation.requiredRules" dense hide-details style="max-width: 115px; margin-right: 15px;" />
+              <v-text-field v-model="order.end_time_slot" label="Time Slot End" type="time" :rules="validation.futureTime(order)" dense hide-details style="max-width: 115px;" />
             </div>
           </v-col>
           <v-col cols="6">
             <v-radio-group v-model="order.anomaly">
               <label class="mr-2">Con Anomalia</label>
-              <v-radio
-                label="Sì"
-                :value="true"
-              />
-              <v-radio
-                label="No"
-                :value="false"
-              />
+              <v-radio label="Sì" :value="true" />
+              <v-radio label="No" :value="false" />
             </v-radio-group>
           </v-col>
+          <div v-if="order.delay && isMobile" style="width: 100%; height: 100%;"class="d-flex justify-center align-center flex-column">
+            <p>Time Slot In Ritardo</p>
+            <v-text-field v-model="order.start_time_slot" label="Time Slot Start" type="time" :rules="validation.requiredRules" dense style="width: 100%;" />
+            <v-text-field v-model="order.end_time_slot" label="Time Slot End" type="time" :rules="validation.futureTime(order)" dense style="width: 100%;" />
+          </div>
         </v-row>
-        <FormButtons
-          :loading="loading"
-          @cancel="emits('cancel')"
-        />
+        <FormButtons :loading="loading" @cancel="emits('cancel')" />
       </v-form>
     </v-card-text>
   </v-card>

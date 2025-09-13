@@ -60,6 +60,7 @@
               :class="isMobile ? '' : 'ml-2'"
               label="Data"
               :rules="validation.requiredRules"
+              :error-messages="error"
             />
           </v-col>
         </v-row>
@@ -131,6 +132,7 @@ import { useScheduleStore } from '@/stores/schedule';
 import { useTransportStore } from '@/stores/transport';
 import { useDeliveryGroupStore } from '@/stores/deliveryGroup';
 
+const error = ref(null);
 const form = ref(null);
 const router = useRouter();
 const loading = ref(false);
@@ -180,6 +182,10 @@ watch(
   { deep: true }
 );
 
+watch(() => schedule.value.date, () => {
+  error.value = null;
+});
+
 const assignDeliveryGroup = async () => {
   if (!(await form.value.validate()).valid) return;
 
@@ -191,7 +197,8 @@ const assignDeliveryGroup = async () => {
       scheduleStore.initList(router);
       schedule.value = {};
       emits('cancel');
-    }
+    } else 
+      error.value = data.error;
   });
 };
 </script>
