@@ -147,38 +147,18 @@ const orders = storesUtils.getStoreList(orderStore, router);
 const transports = storesUtils.getStoreList(transportStore, router);
 const deliveryGroups = storesUtils.getStoreList(deliveryGroupStore, router);
 
-if (!schedule.value.orders) schedule.value.orders = [];
-
-const syncOrders = () => {
-  const existingMap = Object.fromEntries(
-    schedule.value.orders.map(o => [o.id, o])
-  );
-
-  schedule.value.orders = schedule.value.order_ids.map((id, index) => {
-    const existing = existingMap[id];
-    if (existing) 
-      return { ...existing, schedule_index: index };
-    else 
-      return {
-        id,
-        start_time_slot: '',
-        end_time_slot: '',
-        schedule_index: index
-      };
-  });
-};
-
-syncOrders();
-
-watch(
-  () => schedule.value.order_ids,
-  () => syncOrders(),
-  { deep: true }
-);
+schedule.value.orders = schedule.value.order_ids.map((id, index) => {
+  return {
+    id,
+    start_time_slot: '',
+    end_time_slot: '',
+    schedule_index: index
+  };
+});
 
 watch(
   () => schedule.value.orders,
-  (newOrders) => newOrders.forEach((o, i) => o.schedule_index = i),
+  (newOrders) => newOrders?.forEach((o, i) => o.schedule_index = i),
   { deep: true }
 );
 
