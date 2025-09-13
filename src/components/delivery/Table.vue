@@ -91,7 +91,7 @@ const filteredOrders = computed(() => {
   console.log(result);
 
   return result.slice().sort((a, b) => a.schedule_index - b.schedule_index);
-})
+});
 </script>
 
 <style scoped>
