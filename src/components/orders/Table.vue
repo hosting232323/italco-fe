@@ -5,7 +5,7 @@
   >
     <template #activator>
       <v-btn
-        v-if="['Admin', 'Operator'].includes(role)"
+        v-if="['Admin', 'Operator'].includes(role) && schedule.order_ids?.length"
         text="Assegna Gruppo Delivery"
         :color="theme.current.value.primaryColor"
         @click="dialog = true"

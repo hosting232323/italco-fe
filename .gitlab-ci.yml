@@ -76,6 +76,6 @@ lint_frontend:
   image: node:18
   script:
     - npm ci
-    - npx run lint
+    - npx eslint "src/**/*.{js,vue}"
   tags:
     - linux
