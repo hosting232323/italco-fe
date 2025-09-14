@@ -78,13 +78,14 @@ const { keyName } = defineProps(['keyName']);
 const { list: orders, element: order, ready } = storeToRefs(orderStore);
 
 const filteredOrders = computed(() => {
-  if (keyName === 'Anomaly') {
-    return [...(orders.value['In Progress'] || []), ...(orders.value['On Board'] || [])].filter(o => o.anomaly);
-  } else if (keyName === 'Delay') {
-    return [...(orders.value['In Progress'] || []), ...(orders.value['On Board'] || [])].filter(o => o.delay);
-  } else {
-    return orders.value[keyName] || [];
-  }
+  let result = [];
+  if (keyName === 'Anomaly')
+    result = [...(orders.value['In Progress'] || []), ...(orders.value['On Board'] || [])].filter(o => o.anomaly);
+  else if (keyName === 'Delay')
+    result = [...(orders.value['In Progress'] || []), ...(orders.value['On Board'] || [])].filter(o => o.delay);
+  else
+    result = orders.value[keyName] || [];
+  return result.slice().sort((a, b) => a.schedule_index - b.schedule_index);
 });
 </script>
 
