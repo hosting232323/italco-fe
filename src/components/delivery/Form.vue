@@ -86,9 +86,8 @@
           <div
             v-if="order.delay && isMobile"
             style="width: 100%; height: 100%;"
-            class="d-flex justify-center align-center flex-column"
           >
-            <p>Time Slot In Ritardo</p>
+            <p>Time slot in ritardo</p>
             <v-text-field
               v-model="order.start_time_slot"
               label="Time Slot Start"
