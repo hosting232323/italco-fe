@@ -5,7 +5,6 @@
         ref="form"
         @submit.prevent="submitForm"
       >
-      {{ status }}
         <v-select
           v-if="!['Completed', 'Cancelled'].includes(actualStatus)"
           v-model="status"
@@ -206,5 +205,4 @@ const saveSignature = () => {
 
   alert('Firma salvata come file!');
 };
-
 </script>
