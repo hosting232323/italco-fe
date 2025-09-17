@@ -5,6 +5,7 @@
         ref="form"
         @submit.prevent="submitForm"
       >
+      {{ status }}
         <v-select
           v-if="!['Completed', 'Cancelled'].includes(actualStatus)"
           v-model="status"
@@ -106,6 +107,21 @@
             />
           </div>
         </v-row>
+
+        <div v-if="status === 'Completed'" class="pa-4">
+          <label>Firma del cliente</label>
+          <SignaturePad
+            ref="signaturePad"
+            width="auto"
+            height="200"
+            pen-color="black"
+            background-color="white"
+            style="border: 1px solid #ccc;"
+          />
+          <v-btn class="mt-2" color="primary" @click="clearSignature">Cancella</v-btn>
+          <v-btn class="mt-2" color="success" @click="saveSignature">Salva Firma</v-btn>
+        </div>
+
         <FormButtons
           :loading="loading"
           @cancel="emits('cancel')"
@@ -125,11 +141,13 @@ import orderUtils from '@/utils/order';
 import { useRouter } from 'vue-router';
 import validation from '@/utils/validation';
 import { useOrderStore } from '@/stores/order';
+import SignaturePad from 'vue3-signature-pad';
 
 const form = ref(null);
 const status = ref(null);
 const loading = ref(false);
 const router = useRouter();
+const signaturePad = ref(null);
 const orderStore = useOrderStore();
 const emits = defineEmits(['cancel']);
 const isMobile = mobile.setupMobileUtils();
@@ -157,4 +175,36 @@ const submitForm = async () => {
     }
   });
 };
+
+const clearSignature = () => {
+  if (signaturePad.value) {
+    signaturePad.value.signaturePad.clear();
+  } else {
+    console.warn('SignaturePad non inizializzato');
+  }
+};
+
+const saveSignature = () => {
+  if (signaturePad.value.isEmpty()) {
+    alert('Firma vuota!');
+    return;
+  }
+
+  const dataURL = signaturePad.value.toDataURL('image/png');
+
+  const arr = dataURL.split(',');
+  const mime = arr[0].match(/:(.*?);/)[1];
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  const file = new File([u8arr], `firma_${order.value.id}.png`, { type: mime });
+
+  order.value.signature = file;
+
+  alert('Firma salvata come file!');
+};
+
 </script>
