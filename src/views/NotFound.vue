@@ -3,12 +3,13 @@
     <p class="title-error-page" :style="{ color: theme.current.value.primaryColor }">404</p>
     <p class="subtitle">Oops! Pagina non trovata</p>
     <p class="description">La pagina che stai cercando non esiste o è stata spostata.</p>
-    <a href="/" class="home" :style="{ color: theme.current.value.primaryColor }">Torna alla home</a>
+    <a href="/dashboard" class="home" :style="{ color: theme.current.value.primaryColor }">Torna alla Dashboard</a>
   </v-container>
 </template>
 
 <script setup>
 import { useTheme } from 'vuetify';
+
 const theme = useTheme();
 </script>
 
