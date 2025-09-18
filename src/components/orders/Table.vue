@@ -28,11 +28,13 @@
           {{ orderUtils.TYPES.find(type => type.value == item.type)?.title }}
         </template>
         <template #item.productsServices="{ item }">
-          <template v-for="product in Object.keys(item.products)">
-            <b>{{ product }}</b>:
-            {{ item.products[product].map(service => service.name).join(', ') }}
-            <br>
-          </template>
+          <div style="min-width: 250px;">
+            <template v-for="product in Object.keys(item.products)">
+              <b>{{ product }}</b>:
+              {{ item.products[product].map(service => service.name).join(', ') }}
+              <br>
+            </template>
+          </div>
         </template>
         <template #item.addressee="{ item }">
           {{ item.addressee }}<br>
