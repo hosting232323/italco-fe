@@ -20,6 +20,11 @@ const routes = [
         path: 'privacy',
         name: 'Privacy Policy',
         component: () => import('@/views/PrivacyPolicy.vue')
+      },
+      {
+        path: '/:pathMatch(.*)*',
+        name: 'NotFound',
+        component: () => import('@/views/NotFound.vue'),
       }
     ]
   },
