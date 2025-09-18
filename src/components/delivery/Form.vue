@@ -107,7 +107,7 @@
           </div>
         </v-row>
 
-        <div v-if="status === 'Completed'" class="pa-4">
+        <div v-if="status === 'Completed'">
           <label>Firma del cliente</label>
           <SignaturePad
             ref="signaturePad"
@@ -117,6 +117,8 @@
             background-color="white"
             style="border: 1px solid #ccc;"
           />
+          <p v-if="signatureError" class="text-error" style="font-size: 12px; padding-inline: 16px;">{{ signatureError }}</p>
+          <p v-if="signatureSuccess" class="text-success" style="font-size: 12px; padding-inline: 16px;">{{ signatureSuccess }}</p>
           <v-btn class="mt-2" color="primary" @click="clearSignature">Cancella</v-btn>
           <v-btn class="mt-2" color="success" @click="saveSignature">Salva Firma</v-btn>
         </div>
@@ -146,6 +148,8 @@ const form = ref(null);
 const status = ref(null);
 const loading = ref(false);
 const router = useRouter();
+const signatureError = ref(null);
+const signatureSuccess = ref(null);
 const signaturePad = ref(null);
 const orderStore = useOrderStore();
 const emits = defineEmits(['cancel']);
@@ -162,6 +166,11 @@ const actualStatus = order.value.status;
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
 
+  if (status.value === 'Completed' && signaturePad.value.isEmpty()) {
+    signatureError.value = 'La firma non può essere vuota';
+    return;
+  }
+
   loading.value = true;
   order.value.user_id = order.value.user.id;
   if (status.value) order.value.status = status.value;
@@ -176,19 +185,17 @@ const submitForm = async () => {
 };
 
 const clearSignature = () => {
-  if (signaturePad.value) {
-    signaturePad.value.signaturePad.clear();
-  } else {
-    console.warn('SignaturePad non inizializzato');
-  }
+  signatureError.value = null;
+  signatureSuccess.value = null;
+  signaturePad.value.signaturePad.clear();
 };
 
 const saveSignature = () => {
   if (signaturePad.value.isEmpty()) {
-    alert('Firma vuota!');
+    signatureError.value = 'La firma non può essere vuota';
     return;
   }
-
+  signatureError.value = null;
   const dataURL = signaturePad.value.toDataURL('image/png');
 
   const arr = dataURL.split(',');
@@ -202,7 +209,6 @@ const saveSignature = () => {
   const file = new File([u8arr], `firma_${order.value.id}.png`, { type: mime });
 
   order.value.signature = file;
-
-  alert('Firma salvata come file!');
+  signatureSuccess.value = 'Firma salvata correttamente'
 };
 </script>
