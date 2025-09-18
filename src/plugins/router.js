@@ -14,12 +14,17 @@ const routes = [
         path: 'order/:orderId',
         name: 'OrderStatus',
         component: () => import('@/views/OrderStatus.vue'),
-        props: true,
+        props: true
       },
       {
         path: 'privacy',
         name: 'Privacy Policy',
         component: () => import('@/views/PrivacyPolicy.vue')
+      },
+      {
+        path: '/:pathMatch(.*)*',
+        name: 'NotFound',
+        component: () => import('@/views/NotFound.vue')
       }
     ]
   },
