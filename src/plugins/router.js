@@ -14,7 +14,7 @@ const routes = [
         path: 'order/:orderId',
         name: 'OrderStatus',
         component: () => import('@/views/OrderStatus.vue'),
-        props: true,
+        props: true
       },
       {
         path: 'privacy',
@@ -24,7 +24,7 @@ const routes = [
       {
         path: '/:pathMatch(.*)*',
         name: 'NotFound',
-        component: () => import('@/views/NotFound.vue'),
+        component: () => import('@/views/NotFound.vue')
       }
     ]
   },
