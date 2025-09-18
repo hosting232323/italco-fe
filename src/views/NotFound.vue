@@ -15,7 +15,7 @@ const theme = useTheme();
 
 <style scoped>
 .background {
-  height: 100vh;
+  margin-top: 100px;
   display: flex;
   justify-content: center;
   align-items: center;
