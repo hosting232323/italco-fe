@@ -119,8 +119,14 @@
           />
           <p v-if="signatureError" class="text-error" style="font-size: 12px; padding-inline: 16px;">{{ signatureError }}</p>
           <p v-if="signatureSuccess" class="text-success" style="font-size: 12px; padding-inline: 16px;">{{ signatureSuccess }}</p>
-          <v-btn class="mt-2" color="primary" @click="clearSignature">Cancella</v-btn>
-          <v-btn class="mt-2" color="success" @click="saveSignature">Salva Firma</v-btn>
+          <v-row no-gutters>
+            <v-col cols="6">
+              <v-btn class="mt-2 mr-3" block :color="theme.current.value.primaryColor" @click="clearSignature">Cancella</v-btn>
+            </v-col>
+            <v-col cols="6">
+              <v-btn class="mt-2 ml-3" block :color="theme.current.value.primaryColor" @click="saveSignature">Salva Firma</v-btn>
+            </v-col>
+          </v-row>
         </div>
 
         <FormButtons
@@ -134,7 +140,7 @@
 
 <script setup>
 import FormButtons from '@/components/FormButtons';
-
+import { useTheme } from 'vuetify';
 import { ref } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
@@ -145,6 +151,7 @@ import { useOrderStore } from '@/stores/order';
 import SignaturePad from 'vue3-signature-pad';
 
 const form = ref(null);
+const theme = useTheme();
 const status = ref(null);
 const loading = ref(false);
 const router = useRouter();
