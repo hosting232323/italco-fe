@@ -106,6 +106,29 @@
             />
           </div>
         </v-row>
+
+        <div v-if="status === 'Completed'">
+          <label>Firma del cliente</label>
+          <SignaturePad
+            ref="signaturePad"
+            width="auto"
+            height="200"
+            pen-color="black"
+            background-color="white"
+            style="border: 1px solid #ccc;"
+          />
+          <p v-if="signatureError" class="text-error" style="font-size: 12px; padding-inline: 16px;">{{ signatureError }}</p>
+          <p v-if="signatureSuccess" class="text-success" style="font-size: 12px; padding-inline: 16px;">{{ signatureSuccess }}</p>
+          <v-row no-gutters>
+            <v-col cols="6">
+              <v-btn class="mt-2 mr-3" block :color="theme.current.value.primaryColor" @click="clearSignature">Cancella</v-btn>
+            </v-col>
+            <v-col cols="6">
+              <v-btn class="mt-2 ml-3" block :color="theme.current.value.primaryColor" @click="saveSignature">Salva Firma</v-btn>
+            </v-col>
+          </v-row>
+        </div>
+
         <FormButtons
           :loading="loading"
           @cancel="emits('cancel')"
@@ -117,7 +140,7 @@
 
 <script setup>
 import FormButtons from '@/components/FormButtons';
-
+import { useTheme } from 'vuetify';
 import { ref } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
@@ -125,11 +148,16 @@ import orderUtils from '@/utils/order';
 import { useRouter } from 'vue-router';
 import validation from '@/utils/validation';
 import { useOrderStore } from '@/stores/order';
+import SignaturePad from 'vue3-signature-pad';
 
 const form = ref(null);
+const theme = useTheme();
 const status = ref(null);
 const loading = ref(false);
 const router = useRouter();
+const signatureError = ref(null);
+const signatureSuccess = ref(null);
+const signaturePad = ref(null);
 const orderStore = useOrderStore();
 const emits = defineEmits(['cancel']);
 const isMobile = mobile.setupMobileUtils();
@@ -145,6 +173,11 @@ const actualStatus = order.value.status;
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
 
+  if (status.value === 'Completed' && signaturePad.value.isEmpty()) {
+    signatureError.value = 'La firma non può essere vuota';
+    return;
+  }
+
   loading.value = true;
   order.value.user_id = order.value.user.id;
   if (status.value) order.value.status = status.value;
@@ -156,5 +189,33 @@ const submitForm = async () => {
       emits('cancel');
     }
   });
+};
+
+const clearSignature = () => {
+  signatureError.value = null;
+  signatureSuccess.value = null;
+  signaturePad.value.signaturePad.clear();
+};
+
+const saveSignature = () => {
+  if (signaturePad.value.isEmpty()) {
+    signatureError.value = 'La firma non può essere vuota';
+    return;
+  }
+  signatureError.value = null;
+  const dataURL = signaturePad.value.toDataURL('image/png');
+
+  const arr = dataURL.split(',');
+  const mime = arr[0].match(/:(.*?);/)[1];
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  const file = new File([u8arr], `firma_${order.value.id}.png`, { type: mime });
+
+  order.value.signature = file;
+  signatureSuccess.value = 'Firma salvata correttamente'
 };
 </script>
