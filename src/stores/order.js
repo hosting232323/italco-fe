@@ -44,6 +44,9 @@ export const useOrderStore = defineStore('order', {
       if (this.element.photos)
         this.element.photos.forEach(element => content[element.name] = element);
 
+      if (this.element.signature)
+        content['signature'] = this.element.signature; 
+
       http.formDataRequest(
         `order/${this.element.id}`,
         content,
