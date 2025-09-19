@@ -74,7 +74,10 @@ const createHeader = async (router, file = false) => {
   if (role.value === 'Delivery' && navigator.geolocation) {
     try {
       const position = await new Promise((resolve, reject) =>
-        navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 3000 })
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          timeout: 5000,
+          enableHighAccuracy: true
+        })
       );
       headers['X-Lat'] = position.coords.latitude;
       headers['X-Lon'] = position.coords.longitude;
