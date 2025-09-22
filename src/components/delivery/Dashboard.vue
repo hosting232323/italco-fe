@@ -22,19 +22,18 @@
             :cols="isMobile ? 6 :
               ((card.key === 'Delay' || card.key === 'Anomaly') ? 2 : 4)"
           >
-            <v-item
-              v-slot="{ selectedClass, toggle }"
-              :value="card.key"
-            >
-              <v-card
-                :class="['d-flex align-center', selectedClass]"
-                height="100"
-                @click="toggle"
-              >
-                <v-card-text style="font-size: larger;">
-                  {{ card.title }}: <b>{{ cardCounts[card.key] }}</b>
-                </v-card-text>
-              </v-card>
+            <v-item :value="card.key">
+              <template v-slot:default="{ isSelected, toggle }">
+                <v-card
+                  :class="['d-flex align-center', { selected: isSelected }]"
+                  height="100"
+                  @click="toggle"
+                >
+                  <v-card-text style="font-size: larger;">
+                    {{ card.title }}: <b>{{ cardCounts[card.key] }}</b>
+                  </v-card-text>
+                </v-card>
+              </template>
             </v-item>
           </v-col>
         </v-row>

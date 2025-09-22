@@ -7,9 +7,9 @@
     max-width="290"
     min-width="auto"
   >
-    <template #activator="{ props }">
+    <template #activator="{ activatorProps }">
       <v-text-field
-        v-bind="props"
+        v-bind="activatorProps"
         v-model="formattedValue"
         :label="label"
         :class="classStyle"

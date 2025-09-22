@@ -26,10 +26,18 @@ import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import truckIcon from '@/assets/truck.png';
 
-const { lat, lon } = defineProps(['lat', 'lon']);
+const { lat, lon } = defineProps({
+  lat: {
+    type: Number,
+    required: true
+  },
+  lon: {
+    type: Number,
+    required: true
+  }
+});
 
 let mapContainer = ref(null);
-let map;
 
 onMounted(() => {
   const iconFeature = new Feature({
@@ -55,7 +63,7 @@ onMounted(() => {
     source: vectorSource
   });
 
-  map = new Map({
+  new Map({
     target: mapContainer.value,
     layers: [
       new TileLayer({
