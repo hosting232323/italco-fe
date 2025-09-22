@@ -8,7 +8,7 @@
     />
     <div v-else>
       <br><b>
-        Totale ordini: {{ Object.values(orders).reduce((sum, arr) => sum + arr.length, 0) }}
+        Totale ordini: {{ totOrder }}
       </b><br><br>
       <v-item-group
         v-model="selectedCard"
@@ -75,7 +75,14 @@ const theme = useTheme();
 const router = useRouter();
 const orderStore = useOrderStore();
 const { list: orders, ready } = storeToRefs(orderStore);
+console.log(orders.value);
+
 const isMobile = mobile.setupMobileUtils();
+const totOrder = computed(() => {
+  if (!orders.value) return 0;
+  else
+    return Object.values(orders.value).reduce((sum, arr) => sum + arr.length, 0)
+})
 
 
 const cards = [
@@ -114,7 +121,7 @@ const cardCounts = computed(() => {
   const delayOrders = [];
 
   for (const key of ['In Progress', 'On Board']) {
-    const list = orders.value[key] || [];
+    const list = orders.value?.[key] || [];
     list.forEach(order => {
       if (order.anomaly) anomalyOrders.push(order);
       if (order.delay) delayOrders.push(order);
@@ -122,11 +129,11 @@ const cardCounts = computed(() => {
   }
 
   return {
-    'In Progress': orders.value['In Progress']?.length || 0,
-    'On Board': orders.value['On Board']?.length || 0,
-    'Completed': orders.value['Completed']?.length || 0,
-    'Cancelled': orders.value['Cancelled']?.length || 0,
-    'At Warehouse': orders.value['At Warehouse']?.length || 0,
+    'In Progress': orders.value?.['In Progress']?.length || 0,
+    'On Board': orders.value?.['On Board']?.length || 0,
+    'Completed': orders.value?.['Completed']?.length || 0,
+    'Cancelled': orders.value?.['Cancelled']?.length || 0,
+    'At Warehouse': orders.value?.['At Warehouse']?.length || 0,
     'Anomaly': anomalyOrders.length,
     'Delay': delayOrders.length
   };

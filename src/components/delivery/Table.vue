@@ -84,7 +84,7 @@ const filteredOrders = computed(() => {
   else if (keyName === 'Delay')
     result = [...(orders.value['In Progress'] || []), ...(orders.value['On Board'] || [])].filter(o => o.delay);
   else
-    result = orders.value[keyName] || [];
+    result = orders.value?.[keyName] || [];
   return result.slice().sort((a, b) => a.schedule_index - b.schedule_index);
 });
 </script>
