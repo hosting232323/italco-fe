@@ -188,15 +188,18 @@ const serviceStore = useServiceStore();
 const isMobile = mobile.setupMobileUtils();
 const collectionPointStore = useCollectionPointStore();
 const { role } = storeToRefs(userStore);
-const { filters, dateFilter } = storeToRefs(orderStore);
+const { filters, dateFilter, ready } = storeToRefs(orderStore);
 const services = storesUtils.getStoreList(serviceStore, router);
 const collectionPoints = storesUtils.getStoreList(collectionPointStore, router);
 
 const filterOrder = async () => {
   if (!(await form.value.validate()).valid) return;
 
+  ready.value = false;
   orderStore.initList(router);
   panel.value = null;
+  filters.value = {};
+  dateFilter.value = {};
 };
 
 const intervallRules = (otherKey) => {

@@ -139,16 +139,17 @@
 </template>
 
 <script setup>
+import SignaturePad from 'vue3-signature-pad';
 import FormButtons from '@/components/FormButtons';
-import { useTheme } from 'vuetify';
+
 import { ref } from 'vue';
+import { useTheme } from 'vuetify';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import orderUtils from '@/utils/order';
 import { useRouter } from 'vue-router';
 import validation from '@/utils/validation';
 import { useOrderStore } from '@/stores/order';
-import SignaturePad from 'vue3-signature-pad';
 
 const form = ref(null);
 const theme = useTheme();
