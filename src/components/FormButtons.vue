@@ -30,8 +30,7 @@ import { useTheme } from 'vuetify';
 const { loading } = defineProps({
   loading: {
     type: Boolean,
-    required: false,
-    default: false,
+    required: true
   },
 });
 
