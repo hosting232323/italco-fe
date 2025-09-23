@@ -1,10 +1,10 @@
 <template>
   <v-card
-    v-if="!schedule.order_ids"
+    v-if="!schedule.order_ids && !schedule.orders"
     title="Seleziona degli ordini per creare un Borderò"
   />
   <v-card
-    v-else-if="schedule.order_ids.some(
+    v-else-if="schedule.order_ids?.some(
       id => orders.some(
         order => order.id === id && order.status !== 'Pending'
       )
@@ -13,8 +13,10 @@
   />
   <v-card
     v-else
-    title="Crea Borderò"
-    :subtitle="`Ordini: ${schedule.order_ids.join(', ')}`"
+    :title="schedule.id ? 'Modifica Borderò' : 'Crea Borderò'"
+    :subtitle="schedule.id 
+      ? `ID: ${schedule.id}` 
+      : `Ordini: ${schedule.order_ids?.join(', ')}`"
   >
     <v-card-text>
       <v-form
@@ -147,14 +149,16 @@ const orders = storesUtils.getStoreList(orderStore, router);
 const transports = storesUtils.getStoreList(transportStore, router);
 const deliveryGroups = storesUtils.getStoreList(deliveryGroupStore, router);
 
-schedule.value.orders = schedule.value.order_ids.map((id, index) => {
-  return {
+console.log(schedule.value);
+
+if (schedule.value.order_ids && !schedule.value.orders) {
+  schedule.value.orders = schedule.value.order_ids.map((id, index) => ({
     id,
     start_time_slot: '',
     end_time_slot: '',
     schedule_index: index
-  };
-});
+  }));
+}
 
 watch(
   () => schedule.value.orders,
