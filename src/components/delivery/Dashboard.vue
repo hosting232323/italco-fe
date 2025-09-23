@@ -27,7 +27,7 @@
               :value="card.key"
             >
               <v-card
-                :class="['d-flex align-center', { selected: selectedClass }]"
+                :class="['d-flex align-center', selectedClass]"
                 height="100"
                 @click="toggle"
               >
