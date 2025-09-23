@@ -21,7 +21,10 @@
       ]"
     >
       <template #item.orders="{ item }">
-        <div v-for="order in item.orders" :key="order.id">
+        <div
+          v-for="order in item.orders"
+          :key="order.id"
+        >
           ID: <b>{{ order.id }}</b>
           Destinatario: <b>{{ order.addressee }}</b>
         </div>
