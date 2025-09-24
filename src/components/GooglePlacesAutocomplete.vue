@@ -11,6 +11,8 @@
 </template>
 
 <script setup>
+/* global google */
+
 import {
   ref,
   watch,

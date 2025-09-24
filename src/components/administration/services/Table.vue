@@ -65,8 +65,8 @@ import { useServiceStore } from '@/stores/service';
 
 const theme = useTheme();
 const router = useRouter();
+defineProps(['activatorProps']);
 const serviceStore = useServiceStore();
-const props = defineProps(['activatorProps']);
 const { element: service, activeForm, ready } = storeToRefs(serviceStore);
 const services = storesUtils.getStoreList(serviceStore, router);
 const deleteLoading = reactive({});

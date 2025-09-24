@@ -68,7 +68,6 @@ import { useScheduleStore } from '@/stores/schedule';
 const theme = useTheme();
 const router = useRouter();
 const orderStore = useOrderStore();
-const emits = defineEmits(['openPopUp']);
 const scheduleStore = useScheduleStore();
 const { ready } = storeToRefs(scheduleStore);
 const schedules = storesUtils.getStoreList(scheduleStore, router);
