@@ -198,8 +198,6 @@ const filterOrder = async () => {
   ready.value = false;
   orderStore.initList(router);
   panel.value = null;
-  filters.value = {};
-  dateFilter.value = {};
 };
 
 const intervallRules = (otherKey) => {
