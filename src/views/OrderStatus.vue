@@ -165,7 +165,12 @@ import http from '@/utils/http';
 import { ref, onMounted } from 'vue';
 import { decodeId } from '@/utils/hashids';
 
-const props = defineProps({ orderId: String });
+const props = defineProps({ 
+  orderId: {
+    type: String,
+    required: true
+  }
+});
 const isMobile = mobile.setupMobileUtils();
 
 const order = ref({});
@@ -186,9 +191,7 @@ function isStepCompleted(step) {
 
 onMounted(() => {
   const decoded = decodeId(props.orderId);
-  if (decoded === null) {
-    console.error('ID ordine non valido o corrotto');
-  } else {
+  if (decoded != null) {
     orderIdNumeric.value = decoded;
     http.getRequest(`order/${orderIdNumeric.value}`, {}, (data) => {
       if (data.status === 'ok') {

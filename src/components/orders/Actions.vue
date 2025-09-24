@@ -52,21 +52,23 @@
             type="image"
           />
           <div v-else>
-            <div
-              v-for="photo in photos"
-              v-if="photos && photos.length"
-            >
-              <v-skeleton-loader
-                v-if="!imageLoading[photo]"
-                type="image"
-              />
-              <v-img
-                :src="`${http.hostname}order/photo/${photo}`"
-                max-width="1500"
-                max-height="1000"
-                class="mt-4"
-                @load="imageLoading[photo] = true"
-              />
+            <div v-if="photos && photos.length">
+              <div 
+                v-for="photo in photos" 
+                :key="photo"
+              >
+                <v-skeleton-loader 
+                  v-if="!imageLoading[photo]" 
+                  type="image" 
+                />
+                <v-img
+                  :src="`${http.hostname}order/photo/${photo}`"
+                  max-width="1500"
+                  max-height="1000"
+                  class="mt-4"
+                  @load="imageLoading[photo] = true"
+                />
+              </div>
             </div>
             <div v-else>
               Nessuna immagine disponibile.

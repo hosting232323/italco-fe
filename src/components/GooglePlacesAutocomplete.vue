@@ -20,10 +20,22 @@ import {
 } from 'vue';
 
 const props = defineProps({
-  modelValue: String,
-  label: String,
-  rules: Array,
-  customClass: String
+  modelValue: {
+    type: String,
+    required: true
+  },
+  label: {
+    type: String,
+    required: true
+  },
+  rules: {
+    type: Array,
+    required: true
+  },
+  customClass: {
+    type: String,
+    required: true
+  }
 });
 
 const emit = defineEmits(['update:isValid', 'addressComponents']);
@@ -34,7 +46,7 @@ const inputId = ref(
 let autocompleteInstance = null;
 const isValidAddress = ref(true);
 
-const handleInput = (event) => {
+const handleInput = () => {
   isValidAddress.value = false;
   emit('update:isValid', false);
 };

@@ -18,6 +18,7 @@ module.exports = {
     'no-unused-vars': 'warn',
     'eol-last': ['error', 'always'],
     'vue/multi-word-component-names': 'off',
-    'vue/valid-v-slot': 'off'
+    'vue/valid-v-slot': 'off',
+    'no-console': 'off'
   },
 };
