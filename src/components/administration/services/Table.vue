@@ -63,9 +63,15 @@ import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import { useServiceStore } from '@/stores/service';
 
+const { activatorProps } = defineProps({
+  lat: {
+    type: Boolean,
+    required: true
+  }
+});
+
 const theme = useTheme();
 const router = useRouter();
-defineProps(['activatorProps']);
 const serviceStore = useServiceStore();
 const { element: service, activeForm, ready } = storeToRefs(serviceStore);
 const services = storesUtils.getStoreList(serviceStore, router);

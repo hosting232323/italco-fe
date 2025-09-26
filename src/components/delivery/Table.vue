@@ -71,10 +71,16 @@ import orderUtils from '@/utils/order';
 import { useOrderStore } from '@/stores/order';
 import Form from '@/components/delivery/Form';
 
+const { keyName } = defineProps({
+  keyName: {
+    type: String,
+    required: true
+  }
+});
+
 const theme = useTheme();
 const dialog = ref(false);
 const orderStore = useOrderStore();
-const { keyName } = defineProps(['keyName']);
 const { list: orders, element: order, ready } = storeToRefs(orderStore);
 
 const filteredOrders = computed(() => {

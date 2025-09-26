@@ -89,6 +89,13 @@ import { useRouter } from 'vue-router';
 import { encodeId } from '@/utils/hashids';
 import { useOrderStore } from '@/stores/order';
 
+const { item } = defineProps({
+  item: {
+    type: Object,
+    required: true
+  }
+});
+
 const order = ref({});
 const photos = ref([]);
 const theme = useTheme();
@@ -96,7 +103,6 @@ const router = useRouter();
 const loadingPhoto = ref(false);
 const loadingExport = ref(false);
 const orderStore = useOrderStore();
-const props = defineProps(['item']);
 const { element: updatedOrder, activeForm } = storeToRefs(orderStore);
 const imageLoading = reactive({});
 
