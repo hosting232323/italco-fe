@@ -20,6 +20,7 @@
         label="Tipo"
         :items="orderUtils.TYPES"
         :rules="validation.requiredRules"
+        :disabled="order.products"
       />
       <ProductServiceInput />
       <v-row no-gutters>

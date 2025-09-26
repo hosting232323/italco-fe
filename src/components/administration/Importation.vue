@@ -27,7 +27,7 @@
               item-title="email"
               item-value="id"
               :rules="validation.requiredRules"
-              @update:modelValue="collectionPoint = null"
+              @update:model-value="collectionPoint = null"
             />
             <v-autocomplete
               v-if="user"

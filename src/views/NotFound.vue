@@ -1,9 +1,27 @@
 <template>
-  <v-container fluid class="background">
-    <p class="title-error-page" :style="{ color: theme.current.value.primaryColor }">404</p>
-    <p class="subtitle">Oops! Pagina non trovata</p>
-    <p class="description">La pagina che stai cercando non esiste o è stata spostata.</p>
-    <a href="/dashboard" class="home" :style="{ color: theme.current.value.primaryColor }">Torna alla Dashboard</a>
+  <v-container
+    fluid
+    class="background"
+  >
+    <p
+      class="title-error-page"
+      :style="{ color: theme.current.value.primaryColor }"
+    >
+      404
+    </p>
+    <p class="subtitle">
+      Oops! Pagina non trovata
+    </p>
+    <p class="description">
+      La pagina che stai cercando non esiste o è stata spostata.
+    </p>
+    <a
+      href="/dashboard"
+      class="home"
+      :style="{ color: theme.current.value.primaryColor }"
+    >
+      Torna alla Dashboard
+    </a>
   </v-container>
 </template>
 

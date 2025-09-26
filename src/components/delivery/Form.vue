@@ -117,14 +117,40 @@
             background-color="white"
             style="border: 1px solid #ccc;"
           />
-          <p v-if="signatureError" class="text-error" style="font-size: 12px; padding-inline: 16px;">{{ signatureError }}</p>
-          <p v-if="signatureSuccess" class="text-success" style="font-size: 12px; padding-inline: 16px;">{{ signatureSuccess }}</p>
+          <p
+            v-if="signatureError"
+            class="text-error"
+            style="font-size: 12px; padding-inline: 16px;"
+          >
+            {{ signatureError }}
+          </p>
+          <p
+            v-if="signatureSuccess"
+            class="text-success"
+            style="font-size: 12px; padding-inline: 16px;"
+          >
+            {{ signatureSuccess }}
+          </p>
           <v-row no-gutters>
             <v-col cols="6">
-              <v-btn class="mt-2 mr-3" block :color="theme.current.value.primaryColor" @click="clearSignature">Cancella</v-btn>
+              <v-btn
+                class="mt-2 mr-3"
+                block
+                :color="theme.current.value.primaryColor"
+                @click="clearSignature"
+              >
+                Cancella
+              </v-btn>
             </v-col>
             <v-col cols="6">
-              <v-btn class="mt-2 ml-3" block :color="theme.current.value.primaryColor" @click="saveSignature">Salva Firma</v-btn>
+              <v-btn
+                class="mt-2 ml-3"
+                block
+                :color="theme.current.value.primaryColor"
+                @click="saveSignature"
+              >
+                Salva Firma
+              </v-btn>
             </v-col>
           </v-row>
         </div>
@@ -217,6 +243,6 @@ const saveSignature = () => {
   const file = new File([u8arr], `firma_${order.value.id}.png`, { type: mime });
 
   order.value.signature = file;
-  signatureSuccess.value = 'Firma salvata correttamente'
+  signatureSuccess.value = 'Firma salvata correttamente';
 };
 </script>

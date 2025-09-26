@@ -81,8 +81,8 @@ const isMobile = mobile.setupMobileUtils();
 const totOrder = computed(() => {
   if (!orders.value) return 0;
   else
-    return Object.values(orders.value).reduce((sum, arr) => sum + arr.length, 0)
-})
+    return Object.values(orders.value).reduce((sum, arr) => sum + arr.length, 0);
+});
 
 
 const cards = [
