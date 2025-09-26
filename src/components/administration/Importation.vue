@@ -20,6 +20,24 @@
               label="File Excel"
               :rules="validation.requiredRules"
             />
+            <v-autocomplete
+              v-model="user"
+              label="Punto Vendita"
+              :items="users.filter(user => user.role == 'Customer')"
+              item-title="email"
+              item-value="id"
+              :rules="validation.requiredRules"
+              @update:modelValue="collectionPoint = null"
+            />
+            <v-autocomplete
+              v-if="user"
+              v-model="collectionPoint"
+              label="Punto di Ritiro"
+              :items="collectionPoints.filter(collectionPoint => collectionPoint.user_id == user)"
+              item-title="name"
+              item-value="id"
+              :rules="validation.requiredRules"
+            />
             <FormButtons
               :loading="loading"
               @cancel="isActive.value = false"
@@ -36,24 +54,43 @@ import FormButtons from '@/components/FormButtons';
 
 import { ref } from 'vue';
 import http from '@/utils/http';
+import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
+import storesUtils from '@/utils/stores';
 import validation from '@/utils/validation';
+import { useOrderStore } from '@/stores/order';
+import { useCollectionPointStore } from '@/stores/collectionPoint';
+import { useAdministrationUserStore } from '@/stores/administrationUser';
 
 const file = ref(null);
 const form = ref(null);
+const user = ref(null);
 const loading = ref(false);
 const router = useRouter();
+const collectionPoint = ref(null);
+
+const orderStore = useOrderStore();
+const collectionPointStore = useCollectionPointStore();
+const administrationUserStore = useAdministrationUserStore();
+const { ready } = storeToRefs(orderStore);
+const users = storesUtils.getStoreList(administrationUserStore, router);
+const collectionPoints = storesUtils.getStoreList(collectionPointStore, router);
 
 const submitForm = async (isActive) => {
   if (!(await form.value.validate()).valid) return;
 
   loading.value = true;
   http.formDataRequest('import', {
-    file: file.value
+    file: file.value,
+    customer_id: user.value,
+    collection_point_id: collectionPoint.value
   }, function (data) {
     loading.value = false;
-    if (data.status == 'ok')
+    if (data.status == 'ok') {
+      ready.value = false;
+      orderStore.initList(router);
       isActive.value = false;
+    }
   }, 'POST', router);
 };
 </script>
