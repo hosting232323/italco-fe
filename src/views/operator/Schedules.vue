@@ -64,31 +64,32 @@
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue';
+import ScheduleForm from '@/components/operator/schedules/Form';
+
 import http from '@/utils/http';
 import { useTheme } from 'vuetify';
+import { reactive, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import { useOrderStore } from '@/stores/order';
 import { useScheduleStore } from '@/stores/schedule';
-import ScheduleForm from '@/components/operator/schedules/Form';
 
-const dialog = ref(false);
 const theme = useTheme();
+const dialog = ref(false);
 const router = useRouter();
 const orderStore = useOrderStore();
 const emits = defineEmits(['openPopUp']);
 const scheduleStore = useScheduleStore();
-const { ready } = storeToRefs(scheduleStore);
+const { ready, element: schedule } = storeToRefs(scheduleStore);
 const schedules = storesUtils.getStoreList(scheduleStore, router);
 const deleteLoading = reactive({});
 const exportLoading = reactive({});
 
 const editElement = (item) => {
-  scheduleStore.setElement(item)
+  schedule.value = item;
   dialog.value = true;
-}
+};
 
 const deleteItem = (item) => {
   deleteLoading[item.id] = true;

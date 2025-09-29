@@ -1,27 +1,19 @@
 <template>
   <v-card
-    v-if="!schedule.order_ids && !schedule.orders"
+    v-if="!schedule.orders"
     title="Seleziona degli ordini per creare un Borderò"
-  />
-  <v-card
-    v-else-if="schedule.order_ids?.some(
-      id => orders.some(
-        order => order.id === id && order.status !== 'Pending'
-      )
-    )"
-    title="Hai selezionato degli ordini già assegnati"
   />
   <v-card
     v-else
     :title="schedule.id ? 'Modifica Borderò' : 'Crea Borderò'"
     :subtitle="schedule.id 
-      ? `ID: ${schedule.id}` 
-      : `Ordini: ${schedule.order_ids?.join(', ')}`"
+      ? `ID: ${schedule.id}\nOrdini: ${schedule.orders.map(order => order.id).join(', ')}` 
+      : `Ordini: ${schedule.orders.map(order => order.id).join(', ')}`"
   >
     <v-card-text>
       <v-form
         ref="form"
-        @submit.prevent="assignDeliveryGroup"
+        @submit.prevent="submitForm"
       >
         <v-row no-gutters>
           <v-col
@@ -66,7 +58,6 @@
             />
           </v-col>
         </v-row>
-
         <draggable
           v-model="schedule.orders"
           item-key="id"
@@ -145,20 +136,18 @@ const transportStore = useTransportStore();
 const isMobile = mobile.setupMobileUtils();
 const deliveryGroupStore = useDeliveryGroupStore();
 const { element: schedule } = storeToRefs(scheduleStore);
-const orders = storesUtils.getStoreList(orderStore, router);
 const transports = storesUtils.getStoreList(transportStore, router);
 const deliveryGroups = storesUtils.getStoreList(deliveryGroupStore, router);
 
-console.log(schedule.value);
-
-if (schedule.value.order_ids && !schedule.value.orders) {
-  schedule.value.orders = schedule.value.order_ids.map((id, index) => ({
-    id,
-    start_time_slot: '',
-    end_time_slot: '',
-    schedule_index: index
-  }));
-}
+if (!schedule.value.id)
+  schedule.value.orders = schedule.value.order_ids.map((id, index) => {
+    return {
+      id,
+      start_time_slot: '',
+      end_time_slot: '',
+      schedule_index: index
+    };
+  });
 
 watch(
   () => schedule.value.orders,
@@ -170,20 +159,25 @@ watch(() => schedule.value.date, () => {
   error.value = null;
 });
 
-const assignDeliveryGroup = async () => {
+const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
 
   loading.value = true;
-  scheduleStore.createElement(router, function (data) {
-    loading.value = false;
-    if (data.status == 'ok') {
-      orderStore.initList(router);
-      scheduleStore.initList(router);
-      schedule.value = {};
-      emits('cancel');
-    } else 
-      error.value = data.error;
-  });
+  if (schedule.value.id)
+    scheduleStore.updateElement(router, handleResponse);
+  else
+    scheduleStore.createElement(router, handleResponse);
+};
+
+const handleResponse = (data) => {
+  loading.value = false;
+  if (data.status == 'ok') {
+    orderStore.initList(router);
+    scheduleStore.initList(router);
+    schedule.value = {};
+    emits('cancel');
+  } else 
+    error.value = data.error;
 };
 </script>
 
