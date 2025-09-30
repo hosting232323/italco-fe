@@ -102,6 +102,7 @@ const { ready } = storeToRefs(orderStore);
 const { element: schedule } = storeToRefs(scheduleStore);
 schedule.value = {};
 const orders = storesUtils.getStoreList(orderStore, router);
+console.log(orders.value);
 
 const getHeaders = () => {
   const headers = [

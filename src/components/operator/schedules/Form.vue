@@ -77,7 +77,7 @@
                 style="width: 100%;"
               >
                 <p>Ordine #{{ element.id }}</p>
-                <div :class="['d-flex', isMobile ? 'flex-column' : '']">
+                <div :class="['d-flex', 'align-center', isMobile ? 'flex-column' : '']">
                   <v-text-field 
                     v-model="element.start_time_slot" 
                     label="Time Slot Start"
@@ -96,11 +96,28 @@
                     hide-details 
                     :style="isMobile ? { width: '' }: { width: '200px' }"
                   />
+                  <v-btn
+                    variant="text"
+                    icon="mdi-delete"
+                    :color="theme.current.value.primaryColor"
+                    @click="removeOrder(element.id)"
+                  />
                 </div>
               </div>
             </div>
           </template>
         </draggable>
+        <v-autocomplete
+          v-if="schedule.id && ready"
+          v-model="selectedOrderId"
+          label="Aggiungi Ordine"
+          :items="availableOrders"
+          :item-title="order => `ID ordine: ${order.id}`"
+          item-value="id"
+          append-icon="mdi-plus"
+          dense
+          @click="addOrder(selectedOrderId)"
+        />
         <FormButtons
           :loading="loading"
           @cancel="emits('cancel')"
@@ -113,31 +130,60 @@
 <script setup>
 import FormButtons from '@/components/FormButtons';
 
-import { ref, watch } from 'vue';
+import { useTheme } from 'vuetify';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import draggable from 'vuedraggable';
 import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
+import { ref, watch, computed } from 'vue';
 import validation from '@/utils/validation';
 import { useOrderStore } from '@/stores/order';
 import { useScheduleStore } from '@/stores/schedule';
 import { useTransportStore } from '@/stores/transport';
 import { useDeliveryGroupStore } from '@/stores/deliveryGroup';
 
-const error = ref(null);
 const form = ref(null);
+const error = ref(null);
+const theme = useTheme();
 const router = useRouter();
 const loading = ref(false);
+const selectedOrderId = ref(null);
 const orderStore = useOrderStore();
 const emits = defineEmits(['cancel']);
 const scheduleStore = useScheduleStore();
+const { ready } = storeToRefs(orderStore);
 const transportStore = useTransportStore();
 const isMobile = mobile.setupMobileUtils();
 const deliveryGroupStore = useDeliveryGroupStore();
 const { element: schedule } = storeToRefs(scheduleStore);
+const orders = storesUtils.getStoreList(orderStore, router);
 const transports = storesUtils.getStoreList(transportStore, router);
 const deliveryGroups = storesUtils.getStoreList(deliveryGroupStore, router);
+
+const addOrder = (orderId) => {
+  const orderToAdd = orders.value.find(o => o.id === orderId);
+  if (!orderToAdd) return;
+
+  schedule.value.orders.push({
+    id: orderToAdd.id,
+    start_time_slot: '',
+    end_time_slot: '',
+    schedule_index: schedule.value.orders.length
+  });
+  selectedOrderId.value = null;
+}
+
+const removeOrder = (orderId) => {
+  schedule.value.orders = schedule.value.orders.filter(o => o.id !== orderId);
+  schedule.value.orders.forEach((o, i) => o.schedule_index = i);
+};
+
+const availableOrders = computed(() => {
+  return orders.value
+    .filter(o => o.status === 'Pending')
+    .filter(o => !schedule.value.orders.some(so => so.id === o.id));
+});
 
 if (!schedule.value.id)
   schedule.value.orders = schedule.value.order_ids.map((id, index) => {
