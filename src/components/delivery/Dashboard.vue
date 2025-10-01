@@ -75,7 +75,6 @@ const theme = useTheme();
 const router = useRouter();
 const orderStore = useOrderStore();
 const { list: orders, ready } = storeToRefs(orderStore);
-console.log(orders.value);
 
 const isMobile = mobile.setupMobileUtils();
 const totOrder = computed(() => {
