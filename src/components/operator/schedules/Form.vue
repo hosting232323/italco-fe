@@ -58,6 +58,17 @@
             />
           </v-col>
         </v-row>
+        <v-autocomplete
+          v-if="schedule.id"
+          v-model="selectedOrderId"
+          label="Aggiungi Ordine"
+          :items="availableOrders"
+          :item-title="order => `ID ordine: ${order.id}`"
+          item-value="id"
+          append-icon="mdi-plus"
+          dense
+          @click="addOrder"
+        />
         <draggable
           v-model="schedule.orders"
           item-key="id"
@@ -107,17 +118,6 @@
             </div>
           </template>
         </draggable>
-        <v-autocomplete
-          v-if="schedule.id && ready"
-          v-model="selectedOrderId"
-          label="Aggiungi Ordine"
-          :items="availableOrders"
-          :item-title="order => `ID ordine: ${order.id}`"
-          item-value="id"
-          append-icon="mdi-plus"
-          dense
-          @click="addOrder(selectedOrderId)"
-        />
         <FormButtons
           :loading="loading"
           @cancel="emits('cancel')"
@@ -152,7 +152,6 @@ const selectedOrderId = ref(null);
 const orderStore = useOrderStore();
 const emits = defineEmits(['cancel']);
 const scheduleStore = useScheduleStore();
-const { ready } = storeToRefs(orderStore);
 const transportStore = useTransportStore();
 const isMobile = mobile.setupMobileUtils();
 const deliveryGroupStore = useDeliveryGroupStore();
@@ -161,8 +160,8 @@ const orders = storesUtils.getStoreList(orderStore, router);
 const transports = storesUtils.getStoreList(transportStore, router);
 const deliveryGroups = storesUtils.getStoreList(deliveryGroupStore, router);
 
-const addOrder = (orderId) => {
-  const orderToAdd = orders.value.find(o => o.id === orderId);
+const addOrder = () => {
+  const orderToAdd = orders.value.find(o => o.id === selectedOrderId.value);
   if (!orderToAdd) return;
 
   schedule.value.orders.push({
@@ -177,6 +176,9 @@ const addOrder = (orderId) => {
 const removeOrder = (orderId) => {
   schedule.value.orders = schedule.value.orders.filter(o => o.id !== orderId);
   schedule.value.orders.forEach((o, i) => o.schedule_index = i);
+  if (!schedule.value.deleted_orders)
+    schedule.value.deleted_orders = [];
+  schedule.value.deleted_orders.push(orderId);
 };
 
 const availableOrders = computed(() => {
