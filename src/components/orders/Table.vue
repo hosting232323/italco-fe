@@ -66,7 +66,13 @@
       </v-data-table>
     </template>
     <template #default>
-      <ScheduleForm @cancel="dialog = false" />
+      <v-card
+        v-if="schedule.order_ids.some(
+          id => orders.some(order => order.id === id && order.status !== 'Pending')
+        )"
+        title="Hai selezionato degli ordini già assegnati"
+      />
+      <ScheduleForm v-else ="dialog = false" />
     </template>
   </v-dialog>
 </template>
@@ -94,6 +100,7 @@ const scheduleStore = useScheduleStore();
 const { role } = storeToRefs(userStore);
 const { ready } = storeToRefs(orderStore);
 const { element: schedule } = storeToRefs(scheduleStore);
+schedule.value = {};
 const orders = storesUtils.getStoreList(orderStore, router);
 
 const getHeaders = () => {
