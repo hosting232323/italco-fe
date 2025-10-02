@@ -1,25 +1,19 @@
 <template>
   <v-card
-    v-if="!schedule.order_ids"
+    v-if="!schedule.orders"
     title="Seleziona degli ordini per creare un Borderò"
   />
   <v-card
-    v-else-if="schedule.order_ids.some(
-      id => orders.some(
-        order => order.id === id && order.status !== 'Pending'
-      )
-    )"
-    title="Hai selezionato degli ordini già assegnati"
-  />
-  <v-card
     v-else
-    title="Crea Borderò"
-    :subtitle="`Ordini: ${schedule.order_ids.join(', ')}`"
+    :title="schedule.id ? 'Modifica Borderò' : 'Crea Borderò'"
+    :subtitle="schedule.id 
+      ? `ID: ${schedule.id}\nOrdini: ${schedule.orders.map(order => order.id).join(', ')}` 
+      : `Ordini: ${schedule.orders.map(order => order.id).join(', ')}`"
   >
     <v-card-text>
       <v-form
         ref="form"
-        @submit.prevent="assignDeliveryGroup"
+        @submit.prevent="submitForm"
       >
         <v-row no-gutters>
           <v-col
@@ -64,7 +58,17 @@
             />
           </v-col>
         </v-row>
-
+        <v-autocomplete
+          v-if="schedule.id"
+          v-model="selectedOrderId"
+          label="Aggiungi Ordine"
+          :items="availableOrders"
+          :item-title="order => `ID ordine: ${order.id}`"
+          item-value="id"
+          append-icon="mdi-plus"
+          dense
+          @click="addOrder"
+        />
         <draggable
           v-model="schedule.orders"
           item-key="id"
@@ -84,7 +88,7 @@
                 style="width: 100%;"
               >
                 <p>Ordine #{{ element.id }}</p>
-                <div :class="['d-flex', isMobile ? 'flex-column' : '']">
+                <div :class="['d-flex', 'align-center', isMobile ? 'flex-column' : '']">
                   <v-text-field 
                     v-model="element.start_time_slot" 
                     label="Time Slot Start"
@@ -103,6 +107,12 @@
                     hide-details 
                     :style="isMobile ? { width: '' }: { width: '200px' }"
                   />
+                  <v-btn
+                    variant="text"
+                    icon="mdi-delete"
+                    :color="theme.current.value.primaryColor"
+                    @click="removeOrder(element.id)"
+                  />
                 </div>
               </div>
             </div>
@@ -120,22 +130,25 @@
 <script setup>
 import FormButtons from '@/components/FormButtons';
 
-import { ref, watch } from 'vue';
+import { useTheme } from 'vuetify';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import draggable from 'vuedraggable';
 import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
+import { ref, watch, computed } from 'vue';
 import validation from '@/utils/validation';
 import { useOrderStore } from '@/stores/order';
 import { useScheduleStore } from '@/stores/schedule';
 import { useTransportStore } from '@/stores/transport';
 import { useDeliveryGroupStore } from '@/stores/deliveryGroup';
 
-const error = ref(null);
 const form = ref(null);
+const error = ref(null);
+const theme = useTheme();
 const router = useRouter();
 const loading = ref(false);
+const selectedOrderId = ref(null);
 const orderStore = useOrderStore();
 const emits = defineEmits(['cancel']);
 const scheduleStore = useScheduleStore();
@@ -147,14 +160,42 @@ const orders = storesUtils.getStoreList(orderStore, router);
 const transports = storesUtils.getStoreList(transportStore, router);
 const deliveryGroups = storesUtils.getStoreList(deliveryGroupStore, router);
 
-schedule.value.orders = schedule.value.order_ids.map((id, index) => {
-  return {
-    id,
+const addOrder = () => {
+  const orderToAdd = orders.value.find(o => o.id === selectedOrderId.value);
+  if (!orderToAdd) return;
+
+  schedule.value.orders.push({
+    id: orderToAdd.id,
     start_time_slot: '',
     end_time_slot: '',
-    schedule_index: index
-  };
+    schedule_index: schedule.value.orders.length
+  });
+  selectedOrderId.value = null;
+}
+
+const removeOrder = (orderId) => {
+  schedule.value.orders = schedule.value.orders.filter(o => o.id !== orderId);
+  schedule.value.orders.forEach((o, i) => o.schedule_index = i);
+  if (!schedule.value.deleted_orders)
+    schedule.value.deleted_orders = [];
+  schedule.value.deleted_orders.push(orderId);
+};
+
+const availableOrders = computed(() => {
+  return orders.value
+    .filter(o => o.status === 'Pending')
+    .filter(o => !schedule.value.orders.some(so => so.id === o.id));
 });
+
+if (!schedule.value.id)
+  schedule.value.orders = schedule.value.order_ids.map((id, index) => {
+    return {
+      id,
+      start_time_slot: '',
+      end_time_slot: '',
+      schedule_index: index
+    };
+  });
 
 watch(
   () => schedule.value.orders,
@@ -166,20 +207,25 @@ watch(() => schedule.value.date, () => {
   error.value = null;
 });
 
-const assignDeliveryGroup = async () => {
+const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
 
   loading.value = true;
-  scheduleStore.createElement(router, function (data) {
-    loading.value = false;
-    if (data.status == 'ok') {
-      orderStore.initList(router);
-      scheduleStore.initList(router);
-      schedule.value = {};
-      emits('cancel');
-    } else 
-      error.value = data.error;
-  });
+  if (schedule.value.id)
+    scheduleStore.updateElement(router, handleResponse);
+  else
+    scheduleStore.createElement(router, handleResponse);
+};
+
+const handleResponse = (data) => {
+  loading.value = false;
+  if (data.status == 'ok') {
+    orderStore.initList(router);
+    scheduleStore.initList(router);
+    schedule.value = {};
+    emits('cancel');
+  } else 
+    error.value = data.error;
 };
 </script>
 

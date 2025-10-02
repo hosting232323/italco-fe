@@ -28,7 +28,15 @@
       </template>
       <template #item.actions="{ item }">
         <v-row no-gutters>
-          <v-col cols="6">
+          <v-col cols="4">
+            <v-btn
+              icon="mdi-pencil"
+              variant="text"
+              :color="theme.current.value.primaryColor"
+              @click="editElement(item)"
+            />
+          </v-col>
+          <v-col cols="4">
             <v-btn
               icon="mdi-file-export"
               variant="text"
@@ -37,7 +45,7 @@
               @click="exportElement(item)"
             />
           </v-col>
-          <v-col cols="6">
+          <v-col cols="4">
             <v-btn
               icon="mdi-delete"
               variant="text"
@@ -50,12 +58,17 @@
       </template>
     </v-data-table>
   </v-container>
+  <v-dialog v-model="dialog" max-width="1200">
+    <ScheduleForm @cancel="dialog = false" />
+  </v-dialog>
 </template>
 
 <script setup>
-import { reactive } from 'vue';
+import ScheduleForm from '@/components/operator/schedules/Form';
+
 import http from '@/utils/http';
 import { useTheme } from 'vuetify';
+import { reactive, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
@@ -63,14 +76,20 @@ import { useOrderStore } from '@/stores/order';
 import { useScheduleStore } from '@/stores/schedule';
 
 const theme = useTheme();
+const dialog = ref(false);
 const router = useRouter();
 const orderStore = useOrderStore();
 const emits = defineEmits(['openPopUp']);
 const scheduleStore = useScheduleStore();
-const { ready } = storeToRefs(scheduleStore);
+const { ready, element: schedule } = storeToRefs(scheduleStore);
 const schedules = storesUtils.getStoreList(scheduleStore, router);
 const deleteLoading = reactive({});
 const exportLoading = reactive({});
+
+const editElement = (item) => {
+  schedule.value = item;
+  dialog.value = true;
+};
 
 const deleteItem = (item) => {
   deleteLoading[item.id] = true;
