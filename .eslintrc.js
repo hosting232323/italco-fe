@@ -10,12 +10,14 @@ module.exports = {
     'plugin:vue/vue3-recommended'
   ],
   rules: {
-    quotes: ['error', 'single'],
-    semi: ['error', 'always'],
-    indent: ['error', 2],
+    'quotes': ['error', 'single'],
+    'semi': ['error', 'always'],
+    'indent': ['error', 2],
     'vue/html-indent': ['error', 2],
     'no-console': 'warn',
     'no-unused-vars': 'warn',
-    'eol-last': ['error', 'always']
+    'eol-last': ['error', 'always'],
+    'vue/multi-word-component-names': 'off',
+    'vue/valid-v-slot': 'off'
   },
 };

@@ -63,10 +63,16 @@ import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import { useServiceStore } from '@/stores/service';
 
+const { activatorProps } = defineProps({
+  lat: {
+    type: Boolean,
+    required: true
+  }
+});
+
 const theme = useTheme();
 const router = useRouter();
 const serviceStore = useServiceStore();
-const props = defineProps(['activatorProps']);
 const { element: service, activeForm, ready } = storeToRefs(serviceStore);
 const services = storesUtils.getStoreList(serviceStore, router);
 const deleteLoading = reactive({});

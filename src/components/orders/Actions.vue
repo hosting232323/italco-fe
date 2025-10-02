@@ -51,14 +51,14 @@
             v-if="loadingPhoto"
             type="image"
           />
-          <div v-else>
+          <div v-else-if="photos && photos.length">
             <div
               v-for="photo in photos"
-              v-if="photos && photos.length"
+              :key="photo"
             >
-              <v-skeleton-loader
-                v-if="!imageLoading[photo]"
-                type="image"
+              <v-skeleton-loader 
+                v-if="!imageLoading[photo]" 
+                type="image" 
               />
               <v-img
                 :src="`${http.hostname}order/photo/${photo}`"
@@ -68,9 +68,9 @@
                 @load="imageLoading[photo] = true"
               />
             </div>
-            <div v-else>
-              Nessuna immagine disponibile.
-            </div>
+          </div>
+          <div v-else>
+            Nessuna immagine disponibile.
           </div>
         </v-card-text>
       </v-card>
@@ -87,6 +87,13 @@ import { useRouter } from 'vue-router';
 import { encodeId } from '@/utils/hashids';
 import { useOrderStore } from '@/stores/order';
 
+const { item } = defineProps({
+  item: {
+    type: Object,
+    required: true
+  }
+});
+
 const order = ref({});
 const photos = ref([]);
 const theme = useTheme();
@@ -94,7 +101,6 @@ const router = useRouter();
 const loadingPhoto = ref(false);
 const loadingExport = ref(false);
 const orderStore = useOrderStore();
-const props = defineProps(['item']);
 const { element: updatedOrder, activeForm } = storeToRefs(orderStore);
 const imageLoading = reactive({});
 
