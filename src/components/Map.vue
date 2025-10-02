@@ -38,6 +38,7 @@ const { lat, lon } = defineProps({
 });
 
 let mapContainer = ref(null);
+let map;
 
 onMounted(() => {
   const iconFeature = new Feature({
@@ -63,7 +64,7 @@ onMounted(() => {
     source: vectorSource
   });
 
-  new Map({
+  map = new Map({
     target: mapContainer.value,
     layers: [
       new TileLayer({
