@@ -21,7 +21,7 @@
         </v-col>
       </v-row>
       <v-row no-gutters>
-        <v-col cols="6">
+        <v-col :cols="getColsNum(item.status)">
           <v-btn
             icon="mdi-truck-delivery"
             variant="text"
@@ -30,13 +30,22 @@
             @click="openPopUp(item)"
           />
         </v-col>
-        <v-col cols="6">
+        <v-col :cols="getColsNum(item.status)">
           <v-btn
             icon="mdi-link-variant"
             variant="text"
             :color="theme.current.value.primaryColor"
             title="Copia link ordine"
             @click="copyOrderLink(item.id)"
+          />
+        </v-col>
+        <v-col v-if="item.status == 'To Reschedule'" :cols="getColsNum(item.status)">
+          <v-btn
+            icon="mdi-content-copy"
+            variant="text"
+            :color="theme.current.value.primaryColor"
+            title="Copia link ordine"
+            @click="copyOrder(item.id)"
           />
         </v-col>
       </v-row>
@@ -84,6 +93,7 @@ import { useTheme } from 'vuetify';
 import { ref, reactive } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
+import storesUtils from '@/utils/stores';
 import { encodeId } from '@/utils/hashids';
 import { useOrderStore } from '@/stores/order';
 
@@ -101,6 +111,8 @@ const router = useRouter();
 const loadingPhoto = ref(false);
 const loadingExport = ref(false);
 const orderStore = useOrderStore();
+const props = defineProps(['item']);
+const orders = storesUtils.getStoreList(orderStore, router);
 const { element: updatedOrder, activeForm } = storeToRefs(orderStore);
 const imageLoading = reactive({});
 
@@ -143,4 +155,22 @@ const copyOrderLink = (id) => {
     alert('Errore nel copiare il link');
   });
 };
+
+const copyOrder = (id) => {
+  const selectedOrder = orders.value.find(order => order.id == id);
+  const clonedOrder = { ...selectedOrder };
+
+  clonedOrder.user_id = selectedOrder.user.id;
+  ["schedule_id", "status", "anomaly", "delay", "schedule_index", "start_time_slot", "end_time_slot", "id", "price"]
+    .forEach(key => delete clonedOrder[key]);
+
+  
+  updatedOrder.value = clonedOrder;
+  updatedOrder.value.user_id = updatedOrder.value.user.id;
+  activeForm.value = true;
+}
+
+const getColsNum = (item) => {
+  return item == 'To Reschedule' ? 4 : 6;
+}
 </script>

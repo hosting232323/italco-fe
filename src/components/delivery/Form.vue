@@ -191,11 +191,12 @@ const isMobile = mobile.setupMobileUtils();
 const { element: order } = storeToRefs(orderStore);
 
 const STATUS_MAP = {
-  'In Progress': ['On Board', 'Cancelled', 'At Warehouse'],
-  'On Board': ['Completed', 'Cancelled', 'At Warehouse'],
-  'At Warehouse': ['On Board']
+  'In Progress': ['On Board', 'Cancelled', 'At Warehouse', 'To Reschedule'],
+  'On Board': ['Completed', 'Cancelled', 'At Warehouse', 'To Reschedule'],
+  'At Warehouse': ['On Board', 'To Reschedule']
 };
 const actualStatus = order.value.status;
+console.log(actualStatus);
 
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
