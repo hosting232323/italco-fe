@@ -1,8 +1,8 @@
 <template>
-  <v-list>
+  <v-list v-if="order.products">
     <v-list-item
       v-for="product in Object.keys(order.products)"
-      v-if="order.products"
+      :key="product"
       :title="product"
       append-icon="mdi-delete"
       :subtitle="order.products[product].map(service => service.name).join(', ')"
@@ -63,7 +63,8 @@
       <br><br>
     </template>
     <v-chip
-      v-for="service in selectedServices"
+      v-for="(service, index) in selectedServices"
+      :key="index"
       class="mr-2 mb-5"
       append-icon="mdi-close-circle"
       @click="selectedServices.splice(index, 1)"

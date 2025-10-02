@@ -27,8 +27,13 @@
 <script setup>
 import { useTheme } from 'vuetify';
 
-const emits = defineEmits(['cancel']);
-const props = defineProps(['loading']);
+const { loading } = defineProps({
+  loading: {
+    type: Boolean,
+    required: true
+  },
+});
 
+const emits = defineEmits(['cancel']);
 const theme = useTheme();
 </script>

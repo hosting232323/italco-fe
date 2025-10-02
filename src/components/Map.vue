@@ -26,7 +26,16 @@ import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import truckIcon from '@/assets/truck.png';
 
-const { lat, lon } = defineProps(['lat', 'lon']);
+const { lat, lon } = defineProps({
+  lat: {
+    type: Number,
+    required: true
+  },
+  lon: {
+    type: Number,
+    required: true
+  }
+});
 
 let mapContainer = ref(null);
 let map;

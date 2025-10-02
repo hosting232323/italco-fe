@@ -7,9 +7,9 @@
     max-width="290"
     min-width="auto"
   >
-    <template #activator="{ props }">
+    <template #activator="{ activatorProps }">
       <v-text-field
-        v-bind="props"
+        v-bind="activatorProps"
         v-model="formattedValue"
         :label="label"
         :class="classStyle"
@@ -38,11 +38,26 @@
 import { ref, watch } from 'vue';
 
 const props = defineProps({
-  modelValue: [String, Date],
-  label: String,
-  allowedDates: Array,
-  rules: Array,
-  classStyle: String
+  modelValue: {
+    type: [String, Date],
+    required: true
+  },
+  label: {
+    type: String,
+    required: true
+  },
+  allowedDates: {
+    type: Array,
+    required: true
+  },
+  rules: {
+    type: Array,
+    required: true
+  },
+  classStyle: {
+    type: String,
+    required: true
+  }
 });
 
 const emits = defineEmits(['update:modelValue']);

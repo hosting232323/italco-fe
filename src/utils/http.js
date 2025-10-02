@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 import { storeToRefs } from 'pinia';
 import logoutModule from '@/utils/logout';
 import { useUserStore } from '@/stores/user';

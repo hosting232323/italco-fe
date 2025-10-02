@@ -29,7 +29,10 @@
         </template>
         <template #item.productsServices="{ item }">
           <div style="min-width: 250px;">
-            <template v-for="product in Object.keys(item.products)">
+            <template 
+              v-for="product in Object.keys(item.products)" 
+              :key="product"
+            >
               <b>{{ product }}</b>:
               {{ item.products[product].map(service => service.name).join(', ') }}
               <br>
@@ -129,7 +132,7 @@ const getHeaders = () => {
 };
 
 const createdAt = (input) => {
-  const [datePart, _timePart] = input.split(' ');
+  const [datePart] = input.split(' ');
   const [day, month, year] = datePart.split('/');
   return `${year}-${month}-${day}`;
 };
