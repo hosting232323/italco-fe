@@ -61,7 +61,10 @@
       </template>
     </v-data-table>
   </v-container>
-  <v-dialog v-model="dialog" max-width="1200">
+  <v-dialog
+    v-model="dialog"
+    max-width="1200"
+  >
     <ScheduleForm @cancel="dialog = false" />
   </v-dialog>
 </template>

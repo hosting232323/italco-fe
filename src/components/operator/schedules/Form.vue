@@ -171,7 +171,7 @@ const addOrder = () => {
     schedule_index: schedule.value.orders.length
   });
   selectedOrderId.value = null;
-}
+};
 
 const removeOrder = (orderId) => {
   schedule.value.orders = schedule.value.orders.filter(o => o.id !== orderId);

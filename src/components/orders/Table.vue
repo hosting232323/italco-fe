@@ -75,7 +75,10 @@
         )"
         title="Hai selezionato degli ordini già assegnati"
       />
-      <ScheduleForm v-else ="dialog = false" />
+      <ScheduleForm
+        v-else
+        @cancel="dialog = false"
+      />
     </template>
   </v-dialog>
 </template>
