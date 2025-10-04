@@ -56,6 +56,8 @@
     <template #default>
       <v-card :title="`Situazione delivery ordine ${order.id}`">
         <v-card-text>
+          Note Operatore: {{ order.operator_note }}<br>
+          Note Punto Vendita: {{ order.customer_note }}<br>
           <div v-if="motivations && motivations.length">
             <p class="text-h6">Motivazioni</p>
             <v-list dense>
