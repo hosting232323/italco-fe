@@ -70,7 +70,7 @@
     </template>
     <template #default>
       <v-card
-        v-if="schedule.order_ids?.some(
+        v-if="schedule.order_ids.some(
           id => orders.some(order => order.id === id && order.status !== 'Pending')
         )"
         title="Hai selezionato degli ordini già assegnati"
