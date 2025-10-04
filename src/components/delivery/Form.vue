@@ -196,7 +196,6 @@ const STATUS_MAP = {
   'At Warehouse': ['On Board', 'To Reschedule']
 };
 const actualStatus = order.value.status;
-console.log(actualStatus);
 
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
