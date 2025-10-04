@@ -15,8 +15,8 @@
 </template>
 
 <script setup>
-import CollectionPointForm from '@/components/customers/collectionPoints/Form';
-import CollectionPointTable from '@/components/customers/collectionPoints/Table';
+import CollectionPointForm from '@/components/customers/collectionPoints/CollectionPointForm';
+import CollectionPointTable from '@/components/customers/collectionPoints/CollectionPointTable';
 
 import { storeToRefs } from 'pinia';
 import { useCollectionPointStore } from '@/stores/collectionPoint';

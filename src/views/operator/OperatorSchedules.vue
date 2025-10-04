@@ -20,7 +20,7 @@
         { title: 'Azioni', key: 'actions' }
       ]"
     >
-      <template #item.orders="{ item }">
+      <template #[`item.orders`]="{ item }">
         <div
           v-for="order in item.orders"
           :key="order.id"
@@ -29,7 +29,7 @@
           Destinatario: <b>{{ order.addressee }}</b>
         </div>
       </template>
-      <template #item.actions="{ item }">
+      <template #[`item.actions`]="{ item }">
         <v-row no-gutters>
           <v-col cols="4">
             <v-btn
@@ -70,7 +70,7 @@
 </template>
 
 <script setup>
-import ScheduleForm from '@/components/operator/schedules/Form';
+import ScheduleForm from '@/components/operator/schedules/ScheduleForm';
 
 import http from '@/utils/http';
 import { useTheme } from 'vuetify';

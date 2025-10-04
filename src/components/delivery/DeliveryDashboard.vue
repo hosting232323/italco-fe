@@ -67,7 +67,7 @@ import { useRouter } from 'vue-router';
 import { useOrderStore } from '@/stores/order';
 import { ref, computed, onMounted } from 'vue';
 
-import Table from '@/components/delivery/Table';
+import Table from '@/components/delivery/DeliveryTable';
 
 const locationError = ref(false); 
 const selectedCard = ref('In Progress');

@@ -10,7 +10,7 @@
 
 <script setup>
 import NavigationDrawer from '@/layouts/NavigationDrawer';
-import Footer from '@/layouts/Footer.vue';
+import Footer from '@/layouts/FooterBar.vue';
 
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';

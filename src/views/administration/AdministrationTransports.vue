@@ -15,8 +15,8 @@
 </template>
 
 <script setup>
-import TransportForm from '@/components/administration/transports/Form';
-import TransportTable from '@/components/administration/transports/Table';
+import TransportForm from '@/components/administration/transports/TransportForm';
+import TransportTable from '@/components/administration/transports/TransportTable';
 
 import { storeToRefs } from 'pinia';
 import { useTransportStore } from '@/stores/transport';

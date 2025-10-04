@@ -10,7 +10,7 @@
 
 <script setup>
 import AppBar from '@/layouts/AppBar.vue';
-import Footer from '@/layouts/Footer.vue';
+import Footer from '@/layouts/FooterBar.vue';
 
 import { useTheme } from 'vuetify';
 

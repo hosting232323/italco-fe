@@ -8,7 +8,7 @@ const routes = [
       {
         path: '',
         name: 'Login',
-        component: () => import('@/views/Login.vue')
+        component: () => import('@/views/LoginPage.vue')
       },
       {
         path: 'order/:orderId',
@@ -35,32 +35,32 @@ const routes = [
       {
         path: 'dashboard',
         name: 'Dashboard',
-        component: () => import('@/views/Dashboard.vue')
+        component: () => import('@/views/DashboardPage.vue')
       },
       {
         path: 'services',
         name: 'Servizi',
-        component: () => import('@/views/administration/Services.vue')
+        component: () => import('@/views/administration/AdministrationServices.vue')
       },
       {
         path: 'users',
         name: 'Utenti',
-        component: () => import('@/views/administration/Users.vue')
+        component: () => import('@/views/administration/AdministrationUsers.vue')
       },
       {
         path: 'customer-points',
         name: 'Punti Vendita',
-        component: () => import('@/views/administration/CustomerPoints.vue')
+        component: () => import('@/views/administration/AdministrationCustomerPoints.vue')
       },
       {
         path: 'transports',
         name: 'Veicoli',
-        component: () => import('@/views/administration/Transports.vue')
+        component: () => import('@/views/administration/AdministrationTransports.vue')
       },
       {
         path: 'schedules',
         name: 'Borderò',
-        component: () => import('@/views/operator/Schedules.vue')
+        component: () => import('@/views/operator/OperatorSchedules.vue')
       },
       {
         path: 'collection-points',

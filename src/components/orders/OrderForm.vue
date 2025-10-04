@@ -192,7 +192,7 @@
 
 <script setup>
 import FormButtons from '@/components/FormButtons';
-import ProductServiceInput from '@/components/orders/ProductServiceInput';
+import ProductServiceInput from '@/components/orders/OrderProductServiceInput';
 import GooglePlacesAutocomplete from '@/components/GooglePlacesAutocomplete';
 
 import { ref } from 'vue';

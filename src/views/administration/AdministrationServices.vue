@@ -22,9 +22,9 @@
 </template>
 
 <script setup>
-import ServiceForm from '@/components/administration/services/Form';
-import ServicePopUp from '@/components/administration/services/PopUp';
-import ServiceTable from '@/components/administration/services/Table';
+import ServiceForm from '@/components/administration/services/ServiceForm';
+import ServicePopUp from '@/components/administration/services/ServicePopUp';
+import ServiceTable from '@/components/administration/services/ServiceTable';
 
 import { storeToRefs } from 'pinia';
 import { useServiceStore } from '@/stores/service';
