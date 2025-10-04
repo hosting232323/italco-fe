@@ -20,7 +20,7 @@
             v-for="card in cards"
             :key="card.key"
             :cols="isMobile ? 6 :
-              ((card.key === 'Delay' || card.key === 'Anomaly') ? 2 : 4)"
+              (['Delay', 'Anomaly', 'Cancelled', 'To Reschedule'].includes(card.key) ? 2 : 4)"
           >
             <v-item
               v-slot="{ selectedClass, toggle }"
@@ -106,6 +106,10 @@ const cards = [
     key: 'Cancelled'
   },
   {
+    title: 'Da Riprogrammare',
+    key: 'To Reschedule'
+  },
+  {
     title: 'Anomalia',
     key: 'Anomaly'
   },
@@ -126,13 +130,13 @@ const cardCounts = computed(() => {
       if (order.delay) delayOrders.push(order);
     });
   }
-
   return {
     'In Progress': orders.value?.['In Progress']?.length || 0,
     'On Board': orders.value?.['On Board']?.length || 0,
     'Completed': orders.value?.['Completed']?.length || 0,
     'Cancelled': orders.value?.['Cancelled']?.length || 0,
     'At Warehouse': orders.value?.['At Warehouse']?.length || 0,
+    'To Reschedule': orders.value?.['To Reschedule']?.length || 0,
     'Anomaly': anomalyOrders.length,
     'Delay': delayOrders.length
   };

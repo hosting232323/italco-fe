@@ -70,7 +70,6 @@ const orderStore = useOrderStore();
 const isMobile = mobile.setupMobileUtils();
 const { role } = storeToRefs(userStore);
 const { element: order, activeForm } = storeToRefs(orderStore);
-
 const servicesId = [...new Set(Object.values(order.value.products).flat())];
 
 const getDateRangeArray = () => {

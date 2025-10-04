@@ -4,7 +4,8 @@ const LABELS = [
   { value: 'On Board', title: 'A Bordo' },
   { value: 'At Warehouse', title: 'In Magazzino' },
   { value: 'Completed', title: 'Completato' },
-  { value: 'Cancelled', title: 'Non Completato' }
+  { value: 'Cancelled', title: 'Non Completato' },
+  { value: 'To Reschedule', title: 'Da Riprogrammare' }
 ];
 
 const TYPES = [

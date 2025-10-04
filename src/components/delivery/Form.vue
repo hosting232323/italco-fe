@@ -6,7 +6,7 @@
         @submit.prevent="submitForm"
       >
         <v-select
-          v-if="!['Completed', 'Cancelled'].includes(actualStatus)"
+          v-if="!['Completed', 'Cancelled', 'To Reschedule'].includes(actualStatus)"
           v-model="status"
           label="Stato"
           :items="STATUS_MAP[actualStatus].map(status => ({
@@ -191,9 +191,9 @@ const isMobile = mobile.setupMobileUtils();
 const { element: order } = storeToRefs(orderStore);
 
 const STATUS_MAP = {
-  'In Progress': ['On Board', 'Cancelled', 'At Warehouse'],
-  'On Board': ['Completed', 'Cancelled', 'At Warehouse'],
-  'At Warehouse': ['On Board']
+  'In Progress': ['On Board', 'Cancelled', 'At Warehouse', 'To Reschedule'],
+  'On Board': ['Completed', 'Cancelled', 'At Warehouse', 'To Reschedule'],
+  'At Warehouse': ['On Board', 'To Reschedule']
 };
 const actualStatus = order.value.status;
 
