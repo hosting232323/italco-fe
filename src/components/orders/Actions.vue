@@ -111,7 +111,6 @@ const router = useRouter();
 const loadingPhoto = ref(false);
 const loadingExport = ref(false);
 const orderStore = useOrderStore();
-const props = defineProps(['item']);
 const orders = storesUtils.getStoreList(orderStore, router);
 const { element: updatedOrder, activeForm } = storeToRefs(orderStore);
 const imageLoading = reactive({});

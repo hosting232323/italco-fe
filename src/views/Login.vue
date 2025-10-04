@@ -3,7 +3,6 @@
     class="mt-10"
     title="Login"
     logo="/logo.png"
-    :primary-color="theme.current.value.primaryColor"
     :secondary-color="theme.current.value.primaryColor"
     redirect-link="/dashboard"
     :sign-up="false"

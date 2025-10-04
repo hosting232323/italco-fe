@@ -6,7 +6,7 @@
         @submit.prevent="submitForm"
       >
         <v-select
-          v-if="!['Completed', 'Cancelled'].includes(actualStatus)"
+          v-if="!['Completed', 'Cancelled', 'To Reschedule'].includes(actualStatus)"
           v-model="status"
           label="Stato"
           :items="STATUS_MAP[actualStatus].map(status => ({
