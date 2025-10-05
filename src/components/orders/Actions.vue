@@ -59,23 +59,21 @@
           Note Operatore: {{ order.operator_note }}<br>
           Note Punto Vendita: {{ order.customer_note }}<br>
           <div v-if="motivations && motivations.length">
-            <p class="text-h6">Motivazioni</p>
+            <p class="text-h6">
+              Motivazioni
+            </p>
             <v-list dense>
               <v-list-item
                 v-for="motivation in motivations"
                 :key="motivation.id"
+                :title="motivation.text"
               >
-                <v-list-item-content>
-                  <v-list-item-title>
-                    {{ motivation.text }}
-                  </v-list-item-title>
-                  <v-list-item-subtitle>
-                    Stato: {{ orderUtils.LABELS.find(label => label.value == motivation.status).title }} |
-                    Ritardo: {{ motivation.delay ? 'Sì' : 'No' }} |
-                    Anomalia: {{ motivation.anomaly ? 'Sì' : 'No' }} |
-                    Creata: {{ motivation.created_at }}
-                  </v-list-item-subtitle>
-                </v-list-item-content>
+                <v-list-item-subtitle>
+                  Stato: {{ orderUtils.LABELS.find(label => label.value == motivation.status).title }} |
+                  Ritardo: {{ motivation.delay ? 'Sì' : 'No' }} |
+                  Anomalia: {{ motivation.anomaly ? 'Sì' : 'No' }} |
+                  Creata: {{ motivation.created_at }}
+                </v-list-item-subtitle>
               </v-list-item>
             </v-list>
           </div>
