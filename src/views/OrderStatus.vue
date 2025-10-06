@@ -158,7 +158,7 @@
 </template>
 
 <script setup>
-import Map from '@/components/Map.vue';
+import Map from '@/components/ComponentMap.vue';
 import mobile from '@/utils/mobile';
 
 import http from '@/utils/http';

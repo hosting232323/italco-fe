@@ -24,10 +24,10 @@
         :headers="getHeaders()"
         :show-select="['Admin', 'Operator'].includes(role)"
       >
-        <template #item.type="{ item }">
+        <template #[`item.type`]="{ item }">
           {{ orderUtils.TYPES.find(type => type.value == item.type)?.title }}
         </template>
-        <template #item.productsServices="{ item }">
+        <template #[`item.productsServices`]="{ item }">
           <div style="min-width: 250px;">
             <template 
               v-for="product in Object.keys(item.products)" 
@@ -39,38 +39,38 @@
             </template>
           </div>
         </template>
-        <template #item.addressee="{ item }">
+        <template #[`item.addressee`]="{ item }">
           {{ item.addressee }}<br>
           <p style="font-size: smaller;">
             {{ item.address }}, {{ item.cap }}
           </p>
         </template>
-        <template #item.collection_point="{ item }">
+        <template #[`item.collection_point`]="{ item }">
           {{ item.collection_point.name }}<br>
           <p style="font-size: smaller;">
             {{ item.collection_point.address }}, {{ item.collection_point.cap }}
           </p>
         </template>
-        <template #item.status="{ item }">
+        <template #[`item.status`]="{ item }">
           {{ orderUtils.LABELS.find(label => label.value == item.status).title }}
         </template>
-        <template #item.price="{ item }">
+        <template #[`item.price`]="{ item }">
           {{ item.price ? item.price.toFixed(2) : '' }}€
         </template>
-        <template #item.actions="{ item }">
+        <template #[`item.actions`]="{ item }">
           <Action
             v-if="['Admin', 'Operator'].includes(role)"
             :item="item"
           />
         </template>
-        <template #item.created_at="{ item }">
+        <template #[`item.created_at`]="{ item }">
           {{ createdAt(item.created_at) }}
         </template>
       </v-data-table>
     </template>
     <template #default>
       <v-card
-        v-if="schedule.order_ids.some(
+        v-if="schedule.order_ids?.some(
           id => orders.some(order => order.id === id && order.status !== 'Pending')
         )"
         title="Hai selezionato degli ordini già assegnati"
@@ -84,8 +84,8 @@
 </template>
 
 <script setup>
-import Action from '@/components/orders/Actions';
-import ScheduleForm from '@/components/operator/schedules/Form';
+import Action from '@/components/orders/OrderActions';
+import ScheduleForm from '@/components/operator/schedules/ScheduleForm';
 
 import { ref } from 'vue';
 import { useTheme } from 'vuetify';

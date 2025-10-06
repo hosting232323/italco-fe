@@ -18,10 +18,10 @@
       { title: 'Azioni', key: 'actions' }
     ]"
   >
-    <template #item.type="{ item }">
+    <template #[`item.type`]="{ item }">
       {{ orderUtils.TYPES.find(type => type.value == item.type)?.title }}
     </template>
-    <template #item.actions="{ item }">
+    <template #[`item.actions`]="{ item }">
       <v-row no-gutters>
         <v-col cols="4">
           <v-btn

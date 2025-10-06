@@ -19,10 +19,10 @@
 </template>
 
 <script setup>
-import OrderForm from '@/components/orders/Form';
-import DeliveryForm from '@/components/delivery/Form';
-import CustomerForm from '@/components/orders/CustomerForm';
-import DatesForm from '@/components/orders/DatesForm';
+import OrderForm from '@/components/orders/OrderForm';
+import DeliveryForm from '@/components/delivery/DeliveryForm';
+import CustomerForm from '@/components/orders/OrderCustomerForm';
+import DatesForm from '@/components/orders/OrderDatesForm';
 
 import { ref } from 'vue';
 import { storeToRefs } from 'pinia';

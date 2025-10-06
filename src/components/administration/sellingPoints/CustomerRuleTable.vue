@@ -15,7 +15,7 @@
       { title: 'Azioni', key: 'actions' }
     ]"
   >
-    <template #item.rules="{ item }">
+    <template #[`item.rules`]="{ item }">
       <div
         v-for="(rules, index) in item.rules"
         :key="index"
@@ -24,7 +24,7 @@
         {{ rules.max_orders }}
       </div>
     </template>
-    <template #item.actions="{ item }">
+    <template #[`item.actions`]="{ item }">
       <v-btn
         icon="mdi-delete"
         variant="text"

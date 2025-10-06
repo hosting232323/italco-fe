@@ -16,7 +16,7 @@
       { title: 'Azioni', key: 'actions' }
     ]"
   >
-    <template #item.codes="{ item }">
+    <template #[`item.codes`]="{ item }">
       <div v-if="item.codes.length > 0">
         <div
           v-for="(code, index) in item.codes"
@@ -29,7 +29,7 @@
         Nessun CAP speciale
       </div>
     </template>
-    <template #item.constraints="{ item }">
+    <template #[`item.constraints`]="{ item }">
       <div v-if="item.constraints.length > 0">
         <div
           v-for="(constraint, index) in item.constraints"
@@ -43,7 +43,7 @@
         Nessun vincolo
       </div>
     </template>
-    <template #item.actions="{ item }">
+    <template #[`item.actions`]="{ item }">
       <v-row no-gutters>
         <v-col cols="4">
           <v-btn

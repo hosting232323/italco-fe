@@ -7,10 +7,10 @@
       { title: 'Azioni', key: 'actions' }
     ]"
   >
-    <template #item.day_of_week="{ item }">
+    <template #[`item.day_of_week`]="{ item }">
       {{ days.getDayByValue(item.day_of_week) }}
     </template>
-    <template #item.actions="{ item }">
+    <template #[`item.actions`]="{ item }">
       <v-btn
         icon="mdi-delete"
         variant="text"

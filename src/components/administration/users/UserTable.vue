@@ -22,7 +22,7 @@
           { title: 'Azioni', key: 'actions' }
         ]"
       >
-        <template #item.password="{ item }">
+        <template #[`item.password`]="{ item }">
           <template v-if="item.role != 'Admin'">
             <v-btn
               :icon="visiblePasswords[item.id] ? 'mdi-eye' : 'mdi-eye-off'"
@@ -35,7 +35,7 @@
             </span>
           </template>
         </template>
-        <template #item.actions="{ item }">
+        <template #[`item.actions`]="{ item }">
           <v-btn
             v-if="item.role !== 'Admin'"
             icon="mdi-delete"

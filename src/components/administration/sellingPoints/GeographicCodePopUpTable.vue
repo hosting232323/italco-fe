@@ -7,10 +7,10 @@
       { title: 'Azioni', key: 'actions' }
     ]"
   >
-    <template #item.type="{ item }">
+    <template #[`item.type`]="{ item }">
       {{ item.type ? 'Aggiunto' : 'Rimosso' }}
     </template>
-    <template #item.actions="{ item }">
+    <template #[`item.actions`]="{ item }">
       <v-btn
         icon="mdi-delete"
         variant="text"
