@@ -64,7 +64,7 @@ import storesUtils from '@/utils/stores';
 import { useServiceStore } from '@/stores/service';
 
 const { activatorProps } = defineProps({
-  lat: {
+  activatorProps: {
     type: Boolean,
     required: true
   }

@@ -5,7 +5,6 @@ import { useScheduleStore } from '@/stores/schedule';
 import { useTransportStore } from '@/stores/transport';
 import { useCustomerRuleStore } from '@/stores/customerRule';
 import { useCustomerGroupStore } from '@/stores/customerGroup';
-import { useDeliveryGroupStore } from '@/stores/deliveryGroup';
 import { useGeographicZoneStore } from '@/stores/geographicZone';
 import { useCollectionPointStore } from '@/stores/collectionPoint';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
@@ -24,7 +23,6 @@ export const useUserStore = defineStore('user', {
       useTransportStore(this.$pinia).$reset();
       useCustomerRuleStore(this.$pinia).$reset();
       useCustomerGroupStore(this.$pinia).$reset();
-      useDeliveryGroupStore(this.$pinia).$reset();
       useGeographicZoneStore(this.$pinia).$reset();
       useCollectionPointStore(this.$pinia).$reset();
       useAdministrationUserStore(this.$pinia).$reset();
