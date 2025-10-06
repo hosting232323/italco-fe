@@ -17,7 +17,7 @@
       { title: 'Azioni', key: 'actions' }
     ]"
   >
-    <template #item.actions="{ item }">
+    <template #[`item.actions`]="{ item }">
       <v-row no-gutters>
         <v-col cols="6">
           <v-btn

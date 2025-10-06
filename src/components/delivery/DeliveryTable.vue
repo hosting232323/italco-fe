@@ -22,10 +22,10 @@
           { title: 'Azioni', key: 'actions' }
         ]"
       >
-        <template #item.type="{ item }">
+        <template #[`item.type`]="{ item }">
           {{ orderUtils.TYPES.find(type => type.value == item.type)?.title }}
         </template>
-        <template #item.productsServices="{ item }">
+        <template #[`item.productsServices`]="{ item }">
           <template
             v-for="product in Object.keys(item.products)"
             :key="product"
@@ -35,19 +35,19 @@
             <br>
           </template>
         </template>
-        <template #item.addressee="{ item }">
+        <template #[`item.addressee`]="{ item }">
           {{ item.addressee }}<br>
           <p style="font-size: smaller;">
             {{ item.address }}, {{ item.cap }}
           </p>
         </template>
-        <template #item.collection_point="{ item }">
+        <template #[`item.collection_point`]="{ item }">
           {{ item.collection_point.name }}<br>
           <p style="font-size: smaller;">
             {{ item.collection_point.address }}, {{ item.collection_point.cap }}
           </p>
         </template>
-        <template #item.actions="{ item }">
+        <template #[`item.actions`]="{ item }">
           <v-btn
             icon="mdi-pencil"
             variant="text"
@@ -69,7 +69,7 @@ import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import orderUtils from '@/utils/order';
 import { useOrderStore } from '@/stores/order';
-import Form from '@/components/delivery/Form';
+import Form from '@/components/delivery/DeliveryForm';
 
 const { keyName } = defineProps({
   keyName: {

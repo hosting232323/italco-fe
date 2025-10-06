@@ -36,8 +36,8 @@
 </template>
 
 <script setup>
-import UserForm from '@/components/administration/users/Form';
-import UserTable from '@/components/administration/users/Table';
+import UserForm from '@/components/administration/users/UserForm';
+import UserTable from '@/components/administration/users/UserTable';
 import DeliveryGroupForm from '@/components/administration/users/DeliveryGroupForm';
 import DeliveryGroupPopUp from '@/components/administration/users/DeliveryGroupPopUp';
 import DeliveryGroupTable from '@/components/administration/users/DeliveryGroupTable';

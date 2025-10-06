@@ -43,8 +43,8 @@
 </template>
 
 <script setup>
-import PopUpForm from '@/components/administration/services/PopUpForm';
-import PopUpTable from '@/components/administration/services/PopUpTable';
+import PopUpForm from '@/components/administration/services/ServicePopUpForm';
+import PopUpTable from '@/components/administration/services/ServicePopUpTable';
 
 import { ref } from 'vue';
 import http from '@/utils/http';

@@ -16,8 +16,6 @@ module.exports = {
     'vue/html-indent': ['error', 2],
     'no-console': 'warn',
     'no-unused-vars': 'warn',
-    'eol-last': ['error', 'always'],
-    'vue/multi-word-component-names': 'off',
-    'vue/valid-v-slot': 'off'
+    'eol-last': ['error', 'always']
   },
 };

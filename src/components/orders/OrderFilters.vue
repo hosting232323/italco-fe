@@ -162,7 +162,7 @@
 
 <script setup>
 import FormButtons from '@/components/FormButtons';
-import OperatoreFilters from '@/components/operator/Filters';
+import OperatoreFilters from '@/components/operator/OperatorFilters';
 
 import { ref } from 'vue';
 import http from '@/utils/http';

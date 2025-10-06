@@ -7,7 +7,7 @@
       { title: 'Azioni', key: 'actions' }
     ]"
   >
-    <template #item.actions="{ item }">
+    <template #[`item.actions`]="{ item }">
       <v-btn
         icon="mdi-delete"
         variant="text"
