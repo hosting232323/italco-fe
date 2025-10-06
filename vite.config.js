@@ -39,7 +39,7 @@ export default defineConfig({
     extensions: ['.js', '.json', '.jsx', '.mjs', '.ts', '.tsx', '.vue', '.md']
   },
   server: {
-    port: 3000
+    port: process.env.PORT || 3000
   },
   build: {
     outDir: 'dist'
