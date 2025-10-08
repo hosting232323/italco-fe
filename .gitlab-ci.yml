@@ -1,7 +1,9 @@
 stages:
   - prepare
   - test
-image: python-node:3.11
+image:
+  name: python-node:3.11
+  pull_policy: if-not-present
 variables:
   POSTGRES_DB: mydb
   POSTGRES_USER: myuser
