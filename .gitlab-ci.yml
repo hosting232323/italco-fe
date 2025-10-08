@@ -1,9 +1,7 @@
 stages:
   - prepare
   - test
-image:
-  name: nikolaik/python-nodejs:python3.11-node18
-  pull_policy: if-not-present
+image: hosting23232323/python-node:3.11
 variables:
   POSTGRES_DB: mydb
   POSTGRES_USER: myuser
