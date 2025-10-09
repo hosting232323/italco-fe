@@ -15,7 +15,24 @@
         ref="form"
         @submit.prevent="submitForm"
       >
-      <DeliveryGroupUserInput />
+        <v-chip
+          v-for="(user, index) in selectedUsers"
+          :key="index"
+          class="mr-2 mb-5"
+          append-icon="mdi-close-circle"
+          @click="removeUser(user.id)"
+        >
+          {{ user }}
+        </v-chip>
+        <v-autocomplete
+          v-model="selectedUser"
+          label="Utenti"
+          :items="availableUsers"
+          item-title="email"
+          item-value="email"
+          append-icon="mdi-plus"
+          @click:append="addUser"
+        />
         <v-row no-gutters>
           <v-col
             cols="12"
@@ -128,13 +145,15 @@ import validation from '@/utils/validation';
 import { useOrderStore } from '@/stores/order';
 import { useScheduleStore } from '@/stores/schedule';
 import { useTransportStore } from '@/stores/transport';
-import DeliveryGroupUserInput from '@/components/operator/schedules/DeliveryGroupUserInput';
+import { useAdministrationUserStore } from '@/stores/administrationUser';
 
 const form = ref(null);
 const error = ref(null);
 const theme = useTheme();
 const router = useRouter();
 const loading = ref(false);
+const selectedUser = ref(null);
+const selectedUsers = ref([]);
 const selectedOrderId = ref(null);
 const orderStore = useOrderStore();
 const emits = defineEmits(['cancel']);
@@ -143,7 +162,21 @@ const transportStore = useTransportStore();
 const isMobile = mobile.setupMobileUtils();
 const { element: schedule } = storeToRefs(scheduleStore);
 const orders = storesUtils.getStoreList(orderStore, router);
+const administrationUserStore = useAdministrationUserStore();
 const transports = storesUtils.getStoreList(transportStore, router);
+const users = storesUtils.getStoreList(administrationUserStore, router);
+
+const addUser = () => {
+  console.log(selectedUser.value);
+  selectedUsers.value.push(selectedUser.value);
+  selectedUser.value = null;
+}
+
+const availableUsers = computed(() => {
+  return users.value.filter(
+    (u) => !selectedUsers.value.includes(u.email)
+  );
+});
 
 const addOrder = () => {
   const orderToAdd = orders.value.find(o => o.id === selectedOrderId.value);
