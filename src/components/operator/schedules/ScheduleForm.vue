@@ -16,22 +16,22 @@
         @submit.prevent="submitForm"
       >
         <v-chip
-          v-for="(user, index) in selectedUsers"
-          :key="index"
+          v-for="user in schedule.users"
+          :key="user.id"
           class="mr-2 mb-5"
           append-icon="mdi-close-circle"
           @click="removeUser(user.id)"
         >
-          {{ user }}
+          {{ user.email }}
         </v-chip>
         <v-autocomplete
-          v-model="selectedUser"
+          v-model="schedule.users"
           label="Utenti"
           :items="availableUsers"
           item-title="email"
-          item-value="email"
           append-icon="mdi-plus"
           @click:append="addUser"
+          return-object
         />
         <v-row no-gutters>
           <v-col
@@ -153,7 +153,6 @@ const theme = useTheme();
 const router = useRouter();
 const loading = ref(false);
 const selectedUser = ref(null);
-const selectedUsers = ref([]);
 const selectedOrderId = ref(null);
 const orderStore = useOrderStore();
 const emits = defineEmits(['cancel']);
@@ -167,16 +166,20 @@ const transports = storesUtils.getStoreList(transportStore, router);
 const users = storesUtils.getStoreList(administrationUserStore, router);
 
 const addUser = () => {
-  console.log(selectedUser.value);
-  selectedUsers.value.push(selectedUser.value);
+  if (!selectedUser.value) return;
+  schedule.value.users.push(selectedUser.value);
   selectedUser.value = null;
 }
 
 const availableUsers = computed(() => {
   return users.value.filter(
-    (u) => !selectedUsers.value.includes(u.email)
-  );
-});
+    (u) => !schedule.value.users.some(su => su.email === u.email)
+  )
+})
+
+const removeUser = (userId) => {
+  schedule.value.users = schedule.value.users.filter(u => u.id !== userId);
+}
 
 const addOrder = () => {
   const orderToAdd = orders.value.find(o => o.id === selectedOrderId.value);
@@ -214,6 +217,10 @@ if (!schedule.value.id)
       schedule_index: index
     };
   });
+
+if (!schedule.value.users) {
+  schedule.value.users = [];
+}
 
 watch(
   () => schedule.value.orders,
