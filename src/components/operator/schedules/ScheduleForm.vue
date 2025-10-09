@@ -25,7 +25,7 @@
           {{ user.nickname }}
         </v-chip>
         <v-autocomplete
-          v-model="schedule.users"
+          v-model="selectedUser"
           label="Utenti"
           :items="availableUsers"
           item-title="nickname"
@@ -172,6 +172,7 @@ const addUser = () => {
   selectedUser.value = null;
 };
 
+// filtrare solo per delivery
 const availableUsers = computed(() => {
   return users.value.filter(
     (u) => 
