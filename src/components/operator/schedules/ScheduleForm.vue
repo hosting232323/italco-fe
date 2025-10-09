@@ -25,13 +25,14 @@
           {{ user.nickname }}
         </v-chip>
         <v-autocomplete
-          v-model="selectedUser"
+          v-model="schedule.users"
           label="Utenti"
           :items="availableUsers"
           item-title="nickname"
           append-icon="mdi-plus"
           return-object
           @click:append="addUser"
+          return-object
         />
         <v-row no-gutters>
           <v-col
