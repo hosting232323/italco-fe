@@ -22,13 +22,13 @@
           append-icon="mdi-close-circle"
           @click="removeUser(user.id)"
         >
-          {{ user.email }}
+          {{ user.nickname }}
         </v-chip>
         <v-autocomplete
           v-model="selectedUser"
           label="Utenti"
           :items="availableUsers"
-          item-title="email"
+          item-title="nickname"
           append-icon="mdi-plus"
           return-object
           @click:append="addUser"
