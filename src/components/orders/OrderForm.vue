@@ -22,7 +22,7 @@
         :rules="validation.requiredRules"
         :disabled="order.products && Object.keys(order.products).length > 0"
       />
-      <ProductServiceInput />
+      <ProductServiceInput ref="productServiceInputRef" />
       <v-row no-gutters>
         <v-col
           cols="12"
@@ -193,7 +193,7 @@ import FormButtons from '@/components/FormButtons';
 import ProductServiceInput from '@/components/orders/OrderProductServiceInput';
 import GooglePlacesAutocomplete from '@/components/GooglePlacesAutocomplete';
 
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import orderUtils from '@/utils/order';
@@ -209,6 +209,7 @@ const form = ref(null);
 const activeTab = ref(0);
 const errorMsg = ref('');
 const router = useRouter();
+const productServiceInputRef = ref(null);
 const isMobile = mobile.setupMobileUtils();
 
 const userStore = useUserStore();
@@ -247,4 +248,11 @@ const handleAddressComponents = (components) => {
   order.value.address = components.address;
   order.value.cap = components.cap;
 };
+
+watch(
+  () => order.value.type,
+  () => {
+    productServiceInputRef.value?.resetFields();
+  }
+);
 </script>

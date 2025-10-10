@@ -108,4 +108,13 @@ const addProduct = async () => {
   selectedServices.value = [];
   selectedProduct.value = null;
 };
+
+const resetFields = () => {
+  selectedServices.value = [];
+  selectedProduct.value = null;
+  selectedService.value = null;
+  order.value.products = {};
+};
+
+defineExpose({ resetFields });
 </script>
