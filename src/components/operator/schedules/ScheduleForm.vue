@@ -171,10 +171,11 @@ const addUser = () => {
   selectedUser.value = null;
 }
 
-// filtrare solo per delivery
 const availableUsers = computed(() => {
   return users.value.filter(
-    (u) => !schedule.value.users.some(su => su.email === u.email)
+    (u) => 
+      u.role === 'Delivery' &&
+      !schedule.value.users.some(su => su.email === u.email)
   )
 })
 
