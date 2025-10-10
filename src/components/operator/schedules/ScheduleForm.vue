@@ -172,7 +172,6 @@ const addUser = () => {
   selectedUser.value = null;
 };
 
-// filtrare solo per delivery
 const availableUsers = computed(() => {
   return users.value.filter(
     (u) => 
