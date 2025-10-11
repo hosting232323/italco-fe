@@ -251,8 +251,6 @@ const handleAddressComponents = (components) => {
 
 watch(
   () => order.value.type,
-  () => {
-    productServiceInputRef.value?.resetFields();
-  }
+  () => productServiceInputRef.value?.resetFields()
 );
 </script>
