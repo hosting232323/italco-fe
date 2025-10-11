@@ -20,11 +20,9 @@
             md="6"
           >
             <GooglePlacesAutocomplete
-              v-model="collectionPoint.address"
               :custom-class="isMobile ? '' : 'mr-2'"
               label="Indirizzo"
               :rules="validation.requiredRules"
-              @update:is-valid="isLocationValid = $event"
               @address-components="handleAddressComponents"
             />
           </v-col>
@@ -63,7 +61,6 @@ import GooglePlacesAutocomplete from '@/components/GooglePlacesAutocomplete.vue'
 const form = ref(null);
 const loading = ref(false);
 const router = useRouter();
-const isLocationValid = ref(false);
 const isMobile = mobile.setupMobileUtils();
 const collectionPointStore = useCollectionPointStore();
 const { element: collectionPoint, activeForm } = storeToRefs(collectionPointStore);
