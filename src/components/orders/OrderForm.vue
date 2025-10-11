@@ -40,11 +40,9 @@
           md="4"
         >
           <GooglePlacesAutocomplete
-            v-model="order.address"
             :custom-class="isMobile ? '' : 'ml-2 mr-2'"
             label="Indirizzo"
             :rules="validation.requiredRules"
-            @update:is-valid="isLocationValid = $event"
             @address-components="handleAddressComponents"
           />
         </v-col>
@@ -211,7 +209,6 @@ const form = ref(null);
 const activeTab = ref(0);
 const errorMsg = ref('');
 const router = useRouter();
-const isLocationValid = ref(false);
 const isMobile = mobile.setupMobileUtils();
 
 const userStore = useUserStore();
