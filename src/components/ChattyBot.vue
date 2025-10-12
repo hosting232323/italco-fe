@@ -42,8 +42,16 @@
       </div>
       
       <div class="fab-send">
-          <input type="text" name="userMsg" id="userMsg" placeholder="Scrivi qui...">
-          <button id="send-button">
+
+        <input
+          v-model="userMessage"
+          type="text"
+          name="userMsg"
+          id="userMsg"
+          placeholder="Scrivi qui..."
+          @keyup.enter="sendMessage"
+        />
+          <button @click="sendMessage">
             <v-icon id="export-button">mdi-send-circle</v-icon>
           </button>
           
@@ -73,8 +81,14 @@
 </template>
 
 <script setup>
+import { ref } from 'vue';
 import '@/styles/fab.css';
 import '@/styles/chat.css';
+import http from '../utils/http';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+const userMessage = ref(null);
 
 async function toggleWheel(mode) {
     if (mode == "open") {
@@ -86,5 +100,57 @@ async function toggleWheel(mode) {
     }
 }
 
+const sendMessage = () => {
+  if(!userMessage.value) return;
+
+  addMessage(userMessage.value, false)
+
+  http.postRequest('send-message', {
+    message: userMessage.value
+  }, (data) => {
+    if(data.status == 'ok') {
+      addMessage(data.message, true)
+    }
+  }, 'POST', router)
+}
+
+const addMessage = (message, bot = true) => {
+  console.log(message);
+  // const inputData = document.getElementById("userMsg");
+  var fabContent = document.querySelector('.fab-content');
+
+  const messageContainer = createElement('div', '', ['fab-message']);
+  const paragraph = createElement('p', '', [], '');
+
+  if (bot) {
+    const botMessage = createElement('div', '', ['sender', 'bot_s']);
+    const image = document.createElement('img');
+    image.src = `/logo.png`;
+    botMessage.appendChild(image);
+    paragraph.textContent = 'Italco Bot';
+    botMessage.appendChild(paragraph);
+    messageContainer.appendChild(botMessage);
+  } 
+  // else {
+  //   const userMessage = createElement('div', '', ['sender', 'user_s']);
+    
+  //   paragraph.textContent = "Tu";
+  //   userMessage.appendChild(paragraph);
+  //   messageContainer.appendChild(userMessage);
+  // }
+
+  const newMessage = createElement('div', bot ? 'streamingMessage' : '', ['msg', ...(bot ? ['bot', 'first'] : ['user'])], message);
+
+
+  messageContainer.appendChild(newMessage);
+  fabContent.appendChild(messageContainer);
+}
+const createElement = (type = '', id = '', classes = [], content = '') => {
+  const element = document.createElement(type);
+  if(id !== '') element.id = id;
+  if(classes.length > 0) element.classList.add(...classes);
+  if(content !== '') element.textContent = content;
+  return element;
+};
 
 </script>
