@@ -58,10 +58,7 @@
           {{ item.price ? item.price.toFixed(2) : '' }}€
         </template>
         <template #[`item.actions`]="{ item }">
-          <Action
-            v-if="['Admin', 'Operator'].includes(role)"
-            :item="item"
-          />
+          <Action :item="item" />
         </template>
         <template #[`item.created_at`]="{ item }">
           {{ createdAt(item.created_at) }}
