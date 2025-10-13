@@ -20,6 +20,7 @@
             md="6"
           >
             <GooglePlacesAutocomplete
+              v-model="collectionPoint.address"
               :custom-class="isMobile ? '' : 'mr-2'"
               label="Indirizzo"
               :rules="validation.requiredRules"

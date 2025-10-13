@@ -40,6 +40,7 @@
           md="4"
         >
           <GooglePlacesAutocomplete
+            v-model="order.address"
             :custom-class="isMobile ? '' : 'ml-2 mr-2'"
             label="Indirizzo"
             :rules="validation.requiredRules"

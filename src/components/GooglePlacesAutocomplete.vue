@@ -16,6 +16,10 @@
 import { ref, onMounted, nextTick, computed } from 'vue';
 
 const props = defineProps({
+  modelValue: {
+    type: String,
+    required: true
+  },
   label: {
     type: String,
     required: true
@@ -31,8 +35,9 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['addressComponents']);
-const localValue = ref('');
+
 const isValidAddress = ref(true);
+const localValue = ref(props.modelValue);
 const inputId = `google-autocomplete-${Math.random().toString(36).substr(2, 9)}`;
 
 const computedRules = computed(() => [
