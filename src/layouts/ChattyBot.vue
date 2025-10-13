@@ -81,38 +81,37 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
 import '@/styles/fab.css';
 import '@/styles/chat.css';
-import http from '../utils/http';
+
+import { ref } from 'vue';
+import http from '@/utils/http';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
 const userMessage = ref(null);
 
 async function toggleWheel(mode) {
-    if (mode == "open") {
-        document.querySelector(".fab-wheel").style.transform = "scale(1)";
-        document.getElementById("fabButton").style.transform = "scale(0)";
-    } else {
-        document.querySelector(".fab-wheel").style.transform = "scale(0)";
-        document.getElementById("fabButton").style.transform = "scale(1)";
-    }
+  if (mode == "open") {
+    document.querySelector(".fab-wheel").style.transform = "scale(1)";
+    document.getElementById("fabButton").style.transform = "scale(0)";
+  } else {
+    document.querySelector(".fab-wheel").style.transform = "scale(0)";
+    document.getElementById("fabButton").style.transform = "scale(1)";
+  }
 }
 
 const sendMessage = () => {
   if(!userMessage.value) return;
 
   addMessage(userMessage.value, false)
-
-  http.postRequest('send-message', {
+  http.postRequest('chatty/message', {
     message: userMessage.value
   }, (data) => {
-    if(data.status == 'ok') {
-      addMessage(data.message, true)
-    }
-  }, 'POST', router)
-}
+    if(data.status == 'ok')
+      addMessage(data.message, true);
+  }, 'POST', router);
+};
 
 const addMessage = (message, bot = true) => {
   console.log(message);
@@ -144,7 +143,8 @@ const addMessage = (message, bot = true) => {
 
   messageContainer.appendChild(newMessage);
   fabContent.appendChild(messageContainer);
-}
+};
+
 const createElement = (type = '', id = '', classes = [], content = '') => {
   const element = document.createElement(type);
   if(id !== '') element.id = id;
@@ -152,5 +152,4 @@ const createElement = (type = '', id = '', classes = [], content = '') => {
   if(content !== '') element.textContent = content;
   return element;
 };
-
 </script>

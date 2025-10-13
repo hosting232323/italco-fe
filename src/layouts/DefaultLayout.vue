@@ -10,9 +10,9 @@
 </template>
 
 <script setup>
-import NavigationDrawer from '@/layouts/NavigationDrawer';
+import ChattyBot from '@/layouts/ChattyBot';
 import Footer from '@/layouts/FooterBar.vue';
-import ChattyBot from '@/components/ChattyBot';
+import NavigationDrawer from '@/layouts/NavigationDrawer';
 
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
