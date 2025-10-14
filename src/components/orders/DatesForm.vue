@@ -91,7 +91,6 @@ const getDateRangeArray = () => {
 
 const nextTwoMonths = getDateRangeArray();
 
-console.log(servicesId)
 if (role.value == 'Customer')
   http.postRequest('check-constraints', {
     cap: order.value.cap,
