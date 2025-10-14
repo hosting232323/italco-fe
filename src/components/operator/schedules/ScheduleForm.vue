@@ -32,7 +32,6 @@
           append-icon="mdi-plus"
           return-object
           @click:append="addUser"
-          return-object
         />
         <v-row no-gutters>
           <v-col
