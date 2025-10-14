@@ -30,8 +30,8 @@
           :items="availableUsers"
           item-title="email"
           append-icon="mdi-plus"
-          @click:append="addUser"
           return-object
+          @click:append="addUser"
         />
         <v-row no-gutters>
           <v-col
@@ -169,19 +169,19 @@ const addUser = () => {
   if (!selectedUser.value) return;
   schedule.value.users.push(selectedUser.value);
   selectedUser.value = null;
-}
+};
 
 const availableUsers = computed(() => {
   return users.value.filter(
     (u) => 
       u.role === 'Delivery' &&
       !schedule.value.users.some(su => su.email === u.email)
-  )
-})
+  );
+});
 
 const removeUser = (userId) => {
   schedule.value.users = schedule.value.users.filter(u => u.id !== userId);
-}
+};
 
 const addOrder = () => {
   const orderToAdd = orders.value.find(o => o.id === selectedOrderId.value);
