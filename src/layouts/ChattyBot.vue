@@ -22,19 +22,14 @@
       </nav>
       
       <main class="fab-content">
+        <div class="fab-message" style="margin-top: 15px;">
+          <div class="sender bot_s">
+              <img src="/logo.png" alt="botAvatar">
+              <p>Italco Bot</p>
+          </div>
 
-          <div class="fab-message">
-              
-              <div class="sender bot_s">
-                  <img src="/logo.png" alt="botAvatar">
-                  <p>Italco Bot</p>
-              </div>
-
-              <div class="msg bot first">Come posso aiutarti?</div>
-            </div>
-          
-          <div id="faq" class="faq-container"></div>
-          
+          <div class="msg bot first">Come posso aiutarti?</div>
+        </div>
       </main>
 
       <div class="arrow-dynamic arrow-dynamic-hidden">
@@ -49,9 +44,14 @@
           name="userMsg"
           id="userMsg"
           placeholder="Scrivi qui..."
+          @input="onInputChangeColor" 
           @keyup.enter="sendMessage"
+          :disabled="loading"
         />
-          <button @click="sendMessage">
+          <button 
+            @click="sendMessage"  
+            :disabled="loading"
+          >
             <v-icon id="export-button">mdi-send-circle</v-icon>
           </button>
           
@@ -87,9 +87,11 @@ import '@/styles/chat.css';
 import { ref } from 'vue';
 import http from '@/utils/http';
 import { useRouter } from 'vue-router';
+import { marked } from 'marked';
 
 const router = useRouter();
 const userMessage = ref(null);
+const loading = ref(false);
 
 async function toggleWheel(mode) {
   if (mode == "open") {
@@ -104,18 +106,19 @@ async function toggleWheel(mode) {
 const sendMessage = () => {
   if(!userMessage.value) return;
 
-  addMessage(userMessage.value, false)
+  loading.value = true;
+  addMessage(userMessage.value, false);
+  userMessage.value = '';
   http.postRequest('chatty/message', {
     message: userMessage.value
   }, (data) => {
     if(data.status == 'ok')
       addMessage(data.message, true);
+    loading.value = false;
   }, 'POST', router);
 };
 
 const addMessage = (message, bot = true) => {
-  console.log(message);
-  // const inputData = document.getElementById("userMsg");
   var fabContent = document.querySelector('.fab-content');
 
   const messageContainer = createElement('div', '', ['fab-message']);
@@ -129,18 +132,15 @@ const addMessage = (message, bot = true) => {
     paragraph.textContent = 'Italco Bot';
     botMessage.appendChild(paragraph);
     messageContainer.appendChild(botMessage);
-  } 
-  // else {
-  //   const userMessage = createElement('div', '', ['sender', 'user_s']);
-    
-  //   paragraph.textContent = "Tu";
-  //   userMessage.appendChild(paragraph);
-  //   messageContainer.appendChild(userMessage);
-  // }
+  } else {
+    const userMessage = createElement('div', '', ['sender', 'user_s']);
+    paragraph.textContent = "Tu";
+    userMessage.appendChild(paragraph);
+    messageContainer.appendChild(userMessage);
+  }
 
-  const newMessage = createElement('div', bot ? 'streamingMessage' : '', ['msg', ...(bot ? ['bot', 'first'] : ['user'])], message);
-
-
+  const newMessage = createElement('div', '', ['msg', ...(bot ? ['bot', 'first'] : ['user'])],'');
+  newMessage.innerHTML = marked.parse(message);
   messageContainer.appendChild(newMessage);
   fabContent.appendChild(messageContainer);
 };
@@ -152,4 +152,9 @@ const createElement = (type = '', id = '', classes = [], content = '') => {
   if(content !== '') element.textContent = content;
   return element;
 };
+
+const onInputChangeColor = () => {
+  const userMsg = document.getElementById("userMsg");
+  userMsg.value.trim() !== '' ? userMsg.style.color = '#000' : userMsg.style.color = '';
+}
 </script>
