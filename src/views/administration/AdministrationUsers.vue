@@ -22,8 +22,8 @@
 </template>
 
 <script setup>
-import UserForm from '@/components/administration/users/Form';
-import UserTable from '@/components/administration/users/Table';
+import UserForm from '@/components/administration/users/UserForm';
+import UserTable from '@/components/administration/users/UserTable';
 
 import { ref } from 'vue';
 import { storeToRefs } from 'pinia';
