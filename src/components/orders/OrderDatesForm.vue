@@ -70,7 +70,6 @@ const orderStore = useOrderStore();
 const isMobile = mobile.setupMobileUtils();
 const { role } = storeToRefs(userStore);
 const { element: order, activeForm } = storeToRefs(orderStore);
-const servicesId = [...new Set(Object.values(order.value.products).flat())];
 
 const getDateRangeArray = () => {
   const result = [];
@@ -93,7 +92,9 @@ const nextTwoMonths = getDateRangeArray();
 if (role.value == 'Customer')
   http.postRequest('check-constraints', {
     cap: order.value.cap,
-    services_id: servicesId
+    services_id: [
+      ...new Set(Object.values(order.value.products).flat().map(s => s.id))
+    ]
   }, (data) => {
     if (data.status === 'ok')
       allowedDpcDates.value = data.dates; 
