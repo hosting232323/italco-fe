@@ -181,6 +181,9 @@ const availableUsers = computed(() => {
 
 const removeUser = (userId) => {
   schedule.value.users = schedule.value.users.filter(u => u.id !== userId);
+    if (!schedule.value.deleted_users)
+    schedule.value.deleted_users = [];
+  schedule.value.deleted_users.push(userId);
 };
 
 const addOrder = () => {
