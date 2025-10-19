@@ -14,6 +14,7 @@
     "express": "^4.19.2",
     "generic-module": "git+https://github.com/hosting232323/generic-module.git",
     "hashids": "^2.3.0",
+    "marked": "^16.4.1",
     "ol": "^10.6.1",
     "pinia": "^2.1.7",
     "roboto-fontface": "*",

@@ -3,14 +3,16 @@
     <NavigationDrawer />
     <v-main :style="{ backgroundColor: theme.current.value.secondaryColor }">
       <router-view />
+      <ChattyBot />
     </v-main>
     <Footer />
   </v-app>
 </template>
 
 <script setup>
-import NavigationDrawer from '@/layouts/NavigationDrawer';
+import ChattyBot from '@/layouts/ChattyBot';
 import Footer from '@/layouts/FooterBar.vue';
+import NavigationDrawer from '@/layouts/NavigationDrawer';
 
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
