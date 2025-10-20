@@ -28,6 +28,12 @@ const TYPES = [
 ];
 
 const formatFilters = (filters) => {
+  if (filters['Order.booking_date_0'] && filters['Order.booking_date_1']) {
+    filters['Order.booking_date'] = [filters['Order.booking_date_0'], filters['Order.booking_date_1']];
+    delete filters['Order.booking_date_0'];
+    delete filters['Order.booking_date_1'];
+  }
+
   return Object.keys(filters)
     .filter(key => filters[key] !== null)
     .map(key => {
