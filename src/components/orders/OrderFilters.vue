@@ -188,7 +188,7 @@ const serviceStore = useServiceStore();
 const isMobile = mobile.setupMobileUtils();
 const collectionPointStore = useCollectionPointStore();
 const { role } = storeToRefs(userStore);
-const { filters, dateFilter, ready } = storeToRefs(orderStore);
+const { filters, ready } = storeToRefs(orderStore);
 const services = storesUtils.getStoreList(serviceStore, router);
 const collectionPoints = storesUtils.getStoreList(collectionPointStore, router);
 

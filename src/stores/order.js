@@ -12,7 +12,6 @@ export const useOrderStore = defineStore('order', {
     element: {},
     filters: {},
     ready: false,
-    dateFilter: {},
     activeForm: false
   }),
   actions: {
@@ -64,7 +63,6 @@ export const useOrderStore = defineStore('order', {
       http.postRequest(
         'order/filter',
         {
-          date_filter: this.dateFilter,
           filters: orderUtils.formatFilters(this.filters)
         },
         this.setList,
