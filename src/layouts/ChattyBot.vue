@@ -28,7 +28,10 @@
         <div class="line" />
       </div>
     </nav>
-    <main class="fab-content">
+    <main
+      ref="fabContent"
+      class="fab-content"
+    >
       <div
         v-for="(message, index) in messages"
         :key="index"
@@ -73,19 +76,28 @@
         >FastSite</a>
       </p>
     </footer>
+    <div
+      v-show="showArrow"
+      class="arrow-dynamic"
+      @click="scrollToBottom"
+    >
+      <v-icon>mdi-arrow-down</v-icon>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
 import http from '@/utils/http';
 import { marked } from 'marked';
 import { useRouter } from 'vue-router';
+import { ref, onMounted, nextTick, watch } from 'vue';
 
 const router = useRouter();
 const loading = ref(false);
 const fabWheel = ref(null);
 const fabButton = ref(null);
+const fabContent = ref(null);
+const showArrow = ref(false);
 const userMessage = ref(null);
 const messages = ref(['Ciao! Sono qui per rispondere alle tue domande sugli ordini dell\'ultima settimana']);
 
@@ -109,6 +121,35 @@ const sendMessage = () => {
       messages.value.push(data.message);
   }, 'POST', router);
 };
+
+const checkScroll = () => {
+  if (!fabContent.value) return;
+
+  const el = fabContent.value;
+  showArrow.value = el.scrollHeight - el.scrollTop - el.clientHeight > 10;
+};
+
+const scrollToBottom = () => {
+  if (!fabContent.value) return;
+
+  fabContent.value.scrollTo({
+    top: fabContent.value.scrollHeight,
+    behavior: 'smooth'
+  });
+  showArrow.value = false;
+};
+
+watch(messages, async () => {
+  await nextTick();
+  checkScroll();
+});
+
+onMounted(() => {
+  if (fabContent.value) {
+    fabContent.value.addEventListener('scroll', checkScroll);
+    checkScroll();
+  }
+});
 </script>
 
 <style scoped>
@@ -463,5 +504,24 @@ const sendMessage = () => {
 
 .link-decoration:hover {
   text-decoration: underline;
+}
+
+.arrow-dynamic {
+  position: absolute;
+  bottom: 130px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  background-color: #fff;
+  color: rgb(71, 96, 156);
+  width: 30px;
+  height: 30px;
+  border-radius: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0px 4px 4px 0px rgb(0 0 0 / 20%);
+  font-size: 12px;
+  cursor: pointer;
 }
 </style>
