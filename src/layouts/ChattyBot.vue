@@ -28,7 +28,10 @@
         <div class="line" />
       </div>
     </nav>
-    <main ref="fabContent" class="fab-content">
+    <main
+      ref="fabContent"
+      class="fab-content"
+    >
       <div
         v-for="(message, index) in messages"
         :key="index"
@@ -73,7 +76,11 @@
         >FastSite</a>
       </p>
     </footer>
-    <div v-show="showArrow" class="arrow-dynamic" @click="scrollToBottom">
+    <div
+      v-show="showArrow"
+      class="arrow-dynamic"
+      @click="scrollToBottom"
+    >
       <v-icon>mdi-arrow-down</v-icon>
     </div>
   </div>
@@ -119,12 +126,12 @@ const checkScroll = () => {
   if (!fabContent.value) return;
 
   const el = fabContent.value;
-  const scrollBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
-  showArrow.value = scrollBottom > 10;
+  showArrow.value = el.scrollHeight - el.scrollTop - el.clientHeight > 10;
 };
 
 const scrollToBottom = () => {
   if (!fabContent.value) return;
+
   fabContent.value.scrollTo({
     top: fabContent.value.scrollHeight,
     behavior: 'smooth'
