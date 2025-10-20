@@ -55,16 +55,13 @@ export const useOrderStore = defineStore('order', {
       );
     },
     initList(router) {
-      if (Object.keys(this.filters).length > 0)
-        Object.keys(this.filters).forEach(key => {
-          if (!this.filters[key]) delete this.filters[key];
-        });
+      Object.keys(this.filters).forEach(key => {
+        if (!this.filters[key]) delete this.filters[key];
+      });
 
       http.postRequest(
         'order/filter',
-        {
-          filters: orderUtils.formatFilters(this.filters)
-        },
+        {filters: orderUtils.formatFilters({ ...this.filters })},
         this.setList,
         'POST',
         router
