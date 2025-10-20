@@ -106,9 +106,9 @@
                   md="6"
                 >
                   <v-text-field
-                    v-model="dateFilter.start_date"
+                    v-model="filters['Order.booking_date_0']"
                     :class="isMobile ? '' : 'mr-2 ml-2'"
-                    :rules="intervallRules('end_date')"
+                    :rules="intervallRules('Order.booking_date_1')"
                     label="Inizio Intervallo Data Consegna"
                     type="date"
                   />
@@ -118,9 +118,9 @@
                   md="6"
                 >
                   <v-text-field
-                    v-model="dateFilter.end_date"
+                    v-model="filters['Order.booking_date_1']"
                     :class="isMobile ? '' : 'ml-2'"
-                    :rules="intervallRules('start_date')"
+                    :rules="intervallRules('Order.booking_date_0')"
                     label="Fine Intervallo Data Consegna"
                     type="date"
                   />
@@ -137,7 +137,7 @@
     </v-expansion-panel>
   </v-expansion-panels>
   <v-row
-    v-if="role == 'Admin' && !panel && filters['ItalcoUser.id'] && dateFilter.start_date && dateFilter.end_date"
+    v-if="role == 'Admin' && !panel && filters['ItalcoUser.id'] && filters['Order.booking_date_0'] && filters['Order.booking_date_1']"
     no-gutters
   >
     <v-col
@@ -145,8 +145,8 @@
       style="font-size: smaller;"
     >
       Punto Vendita: {{ filters['ItalcoUser.id'] }}<br>
-      Data di Inizio Intervallo: {{ dateFilter.start_date }}<br>
-      Data di Fine Intervallo: {{ dateFilter.end_date }}
+      Data di Inizio Intervallo: {{ filters['Order.booking_date_0'] }}<br>
+      Data di Fine Intervallo: {{ filters['Order.booking_date_1'] }}
     </v-col>
     <v-col cols="4">
       <v-btn
@@ -188,7 +188,7 @@ const serviceStore = useServiceStore();
 const isMobile = mobile.setupMobileUtils();
 const collectionPointStore = useCollectionPointStore();
 const { role } = storeToRefs(userStore);
-const { filters, dateFilter, ready } = storeToRefs(orderStore);
+const { filters, ready } = storeToRefs(orderStore);
 const services = storesUtils.getStoreList(serviceStore, router);
 const collectionPoints = storesUtils.getStoreList(collectionPointStore, router);
 
@@ -203,7 +203,7 @@ const filterOrder = async () => {
 const intervallRules = (otherKey) => {
   return [
     (value) => {
-      if (value && !dateFilter.value[otherKey]) return 'Usare entrambe le date per filtrare';
+      if (value && !filters.value[otherKey]) return 'Usare entrambe le date per filtrare';
       return true;
     }
   ];
@@ -213,15 +213,14 @@ const exportInvoice = async () => {
   loading.value = true;
 
   http.postRequest('export/invoice', {
-    date_filter: dateFilter.value,
-    filters: orderUtils.formatFilters(filters.value)
+    filters: orderUtils.formatFilters({ ...filters.value })
   }, function (data) {
     loading.value = false;
     const blob = new Blob([data], { type: 'application/pdf' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `ordini_${dateFilter.value.start_date}_${dateFilter.value.end_date}.pdf`;
+    a.download = `ordini_${filters.value['Order.booking_date_0']}_${filters.value['Order.booking_date_1']}.pdf`;
     a.click();
     window.URL.revokeObjectURL(url);
   }, 'POST', router, true);

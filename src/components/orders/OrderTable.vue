@@ -23,6 +23,8 @@
         :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
         :headers="getHeaders()"
         :show-select="['Admin', 'Operator'].includes(role)"
+        :items-per-page="100"
+        :items-per-page-options="[10, 25, 50, 100]"
       >
         <template #[`item.type`]="{ item }">
           {{ orderUtils.TYPES.find(type => type.value == item.type)?.title }}
