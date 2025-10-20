@@ -54,7 +54,9 @@
           </p>
         </template>
         <template #[`item.status`]="{ item }">
-          {{ orderUtils.LABELS.find(label => label.value == item.status).title }}
+          <v-chip :color="orderUtils.LABELS.find(label => label.value == item.status).color">
+            {{ orderUtils.LABELS.find(label => label.value == item.status).title }}
+          </v-chip>
         </template>
         <template #[`item.price`]="{ item }">
           {{ item.price ? item.price.toFixed(2) : '' }}€

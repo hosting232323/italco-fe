@@ -1,11 +1,38 @@
 const LABELS = [
-  { value: 'Pending', title: 'In Attesa' },
-  { value: 'In Progress', title: 'In Consegna' },
-  { value: 'On Board', title: 'A Bordo' },
-  { value: 'At Warehouse', title: 'In Magazzino' },
-  { value: 'Completed', title: 'Completato' },
-  { value: 'Cancelled', title: 'Non Completato' },
-  { value: 'To Reschedule', title: 'Da Riprogrammare' }
+  {
+    value: 'Pending',
+    title: 'In Attesa'
+  },
+  {
+    value: 'In Progress',
+    title: 'In Consegna',
+    color: 'blue'
+  },
+  {
+    value: 'On Board',
+    title: 'A Bordo',
+    color: 'blue'
+  },
+  {
+    value: 'At Warehouse',
+    title: 'In Magazzino',
+    color: 'orange'
+  },
+  {
+    value: 'Completed',
+    title: 'Completato',
+    color: 'green'
+  },
+  {
+    value: 'Cancelled',
+    title: 'Non Completato',
+    color: 'red'
+  },
+  {
+    value: 'To Reschedule',
+    title: 'Da Riprogrammare',
+    color: 'orange'
+  }
 ];
 
 const TYPES = [
