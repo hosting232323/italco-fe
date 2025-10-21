@@ -557,3 +557,9 @@ onMounted(() => {
   40% { opacity: 1; transform: scale(1.2); }
 }
 </style>
+
+<style>
+ol, ul{
+  padding-left: 30px;
+}
+</style>
