@@ -13,7 +13,7 @@
           { title: 'ID', value: 'id' },
           { title: 'Tipo', value: 'type' },
           { title: 'Prodotti Servizi', value: 'productsServices' },
-          { title: 'Punto Vendita', value: 'user.email' },
+          { title: 'Punto Vendita', value: 'user.nickname' },
           { title: 'Destinatario', value: 'addressee' },
           { title: 'Recapito', value: 'addressee_contact' },
           { title: 'Punto di Ritiro', value: 'collection_point' },

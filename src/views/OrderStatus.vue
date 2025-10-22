@@ -11,7 +11,7 @@
               <td class="label">
                 Nome
               </td>
-              <td>{{ order.user.email }}</td>
+              <td>{{ order.user.nickname }}</td>
             </tr>
             <tr>
               <td class="label">

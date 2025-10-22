@@ -16,7 +16,7 @@
             md="6"
           >
             <v-text-field
-              v-model="user.email"
+              v-model="user.nickname"
               :class="isMobile ? '' : 'mr-2'"
               label="Nickname"
               :rules="validation.requiredRules"
@@ -34,12 +34,30 @@
             />
           </v-col>
         </v-row>
-        <v-select
-          v-model="user.role"
-          label="Ruolo"
-          :items="['Operator', 'Customer', 'Delivery']"
-          :rules="validation.requiredRules"
-        />
+        <v-row no-gutters>
+          <v-col
+            cols="12"
+            md="6"
+          >
+            <v-text-field
+              v-model="user.email"
+              :class="isMobile ? '' : 'mr-2'"
+              label="Email"
+            />
+          </v-col>
+          <v-col
+            cols="12"
+            md="6"
+          >
+            <v-select
+              v-model="user.role"
+              :class="isMobile ? '' : 'ml-2'"
+              label="Ruolo"
+              :items="['Operator', 'Customer', 'Delivery']"
+              :rules="validation.requiredRules"
+            />
+          </v-col>
+        </v-row>
         <FormButtons
           :loading="loading"
           @cancel="activeForm = false"
