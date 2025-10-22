@@ -49,6 +49,12 @@
           :class="{msg: true, bot: index % 2 === 0, user: index % 2 !== 0}"
           v-html="marked.parse(message)"
         />
+        <div
+          v-if="loading && index == messages.length - 1"
+          class="msg bot"
+        >
+          <span class="loading-dots"><span /><span /><span /></span>
+        </div>
       </div>
     </main>
     <div class="fab-send">
@@ -402,6 +408,7 @@ onMounted(() => {
 }
 
 .user_s {
+  margin-top: 5px;
   align-self: flex-end;
 }
 
@@ -523,5 +530,37 @@ onMounted(() => {
   box-shadow: 0px 4px 4px 0px rgb(0 0 0 / 20%);
   font-size: 12px;
   cursor: pointer;
+}
+
+.loading-dots {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  height: 12px;
+}
+
+.loading-dots span {
+  display: block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #000;
+  animation: dot-blink 1.4s infinite ease-in-out;
+}
+
+.loading-dots span:nth-child(1) { animation-delay: 0s; }
+.loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+.loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes dot-blink {
+  0%, 80%, 100% { opacity: 0.3; transform: scale(1); }
+  40% { opacity: 1; transform: scale(1.2); }
+}
+</style>
+
+<style>
+ol, ul{
+  padding-left: 30px;
 }
 </style>
