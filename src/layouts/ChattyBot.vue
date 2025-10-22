@@ -45,13 +45,12 @@
           >
           <p>{{ index % 2 === 0 ? 'Italco.mi Bot' : 'Tu' }}</p>
         </div>
-        <div class="msg" :class="{bot: index % 2 === 0, user: index % 2 !== 0}">
-          <template v-if="typeof message === 'string'">
-            <div v-html="marked.parse(message)"></div>
-          </template>
-          <template v-else-if="message.type === 'loading'">
-            <span class="loading-dots"><span></span><span></span><span></span></span>
-          </template>
+        <div
+          :class="{msg: true, bot: index % 2 === 0, user: index % 2 !== 0}"
+          v-html="marked.parse(message)"
+        />
+        <div v-if="loading && index == messages.length - 1" class="msg bot">
+          <span class="loading-dots"><span></span><span></span><span></span></span>
         </div>
       </div>
     </main>
@@ -115,16 +114,15 @@ const sendMessage = () => {
 
   loading.value = true;
   const messageToSend = userMessage.value;
-  messages.value.push(messageToSend);
   userMessage.value = '';
-  const loadingMessageIndex = messages.value.push({ type: 'loading' }) - 1;
+  messages.value.push(messageToSend);
 
   http.postRequest('chatty/message', {
     message: messageToSend
   }, (data) => {
     loading.value = false;
     if(data.status == 'ok')
-      messages.value[loadingMessageIndex] = data.message;
+      messages.value.push(data.message);
   }, 'POST', router);
 };
 
@@ -408,6 +406,7 @@ onMounted(() => {
 }
 
 .user_s {
+  margin-top: 5px;
   align-self: flex-end;
 }
 
