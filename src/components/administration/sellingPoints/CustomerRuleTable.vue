@@ -10,7 +10,7 @@
     :items="customerRules"
     :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
     :headers="[
-      { title: 'Utente', value: 'email' },
+      { title: 'Utente', value: 'nickname' },
       { title: 'Regole', value: 'rules' },
       { title: 'Azioni', key: 'actions' }
     ]"

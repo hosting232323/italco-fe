@@ -33,7 +33,7 @@ const userStore = useUserStore();
 const orderStore = useOrderStore();
 const { role } = storeToRefs(userStore);
 const { activeForm, element: order } = storeToRefs(orderStore);
-const subtitle = ref(order.user ? `Punto Vendita: ${order.user.email}` : '');
+const subtitle = ref(order.user ? `Punto Vendita: ${order.user.nickname}` : '');
 
 const setSubtitle = (value) => {
   subtitle.value = value;

@@ -16,8 +16,9 @@
         :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
         :headers="[
           { title: 'ID', value: 'id' },
-          { title: 'Nickname', value: 'email' },
+          { title: 'Nickname', value: 'nickname' },
           { title: 'Password', value: 'password' },
+          { title: 'Email', value: 'email' },
           { title: 'Ruolo', value: 'role' },
           { title: 'Azioni', key: 'actions' }
         ]"
@@ -50,7 +51,7 @@
     <template #default>
       <v-card title="Attenzione!">
         <v-card-text>
-          <p>Stai per cancellare l'utente: <strong>{{ element.email }}</strong></p>
+          <p>Stai per cancellare l'utente: <strong>{{ element.nickname }}</strong></p>
           <ul style="margin-left: 20px;">
             <li>Verranno rimossi {{ element.serviceUsers }} servizi collegati</li>
             <li>Verranno rimosse {{ element.customerRules }} regole personalizzate</li>

@@ -7,7 +7,7 @@
       v-model="userId"
       label="Utente"
       :items="users.filter(user => user.role == 'Customer')"
-      item-title="email"
+      item-title="nickname"
       item-value="id"
       :rules="validation.requiredRules"
     />

@@ -2,7 +2,7 @@
   <v-data-table
     :items="deliveryGroup.users"
     :headers="[
-      { title: 'Nickname', value: 'email' },
+      { title: 'Nickname', value: 'nickname' },
       { title: 'Azioni', key: 'actions' }
     ]"
   >

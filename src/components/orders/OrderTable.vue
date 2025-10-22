@@ -121,7 +121,7 @@ const getHeaders = () => {
     { title: 'Punto di Ritiro', value: 'collection_point' }
   ];
   if (role.value != 'Customer')
-    headers.push({ title: 'Punto Vendita', value: 'user.email' });
+    headers.push({ title: 'Punto Vendita', value: 'user.nickname' });
   headers.push(
     { title: 'D.P.C.', value: 'dpc' },
     { title: 'D.R.C.', value: 'drc' },
