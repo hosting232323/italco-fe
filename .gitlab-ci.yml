@@ -72,7 +72,6 @@ test_end_to_end:
 
 lint_frontend:
   stage: test
-  image: node:18
   script:
     - npm ci
     - npx eslint "src/**/*.{js,vue}"
