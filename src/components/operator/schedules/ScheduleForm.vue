@@ -175,7 +175,7 @@ const availableUsers = computed(() => {
   return users.value.filter(
     (u) => 
       u.role === 'Delivery' &&
-      !schedule.value.users.some(su => su.email === u.email)
+      !schedule.value.users.some(su => su.nickname === u.nickname)
   );
 });
 
