@@ -167,6 +167,7 @@ const users = storesUtils.getStoreList(administrationUserStore, router);
 
 const addUser = () => {
   if (!selectedUser.value) return;
+
   schedule.value.users.push(selectedUser.value);
   selectedUser.value = null;
 };
