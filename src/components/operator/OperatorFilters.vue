@@ -31,7 +31,7 @@
       md="3"
     >
       <v-autocomplete
-        v-model="filters['ItalcoUser.id']"
+        v-model="filters['User.id']"
         :class="isMobile ? '' : 'ml-2 mr-2'"
         label="Punto Vendita"
         :items="users.filter(user => user.role == 'Customer')"
