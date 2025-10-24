@@ -102,10 +102,6 @@ const schedules = storesUtils.getStoreList(scheduleStore, router);
 const deleteLoading = reactive({});
 const exportLoading = reactive({});
 
-for (let schedulet of schedules.value) {
-  console.log(schedulet.users);
-}
-
 const editElement = (item) => {
   schedule.value = item;
   dialog.value = true;

@@ -27,7 +27,9 @@
         <v-autocomplete
           v-model="selectedUser"
           label="Utenti"
-          :items="availableUsers"
+          :items="users.filter(
+            (u) => u.role === 'Delivery' && !schedule.users.some(su => su.nickname === u.nickname)
+          )"
           item-title="nickname"
           append-icon="mdi-plus"
           return-object
@@ -172,17 +174,9 @@ const addUser = () => {
   selectedUser.value = null;
 };
 
-const availableUsers = computed(() => {
-  return users.value.filter(
-    (u) => 
-      u.role === 'Delivery' &&
-      !schedule.value.users.some(su => su.nickname === u.nickname)
-  );
-});
-
 const removeUser = (userId) => {
   schedule.value.users = schedule.value.users.filter(u => u.id !== userId);
-    if (!schedule.value.deleted_users)
+  if (!schedule.value.deleted_users)
     schedule.value.deleted_users = [];
   schedule.value.deleted_users.push(userId);
 };
