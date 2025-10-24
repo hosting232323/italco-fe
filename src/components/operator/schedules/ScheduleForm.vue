@@ -170,6 +170,8 @@ const users = storesUtils.getStoreList(administrationUserStore, router);
 const addUser = () => {
   if (!selectedUser.value) return;
 
+  if (!schedule.value.users)
+    schedule.value.users = [];
   schedule.value.users.push(selectedUser.value);
   selectedUser.value = null;
 };
@@ -217,10 +219,6 @@ if (!schedule.value.id)
       schedule_index: index
     };
   });
-
-if (!schedule.value.users) {
-  schedule.value.users = [];
-}
 
 watch(
   () => schedule.value.orders,

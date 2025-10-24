@@ -31,11 +31,25 @@
       md="3"
     >
       <v-autocomplete
-        v-model="filters['ItalcoUser.id']"
+        v-model="filters['User.id']"
         :class="isMobile ? '' : 'ml-2 mr-2'"
         label="Punto Vendita"
         :items="users.filter(user => user.role == 'Customer')"
         item-title="nickname"
+        item-value="id"
+        clearable
+      />
+    </v-col>
+    <v-col
+      cols="12"
+      md="3"
+    >
+      <v-autocomplete
+        v-model="filters['User.id']"
+        :class="isMobile ? '' : 'ml-2'"
+        label="Utenti Delivery"
+        :items="users.filter(user => user.role == 'Delivery')"
+        item-title="name"
         item-value="id"
         clearable
       />

@@ -12,7 +12,7 @@
           ref="form"
           @submit.prevent="filterOrder"
         >
-          <OperatoreFilters v-if="role != 'Customer'" />
+          <OperatorFilters v-if="role != 'Customer'" />
           <v-row no-gutters>
             <v-col
               cols="12"
@@ -162,7 +162,7 @@
 
 <script setup>
 import FormButtons from '@/components/FormButtons';
-import OperatoreFilters from '@/components/operator/OperatorFilters';
+import OperatorFilters from '@/components/operator/OperatorFilters';
 
 import { ref } from 'vue';
 import http from '@/utils/http';
