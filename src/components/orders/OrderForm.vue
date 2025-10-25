@@ -183,7 +183,7 @@
       {{ errorMsg }}
     </p>
     <FormButtons
-      :loading="false"
+      :loading="loading"
       @cancel="exitFunction"
     />
   </v-form>
@@ -201,7 +201,6 @@ import orderUtils from '@/utils/order';
 import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import validation from '@/utils/validation';
-
 import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
 import { useCollectionPointStore } from '@/stores/collectionPoint';
@@ -210,6 +209,7 @@ const form = ref(null);
 const activeTab = ref(0);
 const errorMsg = ref('');
 const router = useRouter();
+const loading = ref(false);
 const productServiceInputRef = ref(null);
 const isMobile = mobile.setupMobileUtils();
 
@@ -242,7 +242,15 @@ const submitForm = async () => {
     return;
   }
 
-  order.value.dates_form = true;
+  if (role.value == 'Admin' || !order.value.id)
+    order.value.dates_form = true;
+  else {
+    loading.value = true;
+    if (order.value.photos && order.value.photos.length > 0)
+      orderStore.updateElementWithFormData(router, callback);
+    else
+      orderStore.updateElement(router, callback);
+  }
 };
 
 const handleAddressComponents = (components) => {
@@ -254,4 +262,13 @@ watch(
   () => order.value.type,
   () => productServiceInputRef.value?.resetFields()
 );
+
+const callback = (data) => {
+  loading.value = false;
+  if (data.status === 'ok') {
+    order.value = {};
+    orderStore.initList(router);
+    activeForm.value = false;
+  }
+};
 </script>

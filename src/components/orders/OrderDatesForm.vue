@@ -111,20 +111,21 @@ const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
 
   loading.value = true;
-  const callback = (data) => {
-    loading.value = false;
-    if (data.status === 'ok') {
-      order.value = {};
-      orderStore.initList(router);
-      activeForm.value = false;
-    }
-  };
   if (order.value.id && order.value.photos && order.value.photos.length > 0)
     orderStore.updateElementWithFormData(router, callback);
   else if (order.value.id)
     orderStore.updateElement(router, callback);
   else
     orderStore.createElement(router, callback);
+};
+
+const callback = (data) => {
+  loading.value = false;
+  if (data.status === 'ok') {
+    order.value = {};
+    orderStore.initList(router);
+    activeForm.value = false;
+  }
 };
 </script>
 

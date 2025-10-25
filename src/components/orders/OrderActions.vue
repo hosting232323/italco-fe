@@ -21,7 +21,7 @@
         </v-col>
       </v-row>
       <v-row no-gutters>
-        <v-col :cols="item.status == 'To Reschedule' ? 4 : 6">
+        <v-col cols="6">
           <v-btn
             icon="mdi-truck-delivery"
             variant="text"
@@ -30,7 +30,7 @@
             @click="openPopUp(item)"
           />
         </v-col>
-        <v-col :cols="item.status == 'To Reschedule' ? 4 : 6">
+        <v-col cols="6">
           <v-btn
             icon="mdi-link-variant"
             variant="text"
@@ -39,19 +39,15 @@
             @click="copyOrderLink(item.id)"
           />
         </v-col>
-        <v-col
-          v-if="item.status == 'To Reschedule'"
-          :cols="item.status == 'To Reschedule' ? 4 : 6"
-        >
-          <v-btn
-            icon="mdi-content-copy"
-            variant="text"
-            :color="theme.current.value.primaryColor"
-            title="Clona ordine"
-            @click="copyOrder(item.id)"
-          />
-        </v-col>
       </v-row>
+      <v-btn
+        v-if="item.status == 'To Reschedule' && role != 'Customer'"
+        icon="mdi-content-copy"
+        variant="text"
+        :color="theme.current.value.primaryColor"
+        title="Clona ordine"
+        @click="copyOrder(item.id)"
+      />
     </template>
     <template #default>
       <v-card :title="`Situazione delivery ordine ${order.id}`">
@@ -122,6 +118,7 @@ import orderUtils from '@/utils/order';
 import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import { encodeId } from '@/utils/hashids';
+import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
 
 const { item } = defineProps({
@@ -133,15 +130,17 @@ const { item } = defineProps({
 
 const order = ref({});
 const photos = ref([]);
-const motivations = ref([]);
 const theme = useTheme();
 const router = useRouter();
+const motivations = ref([]);
 const loadingPhoto = ref(false);
 const loadingExport = ref(false);
+const userStore = useUserStore();
+const imageLoading = reactive({});
 const orderStore = useOrderStore();
+const { role } = storeToRefs(userStore);
 const orders = storesUtils.getStoreList(orderStore, router);
 const { element: updatedOrder, activeForm } = storeToRefs(orderStore);
-const imageLoading = reactive({});
 
 const openPopUp = (item) => {
   order.value = item;
