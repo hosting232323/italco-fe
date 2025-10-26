@@ -21,7 +21,7 @@ export const useScheduleStore = defineStore('schedule', {
       http.postRequest(
         `schedule/${this.element.id}`,
         Object.fromEntries(
-          Object.entries(this.element).filter(([key]) => !['created_at', 'updated_at', 'users'].includes(key))
+          Object.entries(this.element).filter(([key]) => !['created_at', 'updated_at'].includes(key))
         ),
         func,
         'PUT',

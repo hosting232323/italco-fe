@@ -15,28 +15,34 @@
         ref="form"
         @submit.prevent="submitForm"
       >
+        <v-chip
+          v-for="user in schedule.users"
+          :key="user.id"
+          class="mr-2 mb-5"
+          append-icon="mdi-close-circle"
+          @click="removeUser(user.id)"
+        >
+          {{ user.nickname }}
+        </v-chip>
+        <v-autocomplete
+          v-model="selectedUser"
+          label="Utenti"
+          :items="users.filter(
+            (u) => u.role === 'Delivery' && !schedule.users.some(su => su.nickname === u.nickname)
+          )"
+          item-title="nickname"
+          append-icon="mdi-plus"
+          return-object
+          @click:append="addUser"
+        />
         <v-row no-gutters>
           <v-col
             cols="12"
-            md="4"
-          >
-            <v-select
-              v-model="schedule.delivery_group_id"
-              :class="isMobile ? '' : 'mr-2'"
-              label="Gruppo Delivery"
-              :items="deliveryGroups"
-              item-title="name"
-              item-value="id"
-              :rules="validation.requiredRules"
-            />
-          </v-col>
-          <v-col
-            cols="12"
-            md="4"
+            md="6"
           >
             <v-select
               v-model="schedule.transport_id"
-              :class="isMobile ? '' : 'ml-2 mr-2'"
+              :class="isMobile ? '' : 'mr-2'"
               label="Veicolo"
               :items="transports"
               item-title="name"
@@ -46,7 +52,7 @@
           </v-col>
           <v-col
             cols="12"
-            md="4"
+            md="6"
           >
             <v-text-field
               v-model="schedule.date"
@@ -141,24 +147,41 @@ import validation from '@/utils/validation';
 import { useOrderStore } from '@/stores/order';
 import { useScheduleStore } from '@/stores/schedule';
 import { useTransportStore } from '@/stores/transport';
-import { useDeliveryGroupStore } from '@/stores/deliveryGroup';
+import { useAdministrationUserStore } from '@/stores/administrationUser';
 
 const form = ref(null);
 const error = ref(null);
 const theme = useTheme();
 const router = useRouter();
 const loading = ref(false);
+const selectedUser = ref(null);
 const selectedOrderId = ref(null);
 const orderStore = useOrderStore();
 const emits = defineEmits(['cancel']);
 const scheduleStore = useScheduleStore();
 const transportStore = useTransportStore();
 const isMobile = mobile.setupMobileUtils();
-const deliveryGroupStore = useDeliveryGroupStore();
 const { element: schedule } = storeToRefs(scheduleStore);
 const orders = storesUtils.getStoreList(orderStore, router);
+const administrationUserStore = useAdministrationUserStore();
 const transports = storesUtils.getStoreList(transportStore, router);
-const deliveryGroups = storesUtils.getStoreList(deliveryGroupStore, router);
+const users = storesUtils.getStoreList(administrationUserStore, router);
+
+const addUser = () => {
+  if (!selectedUser.value) return;
+
+  if (!schedule.value.users)
+    schedule.value.users = [];
+  schedule.value.users.push(selectedUser.value);
+  selectedUser.value = null;
+};
+
+const removeUser = (userId) => {
+  schedule.value.users = schedule.value.users.filter(u => u.id !== userId);
+  if (!schedule.value.deleted_users)
+    schedule.value.deleted_users = [];
+  schedule.value.deleted_users.push(userId);
+};
 
 const addOrder = () => {
   const orderToAdd = orders.value.find(o => o.id === selectedOrderId.value);
