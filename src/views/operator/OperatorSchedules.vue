@@ -14,7 +14,7 @@
       :headers="[
         { title: 'ID', value: 'id' },
         { title: 'Data', value: 'date' },
-        { title: 'Gruppo Delivery', value: 'delivery_group.name' },
+        { title: 'Utenti Delivery', value: 'users' },
         { title: 'Veicolo', key: 'transport.name' },
         { title: 'Ordini', key: 'orders' },
         { title: 'Azioni', key: 'actions' }
@@ -28,6 +28,17 @@
           ID: <b>{{ order.id }}</b>
           Destinatario: <b>{{ order.addressee }}</b>
         </div>
+      </template>
+      <template #[`item.users`]="{ item }">
+        <div v-if="item.users && item.users.length">
+          <span
+            v-for="(user, index) in item.users"
+            :key="index"
+          >
+            {{ user.nickname }}<span v-if="index < item.users.length - 1">, </span>
+          </span>
+        </div>
+        <span v-else>-</span>
       </template>
       <template #[`item.actions`]="{ item }">
         <v-row no-gutters>
