@@ -101,6 +101,7 @@ import { ref, onMounted, nextTick, watch } from 'vue';
 const router = useRouter();
 const loading = ref(false);
 const fabWheel = ref(null);
+const threadId = ref(null);
 const fabButton = ref(null);
 const fabContent = ref(null);
 const showArrow = ref(false);
@@ -120,11 +121,14 @@ const sendMessage = () => {
   userMessage.value = '';
   messages.value.push(messageToSend);
   http.postRequest('chatty/message', {
-    message: messageToSend
+    message: messageToSend,
+    thread_id: threadId.value
   }, (data) => {
     loading.value = false;
-    if(data.status == 'ok')
+    if(data.status == 'ok') {
       messages.value.push(data.message);
+      threadId.value = data.thread_id;
+    }
   }, 'POST', router);
 };
 
