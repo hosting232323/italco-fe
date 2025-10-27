@@ -28,7 +28,7 @@
           v-model="selectedUser"
           label="Utenti"
           :items="users.filter(
-            (u) => u.role === 'Delivery' && !schedule.users.some(su => su.nickname === u.nickname)
+            (u) => u.role === 'Delivery' && (!schedule.users || !schedule.users.some(su => su.nickname === u.nickname))
           )"
           item-title="nickname"
           append-icon="mdi-plus"
