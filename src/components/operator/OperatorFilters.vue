@@ -31,7 +31,7 @@
       md="3"
     >
       <v-autocomplete
-        v-model="filters['User.id']"
+        v-model="filters['CustomerUser.id']"
         :class="isMobile ? '' : 'ml-2 mr-2'"
         label="Punto Vendita"
         :items="users.filter(user => user.role == 'Customer')"
@@ -45,11 +45,11 @@
       md="3"
     >
       <v-autocomplete
-        v-model="filters['User.id']"
+        v-model="filters['DeliveryUser.id']"
         :class="isMobile ? '' : 'ml-2'"
         label="Utenti Delivery"
         :items="users.filter(user => user.role == 'Delivery')"
-        item-title="name"
+        item-title="nickname"
         item-value="id"
         clearable
       />
