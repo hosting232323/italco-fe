@@ -137,14 +137,14 @@
     </v-expansion-panel>
   </v-expansion-panels>
   <v-row
-    v-if="role == 'Admin' && !panel && filters['User.id'] && filters['Order.booking_date_0'] && filters['Order.booking_date_1']"
+    v-if="role == 'Admin' && !panel && filters['CustomerUser.id'] && filters['Order.booking_date_0'] && filters['Order.booking_date_1']"
     no-gutters
   >
     <v-col
       cols="8"
       style="font-size: smaller;"
     >
-      Punto Vendita: {{ filters['User.id'] }}<br>
+      Punto Vendita: {{ filters['CustomerUser.id'] }}<br>
       Data di Inizio Intervallo: {{ filters['Order.booking_date_0'] }}<br>
       Data di Fine Intervallo: {{ filters['Order.booking_date_1'] }}
     </v-col>
