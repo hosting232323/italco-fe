@@ -151,10 +151,6 @@ import { useTransportStore } from '@/stores/transport';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
 const form = ref(null);
-const error = ref({
-  user: null,
-  date: null
-});
 const theme = useTheme();
 const router = useRouter();
 const loading = ref(false);
@@ -165,6 +161,7 @@ const emits = defineEmits(['cancel']);
 const scheduleStore = useScheduleStore();
 const transportStore = useTransportStore();
 const isMobile = mobile.setupMobileUtils();
+const error = ref({user: null, date: null});
 const { element: schedule } = storeToRefs(scheduleStore);
 const orders = storesUtils.getStoreList(orderStore, router);
 const administrationUserStore = useAdministrationUserStore();
@@ -241,8 +238,9 @@ watch(() => schedule.value.users, () => {
 
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
+
   if (!schedule.value.users || schedule.value.users.length == 0){
-    error.value.user = 'Aggiungi prima l\'utente'
+    error.value.user = 'Aggiungi prima l\'utente';
     return;
   }
 
