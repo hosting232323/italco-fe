@@ -33,6 +33,7 @@
           item-title="nickname"
           append-icon="mdi-plus"
           return-object
+          :error-messages="error.user"
           @click:append="addUser"
         />
         <v-row no-gutters>
@@ -60,7 +61,7 @@
               :class="isMobile ? '' : 'ml-2'"
               label="Data"
               :rules="validation.requiredRules"
-              :error-messages="error"
+              :error-messages="error.date"
             />
           </v-col>
         </v-row>
@@ -150,7 +151,6 @@ import { useTransportStore } from '@/stores/transport';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
 const form = ref(null);
-const error = ref(null);
 const theme = useTheme();
 const router = useRouter();
 const loading = ref(false);
@@ -161,6 +161,7 @@ const emits = defineEmits(['cancel']);
 const scheduleStore = useScheduleStore();
 const transportStore = useTransportStore();
 const isMobile = mobile.setupMobileUtils();
+const error = ref({user: null, date: null});
 const { element: schedule } = storeToRefs(scheduleStore);
 const orders = storesUtils.getStoreList(orderStore, router);
 const administrationUserStore = useAdministrationUserStore();
@@ -227,11 +228,21 @@ watch(
 );
 
 watch(() => schedule.value.date, () => {
-  error.value = null;
+  error.value.date = null;
 });
+
+watch(() => schedule.value.users, () => {
+  error.value.user = null;
+});
+
 
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
+
+  if (!schedule.value.users || schedule.value.users.length == 0){
+    error.value.user = 'Aggiungi prima l\'utente';
+    return;
+  }
 
   loading.value = true;
   if (schedule.value.id)
@@ -248,7 +259,7 @@ const handleResponse = (data) => {
     schedule.value = {};
     emits('cancel');
   } else 
-    error.value = data.error;
+    error.value.date = data.error;
 };
 </script>
 
