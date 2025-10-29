@@ -1,5 +1,6 @@
 # italco-fe
 
+docker build -t registry.gitlab.com/generic-lab/italco/italco-fe:latest -f Dockerfile .
 
 
 ## Getting started
