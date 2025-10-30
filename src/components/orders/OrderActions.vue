@@ -116,7 +116,6 @@ import { ref, reactive } from 'vue';
 import { storeToRefs } from 'pinia';
 import orderUtils from '@/utils/order';
 import { useRouter } from 'vue-router';
-import storesUtils from '@/utils/stores';
 import { encodeId } from '@/utils/hashids';
 import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
@@ -139,7 +138,6 @@ const userStore = useUserStore();
 const imageLoading = reactive({});
 const orderStore = useOrderStore();
 const { role } = storeToRefs(userStore);
-const orders = storesUtils.getStoreList(orderStore, router);
 const { element: updatedOrder, activeForm } = storeToRefs(orderStore);
 
 const openPopUp = (item) => {
