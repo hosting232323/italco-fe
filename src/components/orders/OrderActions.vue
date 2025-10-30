@@ -46,7 +46,7 @@
         variant="text"
         :color="theme.current.value.primaryColor"
         title="Clona ordine"
-        @click="copyOrder(item.id)"
+        @click="copyOrder(item)"
       />
     </template>
     <template #default>
@@ -183,16 +183,20 @@ const copyOrderLink = (id) => {
   });
 };
 
-const copyOrder = (id) => {
-  const selectedOrder = orders.value.find(order => order.id == id);
-  const clonedOrder = { ...selectedOrder };
-
-  clonedOrder.user_id = selectedOrder.user.id;
-  ['schedule_id', 'status', 'anomaly', 'delay', 'schedule_index', 'start_time_slot', 'end_time_slot', 'id', 'price']
-    .forEach(key => delete clonedOrder[key]);
-
-  updatedOrder.value = clonedOrder;
-  updatedOrder.value.user_id = updatedOrder.value.user.id;
+const copyOrder = (selectedOrder) => {
+  const { user, id, ...rest } = selectedOrder;
+  updatedOrder.value = {
+    user,
+    user_id: user.id,
+    cloned_order_id: id,
+    ...Object.fromEntries(
+      Object.entries(rest).filter(([key]) =>
+        ![
+          'schedule_id', 'status', 'anomaly', 'delay', 'schedule_index', 'start_time_slot', 'end_time_slot', 'id', 'price'
+        ].includes(key)
+      )
+    )
+  };
   activeForm.value = true;
 };
 </script>

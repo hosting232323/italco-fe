@@ -32,6 +32,11 @@ const LABELS = [
     value: 'To Reschedule',
     title: 'Da Riprogrammare',
     color: 'orange'
+  },
+  {
+    value: 'Rescheduled',
+    title: 'Riprogrammato',
+    color: 'green'
   }
 ];
 

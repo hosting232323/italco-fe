@@ -1,7 +1,8 @@
 <template>
   <v-card
     v-if="activeForm"
-    :title="order.id ? `Modifica Ordine ${order.id}` : 'Crea Ordine'"
+    :title="order.id ? `Modifica Ordine ${order.id}` :
+      (order.cloned_order_id ? `Clona Ordine ${order.cloned_order_id}` : 'Crea Ordine')"
     :subtitle="subtitle"
     class="mt-10"
   >
