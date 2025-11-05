@@ -79,8 +79,7 @@
             v-model="order.collection_point_id"
             :class="isMobile ? '' : 'ml-2'"
             label="Punto di Ritiro"
-            :items="role.value == 'Customer' ? collectionPoints.value :
-              collectionPoints.value.filter(collectionPoint => collectionPoint.user_id == order.value.user_id)"
+            :items="role.value == 'Customer' ? collectionPoints : collectionPoints.filter(collectionPoint => collectionPoint.user_id == order.user_id)"
             item-title="name"
             item-value="id"
             :rules="validation.requiredRules"
