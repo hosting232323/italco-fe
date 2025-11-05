@@ -87,21 +87,17 @@ const submitForm = async () => {
 
   loading.value = true;
   if (service.value.id)
-    serviceStore.updateElement(router, function (data) {
-      loading.value = false;
-      if (data.status == 'ok') {
-        service.value = {};
-        activeForm.value = false;
-      }
-    });
+    serviceStore.updateElement(router, callback);
   else
-    serviceStore.createElement(router, function (data) {
-      loading.value = false;
-      if (data.status == 'ok') {
-        serviceStore.initList(router);
-        service.value = {};
-        activeForm.value = false;
-      }
-    });
+    serviceStore.createElement(router, callback);
+};
+
+const callback = (data) => {
+  loading.value = false;
+  if (data.status == 'ok') {
+    service.value = {};
+    serviceStore.initList(router);
+    activeForm.value = false;
+  }
 };
 </script>

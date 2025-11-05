@@ -71,22 +71,18 @@ const submitForm = async () => {
 
   loading.value = true;
   if (collectionPoint.value.id)
-    collectionPointStore.updateElement(router, function (data) {
-      loading.value = false;
-      if (data.status == 'ok') {
-        collectionPoint.value = {};
-        activeForm.value = false;
-      }
-    });
+    collectionPointStore.updateElement(router, callback);
   else
-    collectionPointStore.createElement(router, function (data) {
-      loading.value = false;
-      if (data.status == 'ok') {
-        collectionPoint.value = {};
-        collectionPointStore.initList(router);
-        activeForm.value = false;
-      }
-    });
+    collectionPointStore.createElement(router, callback);
+};
+
+const callback = (data) => {
+  loading.value = false;
+  if (data.status == 'ok') {
+    collectionPoint.value = {};
+    collectionPointStore.initList(router);
+    activeForm.value = false;
+  }
 };
 
 const handleAddressComponents = (components) => {

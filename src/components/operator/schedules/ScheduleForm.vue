@@ -246,12 +246,12 @@ const submitForm = async () => {
 
   loading.value = true;
   if (schedule.value.id)
-    scheduleStore.updateElement(router, handleResponse);
+    scheduleStore.updateElement(router, callback);
   else
-    scheduleStore.createElement(router, handleResponse);
+    scheduleStore.createElement(router, callback);
 };
 
-const handleResponse = (data) => {
+const callback = (data) => {
   loading.value = false;
   if (data.status == 'ok') {
     orderStore.initList(router);

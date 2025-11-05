@@ -79,7 +79,8 @@
             v-model="order.collection_point_id"
             :class="isMobile ? '' : 'ml-2'"
             label="Punto di Ritiro"
-            :items="getCollectionPoints()"
+            :items="role.value == 'Customer' ? collectionPoints.value :
+              collectionPoints.value.filter(collectionPoint => collectionPoint.user_id == order.value.user_id)"
             item-title="name"
             item-value="id"
             :rules="validation.requiredRules"
@@ -220,10 +221,10 @@ const { role } = storeToRefs(userStore);
 const { element: order, activeForm } = storeToRefs(orderStore);
 const collectionPoints = storesUtils.getStoreList(collectionPointStore, router);
 
-const getCollectionPoints = () => {
-  return role.value == 'Customer' ? collectionPoints.value :
-    collectionPoints.value.filter(collectionPoint => collectionPoint.user_id == order.value.user_id);
-};
+watch(
+  () => order.value.type,
+  () => productServiceInputRef.value?.resetFields()
+);
 
 const exitFunction = () => {
   if (order.value.id || role.value == 'Customer') {
@@ -253,16 +254,6 @@ const submitForm = async () => {
   }
 };
 
-const handleAddressComponents = (components) => {
-  order.value.address = components.address;
-  order.value.cap = components.cap;
-};
-
-watch(
-  () => order.value.type,
-  () => productServiceInputRef.value?.resetFields()
-);
-
 const callback = (data) => {
   loading.value = false;
   if (data.status === 'ok') {
@@ -270,5 +261,10 @@ const callback = (data) => {
     orderStore.initList(router);
     activeForm.value = false;
   }
+};
+
+const handleAddressComponents = (components) => {
+  order.value.address = components.address;
+  order.value.cap = components.cap;
 };
 </script>

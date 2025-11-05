@@ -64,21 +64,17 @@ const submitForm = async () => {
 
   loading.value = true;
   if (transport.value.id)
-    transportStore.updateElement(router, function (data) {
-      loading.value = false;
-      if (data.status == 'ok') {
-        transport.value = {};
-        activeForm.value = false;
-      }
-    });
+    transportStore.updateElement(router, callback);
   else
-    transportStore.createElement(router, function (data) {
-      loading.value = false;
-      if (data.status == 'ok') {
-        transport.value = {};
-        transportStore.initList(router);
-        activeForm.value = false;
-      }
-    });
+    transportStore.createElement(router, callback);
+};
+
+const callback = (data) => {
+  loading.value = false;
+  if (data.status == 'ok') {
+    transport.value = {};
+    transportStore.initList(router);
+    activeForm.value = false;
+  }
 };
 </script>
