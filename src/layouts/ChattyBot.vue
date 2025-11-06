@@ -106,7 +106,7 @@ const fabButton = ref(null);
 const fabContent = ref(null);
 const showArrow = ref(false);
 const userMessage = ref(null);
-const messages = ref(['Ciao! Sono qui per rispondere alle tue domande sugli ordini dell\'ultima settimana']);
+const messages = ref(['Ciao! Sono qui per rispondere alle tue domande sugli ordini.<br>Chiedimi quello che ti serve sapere specificando la data di creazione degli ordini interessati.']);
 
 const toggleWheel = (mode) => {
   fabWheel.value.style.transform = mode == 'open' ? 'scale(1)' : 'scale(0)';
