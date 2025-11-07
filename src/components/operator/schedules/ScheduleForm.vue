@@ -134,9 +134,10 @@
           </v-form>
         </v-col>
         <v-col cols="5">
-
+          <div style="height: 100%; border-radius: 12px; overflow: hidden;">
+            <GoogleMap :orders="schedule.orders" />
+          </div>
         </v-col>
-
       </v-row>
     </v-card-text>
   </v-card>
@@ -157,6 +158,7 @@ import { useOrderStore } from '@/stores/order';
 import { useScheduleStore } from '@/stores/schedule';
 import { useTransportStore } from '@/stores/transport';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
+import GoogleMap from '@/components/GoogleMap.vue';
 
 const form = ref(null);
 const theme = useTheme();

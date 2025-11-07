@@ -16,10 +16,8 @@ const map = ref(null);
 const markers = ref([]);
 const mapContainer = ref(null);
 
-// ✅ Usa la tua API key
-const GOOGLE_MAPS_API_KEY = 'LA_TUA_API_KEY_GOOGLE_MAPS';
+const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_API_KEY;
 
-// Funzione per caricare dinamicamente lo script di Google Maps
 function loadGoogleMapsScript() {
   return new Promise((resolve, reject) => {
     if (window.google && window.google.maps) {
@@ -36,12 +34,12 @@ function loadGoogleMapsScript() {
   });
 }
 
-// Inizializza la mappa
 async function initMap() {
   const googleMaps = await loadGoogleMapsScript();
+  console.log(props.orders)
   const center = props.orders.length
     ? { lat: props.orders[0].latitude || 45.4642, lng: props.orders[0].longitude || 9.19 }
-    : { lat: 45.4642, lng: 9.19 }; // Default Milano
+    : { lat: 45.4642, lng: 9.19 };
 
   map.value = new googleMaps.Map(mapContainer.value, {
     zoom: 10,

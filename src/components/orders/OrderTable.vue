@@ -16,6 +16,7 @@
         :color="theme.current.value.secondaryColor"
         class="mt-5"
       />
+      <!-- Passare nel vmodel anche gli address -->
       <v-data-table
         v-else
         v-model="schedule.order_ids"
