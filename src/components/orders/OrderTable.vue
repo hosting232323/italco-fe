@@ -20,6 +20,7 @@
       <v-data-table
         v-else
         v-model="schedule.order_ids"
+        @update:modelValue="val => schedule.orders = val.map(o => ({ id: o.id, address: o.address }))"
         :items="orders"
         :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
         :headers="getHeaders()"
