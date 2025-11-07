@@ -1,7 +1,7 @@
 stages:
   - prepare
   - test
-image: python:3.11
+image: hosting23232323/python-node:3.11
 variables:
   POSTGRES_DB: mydb
   POSTGRES_USER: myuser
@@ -20,8 +20,7 @@ be_dependencies:
   script:
     - python -m venv venv
     - source venv/bin/activate
-    - pip install --upgrade pip
-    - git clone https://$CI_BE_USERNAME:$CI_BE_TOKEN@gitlab.com/generic-lab/italco/italco-be.git
+    - git clone https://$CI_ITALCO_BE_USERNAME:$CI_ITALCO_BE_TOKEN@gitlab.com/generic-lab/italco/italco-be.git
     - cd italco-be
     - pip install -r requirements.txt
     - cd ..
@@ -50,7 +49,6 @@ test_end_to_end:
   script:
     - export VITE_HOSTNAME=http://$(hostname -I | tr ' ' '\n' | grep -m1 '^[0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+$'):8080/
     - export VITE_HOSTNAME_ITALCO_FE=http://$(hostname -I | tr ' ' '\n' | grep -m1 '^[0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+$'):3000/
-    - apt-get update && apt-get install -y npm
     - npm ci
     - npm run build
     - npm run serve &
@@ -73,7 +71,6 @@ test_end_to_end:
 
 lint_frontend:
   stage: test
-  image: node:18
   script:
     - npm ci
     - npx eslint "src/**/*.{js,vue}"
