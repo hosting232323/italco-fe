@@ -178,7 +178,7 @@ const administrationUserStore = useAdministrationUserStore();
 const transports = storesUtils.getStoreList(transportStore, router);
 const users = storesUtils.getStoreList(administrationUserStore, router);
 
-console.log(schedule.value. orders)
+console.log(schedule.value.orders)
 
 const addUser = () => {
   if (!selectedUser.value) return;
@@ -207,8 +207,8 @@ const addOrder = () => {
         end_time_slot: order.end_time_slot || '',
         schedule_index: index
       }))
-    : schedule.value.order_ids.map((id, index) => ({
-        id,
+    : schedule.value.orders.map((order, index) => ({
+        id: order.id,
         start_time_slot: '',
         end_time_slot: '',
         schedule_index: index
@@ -231,9 +231,9 @@ const availableOrders = computed(() => {
 });
 
 if (!schedule.value.id)
-  schedule.value.orders = schedule.value.order_ids.map((id, index) => {
+  schedule.value.orders = schedule.value.orders.map((order, index) => {
     return {
-      id,
+      id: order.id,
       start_time_slot: '',
       end_time_slot: '',
       schedule_index: index

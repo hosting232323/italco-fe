@@ -5,7 +5,7 @@
   >
     <template #activator>
       <v-btn
-        v-if="['Admin', 'Operator'].includes(role) && schedule.order_ids?.length"
+        v-if="['Admin', 'Operator'].includes(role) && schedule.orders?.length"
         text="Assegna Gruppo Delivery"
         :color="theme.current.value.primaryColor"
         @click="dialog = true"
@@ -19,8 +19,8 @@
       <!-- Passare nel vmodel anche gli address -->
       <v-data-table
         v-else
-        v-model="schedule.order_ids"
-        @update:modelValue="val => schedule.orders = val.map(o => ({ id: o.id, address: o.address }))"
+        v-model="schedule.orders"
+        return-object
         :items="orders"
         :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
         :headers="getHeaders()"
