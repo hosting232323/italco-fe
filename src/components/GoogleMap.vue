@@ -5,7 +5,7 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue';
 
-const props = defineProps({
+const { orders } = defineProps({
   orders: {
     type: Array,
     default: () => [],
@@ -36,10 +36,7 @@ function loadGoogleMapsScript() {
 
 async function initMap() {
   const googleMaps = await loadGoogleMapsScript();
-  console.log(props.orders)
-  const center = props.orders.length
-    ? { lat: props.orders[0].latitude || 45.4642, lng: props.orders[0].longitude || 9.19 }
-    : { lat: 45.4642, lng: 9.19 };
+  const center = await geocodeAddress(orders[0].address);
 
   map.value = new googleMaps.Map(mapContainer.value, {
     zoom: 10,
@@ -50,28 +47,43 @@ async function initMap() {
   updateMarkers();
 }
 
-// Crea o aggiorna i marker
-function updateMarkers() {
+async function geocodeAddress(address) {
+  const googleMaps = window.google.maps;
+  return new Promise((resolve) => {
+    const geocoder = new googleMaps.Geocoder();
+    geocoder.geocode({ address }, (results, status) => {
+      if (status === 'OK' && results[0]) {
+        const location = results[0].geometry.location;
+        resolve({ lat: location.lat(), lng: location.lng() });
+      } else {
+        console.warn(`Geocode non riuscito per ${address}: ${status}`);
+        resolve(null);
+      }
+    });
+  });
+}
+
+async function updateMarkers() {
   if (!map.value) return;
   const googleMaps = window.google.maps;
 
-  // Rimuove marker precedenti
   markers.value.forEach(marker => marker.setMap(null));
   markers.value = [];
 
-  // Aggiunge nuovi marker
-  props.orders.forEach(order => {
-    if (!order.latitude || !order.longitude) return;
+  const positions = await Promise.all(
+    orders.map(order => order.address ? geocodeAddress(order.address) : null)
+  );
 
+  positions.forEach((pos, i) => {
+    if (!pos) return;
     const marker = new googleMaps.Marker({
-      position: { lat: order.latitude, lng: order.longitude },
+      position: pos,
       map: map.value,
-      label: `${order.id}`,
     });
     markers.value.push(marker);
   });
 
-  // Adatta lo zoom se ci sono più marker
+
   if (markers.value.length > 1) {
     const bounds = new googleMaps.LatLngBounds();
     markers.value.forEach(marker => bounds.extend(marker.getPosition()));
@@ -83,9 +95,8 @@ onMounted(() => {
   initMap();
 });
 
-// Aggiorna la mappa ogni volta che cambia la lista ordini
 watch(
-  () => props.orders,
+  () => orders,
   () => updateMarkers(),
   { deep: true }
 );

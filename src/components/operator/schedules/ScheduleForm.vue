@@ -200,19 +200,12 @@ const addOrder = () => {
   const orderToAdd = orders.value.find(o => o.id === selectedOrderId.value);
   if (!orderToAdd) return;
 
-  schedule.value.orders = schedule.value.orders?.length
-    ? schedule.value.orders.map((order, index) => ({
-        ...order,
-        start_time_slot: order.start_time_slot || '',
-        end_time_slot: order.end_time_slot || '',
-        schedule_index: index
-      }))
-    : schedule.value.orders.map((order, index) => ({
-        id: order.id,
-        start_time_slot: '',
-        end_time_slot: '',
-        schedule_index: index
-      }));
+  schedule.value.orders.push({
+    ...orderToAdd,
+    start_time_slot: '',
+    end_time_slot: '',
+    schedule_index: schedule.value.orders.length
+  });
   selectedOrderId.value = null;
 };
 
@@ -234,6 +227,7 @@ if (!schedule.value.id)
   schedule.value.orders = schedule.value.orders.map((order, index) => {
     return {
       id: order.id,
+      address: order.address,
       start_time_slot: '',
       end_time_slot: '',
       schedule_index: index
