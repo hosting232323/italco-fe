@@ -88,7 +88,7 @@
       </button>
     </div>
     <div
-      v-if="exportMode"
+      v-else
       class="export-chat"
     >
       <h3 v-if="!exportSuccess">
@@ -106,7 +106,7 @@
         </button>
       </div>
       <div
-        v-if="exportSuccess"
+        v-else
         class="successExport"
       >
         <div class="success-animation">
