@@ -27,7 +27,7 @@
             variant="text"
             :color="theme.current.value.primaryColor"
             v-bind="activatorProps"
-            @click="openPopUp(item)"
+            @click="order = item"
           />
         </v-col>
         <v-col cols="6">
@@ -50,71 +50,18 @@
       />
     </template>
     <template #default>
-      <v-card :title="`Situazione delivery ordine ${order.id}`">
-        <v-card-text>
-          Note Operatore: {{ order.operator_note }}<br>
-          Note Punto Vendita: {{ order.customer_note }}<br>
-          <v-skeleton-loader
-            v-if="loadingPhoto"
-            type="image"
-          />
-          <div v-else>
-            <div v-if="motivations && motivations.length">
-              <p class="text-h6">
-                Motivazioni
-              </p>
-              <v-list dense>
-                <v-list-item
-                  v-for="motivation in motivations"
-                  :key="motivation.id"
-                  :title="motivation.text"
-                >
-                  <v-list-item-subtitle>
-                    Stato: {{ orderUtils.LABELS.find(label => label.value == motivation.status).title }} |
-                    <span v-if="motivation.delay">Ritardo |</span>
-                    <span v-if="motivation.anomaly">Anomalia |</span>
-                    Creata: {{ motivation.created_at }}
-                  </v-list-item-subtitle>
-                </v-list-item>
-              </v-list>
-            </div>
-            <div v-else>
-              Nessuna motivazione presente.
-            </div>
-            <div v-if="photos && photos.length">
-              <div
-                v-for="photo in photos"
-                :key="photo"
-              >
-                <v-skeleton-loader 
-                  v-if="!imageLoading[photo]" 
-                  type="image" 
-                />
-                <v-img
-                  :src="`${http.hostname}order/photo/${photo}`"
-                  max-width="1500"
-                  max-height="1000"
-                  class="mt-4"
-                  @load="imageLoading[photo] = true"
-                />
-              </div>
-            </div>
-            <div v-else>
-              Nessuna immagine disponibile.
-            </div>
-          </div>
-        </v-card-text>
-      </v-card>
+      <OrderDeliverySummary :order="order" />
     </template>
   </v-dialog>
 </template>
 
 <script setup>
+import OrderDeliverySummary from '@/components/orders/OrderDeliverySummary';
+
+import { ref } from 'vue';
 import http from '@/utils/http';
 import { useTheme } from 'vuetify';
-import { ref, reactive } from 'vue';
 import { storeToRefs } from 'pinia';
-import orderUtils from '@/utils/order';
 import { useRouter } from 'vue-router';
 import { encodeId } from '@/utils/hashids';
 import { useUserStore } from '@/stores/user';
@@ -128,28 +75,13 @@ const { item } = defineProps({
 });
 
 const order = ref({});
-const photos = ref([]);
 const theme = useTheme();
 const router = useRouter();
-const motivations = ref([]);
-const loadingPhoto = ref(false);
 const loadingExport = ref(false);
 const userStore = useUserStore();
-const imageLoading = reactive({});
 const orderStore = useOrderStore();
 const { role } = storeToRefs(userStore);
 const { element: updatedOrder, activeForm } = storeToRefs(orderStore);
-
-const openPopUp = (item) => {
-  order.value = item;
-  loadingPhoto.value = true;
-
-  http.getRequest(`order/delivery-details/${item.id}`, {}, function (data) {
-    photos.value = data.photos;
-    motivations.value = data.motivations;
-    loadingPhoto.value = false;
-  }, 'GET', router);
-};
 
 const openForm = (item) => {
   updatedOrder.value = item;

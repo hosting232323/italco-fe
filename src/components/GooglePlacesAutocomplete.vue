@@ -17,8 +17,7 @@ import { ref, onMounted, nextTick, computed } from 'vue';
 
 const props = defineProps({
   modelValue: {
-    type: String,
-    required: true
+    type: String
   },
   label: {
     type: String,

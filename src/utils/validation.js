@@ -1,3 +1,11 @@
+const positiveNumberRules = [
+  (value) => {
+    if (value === null || value === undefined || value === '') return true;
+    if (!isNaN(value) && Number(value) >= 0) return true;
+    return 'Deve essere un numero positivo';
+  }
+]
+;
 const requiredRules = [
   (value) => {
     if (value) return true;
@@ -40,6 +48,7 @@ const futureTime = (element) => [
 ];
 
 export default {
+  positiveNumberRules,
   requiredRules,
   arrayRules,
   capRules,
