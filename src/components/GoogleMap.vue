@@ -1,5 +1,5 @@
 <template>
-  <div ref="mapContainer" style="width: 100%; height: 100%;"></div>
+  <div ref="mapContainer" style="width: 100%; height: 100%;" />
 </template>
 
 <script setup>
@@ -15,15 +15,15 @@ const { orders } = defineProps({
 const map = ref(null);
 const markers = ref([]);
 const mapContainer = ref(null);
-
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_API_KEY;
 
-function loadGoogleMapsScript() {
+const loadGoogleMapsScript = () => {
   return new Promise((resolve, reject) => {
     if (window.google && window.google.maps) {
       resolve(window.google.maps);
       return;
     }
+
     const script = document.createElement('script');
     script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}`;
     script.async = true;
@@ -34,23 +34,9 @@ function loadGoogleMapsScript() {
   });
 }
 
-async function initMap() {
-  const googleMaps = await loadGoogleMapsScript();
-  const center = await geocodeAddress(orders[0].address);
-
-  map.value = new googleMaps.Map(mapContainer.value, {
-    zoom: 10,
-    center,
-    mapTypeControl: false,
-  });
-
-  updateMarkers();
-}
-
-async function geocodeAddress(address) {
-  const googleMaps = window.google.maps;
+const geocodeAddress = async (address) => {
   return new Promise((resolve) => {
-    const geocoder = new googleMaps.Geocoder();
+    const geocoder = new window.google.maps.Geocoder();
     geocoder.geocode({ address }, (results, status) => {
       if (status === 'OK' && results[0]) {
         const location = results[0].geometry.location;
@@ -61,20 +47,18 @@ async function geocodeAddress(address) {
       }
     });
   });
-}
+};
 
-async function updateMarkers() {
+const updateMarkers = async () => {
   if (!map.value) return;
-  const googleMaps = window.google.maps;
 
+  const googleMaps = window.google.maps;
   markers.value.forEach(marker => marker.setMap(null));
   markers.value = [];
 
-  const positions = await Promise.all(
+  (await Promise.all(
     orders.map(order => order.address ? geocodeAddress(order.address) : null)
-  );
-
-  positions.forEach((pos, i) => {
+  )).forEach((pos, i) => {
     if (!pos) return;
     const marker = new googleMaps.Marker({
       position: pos,
@@ -83,16 +67,24 @@ async function updateMarkers() {
     markers.value.push(marker);
   });
 
-
   if (markers.value.length > 1) {
     const bounds = new googleMaps.LatLngBounds();
     markers.value.forEach(marker => bounds.extend(marker.getPosition()));
     map.value.fitBounds(bounds);
   }
-}
+};
 
-onMounted(() => {
-  initMap();
+onMounted(async () => {
+  const googleMaps = await loadGoogleMapsScript();
+  const center = await geocodeAddress(orders[0].address);
+
+  map.value = new googleMaps.Map(mapContainer.value, {
+    zoom: 10,
+    center,
+    mapTypeControl: false,
+  });
+
+  updateMarkers();
 });
 
 watch(
