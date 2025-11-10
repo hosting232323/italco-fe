@@ -13,8 +13,18 @@
     class="fab-wheel"
   >
     <nav class="fab-nav">
-      <v-icon v-if="!exportMode" @click="exportMode = true">mdi-content-save</v-icon>
-      <v-icon v-if="exportMode" @click="exportMode = false">mdi-restore</v-icon>
+      <v-icon
+        v-if="!exportMode"
+        @click="exportMode = true"
+      >
+        mdi-content-save
+      </v-icon>
+      <v-icon
+        v-if="exportMode"
+        @click="exportMode = false"
+      >
+        mdi-restore
+      </v-icon>
       <div class="avatar">
         <img
           src="/logo.png"
@@ -77,24 +87,50 @@
         <v-icon>mdi-send-circle</v-icon>
       </button>
     </div>
-
     <div
       v-if="exportMode"
       class="export-chat"
     >
-      <h3 v-if="!exportSuccess">Vuoi esportare la chat?</h3>
-      <div  v-if="!exportSuccess" class="content-button">
-        <button @click="exportChat">Si</button>
-        <button @click="exportMode = false">No</button>
+      <h3 v-if="!exportSuccess">
+        Vuoi esportare la chat?
+      </h3>
+      <div
+        v-if="!exportSuccess"
+        class="content-button"
+      >
+        <button @click="exportChat">
+          Si
+        </button>
+        <button @click="exportMode = false">
+          No
+        </button>
       </div>
-
-      <div v-if="exportSuccess" class="successExport">
+      <div
+        v-if="exportSuccess"
+        class="successExport"
+      >
         <div class="success-animation">
-          <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52"><circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none" /><path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" /></svg>
+          <svg
+            class="checkmark"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 52 52"
+          >
+            <circle
+              class="checkmark__circle"
+              cx="26"
+              cy="26"
+              r="25"
+              fill="none"
+            />
+            <path
+              class="checkmark__check"
+              fill="none"
+              d="M14.1 27.2l7.1 7.2 16.7-16.8"
+            />
+          </svg>
         </div>
       </div>
     </div>
-
     <footer class="fab-footer">
       <p>
         Powered by
@@ -117,6 +153,7 @@
 
 <script setup>
 import '@/styles/chatty.scss';
+
 import http from '@/utils/http';
 import { marked } from 'marked';
 import { useRouter } from 'vue-router';
@@ -177,25 +214,16 @@ const scrollToBottom = () => {
 
 const exportChat = async () => {
   exportSuccess.value = false;
-
-  const formattedMessages = messages.value.map((msg, index) => {
-    const sender = index % 2 === 0 ? 'Italco.mi Bot' : 'Utente';
-    const plainText = msg.replace(/<[^>]+>/g, ''); 
-    return `${sender}: ${plainText.trim()}`;
-  });
-
-  const chatBlob = new Blob([formattedMessages.join('\n')], {
-    type: 'text/plain',
-  });
-
-  const chatBlobUrl = URL.createObjectURL(chatBlob);
   const link = document.createElement('a');
-  link.href = chatBlobUrl;
+  link.href = URL.createObjectURL(new Blob([
+    messages.value.map((msg, index) => {
+      return `${index % 2 === 0 ? 'Italco.mi Bot' : 'Utente'}: ${msg.replace(/<[^>]+>/g, '').trim()}`;
+    }).join('\n')
+  ], { type: 'text/plain' }));
   link.download = 'chat_messages.txt';
   link.click();
 
   exportSuccess.value = true;
-
   setTimeout(() => {
     exportSuccess.value = false;
     exportMode.value = false;
