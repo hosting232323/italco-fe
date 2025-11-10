@@ -77,7 +77,12 @@
     >
       <v-radio-group
         v-model="order.elevator"
-        :rules="validation.requiredRules"
+        :rules="[
+          (value) => {
+            if (value !== undefined) return true;
+            return 'Campo obbligatorio';
+          }
+        ]"
       >
         <label class="mr-2">Ascensore</label>
         <v-radio
