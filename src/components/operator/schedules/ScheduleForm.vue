@@ -144,6 +144,7 @@
 </template>
 
 <script setup>
+import GoogleMap from '@/components/GoogleMap.vue';
 import FormButtons from '@/components/FormButtons';
 
 import { useTheme } from 'vuetify';
@@ -158,7 +159,6 @@ import { useOrderStore } from '@/stores/order';
 import { useScheduleStore } from '@/stores/schedule';
 import { useTransportStore } from '@/stores/transport';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
-import GoogleMap from '@/components/GoogleMap.vue';
 
 const form = ref(null);
 const theme = useTheme();
