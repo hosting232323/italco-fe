@@ -1,7 +1,7 @@
 <template>
   <v-select
-    :disabled="order.status == 'Pending'"
     v-model="order.status"
+    :disabled="order.status == 'Pending'"
     label="Stato"
     :items="orderUtils.LABELS.filter(label => label.value != 'Pending')"
   />

@@ -39,7 +39,8 @@ import { ref, watch } from 'vue';
 
 const props = defineProps({
   modelValue: {
-    type: [String, Date]
+    type: [String, Date],
+    default: null
   },
   label: {
     type: String,

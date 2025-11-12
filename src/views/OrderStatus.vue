@@ -215,8 +215,7 @@ h3 {
   border-collapse: collapse;
 }
 
-.info-table td,
-th {
+.info-table td, th {
   padding: 12px 15px;
   border: 1px solid #ccc;
   background-color: #fafafa;
@@ -227,5 +226,4 @@ th {
   font-weight: bold;
   width: 30%;
 }
-
 </style>

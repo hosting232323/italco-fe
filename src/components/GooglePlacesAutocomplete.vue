@@ -17,7 +17,8 @@ import { ref, onMounted, nextTick, computed } from 'vue';
 
 const props = defineProps({
   modelValue: {
-    type: String
+    type: String,
+    default: null
   },
   label: {
     type: String,
