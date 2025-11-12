@@ -1,17 +1,21 @@
+// Property icon is used in @/views/OrderStatus
 const LABELS = [
   {
     value: 'Pending',
-    title: 'In Attesa'
+    title: 'In Attesa',
+    icon: 'mdi-timer-sand'
   },
   {
     value: 'In Progress',
     title: 'In Consegna',
-    color: 'blue'
+    color: 'blue',
+    icon: 'mdi-progress-clock'
   },
   {
     value: 'On Board',
     title: 'A Bordo',
-    color: 'blue'
+    color: 'blue',
+    icon: 'mdi-truck-delivery'
   },
   {
     value: 'At Warehouse',
@@ -21,7 +25,8 @@ const LABELS = [
   {
     value: 'Completed',
     title: 'Completato',
-    color: 'green'
+    color: 'green',
+    icon: 'mdi-check-circle-outline'
   },
   {
     value: 'Cancelled',

@@ -104,7 +104,12 @@
         :class="isMobile ? '' : 'mr-2 ml-2'"
         label="Piano"
         type="number"
-        :rules="validation.requiredRules.concat(validation.positiveNumberRules)"
+        :rules="validation.positiveNumberRules.concat([
+          (value) => {
+            if (value !== undefined || value !== '') return true;
+            return 'Campo obbligatorio';
+          }
+        ])"
       />
     </v-col>
     <v-col

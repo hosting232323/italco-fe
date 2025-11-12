@@ -1,7 +1,6 @@
 <template>
   <v-container v-if="show">
     <h2>Informazioni ordine: # {{ order.id }}</h2>
-
     <div class="table-wrapper">
       <div class="table-box">
         <h3>Punto vendita</h3>
@@ -26,7 +25,6 @@
           </tbody>
         </table>
       </div>
-
       <div class="table-box">
         <h3>Destinatario</h3>
         <table class="info-table">
@@ -53,7 +51,6 @@
         </table>
       </div>
     </div>
-
     <div class="table-box">
       <h3>Dettagli consegna</h3>
       <table class="info-table">
@@ -79,7 +76,6 @@
         </tbody>
       </table>
     </div>
-
     <div class="table-box">
       <h3>Prodotti e Servizi</h3>
       <table class="info-table">
@@ -113,10 +109,9 @@
         </tbody>
       </table>
     </div>
-
     <div class="table-box">
       <h3>Stato Ordine</h3>
-      <h3 v-if="order.status == 'Cancelled'">
+      <h3 v-if="!orderUtils.LABELS.find(label => label.value == order.status).icon">
         Non consegnato
       </h3>
       <v-timeline
@@ -125,9 +120,9 @@
         :side="isMobile ? 'start' : 'end'"
       >
         <v-timeline-item
-          v-for="step in orderHistory"
-          :key="step.id"
-          :dot-color="isStepCompleted(step) ? 'green' : 'grey lighten-1'"
+          v-for="(step, index) in orderUtils.LABELS.filter(label => !!label.icon)"
+          :key="index"
+          :dot-color="isStepCompleted(index) ? 'green' : 'grey lighten-1'"
         >
           <template #icon>
             <v-icon :size="18">
@@ -139,16 +134,15 @@
               v-if="!isMobile"
               style="margin: 10px 0 -17px !important;"
             >
-              {{ step.label }}
+              {{ step.title }}
             </p>
             <p v-else>
-              {{ step.label }}
+              {{ step.title }}
             </p>
           </template>
         </v-timeline-item>
       </v-timeline>
     </div>
-
     <Map
       v-if="order.status === 'On Board'"
       :lat="order.lat"
@@ -158,11 +152,12 @@
 </template>
 
 <script setup>
-import Map from '@/components/ComponentMap.vue';
-import mobile from '@/utils/mobile';
+import Map from '@/components/OpenLayerMap';
 
 import http from '@/utils/http';
+import mobile from '@/utils/mobile';
 import { ref, onMounted } from 'vue';
+import orderUtils from '@/utils/order';
 import { decodeId } from '@/utils/hashids';
 
 const props = defineProps({ 
@@ -171,23 +166,17 @@ const props = defineProps({
     required: true
   }
 });
-const isMobile = mobile.setupMobileUtils();
 
 const order = ref({});
 const show = ref(false);
 const orderIdNumeric = ref(null);
+const isMobile = mobile.setupMobileUtils();
 
-const orderHistory = [
-  { id: 0, label: 'Pending', icon: 'mdi-timer-sand' },
-  { id: 1, label: 'In Progress', icon: 'mdi-progress-clock' },
-  { id: 2, label: 'On Board', icon: 'mdi-truck-delivery' },
-  { id: 3, label: 'Completed', icon: 'mdi-check-circle-outline' }
-];
-
-function isStepCompleted(step) {
+const isStepCompleted = (index) => {
   if (!order.value.status) return false;
-  return step.id <= orderHistory.findIndex(s => s.label === order.value.status);
-}
+
+  return index <= orderUtils.LABELS.findIndex(status => status.value === order.value.status);
+};
 
 onMounted(() => {
   const decoded = decodeId(props.orderId);
