@@ -157,9 +157,11 @@ const addMapButton = (googleMaps) => {
 };
 
 onMounted(async () => {
-  if(!orders[0]?.address) return;
   const googleMaps = await loadGoogleMapsScript();
-  const center = await geocodeAddress(orders[0].address);
+  
+    const center = orders[0]?.address
+    ? await geocodeAddress(orders[0].address)
+    : { lat: 41.8719, lng: 12.5674 };
 
   map.value = new googleMaps.Map(mapContainer.value, {
     zoom: 10,
