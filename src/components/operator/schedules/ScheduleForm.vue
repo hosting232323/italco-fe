@@ -96,7 +96,7 @@
                     :class="['d-flex', 'justify-space-between', isMobile ? '' : 'align-center', isMobile ? 'flex-column' : '']"
                     style="width: 100%;"
                   >
-                    <p>Ordine #{{ element.id }}</p>
+                    <p>{{ element.schedule_index + 1 }}: Ordine ID {{ element.id }}</p>
                     <div :class="['d-flex', 'align-center', isMobile ? 'flex-column' : '']">
                       <v-text-field 
                         v-model="element.start_time_slot" 
@@ -153,10 +153,10 @@ import { storeToRefs } from 'pinia';
 import draggable from 'vuedraggable';
 import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
-import { ref, watch, computed } from 'vue';
 import validation from '@/utils/validation';
 import { useOrderStore } from '@/stores/order';
 import { useScheduleStore } from '@/stores/schedule';
+import { ref, watch, computed, onMounted } from 'vue';
 import { useTransportStore } from '@/stores/transport';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
@@ -221,31 +221,6 @@ const availableOrders = computed(() => {
     .filter(o => !schedule.value.orders.some(so => so.id === o.id));
 });
 
-if (!schedule.value.id)
-  schedule.value.orders = schedule.value.orders.map((order, index) => {
-    return {
-      ...order,
-      start_time_slot: '',
-      end_time_slot: '',
-      schedule_index: index
-    };
-  });
-
-watch(
-  () => schedule.value.orders,
-  (newOrders) => newOrders?.forEach((o, i) => o.schedule_index = i),
-  { deep: true }
-);
-
-watch(() => schedule.value.date, () => {
-  error.value.date = null;
-});
-
-watch(() => schedule.value.users, () => {
-  error.value.user = null;
-});
-
-
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
 
@@ -271,6 +246,34 @@ const callback = (data) => {
   } else 
     error.value.date = data.error;
 };
+
+onMounted(() => {
+  if (!schedule.value.id)
+    schedule.value.orders = schedule.value.orders.map((order, index) => {
+      return {
+        ...order,
+        start_time_slot: '',
+        end_time_slot: '',
+        schedule_index: index
+      };
+    });
+
+  schedule.value.orders.sort((a, b) => a.schedule_index - b.schedule_index);
+});
+
+watch(
+  () => schedule.value.orders,
+  (newOrders) => newOrders?.forEach((o, i) => o.schedule_index = i),
+  { deep: true }
+);
+
+watch(() => schedule.value.date, () => {
+  error.value.date = null;
+});
+
+watch(() => schedule.value.users, () => {
+  error.value.user = null;
+});
 </script>
 
 <style scoped>

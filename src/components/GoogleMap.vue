@@ -23,41 +23,20 @@ const distanceKm = ref(0);
 const durationMin = ref(0);
 const googleMapsUrl = ref('');
 const mapContainer = ref(null);
-const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_API_KEY;
 
-let directionsService = null;
 let directionsRenderer = null;
-
-const loadGoogleMapsScript = () => {
-  return new Promise((resolve, reject) => {
-    if (window.google && window.google.maps) {
-      resolve(window.google.maps);
-      return;
-    }
-
-    const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}`;
-    script.async = true;
-    script.defer = true;
-    script.onload = () => resolve(window.google.maps);
-    script.onerror = reject;
-    document.head.appendChild(script);
-  });
-};
 
 const geocodeAddress = async (address) => {
   return new Promise((resolve) => {
-    const geocoder = new window.google.maps.Geocoder();
-    geocoder.geocode({ address }, (results, status) => {
+    new window.google.maps.Geocoder().geocode({ address }, (results, status) => {
       if (status === 'OK' && results[0]) {
         const location = results[0].geometry.location;
         resolve({
           lat: location.lat(),
           lng: location.lng(),
-          formatted: results[0].formatted_address,
+          formatted: results[0].formatted_address
         });
-      } else
-        resolve(null);
+      } else resolve(null);
     });
   });
 };
@@ -65,25 +44,21 @@ const geocodeAddress = async (address) => {
 const drawRoute = async () => {
   if (!map.value || orders.length < 2) return;
 
-  const locations = await Promise.all(
+  const validLocations = (await Promise.all(
     orders.map(order => order.address ? geocodeAddress(order.address) : null)
-  );
-
-  const validLocations = locations.filter(l => l !== null);
+  )).filter(l => l !== null);
   if (validLocations.length < 2) return;
 
   const [origin, ...rest] = validLocations;
   const destination = rest.pop();
   const waypoints = rest.map(loc => ({ location: loc, stopover: true }));
-  const originParam = encodeURIComponent(origin.formatted);
-  const destinationParam = encodeURIComponent(destination.formatted);
   const waypointsParam = waypoints.map(w => encodeURIComponent(w.location.formatted)).join('|');
 
-  googleMapsUrl.value = `https://www.google.com/maps/dir/?api=1&origin=${originParam}&destination=${destinationParam}${
-    waypointsParam ? `&waypoints=${waypointsParam}` : ''
-  }&travelmode=driving`;
+  googleMapsUrl.value = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origin.formatted)}&` +
+    `destination=${encodeURIComponent(destination.formatted)}` +
+    `${waypointsParam ? `&waypoints=${waypointsParam}` : ''}&travelmode=driving`;
 
-  directionsService.route(
+  new window.google.maps.DirectionsService().route(
     {
       origin,
       destination,
@@ -100,7 +75,7 @@ const drawRoute = async () => {
         if (route && route.legs) {
           route.legs.forEach((leg) => {
             totalDistance += leg.distance.value;
-            totalDuration+= leg.duration.value;
+            totalDuration += leg.duration.value;
           });
         }
 
@@ -114,18 +89,15 @@ const drawRoute = async () => {
 const updateMarkers = async () => {
   if (!map.value) return;
 
-  const googleMaps = window.google.maps;
-  markers.value.forEach(marker => marker.setMap(null));
-  markers.value = [];
+  while (markers.value.length > 0)
+    markers.value.pop().setVisible(false);
 
-  const positions = await Promise.all(
+  (await Promise.all(
     orders.map(order => order.address ? geocodeAddress(order.address) : null)
-  );
-
-  positions.forEach((pos, i) => {
+  )).forEach((pos, i) => {
     if (!pos) return;
 
-    markers.value.push(new googleMaps.Marker({
+    markers.value.push(new window.google.maps.Marker({
       position: pos,
       map: map.value,
       label: {
@@ -137,13 +109,13 @@ const updateMarkers = async () => {
   });
 
   if (markers.value.length > 1) {
-    const bounds = new googleMaps.LatLngBounds();
+    const bounds = new window.google.maps.LatLngBounds();
     markers.value.forEach(marker => bounds.extend(marker.getPosition()));
     map.value.fitBounds(bounds);
   }
 };
 
-const addMapButton = (googleMaps) => {
+const addMapButton = () => {
   const controlDiv = document.createElement('div');
   controlDiv.classList.add('map-control-container');
 
@@ -159,10 +131,10 @@ const addMapButton = (googleMaps) => {
       window.open(googleMapsUrl.value, '_blank');
   });
 
-  map.value.controls[googleMaps.ControlPosition.TOP_RIGHT].push(controlDiv);
+  map.value.controls[window.google.maps.ControlPosition.TOP_RIGHT].push(controlDiv);
 };
 
-const addLegend = (googleMaps) => {
+const addLegend = () => {
   const legendDiv = document.createElement('div');
   legendDiv.classList.add('map-legend');
 
@@ -175,36 +147,37 @@ const addLegend = (googleMaps) => {
   watch([distanceKm, durationMin], updateLegend);
 
   updateLegend();
-  map.value.controls[googleMaps.ControlPosition.TOP_LEFT].push(legendDiv);
+  map.value.controls[window.google.maps.ControlPosition.TOP_LEFT].push(legendDiv);
 };
 
 onMounted(async () => {
-  const googleMaps = await loadGoogleMapsScript();
-  const center = orders[0]?.address
-    ? await geocodeAddress(orders[0].address)
-    : { lat: 41.8719, lng: 12.5674 };
+  while (!window.google?.maps?.places)
+    await new Promise((resolve) => setTimeout(resolve, 100));
 
-  map.value = new googleMaps.Map(mapContainer.value, {
+  map.value = new window.google.maps.Map(mapContainer.value, {
     zoom: 10,
-    center,
     mapTypeControl: false,
+    center: orders[0]?.address
+      ? await geocodeAddress(orders[0].address)
+      : { lat: 41.8719, lng: 12.5674 }
   });
 
-  directionsService = new googleMaps.DirectionsService();
-  directionsRenderer = new googleMaps.DirectionsRenderer({ map: map.value, suppressMarkers: true });
+  directionsRenderer = new window.google.maps.DirectionsRenderer({
+    map: map.value,
+    suppressMarkers: true
+  });
 
-  await updateMarkers();
-  await drawRoute();
-
-  addLegend(googleMaps);
-  addMapButton(googleMaps);
+  updateMarkers();
+  drawRoute();
+  addLegend();
+  addMapButton();
 });
 
 watch(
   () => orders,
-  async () => {
-    await updateMarkers();
-    await drawRoute();
+  () => {
+    updateMarkers();
+    drawRoute();
   },
   { deep: true }
 );
