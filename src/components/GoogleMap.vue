@@ -22,9 +22,8 @@ const theme = useTheme();
 const distanceKm = ref(0);
 const durationMin = ref(0);
 const googleMapsUrl = ref('');
-const mapContainer = ref(null);
-
 let directionsRenderer = null;
+const mapContainer = ref(null);
 
 const geocodeAddress = async (address) => {
   return new Promise((resolve) => {
