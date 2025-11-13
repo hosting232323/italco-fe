@@ -11,130 +11,140 @@
       : `Ordini: ${schedule.orders.map(order => order.id).join(', ')}`"
   >
     <v-card-text>
-      <v-form
-        ref="form"
-        @submit.prevent="submitForm"
-      >
-        <v-chip
-          v-for="user in schedule.users"
-          :key="user.id"
-          class="mr-2 mb-5"
-          append-icon="mdi-close-circle"
-          @click="removeUser(user.id)"
-        >
-          {{ user.nickname }}
-        </v-chip>
-        <v-autocomplete
-          v-model="selectedUser"
-          label="Utenti"
-          :items="users.filter(
-            (u) => u.role === 'Delivery' && (!schedule.users || !schedule.users.some(su => su.nickname === u.nickname))
-          )"
-          item-title="nickname"
-          append-icon="mdi-plus"
-          return-object
-          :error-messages="error.user"
-          @click:append="addUser"
-        />
-        <v-row no-gutters>
-          <v-col
-            cols="12"
-            md="6"
+      <v-row>
+        <v-col cols="7">
+          <v-form
+            ref="form"
+            @submit.prevent="submitForm"
           >
-            <v-select
-              v-model="schedule.transport_id"
-              :class="isMobile ? '' : 'mr-2'"
-              label="Veicolo"
-              :items="transports"
-              item-title="name"
+            <v-chip
+              v-for="user in schedule.users"
+              :key="user.id"
+              class="mr-2 mb-5"
+              append-icon="mdi-close-circle"
+              @click="removeUser(user.id)"
+            >
+              {{ user.nickname }}
+            </v-chip>
+            <v-autocomplete
+              v-model="selectedUser"
+              label="Utenti"
+              :items="users.filter(
+                (u) => u.role === 'Delivery' && (!schedule.users || !schedule.users.some(su => su.nickname === u.nickname))
+              )"
+              item-title="nickname"
+              append-icon="mdi-plus"
+              return-object
+              :error-messages="error.user"
+              @click:append="addUser"
+            />
+            <v-row no-gutters>
+              <v-col
+                cols="12"
+                md="6"
+              >
+                <v-select
+                  v-model="schedule.transport_id"
+                  :class="isMobile ? '' : 'mr-2'"
+                  label="Veicolo"
+                  :items="transports"
+                  item-title="name"
+                  item-value="id"
+                  :rules="validation.requiredRules"
+                />
+              </v-col>
+              <v-col
+                cols="12"
+                md="6"
+              >
+                <v-text-field
+                  v-model="schedule.date"
+                  type="date"
+                  :class="isMobile ? '' : 'ml-2'"
+                  label="Data"
+                  :rules="validation.requiredRules"
+                  :error-messages="error.date"
+                />
+              </v-col>
+            </v-row>
+            <v-autocomplete
+              v-if="schedule.id"
+              v-model="selectedOrderId"
+              label="Aggiungi Ordine"
+              :items="availableOrders"
+              :item-title="order => `ID ordine: ${order.id}`"
               item-value="id"
-              :rules="validation.requiredRules"
+              append-icon="mdi-plus"
+              dense
+              @click="addOrder"
             />
-          </v-col>
-          <v-col
-            cols="12"
-            md="6"
-          >
-            <v-text-field
-              v-model="schedule.date"
-              type="date"
-              :class="isMobile ? '' : 'ml-2'"
-              label="Data"
-              :rules="validation.requiredRules"
-              :error-messages="error.date"
-            />
-          </v-col>
-        </v-row>
-        <v-autocomplete
-          v-if="schedule.id"
-          v-model="selectedOrderId"
-          label="Aggiungi Ordine"
-          :items="availableOrders"
-          :item-title="order => `ID ordine: ${order.id}`"
-          item-value="id"
-          append-icon="mdi-plus"
-          dense
-          @click="addOrder"
-        />
-        <draggable
-          v-model="schedule.orders"
-          item-key="id"
-          class="mb-4"
-          handle=".drag-handle"
-        >
-          <template #item="{ element }">
-            <div class="d-flex align-center order-item">
-              <div
-                class="drag-handle"
-                style="cursor: grab;"
-              >
-                <v-icon>mdi-drag</v-icon>
-              </div>
-              <div
-                :class="['d-flex', 'justify-space-between', isMobile ? '' : 'align-center', isMobile ? 'flex-column' : '']"
-                style="width: 100%;"
-              >
-                <p>Ordine #{{ element.id }}</p>
-                <div :class="['d-flex', 'align-center', isMobile ? 'flex-column' : '']">
-                  <v-text-field 
-                    v-model="element.start_time_slot" 
-                    label="Time Slot Start"
-                    type="time"
-                    :rules="validation.requiredRules" 
-                    dense
-                    hide-details 
-                    :style="isMobile ? { margin: '15px 0', width: '' }: { width: '200px', marginRight: '15px' }"
-                  />
-                  <v-text-field 
-                    v-model="element.end_time_slot" 
-                    label="Time Slot End"
-                    type="time"
-                    :rules="validation.futureTime(element)" 
-                    dense
-                    hide-details 
-                    :style="isMobile ? { width: '' }: { width: '200px' }"
-                  />
-                  <v-btn
-                    variant="text"
-                    icon="mdi-delete"
-                    :color="theme.current.value.primaryColor"
-                    @click="removeOrder(element.id)"
-                  />
+            <draggable
+              v-model="schedule.orders"
+              item-key="id"
+              class="mb-4"
+              handle=".drag-handle"
+            >
+              <template #item="{ element }">
+                <div class="d-flex align-center order-item">
+                  <div
+                    class="drag-handle"
+                    style="cursor: grab;"
+                  >
+                    <v-icon>mdi-drag</v-icon>
+                  </div>
+                  <div
+                    :class="['d-flex', 'justify-space-between', isMobile ? '' : 'align-center', isMobile ? 'flex-column' : '']"
+                    style="width: 100%;"
+                  >
+                    <p>{{ element.schedule_index + 1 }}: Ordine ID {{ element.id }}</p>
+                    <div :class="['d-flex', 'align-center', isMobile ? 'flex-column' : '']">
+                      <v-text-field 
+                        v-model="element.start_time_slot" 
+                        label="Time Slot Start"
+                        type="time"
+                        :rules="validation.requiredRules" 
+                        dense
+                        hide-details 
+                        :style="isMobile ? { margin: '15px 0', width: '' }: { width: '200px', marginRight: '15px' }"
+                      />
+                      <v-text-field 
+                        v-model="element.end_time_slot" 
+                        label="Time Slot End"
+                        type="time"
+                        :rules="validation.futureTime(element)" 
+                        dense
+                        hide-details 
+                        :style="isMobile ? { width: '' }: { width: '200px' }"
+                      />
+                      <v-btn
+                        variant="text"
+                        icon="mdi-delete"
+                        :color="theme.current.value.primaryColor"
+                        @click="removeOrder(element.id)"
+                      />
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          </template>
-        </draggable>
-        <FormButtons
-          :loading="loading"
-          @cancel="emits('cancel')"
-        />
-      </v-form>
+              </template>
+            </draggable>
+            <FormButtons
+              :loading="loading"
+              @cancel="emits('cancel')"
+            />
+          </v-form>
+        </v-col>
+        <v-col cols="5">
+          <div style="height: 100%; border-radius: 12px; overflow: hidden;">
+            <GoogleMap :orders="schedule.orders" />
+          </div>
+        </v-col>
+      </v-row>
     </v-card-text>
   </v-card>
 </template>
 
 <script setup>
+import GoogleMap from '@/components/GoogleMap.vue';
 import FormButtons from '@/components/FormButtons';
 
 import { useTheme } from 'vuetify';
@@ -143,10 +153,10 @@ import { storeToRefs } from 'pinia';
 import draggable from 'vuedraggable';
 import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
-import { ref, watch, computed } from 'vue';
 import validation from '@/utils/validation';
 import { useOrderStore } from '@/stores/order';
 import { useScheduleStore } from '@/stores/schedule';
+import { ref, watch, computed, onMounted } from 'vue';
 import { useTransportStore } from '@/stores/transport';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
@@ -189,7 +199,7 @@ const addOrder = () => {
   if (!orderToAdd) return;
 
   schedule.value.orders.push({
-    id: orderToAdd.id,
+    ...orderToAdd,
     start_time_slot: '',
     end_time_slot: '',
     schedule_index: schedule.value.orders.length
@@ -210,31 +220,6 @@ const availableOrders = computed(() => {
     .filter(o => o.status === 'Pending')
     .filter(o => !schedule.value.orders.some(so => so.id === o.id));
 });
-
-if (!schedule.value.id)
-  schedule.value.orders = schedule.value.order_ids.map((id, index) => {
-    return {
-      id,
-      start_time_slot: '',
-      end_time_slot: '',
-      schedule_index: index
-    };
-  });
-
-watch(
-  () => schedule.value.orders,
-  (newOrders) => newOrders?.forEach((o, i) => o.schedule_index = i),
-  { deep: true }
-);
-
-watch(() => schedule.value.date, () => {
-  error.value.date = null;
-});
-
-watch(() => schedule.value.users, () => {
-  error.value.user = null;
-});
-
 
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
@@ -261,6 +246,34 @@ const callback = (data) => {
   } else 
     error.value.date = data.error;
 };
+
+onMounted(() => {
+  if (!schedule.value.id)
+    schedule.value.orders = schedule.value.orders.map((order, index) => {
+      return {
+        ...order,
+        start_time_slot: '',
+        end_time_slot: '',
+        schedule_index: index
+      };
+    });
+
+  schedule.value.orders.sort((a, b) => a.schedule_index - b.schedule_index);
+});
+
+watch(
+  () => schedule.value.orders,
+  (newOrders) => newOrders?.forEach((o, i) => o.schedule_index = i),
+  { deep: true }
+);
+
+watch(() => schedule.value.date, () => {
+  error.value.date = null;
+});
+
+watch(() => schedule.value.users, () => {
+  error.value.user = null;
+});
 </script>
 
 <style scoped>
