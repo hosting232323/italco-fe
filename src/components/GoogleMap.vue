@@ -1,19 +1,24 @@
 <template>
-  <div ref="mapContainer" style="width: 100%; height: 100%;" />
+  <div
+    ref="mapContainer"
+    style="width: 100%; height: 100%;"
+  />
 </template>
 
 <script setup>
+import { useTheme } from 'vuetify';
 import { onMounted, ref, watch } from 'vue';
 
 const { orders } = defineProps({
   orders: {
     type: Array,
-    default: () => [],
-  },
+    default: () => []
+  }
 });
 
 const map = ref(null);
 const markers = ref([]);
+const theme = useTheme();
 const distanceKm = ref(0);
 const durationMin = ref(0);
 const googleMapsUrl = ref('');
@@ -51,10 +56,8 @@ const geocodeAddress = async (address) => {
           lng: location.lng(),
           formatted: results[0].formatted_address,
         });
-      } else {
-        console.warn(`Geocode non riuscito per ${address}: ${status}`);
+      } else
         resolve(null);
-      }
     });
   });
 };
@@ -72,7 +75,6 @@ const drawRoute = async () => {
   const [origin, ...rest] = validLocations;
   const destination = rest.pop();
   const waypoints = rest.map(loc => ({ location: loc, stopover: true }));
-
   const originParam = encodeURIComponent(origin.formatted);
   const destinationParam = encodeURIComponent(destination.formatted);
   const waypointsParam = waypoints.map(w => encodeURIComponent(w.location.formatted)).join('|');
@@ -87,7 +89,7 @@ const drawRoute = async () => {
       destination,
       waypoints,
       travelMode: window.google.maps.TravelMode.DRIVING,
-      optimizeWaypoints: true,
+      optimizeWaypoints: true
     },
     (response, status) => {
       if (status === 'OK') {
@@ -104,8 +106,6 @@ const drawRoute = async () => {
 
         distanceKm.value = (totalDistance / 1000).toFixed(2);
         durationMin.value = Math.round(totalDuration / 60);
-      } else {
-        console.warn('Errore nella creazione dell’itinerario:', status);
       }
     }
   );
@@ -124,16 +124,16 @@ const updateMarkers = async () => {
 
   positions.forEach((pos, i) => {
     if (!pos) return;
-    const marker = new googleMaps.Marker({
+
+    markers.value.push(new googleMaps.Marker({
       position: pos,
       map: map.value,
       label: {
-        text: (orders[i].schedule_index + 1).toString(), // oppure direttamente orders[i].schedule_index
-        color: "white",
-        fontWeight: "bold",
+        text: (orders[i].schedule_index + 1).toString(),
+        color: 'white',
+        fontWeight: 'bold'
       }
-    });
-    markers.value.push(marker);
+    }));
   });
 
   if (markers.value.length > 1) {
@@ -145,26 +145,18 @@ const updateMarkers = async () => {
 
 const addMapButton = (googleMaps) => {
   const controlDiv = document.createElement('div');
-  controlDiv.style.margin = '10px';
-  controlDiv.style.textAlign = 'center';
+  controlDiv.classList.add('map-control-container');
 
   const controlUI = document.createElement('button');
-  controlUI.style.backgroundColor = '#1a73e8';
-  controlUI.style.color = 'white';
-  controlUI.style.border = 'none';
-  controlUI.style.borderRadius = '6px';
-  controlUI.style.padding = '8px 12px';
-  controlUI.style.cursor = 'pointer';
-  controlUI.style.fontSize = '14px';
-  controlUI.style.boxShadow = '0 2px 6px rgba(0,0,0,0.3)';
+  controlUI.classList.add('map-button');
+  controlUI.style.backgroundColor = theme.current.value.primaryColor;
   controlUI.textContent = 'Apri in Google Maps';
   controlUI.title = 'Apri questo itinerario in Google Maps';
   controlDiv.appendChild(controlUI);
 
   controlUI.addEventListener('click', () => {
-    if (googleMapsUrl.value) {
+    if (googleMapsUrl.value)
       window.open(googleMapsUrl.value, '_blank');
-    }
   });
 
   map.value.controls[googleMaps.ControlPosition.TOP_RIGHT].push(controlDiv);
@@ -172,14 +164,7 @@ const addMapButton = (googleMaps) => {
 
 const addLegend = (googleMaps) => {
   const legendDiv = document.createElement('div');
-  legendDiv.style.backgroundColor = 'white';
-  legendDiv.style.padding = '8px 12px';
-  legendDiv.style.margin = '10px';
-  legendDiv.style.borderRadius = '6px';
-  legendDiv.style.boxShadow = '0 2px 6px rgba(0,0,0,0.3)';
-  legendDiv.style.fontSize = '14px';
-  legendDiv.style.fontWeight = 'bold';
-  legendDiv.style.textAlign = 'left';
+  legendDiv.classList.add('map-legend');
 
   const updateLegend = () => {
     const hours = Math.floor(durationMin.value / 60);
@@ -195,8 +180,7 @@ const addLegend = (googleMaps) => {
 
 onMounted(async () => {
   const googleMaps = await loadGoogleMapsScript();
-  
-    const center = orders[0]?.address
+  const center = orders[0]?.address
     ? await geocodeAddress(orders[0].address)
     : { lat: 41.8719, lng: 12.5674 };
 
@@ -225,3 +209,31 @@ watch(
   { deep: true }
 );
 </script>
+
+<style>
+.map-control-container {
+  margin: 10px;
+  text-align: center;
+}
+
+.map-button {
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 14px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.map-legend {
+  background-color: white;
+  padding: 8px 12px;
+  margin: 10px;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  font-size: 14px;
+  font-weight: bold;
+  text-align: left;
+}
+</style>
