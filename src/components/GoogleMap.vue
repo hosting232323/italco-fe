@@ -14,6 +14,8 @@ const { orders } = defineProps({
 
 const map = ref(null);
 const markers = ref([]);
+const distanceKm = ref(0);
+const durationMin = ref(0);
 const googleMapsUrl = ref('');
 const mapContainer = ref(null);
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_API_KEY;
@@ -90,6 +92,18 @@ const drawRoute = async () => {
     (response, status) => {
       if (status === 'OK') {
         directionsRenderer.setDirections(response);
+        let totalDistance = 0;
+        let totalDuration = 0;
+        const route = response.routes[0];
+        if (route && route.legs) {
+          route.legs.forEach((leg) => {
+            totalDistance += leg.distance.value;
+            totalDuration+= leg.duration.value;
+          });
+        }
+
+        distanceKm.value = (totalDistance / 1000).toFixed(2);
+        durationMin.value = Math.round(totalDuration / 60);
       } else {
         console.warn('Errore nella creazione dell’itinerario:', status);
       }
@@ -156,6 +170,29 @@ const addMapButton = (googleMaps) => {
   map.value.controls[googleMaps.ControlPosition.TOP_RIGHT].push(controlDiv);
 };
 
+const addLegend = (googleMaps) => {
+  const legendDiv = document.createElement('div');
+  legendDiv.style.backgroundColor = 'white';
+  legendDiv.style.padding = '8px 12px';
+  legendDiv.style.margin = '10px';
+  legendDiv.style.borderRadius = '6px';
+  legendDiv.style.boxShadow = '0 2px 6px rgba(0,0,0,0.3)';
+  legendDiv.style.fontSize = '14px';
+  legendDiv.style.fontWeight = 'bold';
+  legendDiv.style.textAlign = 'left';
+
+  const updateLegend = () => {
+    const hours = Math.floor(durationMin.value / 60);
+    const minutes = durationMin.value % 60;
+    legendDiv.innerHTML = `🚗 Distanza: ${distanceKm.value} km<br>🕒 Tempo: ${hours > 0 ? hours + 'h ' : ''}${minutes} min`;
+  };
+
+  watch([distanceKm, durationMin], updateLegend);
+
+  updateLegend();
+  map.value.controls[googleMaps.ControlPosition.TOP_LEFT].push(legendDiv);
+};
+
 onMounted(async () => {
   const googleMaps = await loadGoogleMapsScript();
   
@@ -175,6 +212,7 @@ onMounted(async () => {
   await updateMarkers();
   await drawRoute();
 
+  addLegend(googleMaps);
   addMapButton(googleMaps);
 });
 
