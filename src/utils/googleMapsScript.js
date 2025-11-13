@@ -7,9 +7,5 @@ export const loadGoogleMapsScript = () => {
   }&libraries=places&loading=async`;
   script.async = true;
   script.defer = true;
-  script.onload = () => {
-    window.isGoogleMapsLoaded = true;
-  };
-
   document.head.appendChild(script);
 };

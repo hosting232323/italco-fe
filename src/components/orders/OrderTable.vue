@@ -5,7 +5,7 @@
   >
     <template #activator>
       <v-btn
-        v-if="['Admin', 'Operator'].includes(role) && schedule.order_ids?.length"
+        v-if="['Admin', 'Operator'].includes(role) && schedule.orders?.length"
         text="Assegna Gruppo Delivery"
         :color="theme.current.value.primaryColor"
         @click="dialog = true"
@@ -18,7 +18,8 @@
       />
       <v-data-table
         v-else
-        v-model="schedule.order_ids"
+        v-model="schedule.orders"
+        return-object
         :items="orders"
         :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
         :headers="getHeaders()"
