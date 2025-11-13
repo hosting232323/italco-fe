@@ -14,8 +14,12 @@ const { orders } = defineProps({
 
 const map = ref(null);
 const markers = ref([]);
+const googleMapsUrl = ref('');
 const mapContainer = ref(null);
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_API_KEY;
+
+let directionsService = null;
+let directionsRenderer = null;
 
 const loadGoogleMapsScript = () => {
   return new Promise((resolve, reject) => {
@@ -32,7 +36,7 @@ const loadGoogleMapsScript = () => {
     script.onerror = reject;
     document.head.appendChild(script);
   });
-}
+};
 
 const geocodeAddress = async (address) => {
   return new Promise((resolve) => {
@@ -40,13 +44,57 @@ const geocodeAddress = async (address) => {
     geocoder.geocode({ address }, (results, status) => {
       if (status === 'OK' && results[0]) {
         const location = results[0].geometry.location;
-        resolve({ lat: location.lat(), lng: location.lng() });
+        resolve({
+          lat: location.lat(),
+          lng: location.lng(),
+          formatted: results[0].formatted_address,
+        });
       } else {
         console.warn(`Geocode non riuscito per ${address}: ${status}`);
         resolve(null);
       }
     });
   });
+};
+
+const drawRoute = async () => {
+  if (!map.value || orders.length < 2) return;
+
+  const locations = await Promise.all(
+    orders.map(order => order.address ? geocodeAddress(order.address) : null)
+  );
+
+  const validLocations = locations.filter(l => l !== null);
+  if (validLocations.length < 2) return;
+
+  const [origin, ...rest] = validLocations;
+  const destination = rest.pop();
+  const waypoints = rest.map(loc => ({ location: loc, stopover: true }));
+
+  const originParam = encodeURIComponent(origin.formatted);
+  const destinationParam = encodeURIComponent(destination.formatted);
+  const waypointsParam = waypoints.map(w => encodeURIComponent(w.location.formatted)).join('|');
+
+  googleMapsUrl.value = `https://www.google.com/maps/dir/?api=1&origin=${originParam}&destination=${destinationParam}${
+    waypointsParam ? `&waypoints=${waypointsParam}` : ''
+  }&travelmode=driving`;
+
+  directionsService.route(
+    {
+      origin,
+      destination,
+      waypoints,
+      travelMode: window.google.maps.TravelMode.DRIVING,
+      optimizeWaypoints: true,
+    },
+    (response, status) => {
+      if (status === 'OK') {
+        directionsRenderer.setDirections(response);
+      } else {
+        console.warn('Errore nella creazione dell’itinerario:', status);
+      }
+    }
+  );
 };
 
 const updateMarkers = async () => {
@@ -56,13 +104,20 @@ const updateMarkers = async () => {
   markers.value.forEach(marker => marker.setMap(null));
   markers.value = [];
 
-  (await Promise.all(
+  const positions = await Promise.all(
     orders.map(order => order.address ? geocodeAddress(order.address) : null)
-  )).forEach((pos, i) => {
+  );
+
+  positions.forEach((pos, i) => {
     if (!pos) return;
     const marker = new googleMaps.Marker({
       position: pos,
       map: map.value,
+      label: {
+        text: (orders[i].schedule_index + 1).toString(), // oppure direttamente orders[i].schedule_index
+        color: "white",
+        fontWeight: "bold",
+      }
     });
     markers.value.push(marker);
   });
@@ -74,7 +129,35 @@ const updateMarkers = async () => {
   }
 };
 
+const addMapButton = (googleMaps) => {
+  const controlDiv = document.createElement('div');
+  controlDiv.style.margin = '10px';
+  controlDiv.style.textAlign = 'center';
+
+  const controlUI = document.createElement('button');
+  controlUI.style.backgroundColor = '#1a73e8';
+  controlUI.style.color = 'white';
+  controlUI.style.border = 'none';
+  controlUI.style.borderRadius = '6px';
+  controlUI.style.padding = '8px 12px';
+  controlUI.style.cursor = 'pointer';
+  controlUI.style.fontSize = '14px';
+  controlUI.style.boxShadow = '0 2px 6px rgba(0,0,0,0.3)';
+  controlUI.textContent = 'Apri in Google Maps';
+  controlUI.title = 'Apri questo itinerario in Google Maps';
+  controlDiv.appendChild(controlUI);
+
+  controlUI.addEventListener('click', () => {
+    if (googleMapsUrl.value) {
+      window.open(googleMapsUrl.value, '_blank');
+    }
+  });
+
+  map.value.controls[googleMaps.ControlPosition.TOP_RIGHT].push(controlDiv);
+};
+
 onMounted(async () => {
+  if(!orders[0]?.address) return;
   const googleMaps = await loadGoogleMapsScript();
   const center = await geocodeAddress(orders[0].address);
 
@@ -84,12 +167,21 @@ onMounted(async () => {
     mapTypeControl: false,
   });
 
-  updateMarkers();
+  directionsService = new googleMaps.DirectionsService();
+  directionsRenderer = new googleMaps.DirectionsRenderer({ map: map.value, suppressMarkers: true });
+
+  await updateMarkers();
+  await drawRoute();
+
+  addMapButton(googleMaps);
 });
 
 watch(
   () => orders,
-  () => updateMarkers(),
+  async () => {
+    await updateMarkers();
+    await drawRoute();
+  },
   { deep: true }
 );
 </script>

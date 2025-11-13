@@ -135,7 +135,7 @@
         </v-col>
         <v-col cols="5">
           <div style="height: 100%; border-radius: 12px; overflow: hidden;">
-            <GoogleMap :orders="schedule.orders" />
+            <GoogleMap :orders="schedule.orders" :key="schedule.orders.map(o => o.id).join('-')" />
           </div>
         </v-col>
       </v-row>
