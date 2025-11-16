@@ -46,7 +46,18 @@
           </v-col>
           <v-col
             cols="12"
-            md="6"
+            md="3"
+          >
+            <v-text-field
+              v-model="service.duration"
+              label="Durata (minuti)"
+              :class="isMobile ? '' : 'mr-2'"
+              type="number"
+            />
+          </v-col>
+          <v-col
+            cols="12"
+            md="3"
           >
             <v-text-field
               v-model="service.max_services"

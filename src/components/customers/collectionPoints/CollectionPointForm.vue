@@ -39,6 +39,28 @@
             />
           </v-col>
         </v-row>
+        <v-row no-gutters>
+          <v-col cols="6">
+            <v-text-field 
+              v-model="collectionPoint.opening_time" 
+              label="Orario di apertura"
+              type="time"
+              :rules="validation.requiredRules" 
+              dense
+              :class="isMobile ? '' : 'mr-2'"
+            />
+          </v-col>
+          <v-col cols="6">
+            <v-text-field 
+              v-model="collectionPoint.closing_time" 
+              label="Orario di chiusura"
+              type="time"
+              :rules="validation.futureTime(collectionPoint.opening_time)" 
+              dense
+              :class="isMobile ? '' : 'ml-2'"
+            />
+          </v-col>
+        </v-row>
         <FormButtons
           :loading="loading"
           @cancel="activeForm = false"

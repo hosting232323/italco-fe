@@ -14,12 +14,16 @@
       { title: 'Nome', value: 'name' },
       { title:'Tipo', value: 'type' },
       { title: 'Descrizione', value: 'description' },
+      { title: 'Durata', value: 'duration' },
       { title: 'Max Giornaieri', value: 'max_services' },
       { title: 'Azioni', key: 'actions' }
     ]"
   >
     <template #[`item.type`]="{ item }">
       {{ orderUtils.TYPES.find(type => type.value == item.type)?.title }}
+    </template>
+    <template #[`item.duration`]="{ item }">
+      {{ formatTime(item.duration) }}
     </template>
     <template #[`item.actions`]="{ item }">
       <v-row no-gutters>
@@ -92,6 +96,11 @@ const deleteItem = (item) => {
     serviceStore.initList(router);
     deleteLoading[item.id] = false;
   });
+};
+
+const formatTime = (value) => {
+  if (!value) return '-';
+  return `${value} min`
 };
 </script>
 

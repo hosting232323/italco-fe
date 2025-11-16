@@ -14,9 +14,13 @@
       { title: 'Nominativo', value: 'name' },
       { title: 'Indirizzo', value: 'address' },
       { title: 'Cap', value: 'cap' },
-      { title: 'Azioni', key: 'actions' }
+      { title: 'Orari', value: 'opening_closing' },
+      { title: 'Azioni', key: 'actions' },
     ]"
   >
+    <template #[`item.opening_closing`]="{ item }">
+      {{ formatTime(item.opening_time) }} - {{ formatTime(item.closing_time) }}
+    </template>
     <template #[`item.actions`]="{ item }">
       <v-row no-gutters>
         <v-col cols="6">
@@ -67,6 +71,12 @@ const deleteItem = (item) => {
     collectionPointStore.initList(router);
     deleteLoading[item.id] = false;
   });
+};
+
+const formatTime = (value) => {
+  if (!value) return '-';
+  const [h, m] = value.split(':');
+  return `${h}:${m}`;
 };
 </script>
 
