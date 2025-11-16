@@ -8,16 +8,13 @@
       <v-btn
         icon="mdi-plus"
         variant="text"
-        @click="formFlag = true"
+        @click="activePopUpForm = true"
       />
     </template>
     <v-card-text>
-      <PopUpForm
-        v-if="formFlag"
-        @close-form="formFlag = false"
-      />
+      <PopUpForm />
       <PopUpTable v-if="service.users.length > 0" />
-      <template v-else-if="!formFlag">
+      <template v-else-if="!activePopUpForm">
         <v-form
           ref="form"
           @submit.prevent="submitForm"
@@ -59,9 +56,8 @@ const price = ref(null);
 const theme = useTheme();
 const loading = ref(false);
 const router = useRouter();
-const formFlag = ref(false);
 const serviceStore = useServiceStore();
-const { element: service } = storeToRefs(serviceStore);
+const { element: service, activePopUpForm } = storeToRefs(serviceStore);
 
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;

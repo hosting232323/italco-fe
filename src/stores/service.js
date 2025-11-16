@@ -6,7 +6,8 @@ export const useServiceStore = defineStore('service', {
     list: [],
     element: {},
     ready: false,
-    activeForm: false
+    activeForm: false,
+    activePopUpForm: false
   }),
   actions: {
     createElement(router, func) {
