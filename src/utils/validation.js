@@ -38,8 +38,8 @@ const phoneRules = [
 const futureTime = (element) => [
   ...requiredRules,
   (value) => {
-    if (!value || !element.start_time_slot) return true;
-    const [startH, startM] = element.start_time_slot.split(':').map(Number);
+    if (!value || !element) return true;
+    const [startH, startM] = element.split(':').map(Number);
     const [endH, endM] = value.split(':').map(Number);
     const startMinutes = startH * 60 + startM;
     const endMinutes = endH * 60 + endM;
