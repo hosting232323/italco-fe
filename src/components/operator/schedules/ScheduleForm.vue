@@ -111,7 +111,7 @@
                         v-model="element.end_time_slot" 
                         label="Time Slot End"
                         type="time"
-                        :rules="validation.futureTime(element)" 
+                        :rules="validation.futureTime(element.start_time_slot)" 
                         dense
                         hide-details 
                         :style="isMobile ? { width: '' }: { width: '200px' }"
