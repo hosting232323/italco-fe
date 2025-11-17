@@ -36,7 +36,7 @@
         <v-row no-gutters>
           <v-col
             cols="12"
-            md="6"
+            md="4"
           >
             <v-text-field
               v-model="service.description"
@@ -46,22 +46,23 @@
           </v-col>
           <v-col
             cols="12"
-            md="3"
+            md="4"
           >
             <v-text-field
               v-model="service.duration"
               label="Durata (minuti)"
-              :class="isMobile ? '' : 'mr-2'"
+              :class="isMobile ? '' : 'mr-2 ml-2'"
               type="number"
             />
           </v-col>
           <v-col
             cols="12"
-            md="3"
+            md="4"
           >
             <v-text-field
               v-model="service.max_services"
               label="Max Servizi Giornalieri (opzionale)"
+              :class="isMobile ? '' : 'ml-2'"
               type="number"
             />
           </v-col>
