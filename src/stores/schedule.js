@@ -1,5 +1,6 @@
 import http from '@/utils/http';
 import { defineStore } from 'pinia';
+import storeUtils from '@/utils/stores';
 
 export const useScheduleStore = defineStore('schedule', {
   state: () => ({
@@ -20,9 +21,7 @@ export const useScheduleStore = defineStore('schedule', {
     updateElement(router, func) {
       http.postRequest(
         `schedule/${this.element.id}`,
-        Object.fromEntries(
-          Object.entries(this.element).filter(([key]) => !['created_at', 'updated_at'].includes(key))
-        ),
+        storeUtils.exclude_keys(this.element, ['created_at', 'updated_at']),
         func,
         'PUT',
         router

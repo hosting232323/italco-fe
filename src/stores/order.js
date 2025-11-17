@@ -1,6 +1,7 @@
 import http from '@/utils/http';
 import { defineStore } from 'pinia';
 import orderUtils from '@/utils/order';
+import storeUtils from '@/utils/stores';
 
 const EXCLUDED_KEYS = [
   'created_at', 'updated_at', 'delivery_group', 'services', 'user', 'collection_point', 'dates_form'
@@ -18,9 +19,7 @@ export const useOrderStore = defineStore('order', {
     createElement(router, func) {
       http.postRequest(
         'order',
-        Object.fromEntries(
-          Object.entries(this.element).filter(([key]) => !EXCLUDED_KEYS.includes(key))
-        ),
+        storeUtils.exclude_keys(this.element, EXCLUDED_KEYS),
         func,
         'POST',
         router
@@ -29,22 +28,21 @@ export const useOrderStore = defineStore('order', {
     updateElement(router, func) {
       http.postRequest(
         `order/${this.element.id}`,
-        Object.fromEntries(
-          Object.entries(this.element).filter(([key]) => !EXCLUDED_KEYS.includes(key))
-        ),
+        storeUtils.exclude_keys(this.element, EXCLUDED_KEYS),
         func,
         'PUT',
         router
       );
     },
     updateElementWithFormData(router, func) {
-      const content = {data: JSON.stringify(Object.fromEntries(
-        Object.entries(this.element).filter(([key]) => !EXCLUDED_KEYS.concat(['photo']).includes(key))))};
+      const content = {
+        data: JSON.stringify(storeUtils.exclude_keys(this.element, EXCLUDED_KEYS.concat(['photo'])))
+      };
+
       if (this.element.photos)
         this.element.photos.forEach(element => content[element.name] = element);
-
       if (this.element.signature)
-        content['signature'] = this.element.signature; 
+        content.signature = this.element.signature; 
 
       http.formDataRequest(
         `order/${this.element.id}`,

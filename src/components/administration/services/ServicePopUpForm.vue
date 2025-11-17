@@ -12,6 +12,7 @@
       item-title="nickname"
       item-value="id"
       :rules="validation.requiredRules"
+      :disabled="serviceUser.id"
     />
     <v-row no-gutters>
       <v-col
@@ -67,30 +68,28 @@ const form = ref(null);
 const message = ref('');
 const loading = ref(false);
 const router = useRouter();
-const serviceUser = ref({});
 const serviceStore = useServiceStore();
 const isMobile = mobile.setupMobileUtils();
 const administrationUserStore = useAdministrationUserStore();
-const { element: service, activePopUpForm } = storeToRefs(serviceStore);
 const users = storesUtils.getStoreList(administrationUserStore, router);
+const { innerElement: serviceUser, activePopUpForm } = storeToRefs(serviceStore);
 
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
 
   message.value = '';
   loading.value = true;
-  serviceStore.createServiceUserRelationships(
-    serviceUser.value,
-    router,
-    function (data) {
-      loading.value = false;
-      if (data.status == 'ok') {
-        serviceStore.initList(router);
-        service.value.users.push(data.service_user);
-        activePopUpForm.value = false;
-      } else
-        message.value = data.error;
-    }
-  );
+  if (serviceUser.value.id)
+    serviceStore.updateServiceUserRelationships(serviceUser.value, router, callback);
+  else
+    serviceStore.createServiceUserRelationships(serviceUser.value, router, callback);
+};
+
+const callback = (data) => {
+  loading.value = false;
+  if (data.status == 'ok')
+    serviceStore.initList(router);
+  else
+    message.value = data.error;
 };
 </script>

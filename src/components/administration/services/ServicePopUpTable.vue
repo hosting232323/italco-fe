@@ -43,7 +43,7 @@ const theme = useTheme();
 const router = useRouter();
 const deleteLoading = reactive({});
 const serviceStore = useServiceStore();
-const { element: service, activePopUpForm } = storeToRefs(serviceStore);
+const { element: service, innerElement: serviceUser, activePopUpForm } = storeToRefs(serviceStore);
 
 const deleteItem = (item) => {
   deleteLoading[item.id] = true;
@@ -55,7 +55,7 @@ const deleteItem = (item) => {
 };
 
 const openForm = (item) => {
-  service.value = item;
+  serviceUser.value = item;
   activePopUpForm.value = true;
 };
 </script>
