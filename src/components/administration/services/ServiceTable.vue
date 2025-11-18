@@ -95,7 +95,7 @@ const deleteItem = (item) => {
 };
 
 const formatTime = (value) => {
-  if (!value) return '-';
+  if (!value) return '';
   return `${value} min`;
 };
 </script>

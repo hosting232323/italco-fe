@@ -61,7 +61,7 @@
           >
             <v-text-field
               v-model="service.max_services"
-              label="Max Servizi Giornalieri (opzionale)"
+              label="Max Servizi Giornalieri"
               :class="isMobile ? '' : 'ml-2'"
               type="number"
             />
