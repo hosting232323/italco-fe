@@ -7,7 +7,7 @@
 
 <script setup>
 import { useTheme } from 'vuetify';
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, ref, watch, computed } from 'vue';
 
 const { orders } = defineProps({
   orders: {
@@ -91,11 +91,29 @@ const updateMarkers = async () => {
   while (markers.value.length > 0)
     markers.value.pop().setVisible(false);
 
+  console.log(collectionPoints.value);
+
+  (await Promise.all(
+    collectionPoints.value.map(clp => clp.address ? geocodeAddress(clp.address) : null)
+  )).forEach((pos, i) => {
+    if (!pos) return;
+    console.log(pos);
+    markers.value.push(new window.google.maps.Marker({
+      position: pos,
+      map: map.value,
+      label: {
+        text: 'ClpcollectionPoint',
+        color: 'white',
+        fontWeight: 'bold'
+      }
+    }));
+  });
+
   (await Promise.all(
     orders.map(order => order.address ? geocodeAddress(order.address) : null)
   )).forEach((pos, i) => {
     if (!pos) return;
-
+    console.log(pos);
     markers.value.push(new window.google.maps.Marker({
       position: pos,
       map: map.value,
@@ -148,6 +166,24 @@ const addLegend = () => {
   updateLegend();
   map.value.controls[window.google.maps.ControlPosition.TOP_LEFT].push(legendDiv);
 };
+const collectionPoints = computed(() => {
+  const points = new Map();
+
+  orders.forEach(order => {
+    const cp = order.collection_point;
+    if (cp) {
+      if (!points.has(cp.id)) {
+        points.set(cp.id, {
+          id: cp.id,
+          name: cp.name,
+          address: cp.address
+        });
+      }
+    }
+  });
+
+  return Array.from(points.values());
+});
 
 onMounted(async () => {
   while (!window.google?.maps?.places)
