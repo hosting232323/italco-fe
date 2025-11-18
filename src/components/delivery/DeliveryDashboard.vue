@@ -65,7 +65,9 @@ import { storeToRefs } from 'pinia';
 import mobile from '@/utils/mobile';
 import { useRouter } from 'vue-router';
 import { useOrderStore } from '@/stores/order';
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
+import http from '@/utils/http';
+import { useUserStore } from '@/stores/user';
 
 import Table from '@/components/delivery/DeliveryTable';
 
@@ -75,6 +77,10 @@ const theme = useTheme();
 const router = useRouter();
 const orderStore = useOrderStore();
 const { list: orders, ready } = storeToRefs(orderStore);
+const userStore = useUserStore();
+const { role } = storeToRefs(userStore);
+
+let watcherId = null;
 
 const isMobile = mobile.setupMobileUtils();
 const totOrder = computed(() => {
@@ -147,15 +153,53 @@ onMounted(() => {
     locationError.value = true;
     return;
   }
+  if (role.value === 'Delivery') {
+    const watchOptions = { 
+      enableHighAccuracy: true, 
+      maximumAge: 5000, 
+      timeout: 10000 
+    };
+    
+    let firstPositionHandled = false;
+    
+    watcherId = navigator.geolocation.watchPosition(
+      position => {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
 
-  navigator.geolocation.getCurrentPosition(
-    () => {
-      if (!ready.value) orderStore.initListDelivery(router);
-    },
-    () => {
-      locationError.value = true;
-    }
-  );
+        if (!firstPositionHandled) {
+          firstPositionHandled = true;
+          if (!ready.value) orderStore.initListDelivery(router);
+        }
+       http.postRequest(
+        'user/update_position', 
+        { 
+          lat: lat, // Se sono ref usa lat.value
+          lon: lon  // Se sono ref usa lon.value
+        }, 
+        (data) => {
+          if (data && data.status === 'ok') {
+            console.log('Posizione aggiornata con successo');
+          } else {
+            console.warn('Errore o stato non ok:', data);
+        
+          }
+        }, 
+        'POST', 
+        router
+      );
+      },
+      error => {
+        console.warn('Geolocation error:', error);
+        locationError.value = true;
+      },
+      watchOptions
+    );
+  }
+
+  onUnmounted(() => {
+    if (watcherId != null) navigator.geolocation.clearWatch(watcherId);
+  });
 });
 </script>
 

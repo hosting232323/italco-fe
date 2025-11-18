@@ -73,20 +73,6 @@ const createHeader = async (router, file = false) => {
 
   const userStore = useUserStore();
   const { role } = storeToRefs(userStore);
-  if (role.value === 'Delivery' && navigator.geolocation) {
-    try {
-      const position = await new Promise((resolve, reject) =>
-        navigator.geolocation.getCurrentPosition(resolve, reject, {
-          timeout: 5000,
-          enableHighAccuracy: true
-        })
-      );
-      headers['X-Lat'] = position.coords.latitude;
-      headers['X-Lon'] = position.coords.longitude;
-    } catch (error) {
-      console.warn('Posizione non disponibile:', error.message);
-    }
-  }
 
   return headers;
 };
