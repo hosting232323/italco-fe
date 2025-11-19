@@ -97,7 +97,6 @@ const updateMarkers = async () => {
     collectionPoints.value.map(clp => clp.address ? geocodeAddress(clp.address) : null)
   )).forEach((pos, i) => {
     if (!pos) return;
-    console.log(pos);
     markers.value.push(new window.google.maps.Marker({
       position: pos,
       map: map.value,
@@ -113,7 +112,6 @@ const updateMarkers = async () => {
     orders.map(order => order.address ? geocodeAddress(order.address) : null)
   )).forEach((pos, i) => {
     if (!pos) return;
-    console.log(pos);
     markers.value.push(new window.google.maps.Marker({
       position: pos,
       map: map.value,
