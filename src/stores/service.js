@@ -1,12 +1,15 @@
 import http from '@/utils/http';
 import { defineStore } from 'pinia';
+import storeUtils from '@/utils/stores';
 
 export const useServiceStore = defineStore('service', {
   state: () => ({
     list: [],
     element: {},
     ready: false,
-    activeForm: false
+    innerElement: {},
+    activeForm: false,
+    activePopUpForm: false
   }),
   actions: {
     createElement(router, func) {
@@ -21,9 +24,7 @@ export const useServiceStore = defineStore('service', {
     updateElement(router, func) {
       http.postRequest(
         `service/${this.element.id}`,
-        Object.fromEntries(
-          Object.entries(this.element).filter(([key]) => !['created_at', 'updated_at', 'users'].includes(key))
-        ),
+        storeUtils.exclude_keys(this.element, ['created_at', 'updated_at', 'users']),
         func,
         'PUT',
         router
@@ -48,12 +49,23 @@ export const useServiceStore = defineStore('service', {
       );
     },
     createServiceUserRelationships(object, router, func) {
-      object.service_id = this.element.id;
       http.postRequest(
         'service/customer',
-        object,
+        {
+          ...object,
+          service_id: this.element.id
+        },
         func,
         'POST',
+        router
+      );
+    },
+    updateServiceUserRelationships(object, router, func) {
+      http.postRequest(
+        `service/customer/${object.id}`,
+        storeUtils.exclude_keys(object, ['created_at', 'updated_at']),
+        func,
+        'PUT',
         router
       );
     },
@@ -69,6 +81,11 @@ export const useServiceStore = defineStore('service', {
     setList(data) {
       this.list = data.services;
       this.ready = true;
+      if (this.activePopUpForm) {
+        this.element = data.services.find(service => service.id === this.element.id);
+        this.activePopUpForm = false;
+        this.innerElement = {};
+      }
     }
   }
 });
