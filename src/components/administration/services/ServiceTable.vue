@@ -41,7 +41,7 @@
             variant="text"
             :color="theme.current.value.primaryColor"
             v-bind="activatorProps"
-            @click="openPopUp(item)"
+            @click="service = item"
           />
         </v-col>
         <v-col cols="4">
@@ -76,18 +76,14 @@ const { activatorProps } = defineProps({
 
 const theme = useTheme();
 const router = useRouter();
+const deleteLoading = reactive({});
 const serviceStore = useServiceStore();
 const { element: service, activeForm, ready } = storeToRefs(serviceStore);
 const services = storesUtils.getStoreList(serviceStore, router);
-const deleteLoading = reactive({});
 
 const openForm = (item) => {
   service.value = item;
   activeForm.value = true;
-};
-
-const openPopUp = (item) => {
-  service.value = item;
 };
 
 const deleteItem = (item) => {
@@ -99,7 +95,7 @@ const deleteItem = (item) => {
 };
 
 const formatTime = (value) => {
-  if (!value) return '-';
+  if (!value) return '';
   return `${value} min`;
 };
 </script>

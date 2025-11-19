@@ -3,18 +3,31 @@
     :items="service.users"
     :headers="[
       { title: 'Nickname', value: 'nickname' },
-      { title: 'Price', value: 'price' },
+      { title: 'Prezzo', value: 'price' },
+      { title: 'Codice', value: 'code' },
       { title: 'Azioni', key: 'actions' }
     ]"
   >
     <template #[`item.actions`]="{ item }">
-      <v-btn
-        icon="mdi-delete"
-        variant="text"
-        :loading="deleteLoading[item.id]"
-        :color="theme.current.value.primaryColor"
-        @click="deleteItem(item)"
-      />
+      <v-row no-gutters>
+        <v-col cols="6">
+          <v-btn
+            icon="mdi-pencil"
+            variant="text"
+            :color="theme.current.value.primaryColor"
+            @click="openForm(item)"
+          />
+        </v-col>
+        <v-col cols="6">
+          <v-btn
+            icon="mdi-delete"
+            variant="text"
+            :loading="deleteLoading[item.id]"
+            :color="theme.current.value.primaryColor"
+            @click="deleteItem(item)"
+          />
+        </v-col>
+      </v-row>
     </template>
   </v-data-table>
 </template>
@@ -28,9 +41,9 @@ import { useServiceStore } from '@/stores/service';
 
 const theme = useTheme();
 const router = useRouter();
-const serviceStore = useServiceStore();
-const { element: service } = storeToRefs(serviceStore);
 const deleteLoading = reactive({});
+const serviceStore = useServiceStore();
+const { element: service, innerElement: serviceUser, activePopUpForm } = storeToRefs(serviceStore);
 
 const deleteItem = (item) => {
   deleteLoading[item.id] = true;
@@ -39,5 +52,10 @@ const deleteItem = (item) => {
     serviceStore.initList(router);
     deleteLoading[item.id] = false;
   });
+};
+
+const openForm = (item) => {
+  serviceUser.value = item;
+  activePopUpForm.value = true;
 };
 </script>

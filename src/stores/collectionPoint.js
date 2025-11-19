@@ -1,5 +1,6 @@
 import http from '@/utils/http';
 import { defineStore } from 'pinia';
+import storeUtils from '@/utils/stores';
 
 export const useCollectionPointStore = defineStore('collectionPoint', {
   state: () => ({
@@ -21,9 +22,7 @@ export const useCollectionPointStore = defineStore('collectionPoint', {
     updateElement(router, func) {
       http.postRequest(
         `collection-point/${this.element.id}`,
-        Object.fromEntries(
-          Object.entries(this.element).filter(([key]) => !['created_at', 'updated_at', 'users'].includes(key))
-        ),
+        storeUtils.exclude_keys(this.element, ['created_at', 'updated_at', 'users']),
         func,
         'PUT',
         router

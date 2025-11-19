@@ -44,7 +44,7 @@ export const useCustomerGroupStore = defineStore('customerGroup', {
           customer_group_id: deassign ? null : this.element.id
         },
         func,
-        'PATCH',
+        'PUT',
         router
       );
     },
