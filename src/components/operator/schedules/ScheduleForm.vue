@@ -79,7 +79,7 @@
               @click="addOrder"
             />
             <draggable
-              v-model="schedule.orders"
+              v-model="draggableItems"
               item-key="id"
               class="mb-4"
               handle=".drag-handle"
@@ -248,6 +248,25 @@ const callback = (data) => {
   } else 
     error.value.date = data.error;
 };
+
+const draggableItems = computed(() => {
+  if (!schedule.value.orders) return [];
+  let items = [];
+
+  schedule.value.orders.forEach(order => {
+    items.push({
+      type: 'collection_point',
+      id: `cp-${order.id}`,
+      collection_point: order.collection_point
+    });
+    items.push({
+      type: 'order',
+      ...order
+    });
+  });
+
+  return items;
+});
 
 onMounted(() => {
   if (!schedule.value.id)
