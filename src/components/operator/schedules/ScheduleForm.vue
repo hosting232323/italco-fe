@@ -79,13 +79,13 @@
               @click="addOrder"
             />
             <draggable
-              v-model="draggableItems"
+              v-model="scheduleItems"
               item-key="id"
               class="mb-4"
               handle=".drag-handle"
             >
               <template #item="{ element }">
-                <div class="d-flex align-center order-item">
+                <div class="d-flex align-center order-item" style="height: 55px;">
                   <div
                     class="drag-handle"
                     style="cursor: grab;"
@@ -97,7 +97,7 @@
                     style="width: 100%;"
                   >
                     <p>{{ element.schedule_index + 1 }}: Ordine ID {{ element.id }}</p>
-                    <div :class="['d-flex', 'align-center', isMobile ? 'flex-column' : '']">
+                    <div :class="['d-flex', 'align-center', isMobile ? 'flex-column' : '']" v-if="element.type === 'Delivery'">
                       <v-text-field 
                         v-model="element.start_time_slot" 
                         label="Time Slot Start"
@@ -135,7 +135,7 @@
         </v-col>
         <v-col cols="5">
           <div style="height: 100%; border-radius: 12px; overflow: hidden;">
-            <GoogleMap :orders="schedule.orders" />
+            <GoogleMap :scheduleItems="scheduleItems" />
           </div>
         </v-col>
       </v-row>
@@ -249,27 +249,44 @@ const callback = (data) => {
     error.value.date = data.error;
 };
 
-const draggableItems = computed(() => {
-  if (!schedule.value.orders) return [];
-  let items = [];
+const scheduleItems = ref([]);
 
-  schedule.value.orders.forEach(order => {
-    items.push({
-      type: 'collection_point',
+const initScheduleItems = () => {
+  if (!schedule.value.orders) return;
+  console.log(schedule.value.orders);
+  scheduleItems.value = schedule.value.orders.flatMap((order, index) => [
+    {
       id: `cp-${order.id}`,
+      type: 'collection_point',
+      schedule_index: index * 2,
       collection_point: order.collection_point
-    });
-    items.push({
-      type: 'order',
+    },
+    {
+      id: order.id,
+      schedule_index: index * 2 + 1,
+      start_time_slot: order.start_time_slot || '',
+      end_time_slot: order.end_time_slot || '',
       ...order
-    });
-  });
+    }
+  ]);
+  console.log(scheduleItems.value);
+};
+console.log(scheduleItems.value);
 
-  return items;
-});
+watch(
+  () => scheduleItems.value,
+  (items) => {
+    items.forEach((item, index) => item.schedule_index = index);
+
+    schedule.value.orders = items
+      .filter(i => i.type === 'Delivery')
+      .map((i, index) => ({ ...i, schedule_index: index }));
+  },
+  { deep: true }
+);
 
 onMounted(() => {
-  if (!schedule.value.id)
+  if (!schedule.value.id) {
     schedule.value.orders = schedule.value.orders.map((order, index) => {
       return {
         ...order,
@@ -278,15 +295,12 @@ onMounted(() => {
         schedule_index: index
       };
     });
+  }
 
   schedule.value.orders.sort((a, b) => a.schedule_index - b.schedule_index);
+  initScheduleItems();
 });
 
-watch(
-  () => schedule.value.orders,
-  (newOrders) => newOrders?.forEach((o, i) => o.schedule_index = i),
-  { deep: true }
-);
 
 watch(() => schedule.value.date, () => {
   error.value.date = null;
