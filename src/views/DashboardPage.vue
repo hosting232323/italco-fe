@@ -31,10 +31,10 @@
 
 <script setup>
 import OrderTable from '@/components/orders/OrderTable';
-import DeliveryDashboard from '@/components/delivery/DeliveryDashboard';
 import OrderForm from '@/components/orders/OrderFormCard';
 import OrdersFilters from '@/components/orders/OrderFilters';
-import OrderImportation from '@/components/administration/AdministrationImportation';
+import DeliveryDashboard from '@/components/delivery/DeliveryDashboard';
+import OrderImportation from '@/components/administration/OrderImportation';
 
 import { storeToRefs } from 'pinia';
 import { useUserStore } from '@/stores/user';
