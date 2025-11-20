@@ -97,7 +97,7 @@
                     style="width: 100%;"
                   >
                     <p>{{ element.schedule_index + 1 }}: Ordine ID {{ element.id }}</p>
-                    <div :class="['d-flex', 'align-center', isMobile ? 'flex-column' : '']" v-if="element.type === 'Delivery'">
+                    <div :class="['d-flex', 'align-center', isMobile ? 'flex-column' : '']">
                       <v-text-field 
                         v-model="element.start_time_slot" 
                         label="Time Slot Start"
@@ -117,6 +117,7 @@
                         :style="isMobile ? { width: '' }: { width: '200px' }"
                       />
                       <v-btn
+                        v-if="element.type === 'Delivery'"
                         variant="text"
                         icon="mdi-delete"
                         :color="theme.current.value.primaryColor"
@@ -200,21 +201,36 @@ const addOrder = () => {
   const orderToAdd = orders.value.find(o => o.id === selectedOrderId.value);
   if (!orderToAdd) return;
 
-  schedule.value.orders.push({
+  const newOrder = {
     ...orderToAdd,
     start_time_slot: '',
     end_time_slot: '',
     schedule_index: schedule.value.orders.length
-  });
+  };
+  schedule.value.orders.push(newOrder);
+
+  scheduleItems.value.push(
+    {
+      id: `cp-${newOrder.id}`,
+      type: 'collection_point',
+      collection_point: newOrder.collection_point,
+      schedule_index: scheduleItems.value.length
+    },
+    {
+      ...newOrder,
+      type: 'Delivery',
+      schedule_index: scheduleItems.value.length + 1
+    }
+  );
+
   selectedOrderId.value = null;
 };
 
 const removeOrder = (orderId) => {
   schedule.value.orders = schedule.value.orders.filter(o => o.id !== orderId);
-  schedule.value.orders.forEach((o, i) => o.schedule_index = i);
-  if (!schedule.value.deleted_orders)
-    schedule.value.deleted_orders = [];
+  if (!schedule.value.deleted_orders) schedule.value.deleted_orders = [];
   schedule.value.deleted_orders.push(orderId);
+  scheduleItems.value = scheduleItems.value.filter(item => item.id !== orderId);
 };
 
 const availableOrders = computed(() => {
@@ -253,7 +269,6 @@ const scheduleItems = ref([]);
 
 const initScheduleItems = () => {
   if (!schedule.value.orders) return;
-  console.log(schedule.value.orders);
   scheduleItems.value = schedule.value.orders.flatMap((order, index) => [
     {
       id: `cp-${order.id}`,
@@ -269,9 +284,7 @@ const initScheduleItems = () => {
       ...order
     }
   ]);
-  console.log(scheduleItems.value);
 };
-console.log(scheduleItems.value);
 
 watch(
   () => scheduleItems.value,
@@ -281,6 +294,18 @@ watch(
     schedule.value.orders = items
       .filter(i => i.type === 'Delivery')
       .map((i, index) => ({ ...i, schedule_index: index }));
+
+    const deliveryOrders = items.filter(i => i.type === 'Delivery');
+    const cpItems = items.filter(i => i.type === 'collection_point');
+
+    cpItems.forEach(cp => {
+      const isUsed = deliveryOrders.some(
+        order => order.collection_point?.id === cp.collection_point?.id
+      );
+      if (!isUsed) {
+        scheduleItems.value = scheduleItems.value.filter(item => item.id !== cp.id);
+      }
+    });
   },
   { deep: true }
 );
