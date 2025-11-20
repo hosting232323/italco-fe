@@ -9,8 +9,8 @@
 import { useTheme } from 'vuetify';
 import { onMounted, ref, watch, computed } from 'vue';
 
-const { orders } = defineProps({
-  orders: {
+const { scheduleItems } = defineProps({
+  scheduleItems: {
     type: Array,
     default: () => []
   }
@@ -41,11 +41,17 @@ const geocodeAddress = async (address) => {
 };
 
 const drawRoute = async () => {
-  if (!map.value || orders.length < 2) return;
+  if (!map.value || scheduleItems.length < 2) return;
 
   const validLocations = (await Promise.all(
-    orders.map(order => order.address ? geocodeAddress(order.address) : null)
+    scheduleItems.map(item => {
+      const address = item.type === 'Delivery'
+        ? item.address
+        : item.collection_point?.address;
+      return address ? geocodeAddress(address) : null;
+    })
   )).filter(l => l !== null);
+
   if (validLocations.length < 2) return;
 
   const [origin, ...rest] = validLocations;
@@ -91,32 +97,25 @@ const updateMarkers = async () => {
   while (markers.value.length > 0)
     markers.value.pop().setVisible(false);
 
-  console.log(collectionPoints.value);
-
   (await Promise.all(
-    collectionPoints.value.map(clp => clp.address ? geocodeAddress(clp.address) : null)
+    scheduleItems.map(item => {
+      const address = item.type === 'Delivery'
+        ? item.address
+        : item.collection_point?.address;
+
+      return address ? geocodeAddress(address) : null;
+    })
   )).forEach((pos, i) => {
     if (!pos) return;
+
+    const item = scheduleItems[i];
     markers.value.push(new window.google.maps.Marker({
       position: pos,
       map: map.value,
       label: {
-        text: 'ClpcollectionPoint',
-        color: 'white',
-        fontWeight: 'bold'
-      }
-    }));
-  });
-
-  (await Promise.all(
-    orders.map(order => order.address ? geocodeAddress(order.address) : null)
-  )).forEach((pos, i) => {
-    if (!pos) return;
-    markers.value.push(new window.google.maps.Marker({
-      position: pos,
-      map: map.value,
-      label: {
-        text: (orders[i].schedule_index + 1).toString(),
+        text: item.type === 'Delivery'
+          ? (item.schedule_index + 1).toString()
+          : 'CP',
         color: 'white',
         fontWeight: 'bold'
       }
@@ -164,34 +163,17 @@ const addLegend = () => {
   updateLegend();
   map.value.controls[window.google.maps.ControlPosition.TOP_LEFT].push(legendDiv);
 };
-const collectionPoints = computed(() => {
-  const points = new Map();
-
-  orders.forEach(order => {
-    const cp = order.collection_point;
-    if (cp) {
-      if (!points.has(cp.id)) {
-        points.set(cp.id, {
-          id: cp.id,
-          name: cp.name,
-          address: cp.address
-        });
-      }
-    }
-  });
-
-  return Array.from(points.values());
-});
 
 onMounted(async () => {
   while (!window.google?.maps?.places)
     await new Promise((resolve) => setTimeout(resolve, 100));
 
+  const firstDelivery = scheduleItems.find(item => item.type === 'Delivery');
   map.value = new window.google.maps.Map(mapContainer.value, {
     zoom: 10,
     mapTypeControl: false,
-    center: orders[0]?.address
-      ? await geocodeAddress(orders[0].address)
+    center: firstDelivery?.address
+      ? await geocodeAddress(firstDelivery.address)
       : { lat: 41.8719, lng: 12.5674 }
   });
 
@@ -207,7 +189,7 @@ onMounted(async () => {
 });
 
 watch(
-  () => orders,
+  () => scheduleItems,
   () => {
     updateMarkers();
     drawRoute();
