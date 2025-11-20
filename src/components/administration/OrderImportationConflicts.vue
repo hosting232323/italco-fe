@@ -33,7 +33,10 @@
             :items="order.services"
             item-title="name"
             item-value="id"
-            menu
+            :rules="[(_) => {
+              if (order.products[product].length > 0) return true;
+              return 'Campo obbligatorio';
+            }]"
           >
             <template #item="{ props }">
               <v-list-item
@@ -64,11 +67,7 @@ import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import { useOrderStore } from '@/stores/order';
 
-const props = defineProps({
-  isActive: {
-    type: Boolean,
-    required: true
-  },
+const { conflictsOrders, collectionPoint } = defineProps({
   conflictsOrders: {
     type: Array,
     required: true
@@ -89,11 +88,13 @@ const orderStore = useOrderStore();
 const emits = defineEmits(['cancel']);
 const { ready } = storeToRefs(orderStore);
 
-const submitConflictsForm = () => {
+const submitConflictsForm = async () => {
+  if (!(await form.value.validate()).valid) return;
+
   loading.value = true;
   http.postRequest('import/conflict', {
-    orders: props.conflictsOrders,
-    collection_point_id: props.collectionPoint
+    orders: conflictsOrders,
+    collection_point_id: collectionPoint
   }, function (data) {
     loading.value = false;
     if (data.status == 'ok') {

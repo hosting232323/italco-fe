@@ -46,8 +46,8 @@
           </v-form>
           <OrderImportationConflicts
             v-else
-            :conflictsOrders="conflictsOrders"
-            :collectionPoint="collectionPoint"
+            :conflicts-orders="conflictsOrders"
+            :collection-point="collectionPoint"
             @cancel="isActive.value = false"
           />
         </v-card-text>

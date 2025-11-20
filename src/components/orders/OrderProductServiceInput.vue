@@ -46,7 +46,6 @@
             (role == 'Customer' || service.users.map(user => user.user_id).includes(order.user_id)))"
           item-title="name"
           :rules="validation.requiredRules"
-          menu
           return-object
         >
           <template #item="{ props }">

@@ -16,6 +16,7 @@
         readonly
         clearable
         :rules="rules"
+        :disabled="disabled"
         @click:clear="clearDate"
       >
         <template #append-inner>
@@ -57,6 +58,10 @@ const props = defineProps({
   classStyle: {
     type: String,
     required: true
+  },
+  disabled: {
+    type: Boolean,
+    default: false
   }
 });
 

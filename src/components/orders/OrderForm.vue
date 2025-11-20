@@ -69,7 +69,7 @@ const submitForm = async () => {
     return;
   }
 
-  if (role.value == 'Admin' || !order.value.id)
+  if (['Admin', 'Operator'].includes(role.value) || !order.value.id)
     order.value.dates_form = true;
   else {
     loading.value = true;
