@@ -7,14 +7,9 @@
 
 <script setup>
 import { useTheme } from 'vuetify';
-import { onMounted, ref, watch, computed } from 'vue';
-
-const { scheduleItems } = defineProps({
-  scheduleItems: {
-    type: Array,
-    default: () => []
-  }
-});
+import { storeToRefs } from 'pinia';
+import { onMounted, ref, watch } from 'vue';
+import { useScheduleStore } from '@/stores/schedule';
 
 const map = ref(null);
 const markers = ref([]);
@@ -24,6 +19,8 @@ const durationMin = ref(0);
 const googleMapsUrl = ref('');
 let directionsRenderer = null;
 const mapContainer = ref(null);
+const scheduleStore = useScheduleStore();
+const { element: schedule } = storeToRefs(scheduleStore);
 
 const geocodeAddress = async (address) => {
   return new Promise((resolve) => {
@@ -41,10 +38,10 @@ const geocodeAddress = async (address) => {
 };
 
 const drawRoute = async () => {
-  if (!map.value || scheduleItems.length < 2) return;
+  if (!map.value || schedule.value.scheduleItems.length < 2) return;
 
   const validLocations = (await Promise.all(
-    scheduleItems.map(item => {
+    schedule.value.scheduleItems.map(item => {
       const address = item.type === 'Delivery'
         ? item.address
         : item.collection_point?.address;
@@ -98,7 +95,7 @@ const updateMarkers = async () => {
     markers.value.pop().setVisible(false);
 
   (await Promise.all(
-    scheduleItems.map(item => {
+    schedule.value.scheduleItems.map(item => {
       const address = item.type === 'Delivery'
         ? item.address
         : item.collection_point?.address;
@@ -108,7 +105,7 @@ const updateMarkers = async () => {
   )).forEach((pos, i) => {
     if (!pos) return;
 
-    const item = scheduleItems[i];
+    const item = schedule.value.scheduleItems[i];
     markers.value.push(new window.google.maps.Marker({
       position: pos,
       map: map.value,
@@ -168,7 +165,7 @@ onMounted(async () => {
   while (!window.google?.maps?.places)
     await new Promise((resolve) => setTimeout(resolve, 100));
 
-  const firstDelivery = scheduleItems.find(item => item.type === 'Delivery');
+  const firstDelivery = schedule.value.scheduleItems.find(item => item.type === 'Delivery');
   map.value = new window.google.maps.Map(mapContainer.value, {
     zoom: 10,
     mapTypeControl: false,
@@ -189,7 +186,7 @@ onMounted(async () => {
 });
 
 watch(
-  () => scheduleItems,
+  () => schedule.value.scheduleItems,
   () => {
     updateMarkers();
     drawRoute();
