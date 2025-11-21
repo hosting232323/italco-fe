@@ -27,6 +27,10 @@
         :items-per-page="25"
         :items-per-page-options="[10, 25, 50, 100]"
       >
+        <template #[`item.id`]="{ item }">
+          {{ item.id }}
+          {{ item.external_id ? `(${item.external_id})` : '' }}
+        </template>
         <template #[`item.type`]="{ item }">
           {{ orderUtils.TYPES.find(type => type.value == item.type)?.title }}
         </template>

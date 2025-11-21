@@ -7,13 +7,19 @@
       v-for="order in conflictsOrders"
       :key="order['Rif. Com']"
     >
-      <v-col cols="6">
+      <v-col
+        cols="12"
+        md="4"
+      >
         Ordine: {{ order['Rif. Com'] }}<br>
         DPC: {{ order['DPC'] }}<br>
         DRC: {{ order['DRC'] }}<br>
         Indirizzo: {{ order['Indirizzo Dest.'] }} {{ order['Localita'] }}<br>
       </v-col>
-      <v-col cols="6">
+      <v-col
+        cols="12"
+        md="8"
+      >
         <template
           v-for="product in Object.keys(order.products)"
           :key="product"
@@ -28,23 +34,44 @@
           >
             {{ serviceNames[serviceId] }}
           </v-chip>
-          <v-select
-            v-model="selectedServices[order['Rif. Com'] + product]"
-            :items="order.services"
-            item-title="name"
-            item-value="id"
-            :rules="[(_) => {
-              if (order.products[product].length > 0) return true;
-              return 'Campo obbligatorio';
-            }]"
-          >
-            <template #item="{ props }">
-              <v-list-item
-                v-bind="props"
-                @click="selectService(order, product)"
-              />
-            </template>
-          </v-select>
+          <v-row no-gutters>
+            <v-col cols="6">
+              <v-select
+                v-model="selectedFileServices[order['Rif. Com'] + product]"
+                label="Servizi da file"
+                :items="order.services"
+                item-title="name"
+                item-value="id"
+                :rules="getRules(order, product)"
+                class="mr-2"
+              >
+                <template #item="{ props }">
+                  <v-list-item
+                    v-bind="props"
+                    @click="selectService(order, product, 'file')"
+                  />
+                </template>
+              </v-select>
+            </v-col>
+            <v-col cols="6">
+              <v-select
+                v-model="selectedAresServices[order['Rif. Com'] + product]"
+                :items="getServiceUser()"
+                label="Servizi da Ares"
+                item-title="name"
+                item-value="id"
+                :rules="getRules(order, product)"
+                class="ml-2"
+              >
+                <template #item="{ props }">
+                  <v-list-item
+                    v-bind="props"
+                    @click="selectService(order, product, 'ares')"
+                  />
+                </template>
+              </v-select>
+            </v-col>
+          </v-row>
         </template>
       </v-col>
     </v-row>
@@ -65,9 +92,15 @@ import http from '@/utils/http';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
+import storesUtils from '@/utils/stores';
 import { useOrderStore } from '@/stores/order';
+import { useServiceStore } from '@/stores/service';
 
-const { conflictsOrders, collectionPoint } = defineProps({
+const { customerId, conflictsOrders, collectionPoint } = defineProps({
+  customerId: {
+    type: Number,
+    required: true
+  },
   conflictsOrders: {
     type: Array,
     required: true
@@ -83,10 +116,13 @@ const theme = useTheme();
 const loading = ref(false);
 const router = useRouter();
 const serviceNames = ref({});
-const selectedServices = ref({});
 const orderStore = useOrderStore();
+const selectedFileServices = ref({});
+const selectedAresServices = ref({});
 const emits = defineEmits(['cancel']);
+const serviceStore = useServiceStore();
 const { ready } = storeToRefs(orderStore);
+const services = storesUtils.getStoreList(serviceStore, router);
 
 const submitConflictsForm = async () => {
   if (!(await form.value.validate()).valid) return;
@@ -108,12 +144,36 @@ const submitConflictsForm = async () => {
   }, 'POST', router);
 };
 
-const selectService = (order, product) => {
-  const serviceId = selectedServices.value[order['Rif. Com'] + product];
+const selectService = (order, product, type) => {
+  const refId = order['Rif. Com'] + product;
+  const serviceId = type == 'file' ? selectedFileServices.value[refId] : selectedAresServices.value[refId];
   order.products[product].push(serviceId);
-  selectedServices.value[order['Rif. Com'] + product] = null;
-  const serviceIndex = order.services.findIndex(service => service.id === serviceId);
-  serviceNames.value[serviceId] = order.services[serviceIndex].name;
-  order.services.splice(serviceIndex, 1);
+
+  if (!serviceNames.value[serviceId])
+    serviceNames.value[serviceId] = services.value.find(service => service.users.find(user => user.id == serviceId)).name;
+
+  if (type == 'ares')
+    selectedAresServices.value[refId] = null;
+  else {
+    selectedFileServices.value[refId] = null;
+    order.services.splice(order.services.findIndex(service => service.id === serviceId), 1);
+  }
+};
+
+const getRules = (order, product) => {
+  return [() => {
+    if (order.products[product].length > 0) return true;
+    return 'Inserire almeno un servizio per prodotto';
+  }];
+};
+
+const getServiceUser = () => {
+  return services.value.reduce((acc, service) => {
+    const serviceUser = service.users.find(user => user.user_id === customerId);
+    if (serviceUser)
+      acc.push({name: service.name, id: serviceUser.id});
+
+    return acc;
+  }, []);
 };
 </script>
