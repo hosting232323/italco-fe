@@ -79,7 +79,7 @@
               @click="addOrder"
             />
             <draggable
-              v-model="schedule.scheduleItems"
+              v-model="schedule.schedule_items"
               item-key="id"
               class="mb-4"
               handle=".drag-handle"
@@ -136,7 +136,7 @@
         </v-col>
         <v-col cols="5">
           <div style="height: 100%; border-radius: 12px; overflow: hidden;">
-            <GoogleMap />
+            <GoogleMap v-if="schedule.schedule_items && schedule.schedule_items.length > 0"/>
           </div>
         </v-col>
       </v-row>
@@ -209,17 +209,17 @@ const addOrder = () => {
   };
   schedule.value.orders.push(newOrder);
 
-  schedule.value.scheduleItems.push(
+  schedule.value.schedule_items.push(
     {
       id: `cp-${newOrder.id}`,
       type: 'collection_point',
       collection_point: newOrder.collection_point,
-      schedule_index: schedule.value.scheduleItems.length
+      schedule_index: schedule.value.schedule_items.length
     },
     {
       ...newOrder,
       type: 'Delivery',
-      schedule_index: schedule.value.scheduleItems.length + 1
+      schedule_index: schedule.value.schedule_items.length + 1
     }
   );
 
@@ -230,7 +230,7 @@ const removeOrder = (orderId) => {
   schedule.value.orders = schedule.value.orders.filter(o => o.id !== orderId);
   if (!schedule.value.deleted_orders) schedule.value.deleted_orders = [];
   schedule.value.deleted_orders.push(orderId);
-  schedule.value.scheduleItems = schedule.value.scheduleItems.filter(item => item.id !== orderId);
+  schedule.value.schedule_items = schedule.value.schedule_items.filter(item => item.id !== orderId);
 };
 
 const availableOrders = computed(() => {
@@ -267,7 +267,7 @@ const callback = (data) => {
 
 const initScheduleItems = () => {
   if (!schedule.value.orders) return;
-  schedule.value.scheduleItems = schedule.value.orders.flatMap((order, index) => [
+  schedule.value.schedule_items = schedule.value.orders.flatMap((order, index) => [
     {
       id: `cp-${order.id}`,
       type: 'collection_point',
@@ -285,7 +285,7 @@ const initScheduleItems = () => {
 };
 
 watch(
-  () => schedule.value.scheduleItems,
+  () => schedule.value.schedule_items,
   (items) => {
     items.forEach((item, index) => item.schedule_index = index);
 
@@ -301,7 +301,7 @@ watch(
         order => order.collection_point?.id === cp.collection_point?.id
       );
       if (!isUsed) {
-        schedule.value.scheduleItems = schedule.value.scheduleItems.filter(item => item.id !== cp.id);
+        schedule.value.schedule_items = schedule.value.schedule_items.filter(item => item.id !== cp.id);
       }
     });
   },
