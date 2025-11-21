@@ -27,7 +27,7 @@
             variant="text"
             :color="theme.current.value.primaryColor"
             v-bind="activatorProps"
-            @click="order = item"
+            @click="openPopUp(item, 'delivery')"
           />
         </v-col>
         <v-col cols="6">
@@ -40,22 +40,48 @@
           />
         </v-col>
       </v-row>
-      <v-btn
-        v-if="item.status == 'To Reschedule' && role != 'Customer'"
-        icon="mdi-content-copy"
-        variant="text"
-        :color="theme.current.value.primaryColor"
-        title="Clona ordine"
-        @click="copyOrder(item)"
-      />
+      <v-row
+        v-if="role != 'Customer'"
+        no-gutters
+      >
+        <v-col cols="6">
+          <v-btn
+            icon="mdi-account"
+            variant="text"
+            :color="theme.current.value.primaryColor"
+            title="Cambia punto vendita"
+            v-bind="activatorProps"
+            @click="openPopUp(item, 'customer')"
+          />
+        </v-col>
+        <v-col cols="6">
+          <v-btn
+            v-if="item.status == 'To Reschedule'"
+            icon="mdi-content-copy"
+            variant="text"
+            :color="theme.current.value.primaryColor"
+            title="Clona ordine"
+            @click="copyOrder(item)"
+          />
+        </v-col>
+      </v-row>
     </template>
-    <template #default>
-      <OrderDeliverySummary :order="order" />
+    <template #default="{ isActive }">
+      <OrderDeliverySummary
+        v-if="popUpType == 'delivery'"
+        :order="order"
+      />
+      <ChangeOrderUser
+        v-else-if="popUpType == 'customer'"
+        :order="order"
+        @cancel="isActive.value = false"
+      />
     </template>
   </v-dialog>
 </template>
 
 <script setup>
+import ChangeOrderUser from '@/components/orders/ChangeOrderUser';
 import OrderDeliverySummary from '@/components/orders/OrderDeliverySummary';
 
 import { ref } from 'vue';
@@ -76,6 +102,7 @@ const { item } = defineProps({
 
 const order = ref({});
 const theme = useTheme();
+const popUpType = ref('');
 const router = useRouter();
 const loadingExport = ref(false);
 const userStore = useUserStore();
@@ -87,6 +114,11 @@ const openForm = (item) => {
   updatedOrder.value = item;
   updatedOrder.value.user_id = updatedOrder.value.user.id;
   activeForm.value = true;
+};
+
+const openPopUp = (item, type) => {
+  order.value = item;
+  popUpType.value = type;
 };
 
 const exportPdf = async (item) => {
@@ -129,4 +161,6 @@ const copyOrder = (selectedOrder) => {
   };
   activeForm.value = true;
 };
+
+const changeCustomer = () => {};
 </script>
