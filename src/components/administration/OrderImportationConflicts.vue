@@ -15,6 +15,11 @@
         DPC: {{ order['DPC'] }}<br>
         DRC: {{ order['DRC'] }}<br>
         Indirizzo: {{ order['Indirizzo Dest.'] }} {{ order['Localita'] }}<br>
+        <v-btn
+          text="Elimina ordine"
+          @click="deleteOrder(order)"
+          :color="theme.current.value.primaryColor"
+        />
       </v-col>
       <v-col
         cols="12"
@@ -144,6 +149,7 @@ const submitConflictsForm = async () => {
   }, 'POST', router);
 };
 
+
 const selectService = (order, product, type) => {
   const refId = order['Rif. Com'] + product;
   const serviceId = type == 'file' ? selectedFileServices.value[refId] : selectedAresServices.value[refId];
@@ -163,6 +169,7 @@ const selectService = (order, product, type) => {
 const getRules = (order, product) => {
   return [() => {
     if (order.products[product].length > 0) return true;
+
     return 'Inserire almeno un servizio per prodotto';
   }];
 };
