@@ -176,23 +176,68 @@ const toggleWheel = (mode) => {
   fabButton.value.style.transform = mode == 'open' ? 'scale(0)' : 'scale(1)';
 };
 
-const sendMessage = () => {
+const sendMessage = async () => {
   if(!userMessage.value) return;
 
-  loading.value = true;
-  const messageToSend = userMessage.value;
-  userMessage.value = '';
-  messages.value.push(messageToSend);
-  http.postRequest('chatty/message', {
-    message: messageToSend,
-    thread_id: threadId.value
-  }, (data) => {
-    loading.value = false;
-    if(data.status == 'ok') {
-      messages.value.push(data.message);
-      threadId.value = data.thread_id;
+  const response = await fetch(`http://127.0.0.1:8080/chatty/message`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      message: userMessage.value,
+      thread_id: threadId.value
+    })
+  })
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let completeMessage = '';
+
+  let counter = 0;
+    while (true) {
+      const { done, value } = await reader.read();
+      // if (done) {
+      //   document.getElementById('streamingMessage').id = '';
+      //   break;
+      // }
+
+      const chunk = decoder.decode(value, { stream: true });
+      // if (!threadId && chunk.includes('"thread_id"')) {
+      //   threadId = JSON.parse(chunk).thread_id;
+      //   continue
+      // }
+      console.log(chunk)
+
+      // if (chunk.trim().startsWith('{') && chunk.includes('"thread_id"'))
+      //   continue;
+
+      // if(counter === 0){
+      //   removeMessageAnimation()
+      //   counter++;
+      // }
+      // completeMessage += chunk;
+      // updateStreamingMessage(completeMessage);
     }
-  }, 'POST', router);
+  
+  // botResAnimation(true);
+  // faq.toggleFaq(true);
+
+
+  // loading.value = true;
+  // const messageToSend = userMessage.value;
+  // userMessage.value = '';
+  // messages.value.push(messageToSend);
+  // http.postRequest('chatty/message', {
+  //   message: messageToSend,
+  //   thread_id: threadId.value
+  // }, (data) => {
+  //   loading.value = false;
+  //   if(data.status == 'ok') {
+  //     messages.value.push(data.message);
+  //     threadId.value = data.thread_id;
+  //   }
+  // }, 'POST', router);
 };
 
 const checkScroll = () => {
