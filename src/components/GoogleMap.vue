@@ -41,12 +41,7 @@ const drawRoute = async () => {
   if (!map.value || schedule.value.schedule_items.length < 2) return;
 
   const validLocations = (await Promise.all(
-    schedule.value.schedule_items.map(item => {
-      const address = item.type === 'Delivery'
-        ? item.address
-        : item.collection_point?.address;
-      return address ? geocodeAddress(address) : null;
-    })
+    schedule.value.schedule_items.map(item => item.address ? geocodeAddress(item.address) : null)
   )).filter(l => l !== null);
 
   if (validLocations.length < 2) return;
@@ -95,13 +90,9 @@ const updateMarkers = async () => {
     markers.value.pop().setVisible(false);
 
   (await Promise.all(
-    schedule.value.schedule_items.map(item => {
-      const address = item.type === 'Delivery'
-        ? item.address
-        : item.collection_point?.address;
-
-      return address ? geocodeAddress(address) : null;
-    })
+    schedule.value.schedule_items.map(item =>
+      item.address ? geocodeAddress(item.address) : null
+    )
   )).forEach((pos, i) => {
     if (!pos) return;
 
@@ -110,11 +101,9 @@ const updateMarkers = async () => {
       position: pos,
       map: map.value,
       label: {
-        text: item.type === 'Delivery'
-          ? (item.schedule_index + 1).toString()
-          : 'CP',
         color: 'white',
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        text: (item.index + 1).toString()
       }
     }));
   });
@@ -165,7 +154,7 @@ onMounted(async () => {
   while (!window.google?.maps?.places)
     await new Promise((resolve) => setTimeout(resolve, 100));
 
-  const firstDelivery = schedule.value.schedule_items.find(item => item.type === 'Delivery');
+  const firstDelivery = schedule.value.schedule_items[0];
   map.value = new window.google.maps.Map(mapContainer.value, {
     zoom: 10,
     mapTypeControl: false,

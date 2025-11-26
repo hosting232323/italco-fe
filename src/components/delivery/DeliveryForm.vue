@@ -63,7 +63,7 @@
                 v-model="order.end_time_slot"
                 label="Time Slot End"
                 type="time"
-                :rules="validation.futureTime(order)"
+                :rules="validation.futureTime(order.start_time_slot)"
                 dense
                 hide-details
                 style="max-width: 115px;"
@@ -100,7 +100,7 @@
               v-model="order.end_time_slot"
               label="Time Slot End"
               type="time"
-              :rules="validation.futureTime(order)"
+              :rules="validation.futureTime(order.start_time_slot)"
               dense
               style="width: 100%;"
             />
