@@ -40,31 +40,39 @@
           />
         </v-col>
       </v-row>
-      <v-row
-        v-if="role != 'Customer'"
-        no-gutters
-      >
-        <v-col cols="6">
-          <v-btn
-            icon="mdi-account"
-            variant="text"
-            :color="theme.current.value.primaryColor"
-            title="Cambia punto vendita"
-            v-bind="activatorProps"
-            @click="openPopUp(item, 'customer')"
-          />
-        </v-col>
-        <v-col cols="6">
-          <v-btn
-            v-if="item.status == 'To Reschedule'"
-            icon="mdi-content-copy"
-            variant="text"
-            :color="theme.current.value.primaryColor"
-            title="Clona ordine"
-            @click="copyOrder(item)"
-          />
-        </v-col>
-      </v-row>
+      <template v-if="role != 'Customer'">
+        <v-row no-gutters>
+          <v-col cols="6">
+            <v-btn
+              icon="mdi-account"
+              variant="text"
+              :color="theme.current.value.primaryColor"
+              title="Cambia punto vendita"
+              v-bind="activatorProps"
+              @click="openPopUp(item, 'customer')"
+            />
+          </v-col>
+          <v-col cols="6">
+            <v-btn
+              v-if="role == 'Admin'"
+              icon="mdi-delete"
+              :loading="loadingDelete"
+              variant="text"
+              :color="theme.current.value.primaryColor"
+              title="Elimina ordine"
+              @click="deleteOrder(item)"
+            />
+          </v-col>
+        </v-row>
+        <v-btn
+          v-if="item.status == 'To Reschedule'"
+          icon="mdi-content-copy"
+          variant="text"
+          :color="theme.current.value.primaryColor"
+          title="Clona ordine"
+          @click="copyOrder(item)"
+        />
+      </template>
     </template>
     <template #default="{ isActive }">
       <OrderDeliverySummary
@@ -105,10 +113,11 @@ const theme = useTheme();
 const popUpType = ref('');
 const router = useRouter();
 const loadingExport = ref(false);
+const loadingDelete = ref(false);
 const userStore = useUserStore();
 const orderStore = useOrderStore();
 const { role } = storeToRefs(userStore);
-const { element: updatedOrder, activeForm } = storeToRefs(orderStore);
+const { element: updatedOrder, activeForm, ready } = storeToRefs(orderStore);
 
 const openForm = (item) => {
   updatedOrder.value = item;
@@ -162,5 +171,15 @@ const copyOrder = (selectedOrder) => {
   activeForm.value = true;
 };
 
-const changeCustomer = () => {};
+const deleteOrder = (item) => {
+  loadingDelete.value = true;
+  http.getRequest(`order/${item.id}`, {}, function (data) {
+    loadingDelete.value = false;
+    if (data.status == 'ok') {
+      ready.value = false;
+      orderStore.initList(router);
+    } else
+      alert(data.error);
+  }, 'DELETE', router);
+};
 </script>

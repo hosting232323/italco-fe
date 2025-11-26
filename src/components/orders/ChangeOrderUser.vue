@@ -72,7 +72,7 @@ const submitForm = async () => {
     if (data.status == 'ok') {
       ready.value = false;
       orderStore.initList(router);
-      emits('cancel')
+      emits('cancel');
     } else
       message.value = data.error;
   }, 'POST', router);
