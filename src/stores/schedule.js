@@ -1,11 +1,13 @@
 import http from '@/utils/http';
 import { defineStore } from 'pinia';
 import storeUtils from '@/utils/stores';
+import scheduleUtils from '@/utils/schedule';
 
 export const useScheduleStore = defineStore('schedule', {
   state: () => ({
     list: [],
     element: {},
+    filters: {},
     ready: false
   }),
   actions: {
@@ -28,11 +30,15 @@ export const useScheduleStore = defineStore('schedule', {
       );
     },
     initList(router) {
-      http.getRequest(
-        'schedule',
-        {},
+      Object.keys(this.filters).forEach(key => {
+        if (!this.filters[key]) delete this.filters[key];
+      });
+
+      http.postRequest(
+        'schedule/filter',
+        {filters: scheduleUtils.formatFilters({ ...this.filters })},
         this.setList,
-        'GET',
+        'POST',
         router
       );
     },
