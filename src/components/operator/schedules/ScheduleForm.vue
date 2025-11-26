@@ -12,7 +12,7 @@
   >
     <v-card-text>
       <v-row>
-        <v-col cols="7">
+        <v-col cols="12" md="7">
           <v-form
             ref="form"
             @submit.prevent="submitForm"
@@ -71,7 +71,10 @@
               v-if="schedule.id"
               v-model="selectedOrderId"
               label="Aggiungi Ordine"
-              :items="availableOrders"
+              :items="orders.value.filter(order => order.status === 'Pending').filter(order =>
+                !schedule.schedule_items.filter(collectionPoint => collectionPoint.operation_type == 'Order')
+                  .some(scheduleOrder => scheduleOrder.id === order.id)
+              )"
               :item-title="order => `ID ordine: ${order.id}`"
               item-value="id"
               append-icon="mdi-plus"
@@ -85,18 +88,20 @@
               handle=".drag-handle"
             >
               <template #item="{ element }">
-                <div class="d-flex align-center order-item" style="height: 55px;">
-                  <div
-                    class="drag-handle"
-                    style="cursor: grab;"
-                  >
-                    <v-icon>mdi-drag</v-icon>
-                  </div>
-                  <div
-                    :class="['d-flex', 'justify-space-between', isMobile ? '' : 'align-center', isMobile ? 'flex-column' : '']"
-                    style="width: 100%;"
-                  >
-                    <p>{{ element.schedule_index + 1 }}: Ordine ID {{ element.id }}</p>
+                <v-row no-gutters class="mt-2">
+                  <v-col cols="1">
+                    <div
+                      class="drag-handle"
+                      style="cursor: grab;"
+                    >
+                      <v-icon>mdi-drag</v-icon>
+                    </div>
+                  </v-col>
+                  <v-col cols="4">
+                    <p>{{ element.index + 1 }}: 
+                    {{ element.operation_type == 'Order' ? 'Ordine' : 'Punto di ritiro' }} ID {{ element.id }}</p>
+                  </v-col>
+                  <v-col cols="6">
                     <div :class="['d-flex', 'align-center', isMobile ? 'flex-column' : '']">
                       <v-text-field 
                         v-model="element.start_time_slot" 
@@ -116,16 +121,18 @@
                         hide-details 
                         :style="isMobile ? { width: '' }: { width: '200px' }"
                       />
-                      <v-btn
-                        v-if="element.type === 'Delivery'"
-                        variant="text"
-                        icon="mdi-delete"
-                        :color="theme.current.value.primaryColor"
-                        @click="removeOrder(element.id)"
-                      />
                     </div>
-                  </div>
-                </div>
+                  </v-col>
+                  <v-col cols="1">
+                    <v-btn
+                      v-if="element.type === 'Delivery'"
+                      variant="text"
+                      icon="mdi-delete"
+                      :color="theme.current.value.primaryColor"
+                      @click="removeOrder(element.id)"
+                    />
+                  </v-col>
+                </v-row>
               </template>
             </draggable>
             <FormButtons
@@ -134,7 +141,7 @@
             />
           </v-form>
         </v-col>
-        <v-col cols="5">
+        <v-col cols="12" md="5">
           <div style="height: 100%; border-radius: 12px; overflow: hidden;">
             <GoogleMap v-if="schedule.schedule_items && schedule.schedule_items.length > 0"/>
           </div>
@@ -154,10 +161,10 @@ import { storeToRefs } from 'pinia';
 import draggable from 'vuedraggable';
 import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
+import { ref, watch, onMounted } from 'vue';
 import validation from '@/utils/validation';
 import { useOrderStore } from '@/stores/order';
 import { useScheduleStore } from '@/stores/schedule';
-import { ref, watch, computed, onMounted } from 'vue';
 import { useTransportStore } from '@/stores/transport';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
@@ -201,28 +208,17 @@ const addOrder = () => {
   const orderToAdd = orders.value.find(o => o.id === selectedOrderId.value);
   if (!orderToAdd) return;
 
-  const newOrder = {
-    ...orderToAdd,
-    start_time_slot: '',
-    end_time_slot: '',
-    schedule_index: schedule.value.orders.length
-  };
-  schedule.value.orders.push(newOrder);
+  if (
+    !schedule.value.schedule_items.filter(scheduleItem => scheduleItem.operation_type == 'Collection Point')
+      .map(collectionPoint => collectionPoint.id).includes(orderToAdd.collection_point.id)
+  )
+    schedule.value.schedule_items.push(createScheduleItem(
+      orderToAdd.collection_point, 'CollectionPoint', schedule.value.schedule_items.length
+    ));
 
-  schedule.value.schedule_items.push(
-    {
-      id: `cp-${newOrder.id}`,
-      type: 'collection_point',
-      collection_point: newOrder.collection_point,
-      schedule_index: schedule.value.schedule_items.length
-    },
-    {
-      ...newOrder,
-      type: 'Delivery',
-      schedule_index: schedule.value.schedule_items.length + 1
-    }
-  );
-
+  schedule.value.schedule_items.push(createScheduleItem(
+    orderToAdd, 'Order', schedule.value.schedule_items.length
+  ));
   selectedOrderId.value = null;
 };
 
@@ -232,12 +228,6 @@ const removeOrder = (orderId) => {
   schedule.value.deleted_orders.push(orderId);
   schedule.value.schedule_items = schedule.value.schedule_items.filter(item => item.id !== orderId);
 };
-
-const availableOrders = computed(() => {
-  return orders.value
-    .filter(o => o.status === 'Pending')
-    .filter(o => !schedule.value.orders.some(so => so.id === o.id));
-});
 
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
@@ -265,64 +255,38 @@ const callback = (data) => {
     error.value.date = data.error;
 };
 
-const initScheduleItems = () => {
-  if (!schedule.value.orders) return;
-  schedule.value.schedule_items = schedule.value.orders.flatMap((order, index) => [
-    {
-      id: `cp-${order.id}`,
-      type: 'collection_point',
-      schedule_index: index * 2,
-      collection_point: order.collection_point
-    },
-    {
-      id: order.id,
-      schedule_index: index * 2 + 1,
-      start_time_slot: order.start_time_slot || '',
-      end_time_slot: order.end_time_slot || '',
-      ...order
-    }
-  ]);
+const createScheduleItem = (element, type, index = undefined) => {
+  const item = {
+    ...element,
+    end_time_slot: '',
+    start_time_slot: '',
+    operation_type: type
+  };
+  if (index) item.index = index;
+  return item;
 };
-
-watch(
-  () => schedule.value.schedule_items,
-  (items) => {
-    items.forEach((item, index) => item.schedule_index = index);
-
-    schedule.value.orders = items
-      .filter(i => i.type === 'Delivery')
-      .map((i, index) => ({ ...i, schedule_index: index }));
-
-    const deliveryOrders = items.filter(i => i.type === 'Delivery');
-    const cpItems = items.filter(i => i.type === 'collection_point');
-
-    cpItems.forEach(cp => {
-      const isUsed = deliveryOrders.some(
-        order => order.collection_point?.id === cp.collection_point?.id
-      );
-      if (!isUsed) {
-        schedule.value.schedule_items = schedule.value.schedule_items.filter(item => item.id !== cp.id);
-      }
-    });
-  },
-  { deep: true }
-);
 
 onMounted(() => {
   if (!schedule.value.id) {
-    schedule.value.orders = schedule.value.orders.map((order, index) => {
-      return {
-        ...order,
-        start_time_slot: '',
-        end_time_slot: '',
-        schedule_index: index
-      };
+    const collectionPoints = [];
+    const orders = schedule.value.orders.map(order => {
+      if (!collectionPoints.map(collectionPoint => collectionPoint.id).includes(order.collection_point.id))
+        collectionPoints.push(createScheduleItem(order.collection_point, 'CollectionPoint'));
+      return createScheduleItem(order, 'Order');
+    });
+    schedule.value.schedule_items = collectionPoints.concat(orders).map((scheduleItem, index) => {
+      return {...scheduleItem, index};
     });
   }
 
-  schedule.value.orders.sort((a, b) => a.schedule_index - b.schedule_index);
-  initScheduleItems();
+  schedule.value.schedule_items.sort((a, b) => a.index - b.index);
 });
+
+watch(
+  () => schedule.value.schedule_items,
+  (newItems) => newItems?.forEach((item, index) => item.index = index),
+  { deep: true }
+);
 
 
 watch(() => schedule.value.date, () => {
@@ -333,16 +297,3 @@ watch(() => schedule.value.users, () => {
   error.value.user = null;
 });
 </script>
-
-<style scoped>
-.order-item {
-  border-bottom: 1px solid #ccc;
-  padding-bottom: 8px;
-  margin-bottom: 8px;
-}
-.order-item:last-child {
-  border-bottom: none;
-  margin-bottom: 0;
-  padding-bottom: 0;
-}
-</style>
