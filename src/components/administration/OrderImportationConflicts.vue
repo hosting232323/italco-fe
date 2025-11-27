@@ -15,6 +15,26 @@
         DPC: {{ order['DPC'] }}<br>
         DRC: {{ order['DRC'] }}<br>
         Indirizzo: {{ order['Indirizzo Dest.'] }} {{ order['Localita'] }}<br>
+        <v-btn
+          text="Elimina ordine"
+          :color="theme.current.value.primaryColor"
+          class="mb-1"
+          block
+          @click="emits('deleteOrder', isActive, order)"
+        />
+        <OrderImportationNewProduct
+          v-if="activeNewProductForm[order['Rif. Com']]"
+          :order="order"
+          @close-form="activeNewProductForm[order['Rif. Com']] = false"
+          @add-product="(order, product) => order.products[product] = []"
+        />
+        <v-btn
+          v-else
+          text="Aggiungi prodotto"
+          :color="theme.current.value.primaryColor"
+          block
+          @click="activeNewProductForm[order['Rif. Com']] = true"
+        />
       </v-col>
       <v-col
         cols="12"
@@ -24,9 +44,21 @@
           v-for="product in Object.keys(order.products)"
           :key="product"
         >
-          <p>
-            Prodotto: {{ product }}
-          </p>
+          <v-row no-gutters>
+            <v-col cols="11">
+              <p>
+                Prodotto: {{ product }}
+              </p>
+            </v-col>
+            <v-col cols="1">
+              <v-btn
+                icon="mdi-delete"
+                variant="text"
+                :color="theme.current.value.primaryColor"
+                @click="delete order.products[product]"
+              />
+            </v-col>
+          </v-row>
           <v-chip
             v-for="(serviceId, index) in order.products[product]"
             :key="index"
@@ -87,6 +119,8 @@
 </template>
 
 <script setup>
+import OrderImportationNewProduct from '@/components/administration/OrderImportationNewProduct';
+
 import { ref } from 'vue';
 import http from '@/utils/http';
 import { useTheme } from 'vuetify';
@@ -96,7 +130,11 @@ import storesUtils from '@/utils/stores';
 import { useOrderStore } from '@/stores/order';
 import { useServiceStore } from '@/stores/service';
 
-const { customerId, conflictsOrders, collectionPoint } = defineProps({
+const { isActive, customerId, conflictsOrders, collectionPoint } = defineProps({
+  isActive: {
+    type: Object,
+    required: true
+  },
   customerId: {
     type: Number,
     required: true
@@ -117,10 +155,12 @@ const loading = ref(false);
 const router = useRouter();
 const serviceNames = ref({});
 const orderStore = useOrderStore();
+const activeNewProductForm = ref({});
 const selectedFileServices = ref({});
 const selectedAresServices = ref({});
-const emits = defineEmits(['cancel']);
 const serviceStore = useServiceStore();
+const emits = defineEmits(['cancel', 'deleteOrder']);
+
 const { ready } = storeToRefs(orderStore);
 const services = storesUtils.getStoreList(serviceStore, router);
 
@@ -139,7 +179,7 @@ const submitConflictsForm = async () => {
 
       ready.value = false;
       orderStore.initList(router);
-      emits('cancel');
+      emits('cancel', isActive);
     }
   }, 'POST', router);
 };
@@ -163,6 +203,7 @@ const selectService = (order, product, type) => {
 const getRules = (order, product) => {
   return [() => {
     if (order.products[product].length > 0) return true;
+
     return 'Inserire almeno un servizio per prodotto';
   }];
 };
