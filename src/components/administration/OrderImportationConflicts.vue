@@ -149,7 +149,6 @@ const submitConflictsForm = async () => {
   }, 'POST', router);
 };
 
-
 const selectService = (order, product, type) => {
   const refId = order['Rif. Com'] + product;
   const serviceId = type == 'file' ? selectedFileServices.value[refId] : selectedAresServices.value[refId];
