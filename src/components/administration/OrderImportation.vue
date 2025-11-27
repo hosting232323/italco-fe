@@ -46,12 +46,12 @@
           </v-form>
           <OrderImportationConflicts
             v-else
-            :isActive="isActive"
+            :is-active="isActive"
             :customer-id="user"
             :conflicts-orders="conflictsOrders"
             :collection-point="collectionPoint"
             @cancel="closeConflictsForm"
-            @deleteOrder="deleteOrder"
+            @delete-order="deleteOrder"
           />
         </v-card-text>
       </v-card>

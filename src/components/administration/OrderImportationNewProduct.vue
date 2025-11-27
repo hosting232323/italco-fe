@@ -4,8 +4,8 @@
     @submit.prevent="submitForm"
   >
     <v-text-field
-      label="Prodotto"
       v-model="product"
+      label="Prodotto"
       :rules="validation.requiredRules"
     />
     <FormButtons
@@ -30,12 +30,12 @@ const { order } = defineProps({
 
 const form = ref(null);
 const product = ref('');
-const emits = defineEmits(['closeForm']);
+const emits = defineEmits(['closeForm', 'addProduct']);
 
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
 
-  order.products[product.value] = [];
+  emits('addProduct', order, product.value);
   emits('closeForm');
 };
 </script>

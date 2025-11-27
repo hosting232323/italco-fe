@@ -17,22 +17,23 @@
         Indirizzo: {{ order['Indirizzo Dest.'] }} {{ order['Localita'] }}<br>
         <v-btn
           text="Elimina ordine"
-          @click="emits('deleteOrder', isActive, order)"
           :color="theme.current.value.primaryColor"
           class="mb-1"
           block
+          @click="emits('deleteOrder', isActive, order)"
         />
         <OrderImportationNewProduct
           v-if="activeNewProductForm[order['Rif. Com']]"
           :order="order"
-          @closeForm="activeNewProductForm[order['Rif. Com']] = false"
+          @close-form="activeNewProductForm[order['Rif. Com']] = false"
+          @add-product="(order, product) => order.products[product] = []"
         />
         <v-btn
           v-else
           text="Aggiungi prodotto"
-          @click="activeNewProductForm[order['Rif. Com']] = true"
           :color="theme.current.value.primaryColor"
           block
+          @click="activeNewProductForm[order['Rif. Com']] = true"
         />
       </v-col>
       <v-col
