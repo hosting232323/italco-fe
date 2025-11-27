@@ -17,8 +17,9 @@
         Indirizzo: {{ order['Indirizzo Dest.'] }} {{ order['Localita'] }}<br>
         <v-btn
           text="Elimina ordine"
-          @click="deleteOrder(order)"
+          @click="emits('deleteOrder', isActive, order)"
           :color="theme.current.value.primaryColor"
+          block
         />
       </v-col>
       <v-col
@@ -101,7 +102,11 @@ import storesUtils from '@/utils/stores';
 import { useOrderStore } from '@/stores/order';
 import { useServiceStore } from '@/stores/service';
 
-const { customerId, conflictsOrders, collectionPoint } = defineProps({
+const { isActive, customerId, conflictsOrders, collectionPoint } = defineProps({
+  isActive: {
+    type: Object,
+    required: true
+  },
   customerId: {
     type: Number,
     required: true
@@ -124,8 +129,9 @@ const serviceNames = ref({});
 const orderStore = useOrderStore();
 const selectedFileServices = ref({});
 const selectedAresServices = ref({});
-const emits = defineEmits(['cancel']);
 const serviceStore = useServiceStore();
+const emits = defineEmits(['cancel', 'deleteOrder']);
+
 const { ready } = storeToRefs(orderStore);
 const services = storesUtils.getStoreList(serviceStore, router);
 
@@ -144,7 +150,7 @@ const submitConflictsForm = async () => {
 
       ready.value = false;
       orderStore.initList(router);
-      emits('cancel');
+      emits('cancel', isActive);
     }
   }, 'POST', router);
 };

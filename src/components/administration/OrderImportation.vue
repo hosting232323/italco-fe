@@ -46,10 +46,12 @@
           </v-form>
           <OrderImportationConflicts
             v-else
+            :isActive="isActive"
             :customer-id="user"
             :conflicts-orders="conflictsOrders"
             :collection-point="collectionPoint"
-            @cancel="closeConflictsForm(isActive)"
+            @cancel="closeConflictsForm"
+            @deleteOrder="deleteOrder"
           />
         </v-card-text>
       </v-card>
@@ -115,5 +117,11 @@ const submitForm = async (isActive) => {
 const closeConflictsForm = (isActive) => {
   isActive.value = false;
   conflictsOrders.value = [];
+};
+
+const deleteOrder = (isActive, order) => {
+  conflictsOrders.value.splice(conflictsOrders.value.indexOf(order), 1);
+  if (conflictsOrders.value.length == 0)
+    isActive.value = false;
 };
 </script>
