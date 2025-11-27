@@ -125,11 +125,11 @@
                   </v-col>
                   <v-col cols="1">
                     <v-btn
-                      v-if="element.type === 'Delivery'"
+                      v-if="element.operation_type === 'Order'"
                       variant="text"
                       icon="mdi-delete"
                       :color="theme.current.value.primaryColor"
-                      @click="removeOrder(element.id)"
+                      @click="removeOrder(element)"
                     />
                   </v-col>
                 </v-row>
@@ -209,7 +209,7 @@ const addOrder = () => {
   if (!orderToAdd) return;
 
   if (
-    !schedule.value.schedule_items.filter(scheduleItem => scheduleItem.operation_type == 'Collection Point')
+    !schedule.value.schedule_items.filter(scheduleItem => scheduleItem.operation_type == 'CollectionPoint')
       .map(collectionPoint => collectionPoint.id).includes(orderToAdd.collection_point.id)
   )
     schedule.value.schedule_items.push(createScheduleItem(
@@ -222,11 +222,16 @@ const addOrder = () => {
   selectedOrderId.value = null;
 };
 
-const removeOrder = (orderId) => {
-  schedule.value.orders = schedule.value.orders.filter(o => o.id !== orderId);
-  if (!schedule.value.deleted_orders) schedule.value.deleted_orders = [];
-  schedule.value.deleted_orders.push(orderId);
-  schedule.value.schedule_items = schedule.value.schedule_items.filter(item => item.id !== orderId);
+const removeOrder = (order) => {
+  schedule.value.schedule_items = schedule.value.schedule_items.filter(
+    item => !(item.operation_type == 'Order' && item.id == order.id)
+  );
+  if (schedule.value.schedule_items.filter(
+    item => item.operation_type == 'Order' && item.collection_point.id == order.collection_point.id
+  ).length == 0)
+    schedule.value.schedule_items = schedule.value.schedule_items.filter(
+      item => !(item.operation_type == 'CollectionPoint' && item.id == order.collection_point.id)
+    );
 };
 
 const submitForm = async () => {
