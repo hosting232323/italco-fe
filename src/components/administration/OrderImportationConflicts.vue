@@ -19,6 +19,19 @@
           text="Elimina ordine"
           @click="emits('deleteOrder', isActive, order)"
           :color="theme.current.value.primaryColor"
+          class="mb-1"
+          block
+        />
+        <OrderImportationNewProduct
+          v-if="activeNewProductForm[order['Rif. Com']]"
+          :order="order"
+          @closeForm="activeNewProductForm[order['Rif. Com']] = false"
+        />
+        <v-btn
+          v-else
+          text="Aggiungi prodotto"
+          @click="activeNewProductForm[order['Rif. Com']] = true"
+          :color="theme.current.value.primaryColor"
           block
         />
       </v-col>
@@ -30,9 +43,21 @@
           v-for="product in Object.keys(order.products)"
           :key="product"
         >
-          <p>
-            Prodotto: {{ product }}
-          </p>
+          <v-row no-gutters>
+            <v-col cols="11">
+              <p>
+                Prodotto: {{ product }}
+              </p>
+            </v-col>
+            <v-col cols="1">
+              <v-btn
+                icon="mdi-delete"
+                variant="text"
+                :color="theme.current.value.primaryColor"
+                @click="delete order.products[product]"
+              />
+            </v-col>
+          </v-row>
           <v-chip
             v-for="(serviceId, index) in order.products[product]"
             :key="index"
@@ -93,6 +118,8 @@
 </template>
 
 <script setup>
+import OrderImportationNewProduct from '@/components/administration/OrderImportationNewProduct';
+
 import { ref } from 'vue';
 import http from '@/utils/http';
 import { useTheme } from 'vuetify';
@@ -127,6 +154,7 @@ const loading = ref(false);
 const router = useRouter();
 const serviceNames = ref({});
 const orderStore = useOrderStore();
+const activeNewProductForm = ref({});
 const selectedFileServices = ref({});
 const selectedAresServices = ref({});
 const serviceStore = useServiceStore();
