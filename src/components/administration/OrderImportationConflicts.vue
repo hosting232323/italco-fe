@@ -25,7 +25,7 @@
         <OrderImportationNewProduct
           v-if="activeNewProductForm[order['Rif. Com']]"
           :order="order"
-          :customerId="customerId"
+          :customer-id="customerId"
           @close-form="activeNewProductForm[order['Rif. Com']] = false"
           @add-product="(order, productName, collectionPoint) => order.products[productName] = {
             services: [], collection_point: collectionPoint

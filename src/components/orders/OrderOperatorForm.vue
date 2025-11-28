@@ -84,7 +84,7 @@
           }
         ]"
       >
-        <label class="mr-2 mt-2">Ascensore:</label>
+        <label class="mr-2 mt-2 ml-5">Ascensore:</label>
         <v-radio
           label="Sì"
           :value="true"
@@ -111,11 +111,6 @@
           }
         ])"
       />
-    </v-col>
-    <v-col
-      cols="12"
-      md="6"
-    >
     </v-col>
   </v-row>
   <v-textarea

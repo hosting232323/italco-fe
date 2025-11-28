@@ -65,10 +65,11 @@
           v-model="selectedCollectionPoint"
           :class="isMobile ? '' : 'ml-2'"
           label="Punto di Ritiro"
-          :items="role.value == 'Customer' ? collectionPoints : collectionPoints.filter(collectionPoint => collectionPoint.user_id == order.user_id)"
+          :items="filteredCollectionPoints"
           item-title="name"
           :rules="validation.requiredRules"
           return-object
+          :disabled="filteredCollectionPoints.length == 1"
         />
       </v-col>
     </v-row>
@@ -91,9 +92,9 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
+import { ref, computed, watch, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import validation from '@/utils/validation';
@@ -118,6 +119,19 @@ const selectedServices = ref([]);
 const selectedProduct = ref(null);
 const selectedService = ref(null);
 const selectedCollectionPoint = ref(null);
+
+const filteredCollectionPoints = computed(() => {
+  return role.value === 'Customer'
+    ? collectionPoints.value
+    : collectionPoints.value.filter(cp => cp.user_id === order.value.user_id);
+});
+
+watch([filteredCollectionPoints, () => selectedCollectionPoint.value], async ([list, selected]) => {
+  if (list.length === 1 && !selected) {
+    await nextTick();
+    selectedCollectionPoint.value = list[0];
+  }
+}, { immediate: true });
 
 const addProduct = async () => {
   if (!(await form.value.validate()).valid) return;
