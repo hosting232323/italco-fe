@@ -180,23 +180,54 @@ const toggleWheel = (mode) => {
   fabButton.value.style.transform = mode == 'open' ? 'scale(0)' : 'scale(1)';
 };
 
-const sendMessage = () => {
+const sendMessage = async () => {
   if(!userMessage.value) return;
 
-  loading.value = true;
-  const messageToSend = userMessage.value;
-  userMessage.value = '';
-  messages.value.push(messageToSend);
-  http.postRequest('chatty/message', {
-    message: messageToSend,
-    thread_id: threadId.value
-  }, (data) => {
-    loading.value = false;
-    if(data.status == 'ok') {
-      messages.value.push(data.message);
-      threadId.value = data.thread_id;
+  const response = await fetch(`http://127.0.0.1:8080/chatty/message/stream`, {
+    method: 'POST',
+    headers: await createHeader(router),
+    body: JSON.stringify({
+      message: userMessage.value,
+      thread_id: threadId.value
+    })
+  })
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+
+    while (true) {
+      const { done, value } = await reader.read();
+
+      const chunk = decoder.decode(value, { stream: true });
+      console.log(chunk);
     }
-  }, 'POST', router);
+
+  // loading.value = true;
+  // const messageToSend = userMessage.value;
+  // userMessage.value = '';
+  // messages.value.push(messageToSend);
+  // http.postRequest('chatty/message', {
+  //   message: messageToSend,
+  //   thread_id: threadId.value
+  // }, (data) => {
+  //   loading.value = false;
+  //   if(data.status == 'ok') {
+  //     messages.value.push(data.message);
+  //     threadId.value = data.thread_id;
+  //   }
+  // }, 'POST', router);
+};
+
+const createHeader = async (router, file = false) => {
+  let headers = {};
+  if (file)
+    headers['Accept'] = '*/*';
+  else
+    headers['Content-Type'] = 'application/json';
+
+  if (router)
+    headers['Authorization'] = localStorage.getItem('token');
+
+  return headers;
 };
 
 const checkScroll = () => {
