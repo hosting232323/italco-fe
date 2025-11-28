@@ -94,13 +94,13 @@
 <script setup>
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
-import { ref, computed, watch, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import validation from '@/utils/validation';
 import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
 import { useServiceStore } from '@/stores/service';
+import { ref, computed, watch, nextTick } from 'vue';
 import { useCollectionPointStore } from '@/stores/collectionPoint';
 
 const form = ref(null);
