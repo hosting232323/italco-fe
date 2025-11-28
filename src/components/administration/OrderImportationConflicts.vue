@@ -25,8 +25,11 @@
         <OrderImportationNewProduct
           v-if="activeNewProductForm[order['Rif. Com']]"
           :order="order"
+          :customerId="customerId"
           @close-form="activeNewProductForm[order['Rif. Com']] = false"
-          @add-product="(order, product) => order.products[product] = []"
+          @add-product="(order, productName, collectionPoint) => order.products[productName] = {
+            services: [], collection_point: collectionPoint
+          }"
         />
         <v-btn
           v-else
@@ -41,13 +44,14 @@
         md="8"
       >
         <template
-          v-for="product in Object.keys(order.products)"
-          :key="product"
+          v-for="[productName, product] in Object.entries(order.products)"
+          :key="productName"
         >
           <v-row no-gutters>
             <v-col cols="11">
               <p>
-                Prodotto: {{ product }}
+                Prodotto: {{ productName }}
+                {{ product.collection_point ? `[${product.collection_point.name}]` : '' }}
               </p>
             </v-col>
             <v-col cols="1">
@@ -55,50 +59,50 @@
                 icon="mdi-delete"
                 variant="text"
                 :color="theme.current.value.primaryColor"
-                @click="delete order.products[product]"
+                @click="delete order.products[productName]"
               />
             </v-col>
           </v-row>
           <v-chip
-            v-for="(serviceId, index) in order.products[product]"
+            v-for="(serviceId, index) in product.services"
             :key="index"
-            class="mb-2"
+            class="mb-2 mr-1"
           >
             {{ serviceNames[serviceId] }}
           </v-chip>
           <v-row no-gutters>
             <v-col cols="6">
               <v-select
-                v-model="selectedFileServices[order['Rif. Com'] + product]"
+                v-model="selectedFileServices[order['Rif. Com'] + productName]"
                 label="Servizi da file"
                 :items="order.services"
                 item-title="name"
                 item-value="id"
-                :rules="getRules(order, product)"
+                :rules="getRules(order, productName)"
                 class="mr-2"
               >
                 <template #item="{ props }">
                   <v-list-item
                     v-bind="props"
-                    @click="selectService(order, product, 'file')"
+                    @click="selectService(order, productName, 'file')"
                   />
                 </template>
               </v-select>
             </v-col>
             <v-col cols="6">
               <v-select
-                v-model="selectedAresServices[order['Rif. Com'] + product]"
+                v-model="selectedAresServices[order['Rif. Com'] + productName]"
                 :items="getServiceUser()"
                 label="Servizi da Ares"
                 item-title="name"
                 item-value="id"
-                :rules="getRules(order, product)"
+                :rules="getRules(order, productName)"
                 class="ml-2"
               >
                 <template #item="{ props }">
                   <v-list-item
                     v-bind="props"
-                    @click="selectService(order, product, 'ares')"
+                    @click="selectService(order, productName, 'ares')"
                   />
                 </template>
               </v-select>
@@ -175,6 +179,11 @@ const submitConflictsForm = async () => {
     return;
   }
 
+  if (!conflictsOrders.every(order => Object.values(order.products).every(product => product.collection_point))) {
+    message.value = 'Attenzione: è necessario che ogni prodotto sia associato ad un punto di ritiro';
+    return;
+  }
+
   loading.value = true;
   http.postRequest('import/conflict', {
     orders: conflictsOrders,
@@ -192,10 +201,10 @@ const submitConflictsForm = async () => {
   }, 'POST', router);
 };
 
-const selectService = (order, product, type) => {
-  const refId = order['Rif. Com'] + product;
+const selectService = (order, productName, type) => {
+  const refId = order['Rif. Com'] + productName;
   const serviceId = type == 'file' ? selectedFileServices.value[refId] : selectedAresServices.value[refId];
-  order.products[product].push(serviceId);
+  order.products[productName].services.push(serviceId);
 
   if (!serviceNames.value[serviceId])
     serviceNames.value[serviceId] = services.value.find(service => service.users.find(user => user.id == serviceId)).name;
@@ -208,9 +217,9 @@ const selectService = (order, product, type) => {
   }
 };
 
-const getRules = (order, product) => {
+const getRules = (order, productName) => {
   return [() => {
-    if (order.products[product].length > 0) return true;
+    if (order.products[productName].services.length > 0) return true;
 
     return 'Inserire almeno un servizio per prodotto';
   }];

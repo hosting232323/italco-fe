@@ -59,24 +59,24 @@
       cols="12"
       md="6"
     >
-      <v-autocomplete
-        v-model="order.collection_point_id"
+      <v-text-field
+        v-model="order.mark"
         :class="isMobile ? '' : 'ml-2'"
-        label="Punto di Ritiro"
-        :items="role.value == 'Customer' ? collectionPoints : collectionPoints.filter(collectionPoint => collectionPoint.user_id == order.user_id)"
-        item-title="name"
-        item-value="id"
-        :rules="validation.requiredRules"
+        label="Contrassegno"
+        type="number"
+        :rules="validation.positiveNumberRules"
+        append-inner-icon="mdi-currency-eur"
       />
     </v-col>
   </v-row>
   <v-row no-gutters>
     <v-col
       cols="12"
-      md="2"
+      md="6"
     >
       <v-radio-group
         v-model="order.elevator"
+        inline
         :rules="[
           (value) => {
             if (value !== undefined) return true;
@@ -84,7 +84,7 @@
           }
         ]"
       >
-        <label class="mr-2">Ascensore</label>
+        <label class="mr-2 mt-2">Ascensore:</label>
         <v-radio
           label="Sì"
           :value="true"
@@ -97,11 +97,11 @@
     </v-col>
     <v-col
       cols="12"
-      md="4"
+      md="6"
     >
       <v-text-field
         v-model="order.floor"
-        :class="isMobile ? '' : 'mr-2 ml-2'"
+        :class="isMobile ? '' : 'ml-2'"
         label="Piano"
         type="number"
         :rules="validation.positiveNumberRules.concat([
@@ -116,14 +116,6 @@
       cols="12"
       md="6"
     >
-      <v-text-field
-        v-model="order.mark"
-        :class="isMobile ? '' : 'ml-2'"
-        label="Contrassegno"
-        type="number"
-        :rules="validation.positiveNumberRules"
-        append-inner-icon="mdi-currency-eur"
-      />
     </v-col>
   </v-row>
   <v-textarea
@@ -147,24 +139,18 @@ import GooglePlacesAutocomplete from '@/components/GooglePlacesAutocomplete';
 import { ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import mobile from '@/utils/mobile';
-import { useRouter } from 'vue-router';
 import orderUtils from '@/utils/order';
-import storesUtils from '@/utils/stores';
 import validation from '@/utils/validation';
 import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
-import { useCollectionPointStore } from '@/stores/collectionPoint';
 
-const router = useRouter();
 const productServiceInputRef = ref(null);
 const isMobile = mobile.setupMobileUtils();
 
 const userStore = useUserStore();
 const orderStore = useOrderStore();
-const collectionPointStore = useCollectionPointStore();
 const { role } = storeToRefs(userStore);
 const { element: order } = storeToRefs(orderStore);
-const collectionPoints = storesUtils.getStoreList(collectionPointStore, router);
 
 watch(
   () => order.value.type,

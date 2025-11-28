@@ -4,7 +4,7 @@ import orderUtils from '@/utils/order';
 import storeUtils from '@/utils/stores';
 
 const EXCLUDED_KEYS = [
-  'created_at', 'updated_at', 'delivery_group', 'services', 'user', 'collection_point', 'dates_form'
+  'created_at', 'updated_at', 'delivery_group', 'services', 'user', 'dates_form'
 ];
 
 export const useOrderStore = defineStore('order', {

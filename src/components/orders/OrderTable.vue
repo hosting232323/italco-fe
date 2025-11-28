@@ -29,7 +29,7 @@
       >
         <template #[`item.id`]="{ item }">
           {{ item.id }}
-          {{ item.external_id ? `(${item.external_id})` : '' }}
+          {{ item.external_id ? `[${item.external_id}]` : '' }}
         </template>
         <template #[`item.type`]="{ item }">
           {{ orderUtils.TYPES.find(type => type.value == item.type)?.title }}
@@ -40,8 +40,9 @@
               v-for="product in Object.keys(item.products)" 
               :key="product"
             >
-              <b>{{ product }}</b>:
-              {{ item.products[product].map(service => service.name).join(', ') }}
+              <b>{{ product }}</b>
+              [{{ item.products[product].collection_point.name }}] :
+              {{ item.products[product].services.map(service => service.name).join(', ') }}
               <br>
             </template>
           </div>
@@ -50,12 +51,6 @@
           {{ item.addressee }}<br>
           <p style="font-size: smaller;">
             {{ item.address }}, {{ item.cap }}
-          </p>
-        </template>
-        <template #[`item.collection_point`]="{ item }">
-          {{ item.collection_point.name }}<br>
-          <p style="font-size: smaller;">
-            {{ item.collection_point.address }}, {{ item.collection_point.cap }}
           </p>
         </template>
         <template #[`item.status`]="{ item }">
@@ -122,8 +117,7 @@ const getHeaders = () => {
     { title: 'Stato', value: 'status' },
     { title: 'Prodotti Servizi', value: 'productsServices' },
     { title: 'Destinatario', value: 'addressee' },
-    { title: 'Recapito', value: 'addressee_contact' },
-    { title: 'Punto di Ritiro', value: 'collection_point' }
+    { title: 'Recapito', value: 'addressee_contact' }
   ];
   if (role.value != 'Customer')
     headers.push({ title: 'Punto Vendita', value: 'user.nickname' });

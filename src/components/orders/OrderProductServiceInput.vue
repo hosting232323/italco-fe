@@ -1,11 +1,12 @@
 <template>
+  <v-divider />
   <v-list v-if="order.products">
     <v-list-item
       v-for="product in Object.keys(order.products)"
       :key="product"
-      :title="product"
+      :title="`${product} [${order.products[product].collection_point.name}]`"
       append-icon="mdi-delete"
-      :subtitle="order.products[product].map(service => service.name).join(', ')"
+      :subtitle="order.products[product].services.map(service => service.name).join(', ')"
       @click:append="addProduct"
     >
       <template #append>
@@ -23,24 +24,24 @@
     >
       <v-col
         cols="12"
-        md="6"
+        md="4"
       >
         <v-text-field
           v-model="selectedProduct"
           :class="isMobile ? '' : 'mr-2'"
           label="Prodotto"
-          append-icon="mdi-plus"
+          prepend-icon="mdi-plus"
           :rules="validation.requiredRules"
-          @click:append="addProduct"
+          @click:prepend="addProduct"
         />
       </v-col>
       <v-col
         cols="12"
-        md="6"
+        md="4"
       >
         <v-select
           v-model="selectedService"
-          :class="isMobile ? '' : 'ml-2'"
+          :class="isMobile ? '' : 'ml-2 mr-2'"
           label="Servizio"
           :items="services.filter(service => service.type == order.type &&
             (role == 'Customer' || service.users.map(user => user.user_id).includes(order.user_id)))"
@@ -56,8 +57,23 @@
           </template>
         </v-select>
       </v-col>
+      <v-col
+        cols="12"
+        md="4"
+      >
+        <v-autocomplete
+          v-model="selectedCollectionPoint"
+          :class="isMobile ? '' : 'ml-2'"
+          label="Punto di Ritiro"
+          :items="role.value == 'Customer' ? collectionPoints : collectionPoints.filter(collectionPoint => collectionPoint.user_id == order.user_id)"
+          item-title="name"
+          :rules="validation.requiredRules"
+          return-object
+        />
+      </v-col>
     </v-row>
     <template v-else>
+      <br>
       Seleziona un tipo di ordine
       <br><br>
     </template>
@@ -71,6 +87,7 @@
       {{ service.name }}
     </v-chip>
   </v-form>
+  <v-divider class="mb-4" />
 </template>
 
 <script setup>
@@ -83,6 +100,7 @@ import validation from '@/utils/validation';
 import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
 import { useServiceStore } from '@/stores/service';
+import { useCollectionPointStore } from '@/stores/collectionPoint';
 
 const form = ref(null);
 const router = useRouter();
@@ -91,28 +109,37 @@ const orderStore = useOrderStore();
 const serviceStore = useServiceStore();
 const { role } = storeToRefs(userStore);
 const isMobile = mobile.setupMobileUtils();
+const collectionPointStore = useCollectionPointStore();
 const { element: order } = storeToRefs(orderStore);
 const services = storesUtils.getStoreList(serviceStore, router);
+const collectionPoints = storesUtils.getStoreList(collectionPointStore, router);
 
 const selectedServices = ref([]);
 const selectedProduct = ref(null);
 const selectedService = ref(null);
+const selectedCollectionPoint = ref(null);
 
 const addProduct = async () => {
   if (!(await form.value.validate()).valid) return;
 
   if (!order.value.products)
     order.value.products = {};
-  order.value.products[selectedProduct.value] = selectedServices.value;
+
+  order.value.products[selectedProduct.value] = {
+    services: selectedServices.value,
+    collection_point: selectedCollectionPoint.value
+  };
   selectedServices.value = [];
   selectedProduct.value = null;
+  selectedCollectionPoint.value = null;
 };
 
 const resetFields = () => {
+  order.value.products = {};
   selectedServices.value = [];
   selectedProduct.value = null;
   selectedService.value = null;
-  order.value.products = {};
+  selectedCollectionPoint.value = null;
 };
 
 defineExpose({ resetFields });
