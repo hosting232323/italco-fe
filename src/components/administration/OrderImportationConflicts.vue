@@ -116,6 +116,12 @@
       :color="theme.current.value.primaryColor"
     />
   </v-form>
+  <v-alert
+    v-if="message"
+    class="mt-5 mb-5"
+  >
+    {{ message }}
+  </v-alert>
 </template>
 
 <script setup>
@@ -130,7 +136,7 @@ import storesUtils from '@/utils/stores';
 import { useOrderStore } from '@/stores/order';
 import { useServiceStore } from '@/stores/service';
 
-const { isActive, customerId, conflictsOrders, collectionPoint } = defineProps({
+const { isActive, customerId, conflictsOrders } = defineProps({
   isActive: {
     type: Object,
     required: true
@@ -142,14 +148,11 @@ const { isActive, customerId, conflictsOrders, collectionPoint } = defineProps({
   conflictsOrders: {
     type: Array,
     required: true
-  },
-  collectionPoint: {
-    type: Number,
-    required: true
   }
 });
 
 const form = ref(null);
+const message = ref('');
 const theme = useTheme();
 const loading = ref(false);
 const router = useRouter();
@@ -167,10 +170,15 @@ const services = storesUtils.getStoreList(serviceStore, router);
 const submitConflictsForm = async () => {
   if (!(await form.value.validate()).valid) return;
 
+  if (!conflictsOrders.every(order => order.products && Object.keys(order.products).length > 0)) {
+    message.value = 'Attenzione: è necessario che ogni ordine abbia almeno un prodotto';
+    return;
+  }
+
   loading.value = true;
   http.postRequest('import/conflict', {
     orders: conflictsOrders,
-    collection_point_id: collectionPoint
+    customer_id: customerId
   }, function (data) {
     loading.value = false;
     if (data.status == 'ok') {
