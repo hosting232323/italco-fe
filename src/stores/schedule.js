@@ -1,7 +1,6 @@
 import http from '@/utils/http';
 import { defineStore } from 'pinia';
 import storeUtils from '@/utils/stores';
-import scheduleUtils from '@/utils/schedule';
 
 export const useScheduleStore = defineStore('schedule', {
   state: () => ({
@@ -36,7 +35,7 @@ export const useScheduleStore = defineStore('schedule', {
 
       http.postRequest(
         'schedule/filter',
-        {filters: scheduleUtils.formatFilters({ ...this.filters })},
+        {filters: storeUtils.formatFilters({ ...this.filters }, 'Schedule.date')},
         this.setList,
         'POST',
         router

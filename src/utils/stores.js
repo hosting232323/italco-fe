@@ -15,7 +15,27 @@ const exclude_keys = (obj, keys) => {
 };
 
 
+const formatFilters = (filters, key) => {
+  if (filters[key + '_0'] && filters[key + '_1']) {
+    filters[key + ''] = [filters[key + '_0'], filters[key + '_1']];
+    delete filters[key + '_0'];
+    delete filters[key + '_1'];
+  }
+
+  return Object.keys(filters)
+    .filter(key => filters[key] !== null)
+    .map(key => {
+      return {
+        value: filters[key],
+        model: key.split('.')[0],
+        field: key.split('.')[1]
+      };
+    });
+};
+
+
 export default {
   getStoreList,
-  exclude_keys
+  exclude_keys,
+  formatFilters
 };

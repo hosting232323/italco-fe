@@ -15,7 +15,7 @@
           <v-row no-gutters>
             <v-col
               cols="12"
-              md="6"
+              md="3"
             >
               <v-text-field
                 v-model="filters['Schedule.id']"
@@ -25,29 +25,25 @@
                 clearable
               />
             </v-col>
-
             <v-col
               cols="12"
-              md="6"
+              md="3"
             >
               <v-text-field
                 v-model="filters['Order.id']"
-                :class="isMobile ? '' : 'ml-2'"
+                :class="isMobile ? '' : 'ml-2 mr-2'"
                 label="ID Ordine"
                 type="number"
                 clearable
               />
             </v-col>
-          </v-row>
-
-          <v-row no-gutters>
             <v-col
               cols="12"
-              md="6"
+              md="3"
             >
               <v-text-field
                 v-model="filters['Schedule.date_0']"
-                :class="isMobile ? '' : 'mr-2'"
+                :class="isMobile ? '' : 'ml-2 mr-2'"
                 :rules="intervallRules('Schedule.date_1')"
                 label="Inizio Intervallo Data Consegna"
                 type="date"
@@ -55,7 +51,7 @@
             </v-col>
             <v-col
               cols="12"
-              md="6"
+              md="3"
             >
               <v-text-field
                 v-model="filters['Schedule.date_1']"
@@ -90,8 +86,8 @@ const form = ref(null);
 const panel = ref(null);
 const theme = useTheme();
 const router = useRouter();
-const isMobile = mobile.setupMobileUtils();
 const scheduleStore = useScheduleStore();
+const isMobile = mobile.setupMobileUtils();
 const { filters, ready } = storeToRefs(scheduleStore);
 
 const filterOrder = async () => {
