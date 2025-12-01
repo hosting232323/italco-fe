@@ -1,6 +1,5 @@
 import http from '@/utils/http';
 import { defineStore } from 'pinia';
-import orderUtils from '@/utils/order';
 import storeUtils from '@/utils/stores';
 
 const EXCLUDED_KEYS = [
@@ -59,7 +58,7 @@ export const useOrderStore = defineStore('order', {
 
       http.postRequest(
         'order/filter',
-        {filters: orderUtils.formatFilters({ ...this.filters })},
+        {filters: storeUtils.formatFilters({ ...this.filters }, 'Order.booking_date')},
         this.setList,
         'POST',
         router

@@ -1,6 +1,7 @@
 <template>
   <v-container>
     <h1>Borderò</h1><hr>
+    <ScheduleFilter />
     <v-skeleton-loader
       v-if="!ready"
       type="table"
@@ -82,6 +83,7 @@
 
 <script setup>
 import ScheduleForm from '@/components/operator/schedules/ScheduleForm';
+import ScheduleFilter from '@/components/operator/schedules/ScheduleFilter';
 
 import http from '@/utils/http';
 import { useTheme } from 'vuetify';
