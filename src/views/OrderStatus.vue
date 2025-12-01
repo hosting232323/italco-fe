@@ -1,55 +1,36 @@
 <template>
   <v-container v-if="show">
     <h2>Informazioni ordine: # {{ order.id }}</h2>
-    <div class="table-wrapper">
-      <div class="table-box">
-        <h3>Punto vendita</h3>
-        <table class="info-table">
-          <tbody>
-            <tr>
-              <td class="label">
-                Nome
-              </td>
-              <td>{{ order.user.nickname }}</td>
-            </tr>
-            <tr>
-              <td class="label">
-                Punto di ritiro
-              </td>
-              <td>
-                {{ order.collection_point.name }}<br>
-                {{ order.collection_point.address }}<br>
-                {{ order.collection_point.city }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="table-box">
-        <h3>Destinatario</h3>
-        <table class="info-table">
-          <tbody>
-            <tr>
-              <td class="label">
-                Nome
-              </td>
-              <td>{{ order.addressee }}</td>
-            </tr>
-            <tr>
-              <td class="label">
-                Indirizzo
-              </td>
-              <td>{{ order.address }}</td>
-            </tr>
-            <tr>
-              <td class="label">
-                Recapito
-              </td>
-              <td>{{ order.addressee_contact ?? '/' }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+    <div class="table-box">
+      <h3>Informazioni destinatario</h3>
+      <table class="info-table">
+        <tbody>
+          <tr>
+            <td class="label">
+              Nome
+            </td>
+            <td>{{ order.addressee }}</td>
+          </tr>
+          <tr>
+            <td class="label">
+              Indirizzo
+            </td>
+            <td>{{ order.address }}</td>
+          </tr>
+          <tr>
+            <td class="label">
+              Recapito
+            </td>
+            <td>{{ order.addressee_contact ?? '/' }}</td>
+          </tr>
+          <tr>
+            <td class="label">
+              Punto vendita
+            </td>
+            <td>{{ order.user.nickname }}</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
     <div class="table-box">
       <h3>Dettagli consegna</h3>
@@ -91,14 +72,14 @@
         </thead>
         <tbody>
           <tr
-            v-for="(services, product_name) in order.products"
-            :key="product_name"
+            v-for="[productName, product] in Object.entries(order.products)"
+            :key="productName"
           >
-            <td>{{ product_name }}</td>
+            <td>{{ productName }}</td>
             <td>
               <ul style="padding-left: 15px;">
                 <li
-                  v-for="(service, index) in services"
+                  v-for="(service, index) in product.services"
                   :key="index"
                 >
                   {{ service.name }} - {{ service.type }}
@@ -193,12 +174,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.table-wrapper {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-
 .table-box {
   border-radius: 8px;
   padding: 16px;
