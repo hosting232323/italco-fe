@@ -169,7 +169,6 @@ import http from '@/utils/http';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import mobile from '@/utils/mobile';
-import orderUtils from '@/utils/order';
 import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import { useUserStore } from '@/stores/user';
@@ -213,7 +212,7 @@ const exportInvoice = async () => {
   loading.value = true;
 
   http.postRequest('export/invoice', {
-    filters: orderUtils.formatFilters({ ...filters.value })
+    filters: storesUtils.formatFilters({ ...filters.value }, 'Order.booking_date')
   }, function (data) {
     loading.value = false;
     const blob = new Blob([data], { type: 'application/pdf' });
