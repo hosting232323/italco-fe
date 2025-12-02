@@ -12,11 +12,11 @@
         :headers="[
           { title: 'ID', value: 'id' },
           { title: 'Tipo', value: 'type' },
-          { title: 'Prodotti Servizi', value: 'productsServices' },
+          { title: 'Prodotti e Servizi', value: 'productsServices' },
+          { title: 'Prodotti e Punti di Ritiro', value: 'productsCollectionPoint' },
           { title: 'Punto Vendita', value: 'user.nickname' },
           { title: 'Destinatario', value: 'addressee' },
           { title: 'Recapito', value: 'addressee_contact' },
-          { title: 'Punto di Ritiro', value: 'collection_point' },
           { title: 'Note Punto Vendita', value: 'customer_note' },
           { title: 'Note Operatori', value: 'operator_note' },
           { title: 'Azioni', key: 'actions' }
@@ -27,24 +27,31 @@
         </template>
         <template #[`item.productsServices`]="{ item }">
           <template
-            v-for="product in Object.keys(item.products)"
-            :key="product"
+            v-for="[productName, product] in Object.entries(item.products)"
+            :key="productName"
           >
-            <b>{{ product }}</b>:
-            {{ item.products[product].map(service => service.name).join(', ') }}
-            <br>
+            <p>
+              <b>{{ productName }}</b>:
+              {{ product.services.map(service => service.name).join(', ') }}
+            </p>
+          </template>
+        </template>
+        <template #[`item.productsCollectionPoint`]="{ item }">
+          <template
+            v-for="[productName, product] in Object.entries(item.products)"
+            :key="productName"
+          >
+            <b>{{ productName }}</b>
+            <p style="font-size: smaller;">
+              Punto di Ritiro: {{ product.collection_point?.name }},
+              {{ product.collection_point?.address }}, {{ product.collection_point?.cap }}
+            </p>
           </template>
         </template>
         <template #[`item.addressee`]="{ item }">
           {{ item.addressee }}<br>
           <p style="font-size: smaller;">
             {{ item.address }}, {{ item.cap }}
-          </p>
-        </template>
-        <template #[`item.collection_point`]="{ item }">
-          {{ item.collection_point.name }}<br>
-          <p style="font-size: smaller;">
-            {{ item.collection_point.address }}, {{ item.collection_point.cap }}
           </p>
         </template>
         <template #[`item.actions`]="{ item }">
