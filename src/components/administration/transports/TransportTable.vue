@@ -13,6 +13,7 @@
       { title: 'ID', value: 'id' },
       { title: 'Nome', value: 'name' },
       { title: 'Targa', value: 'plate' },
+      { title: 'Località', value: 'location' },
       { title: 'Azioni', key: 'actions' }
     ]"
   >
