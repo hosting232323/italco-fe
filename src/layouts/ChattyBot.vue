@@ -66,7 +66,7 @@
         <!-- eslint-enable vue/no-v-html -->
 
         <div
-          v-if="loading && index == messages.length - 1"
+          v-if="loading && loadingIndex === index"
           class="msg bot"
         >
           <span class="loading-dots"><span /><span /><span /></span>
@@ -172,6 +172,7 @@ const fabContent = ref(null);
 const showArrow = ref(false);
 const exportMode = ref(false);
 const userMessage = ref(null);
+const loadingIndex = ref(null);
 const exportSuccess = ref(false);
 const messages = ref(['Ciao! Sono qui per rispondere alle tue domande sugli ordini.<br>Chiedimi quello che ti serve sapere specificando la data di creazione degli ordini interessati.']);
 
@@ -183,38 +184,45 @@ const toggleWheel = (mode) => {
 const sendMessage = async () => {
   if(!userMessage.value) return;
 
+  const messageToSend = userMessage.value;
+  userMessage.value = "";
+  loading.value = true;
+
+  messages.value.push(messageToSend);
+
+  messages.value.push("");  
+  const botIndex = messages.value.length - 1;
+  loadingIndex.value = botIndex;
+
   const response = await fetch(`http://127.0.0.1:8080/chatty/message/stream`, {
     method: 'POST',
     headers: await createHeader(router),
     body: JSON.stringify({
-      message: userMessage.value,
+      message: messageToSend,
       thread_id: threadId.value
     })
   })
+
   const reader = response.body.getReader();
   const decoder = new TextDecoder();
 
-    while (true) {
-      const { done, value } = await reader.read();
+  let firstChunkArrived = false;
+  while (true) {
+    const { done, value } = await reader.read();
 
-      const chunk = decoder.decode(value, { stream: true });
-      console.log(chunk);
+    if (done) break;
+
+    if (!firstChunkArrived) {
+      loadingIndex.value = null;
+      firstChunkArrived = true;
     }
 
-  // loading.value = true;
-  // const messageToSend = userMessage.value;
-  // userMessage.value = '';
-  // messages.value.push(messageToSend);
-  // http.postRequest('chatty/message', {
-  //   message: messageToSend,
-  //   thread_id: threadId.value
-  // }, (data) => {
-  //   loading.value = false;
-  //   if(data.status == 'ok') {
-  //     messages.value.push(data.message);
-  //     threadId.value = data.thread_id;
-  //   }
-  // }, 'POST', router);
+    const chunk = decoder.decode(value, { stream: true });
+    messages.value[botIndex] += chunk;
+  }
+
+  threadId.value = response.headers.get("thread_id");
+  loading.value = false;
 };
 
 const createHeader = async (router, file = false) => {
