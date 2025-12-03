@@ -6,6 +6,17 @@
     <template #activator>
       <v-container>
         <h1>
+          Crea un utente Customer
+          <v-btn
+            icon="mdi-plus"
+            style="float: right;"
+            variant="text"
+            @click="openCreateCustomerUserForm"
+          />
+        </h1><hr class="mt-2">
+        <UserForm :role="'Customer'"/>
+        <UserTable :role="'Customer'" />
+        <h1>
           Gestione GDO
           <v-btn
             icon="mdi-plus"
@@ -51,6 +62,8 @@
 </template>
 
 <script setup>
+import UserForm from '@/components/administration/users/UserForm';
+import UserTable from '@/components/administration/users/UserTable';
 import ConstraintPopUp from '@/components/administration/sellingPoints/ConstraintPopUp';
 import CustomerRuleForm from '@/components/administration/sellingPoints/CustomerRuleForm';
 import CustomerGroupForm from '@/components/administration/sellingPoints/CustomerGroupForm';
@@ -66,15 +79,18 @@ import { storeToRefs } from 'pinia';
 import { useCustomerRuleStore } from '@/stores/customerRule';
 import { useCustomerGroupStore } from '@/stores/customerGroup';
 import { useGeographicZoneStore } from '@/stores/geographicZone';
+import { useAdministrationUserStore } from '@/stores/administrationUser';
 
 const popUp = ref(false);
 const popUpType = ref('');
 const customerRuleStore = useCustomerRuleStore();
 const customerGroupStore = useCustomerGroupStore();
 const geographicZoneStore = useGeographicZoneStore();
+const administrationUserStore = useAdministrationUserStore();
 const { activeForm: customerRuleForm, element: customerRule } = storeToRefs(customerRuleStore);
 const { activeForm: customerGroupForm, element: customerGroup } = storeToRefs(customerGroupStore);
 const { activeForm: geographicZoneForm, element: geographicZone } = storeToRefs(geographicZoneStore);
+const { activeForm: administrationUserForm, element: administrationUser } = storeToRefs(administrationUserStore);
 
 const openPopUp = (item, type) => {
   popUp.value = true;
@@ -98,5 +114,10 @@ const openCustomerRuleForm = () => {
 const openGeographicZoneForm = () => {
   geographicZone.value = {};
   geographicZoneForm.value = true;
+};
+
+const openCreateCustomerUserForm = () => {
+  administrationUser.value = {};
+  administrationUserForm.value = true;
 };
 </script>

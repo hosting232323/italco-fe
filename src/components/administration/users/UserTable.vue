@@ -12,7 +12,7 @@
       />
       <v-data-table
         v-else
-        :items="users"
+        :items="filteredUsers"
         :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
         :headers="[
           { title: 'ID', value: 'id', sortable: false },
@@ -83,7 +83,7 @@
 <script setup>
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
-import { ref, reactive  } from 'vue';
+import { ref, reactive, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
@@ -98,6 +98,17 @@ const router = useRouter();
 const administrationUserStore = useAdministrationUserStore();
 const { ready } = storeToRefs(administrationUserStore);
 const users = storesUtils.getStoreList(administrationUserStore, router);
+
+const { role } = defineProps({
+  role: {
+    type: String,
+    default: ''
+  }
+});
+
+const filteredUsers = computed(() => {
+  return role ? users.value.filter(u => u.role === role) : users;
+});
 
 const deleteLoading = reactive({});
 const visiblePasswords = reactive({});

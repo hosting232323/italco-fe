@@ -33,6 +33,12 @@
             />
           </v-col>
         </v-row>
+        <GooglePlacesAutocomplete
+          v-model="transport.location"
+          label="Località"
+          :rules="validation.requiredRules"
+          @address-components="handleAddressComponents"
+        />
         <FormButtons
           :loading="loading"
           @cancel="activeForm = false"
@@ -44,6 +50,7 @@
 
 <script setup>
 import FormButtons from '@/components/FormButtons';
+import GooglePlacesAutocomplete from '@/components/GooglePlacesAutocomplete';
 
 import { ref } from 'vue';
 import mobile from '@/utils/mobile';
@@ -76,5 +83,9 @@ const callback = (data) => {
     transportStore.initList(router);
     activeForm.value = false;
   }
+};
+
+const handleAddressComponents = (components) => {
+  transport.value.location = components.location;
 };
 </script>

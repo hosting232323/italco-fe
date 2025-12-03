@@ -54,6 +54,7 @@
               :class="isMobile ? '' : 'ml-2'"
               label="Ruolo"
               :items="['Operator', 'Customer', 'Delivery']"
+              :disabled="role !== ''"
               :rules="validation.requiredRules"
             />
           </v-col>
@@ -70,7 +71,7 @@
 <script setup>
 import FormButtons from '@/components/FormButtons';
 
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
@@ -88,6 +89,13 @@ const administrationUserStore = useAdministrationUserStore();
 const { element: user, activeForm } = storeToRefs(administrationUserStore);
 const users = storesUtils.getStoreList(administrationUserStore, router);
 
+const { role } = defineProps({
+  role: {
+    type: String,
+    default: ''
+  }
+});
+
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
 
@@ -101,4 +109,13 @@ const submitForm = async () => {
     }
   });
 };
+
+watch(() => role, 
+  (val) => {
+    if (val) {
+      user.value.role = val;
+    }
+  },
+  { immediate: true }
+);
 </script>
