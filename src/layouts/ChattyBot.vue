@@ -49,27 +49,27 @@
         :key="index"
         class="fab-message"
       >
-        <div :class="{sender: true, bot_s: index % 2 === 0, user_s: index % 2 !== 0}">
+        <div :class="{sender: true, bot_s: message.from === 'bot', user_s: message.from === 'user' }">
           <img
             v-if="index % 2 === 0"
             src="/logo.png"
             alt="botAvatar"
           >
-          <p>{{ index % 2 === 0 ? 'Italco.mi Bot' : 'Tu' }}</p>
+          <p>{{ message.from === 'bot' ? 'Italco.mi Bot' : 'Tu' }}</p>
         </div>
 
         <!-- eslint-disable vue/no-v-html -->
         <div
-          :class="{msg: true, bot: index % 2 === 0, user: index % 2 !== 0}"
-          v-html="marked.parse(message)"
-        />
-        <!-- eslint-enable vue/no-v-html -->
-
-        <div
-          v-if="loading && loadingIndex === index"
-          class="msg bot"
+          :class="{ msg: true, bot: message.from === 'bot', user: message.from === 'user' }"
         >
-          <span class="loading-dots"><span /><span /><span /></span>
+          <span 
+            v-if="message.loading"
+            class="loading-dots"
+          >
+            <span></span><span></span><span></span>
+          </span>
+
+          <span v-else v-html="marked.parse(message.text)"></span>
         </div>
       </div>
     </main>
@@ -158,7 +158,6 @@
 <script setup>
 import '@/styles/chatty.scss';
 
-import http from '@/utils/http';
 import { marked } from 'marked';
 import { useRouter } from 'vue-router';
 import { ref, onMounted, nextTick, watch } from 'vue';
@@ -172,9 +171,14 @@ const fabContent = ref(null);
 const showArrow = ref(false);
 const exportMode = ref(false);
 const userMessage = ref(null);
-const loadingIndex = ref(null);
 const exportSuccess = ref(false);
-const messages = ref(['Ciao! Sono qui per rispondere alle tue domande sugli ordini.<br>Chiedimi quello che ti serve sapere specificando la data di creazione degli ordini interessati.']);
+const messages = ref([
+  {
+    from: "bot",
+    text: "Ciao! Sono qui per rispondere alle tue domande sugli ordini.<br>Chiedimi quello che ti serve sapere specificando la data di creazione degli ordini interessati.",
+    loading: false
+  }
+]);
 
 const toggleWheel = (mode) => {
   fabWheel.value.style.transform = mode == 'open' ? 'scale(1)' : 'scale(0)';
@@ -188,11 +192,18 @@ const sendMessage = async () => {
   userMessage.value = "";
   loading.value = true;
 
-  messages.value.push(messageToSend);
+  messages.value.push({
+    from: "user",
+    text: messageToSend,
+    loading: false
+  });
 
-  messages.value.push("");  
+  messages.value.push({
+    from: "bot",
+    text: "",
+    loading: true
+  });
   const botIndex = messages.value.length - 1;
-  loadingIndex.value = botIndex;
 
   const response = await fetch(`http://127.0.0.1:8080/chatty/message/stream`, {
     method: 'POST',
@@ -213,12 +224,12 @@ const sendMessage = async () => {
     if (done) break;
 
     if (!firstChunkArrived) {
-      loadingIndex.value = null;
+      messages.value[botIndex].loading = false;
       firstChunkArrived = true;
     }
 
     const chunk = decoder.decode(value, { stream: true });
-    messages.value[botIndex] += chunk;
+    messages.value[botIndex].text += chunk;
   }
 
   threadId.value = response.headers.get("thread_id");
@@ -260,7 +271,7 @@ const exportChat = async () => {
   const link = document.createElement('a');
   link.href = URL.createObjectURL(new Blob([
     messages.value.map((msg, index) => {
-      return `${index % 2 === 0 ? 'Italco.mi Bot' : 'Utente'}: ${msg.replace(/<[^>]+>/g, '').trim()}`;
+      return `${message.from === 'bot' ? 'Italco.mi Bot' : 'Utente'}: ${(msg.text || '').replace(/<[^>]+>/g, '').trim()}`;
     }).join('\n')
   ], { type: 'text/plain' }));
   link.download = 'chat_messages.txt';
