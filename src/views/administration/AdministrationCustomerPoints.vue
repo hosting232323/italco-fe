@@ -15,7 +15,7 @@
           />
         </h1><hr class="mt-2">
         <UserForm :role="'Customer'"/>
-        <UserTable :role="'Customer'" @open-pop-up="openPopUp" />
+        <UserTable :role="'Customer'" />
         <h1>
           Gestione GDO
           <v-btn
@@ -64,7 +64,6 @@
 <script setup>
 import UserForm from '@/components/administration/users/UserForm';
 import UserTable from '@/components/administration/users/UserTable';
-
 import ConstraintPopUp from '@/components/administration/sellingPoints/ConstraintPopUp';
 import CustomerRuleForm from '@/components/administration/sellingPoints/CustomerRuleForm';
 import CustomerGroupForm from '@/components/administration/sellingPoints/CustomerGroupForm';
