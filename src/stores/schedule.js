@@ -22,7 +22,7 @@ export const useScheduleStore = defineStore('schedule', {
     updateElement(router, func) {
       http.postRequest(
         `schedule/${this.element.id}`,
-        storeUtils.exclude_keys(this.element, ['created_at', 'updated_at']),
+        storeUtils.exclude_keys(this.element, ['created_at', 'updated_at', 'transport', 'orders']),
         func,
         'PUT',
         router
