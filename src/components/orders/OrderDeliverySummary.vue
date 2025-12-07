@@ -53,7 +53,7 @@
               type="image" 
             />
             <v-img
-              :src="`${http.hostname}order/photo/${photo}`"
+              :src="photo"
               max-width="1500"
               max-height="1000"
               class="mt-4"
