@@ -7,14 +7,9 @@
 
 <script setup>
 import { useTheme } from 'vuetify';
+import { storeToRefs } from 'pinia';
 import { onMounted, ref, watch } from 'vue';
-
-const { orders } = defineProps({
-  orders: {
-    type: Array,
-    default: () => []
-  }
-});
+import { useScheduleStore } from '@/stores/schedule';
 
 const map = ref(null);
 const markers = ref([]);
@@ -24,6 +19,8 @@ const durationMin = ref(0);
 const googleMapsUrl = ref('');
 let directionsRenderer = null;
 const mapContainer = ref(null);
+const scheduleStore = useScheduleStore();
+const { element: schedule } = storeToRefs(scheduleStore);
 
 const geocodeAddress = async (address) => {
   return new Promise((resolve) => {
@@ -41,11 +38,12 @@ const geocodeAddress = async (address) => {
 };
 
 const drawRoute = async () => {
-  if (!map.value || orders.length < 2) return;
+  if (!map.value || schedule.value.schedule_items.length < 2) return;
 
   const validLocations = (await Promise.all(
-    orders.map(order => order.address ? geocodeAddress(order.address) : null)
+    schedule.value.schedule_items.map(item => item.address ? geocodeAddress(item.address) : null)
   )).filter(l => l !== null);
+
   if (validLocations.length < 2) return;
 
   const [origin, ...rest] = validLocations;
@@ -92,17 +90,20 @@ const updateMarkers = async () => {
     markers.value.pop().setVisible(false);
 
   (await Promise.all(
-    orders.map(order => order.address ? geocodeAddress(order.address) : null)
+    schedule.value.schedule_items.map(item =>
+      item.address ? geocodeAddress(item.address) : null
+    )
   )).forEach((pos, i) => {
     if (!pos) return;
 
+    const item = schedule.value.schedule_items[i];
     markers.value.push(new window.google.maps.Marker({
       position: pos,
       map: map.value,
       label: {
-        text: (orders[i].schedule_index + 1).toString(),
         color: 'white',
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        text: (item.index + 1).toString()
       }
     }));
   });
@@ -153,11 +154,12 @@ onMounted(async () => {
   while (!window.google?.maps?.places)
     await new Promise((resolve) => setTimeout(resolve, 100));
 
+  const firstDelivery = schedule.value.schedule_items[0];
   map.value = new window.google.maps.Map(mapContainer.value, {
     zoom: 10,
     mapTypeControl: false,
-    center: orders[0]?.address
-      ? await geocodeAddress(orders[0].address)
+    center: firstDelivery?.address
+      ? await geocodeAddress(firstDelivery.address)
       : { lat: 41.8719, lng: 12.5674 }
   });
 
@@ -173,7 +175,7 @@ onMounted(async () => {
 });
 
 watch(
-  () => orders,
+  () => schedule.value.schedule_items,
   () => {
     updateMarkers();
     drawRoute();

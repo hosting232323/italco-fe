@@ -2,6 +2,10 @@ import http from '@/utils/http';
 import { defineStore } from 'pinia';
 import storeUtils from '@/utils/stores';
 
+const EXCLUDED_KEYS = [
+  'created_at', 'updated_at', 'transport', 'orders'
+];
+
 export const useScheduleStore = defineStore('schedule', {
   state: () => ({
     list: [],
@@ -13,7 +17,7 @@ export const useScheduleStore = defineStore('schedule', {
     createElement(router, func) {
       http.postRequest(
         'schedule',
-        this.element,
+        storeUtils.exclude_keys(this.element, EXCLUDED_KEYS),
         func,
         'POST',
         router
@@ -22,7 +26,7 @@ export const useScheduleStore = defineStore('schedule', {
     updateElement(router, func) {
       http.postRequest(
         `schedule/${this.element.id}`,
-        storeUtils.exclude_keys(this.element, ['created_at', 'updated_at']),
+        storeUtils.exclude_keys(this.element, EXCLUDED_KEYS),
         func,
         'PUT',
         router

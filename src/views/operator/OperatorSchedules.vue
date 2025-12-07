@@ -17,17 +17,18 @@
         { title: 'Data', value: 'date' },
         { title: 'Utenti Delivery', value: 'users' },
         { title: 'Veicolo', key: 'transport.name' },
-        { title: 'Ordini', key: 'orders' },
+        { title: 'Pianificazione', key: 'schedule_items' },
         { title: 'Azioni', key: 'actions' }
       ]"
     >
-      <template #[`item.orders`]="{ item }">
+      <template #[`item.schedule_items`]="{ item }">
         <div
-          v-for="order in item.orders"
-          :key="order.id"
+          v-for="scheduleItem in item.schedule_items.sort((a, b) => a.index - b.index)"
+          :key="scheduleItem.index"
         >
-          ID: <b>{{ order.id }}</b>
-          Destinatario: <b>{{ order.addressee }}</b>
+          {{ scheduleItem.operation_type == 'Order' ? 'Ordine' : 'Punto di ritiro' }}
+          ID: <b>{{ scheduleItem.id }}</b>
+          Destinatario: <b>{{ scheduleItem.address }}</b>
         </div>
       </template>
       <template #[`item.users`]="{ item }">
