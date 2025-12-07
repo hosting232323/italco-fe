@@ -1,13 +1,16 @@
 <template>
   <v-card
-    v-if="!schedule.orders"
+    v-if="!schedule.id && !schedule.orders"
     title="Seleziona degli ordini per creare un Borderò"
   />
   <v-card
     v-else
     :title="schedule.id ? 'Modifica Borderò' : 'Crea Borderò'"
     :subtitle="schedule.id 
-      ? `ID: ${schedule.id}\nOrdini: ${schedule.orders.map(order => order.id).join(', ')}` 
+      ? `ID: ${schedule.id}\nOrdini: ${
+        schedule.schedule_items.filter(item => item.operation_type == 'Order')
+          .map(item => item.order_id).join(', ')
+      }` 
       : `Ordini: ${schedule.orders.map(order => order.id).join(', ')}`"
   >
     <v-card-text>
@@ -71,9 +74,9 @@
               v-if="schedule.id"
               v-model="selectedOrderId"
               label="Aggiungi Ordine"
-              :items="orders.value.filter(order => order.status === 'Pending').filter(order =>
+              :items="orders.filter(order => order.status === 'Pending').filter(order =>
                 !schedule.schedule_items.filter(collectionPoint => collectionPoint.operation_type == 'Order')
-                  .some(scheduleOrder => scheduleOrder.id === order.id)
+                  .some(scheduleOrder => scheduleOrder.order_id === order.id)
               )"
               :item-title="order => `ID ordine: ${order.id}`"
               item-value="id"
@@ -210,7 +213,7 @@ const addOrder = () => {
 
   if (
     !schedule.value.schedule_items.filter(scheduleItem => scheduleItem.operation_type == 'CollectionPoint')
-      .map(collectionPoint => collectionPoint.id).includes(orderToAdd.collection_point.id)
+      .map(collectionPoint => collectionPoint.collection_point_id).includes(orderToAdd.collection_point.id)
   )
     schedule.value.schedule_items.push(createScheduleItem(
       orderToAdd.collection_point, 'CollectionPoint', schedule.value.schedule_items.length
@@ -224,14 +227,19 @@ const addOrder = () => {
 
 const removeOrder = (order) => {
   schedule.value.schedule_items = schedule.value.schedule_items.filter(
-    item => !(item.operation_type == 'Order' && item.id == order.id)
+    item => !(item.operation_type == 'Order' && item.order_id == order.order_id)
   );
-  if (schedule.value.schedule_items.filter(
-    item => item.operation_type == 'Order' && item.collection_point.id == order.collection_point.id
-  ).length == 0)
-    schedule.value.schedule_items = schedule.value.schedule_items.filter(
-      item => !(item.operation_type == 'CollectionPoint' && item.id == order.collection_point.id)
-    );
+
+  const otherCollectionPointIds = schedule.value.schedule_items.filter(
+    item => item.operation_type == 'Order'
+  ).flatMap(
+    item => Object.values(item.products).map(product => product.collection_point.id)
+  );
+  for (const collectionPointId of Object.values(order.products).map(product => product.collection_point.id))
+    if (!otherCollectionPointIds.includes(collectionPointId))
+      schedule.value.schedule_items = schedule.value.schedule_items.filter(
+        item => !(item.operation_type == 'CollectionPoint' && item.collection_point_id == collectionPointId)
+      );
 };
 
 const submitForm = async () => {
@@ -268,6 +276,9 @@ const createScheduleItem = (element, type, index = undefined) => {
     operation_type: type
   };
   if (index) item.index = index;
+  delete item.id;
+  if (type == 'Order') item.order_id = element.id;
+  else item.collection_point_id = element.id;
   return item;
 };
 
@@ -275,10 +286,13 @@ onMounted(() => {
   if (!schedule.value.id) {
     const collectionPoints = [];
     const orders = schedule.value.orders.map(order => {
-      if (!collectionPoints.map(collectionPoint => collectionPoint.id).includes(order.collection_point.id))
-        collectionPoints.push(createScheduleItem(order.collection_point, 'CollectionPoint'));
+      Object.values(order.products).map(product => product.collection_point).forEach((collectionPoint) => {
+        if (!collectionPoints.map(collectionPoint => collectionPoint.collection_point_id).includes(collectionPoint.id))
+          collectionPoints.push(createScheduleItem(collectionPoint, 'CollectionPoint'));
+      });
       return createScheduleItem(order, 'Order');
     });
+
     schedule.value.schedule_items = collectionPoints.concat(orders).map((scheduleItem, index) => {
       return {...scheduleItem, index};
     });
