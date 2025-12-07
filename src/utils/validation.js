@@ -39,6 +39,7 @@ const futureTime = (element) => [
   ...requiredRules,
   (value) => {
     if (!value || !element) return true;
+
     const [startH, startM] = element.split(':').map(Number);
     const [endH, endM] = value.split(':').map(Number);
     const startMinutes = startH * 60 + startM;

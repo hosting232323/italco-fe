@@ -50,7 +50,7 @@
           v-model="order.end_time_slot"
           label="Time Slot End"
           type="time"
-          :rules="validation.futureTime(order)"
+          :rules="validation.futureTime(order.start_time_slot)"
           dense
           hide-details
           :style="isMobile ? { width: '100%' } : { maxWidth: '115px' }"

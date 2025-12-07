@@ -1,18 +1,24 @@
 <template>
   <v-card
-    v-if="!schedule.orders"
+    v-if="!schedule.id && !schedule.orders"
     title="Seleziona degli ordini per creare un Borderò"
   />
   <v-card
     v-else
     :title="schedule.id ? 'Modifica Borderò' : 'Crea Borderò'"
     :subtitle="schedule.id 
-      ? `ID: ${schedule.id}\nOrdini: ${schedule.orders.map(order => order.id).join(', ')}` 
+      ? `ID: ${schedule.id}\nOrdini: ${
+        schedule.schedule_items.filter(item => item.operation_type == 'Order')
+          .map(item => item.order_id).join(', ')
+      }` 
       : `Ordini: ${schedule.orders.map(order => order.id).join(', ')}`"
   >
     <v-card-text>
       <v-row>
-        <v-col cols="7">
+        <v-col
+          cols="12"
+          md="7"
+        >
           <v-form
             ref="form"
             @submit.prevent="submitForm"
@@ -71,7 +77,10 @@
               v-if="schedule.id"
               v-model="selectedOrderId"
               label="Aggiungi Ordine"
-              :items="availableOrders"
+              :items="orders.filter(order => order.status === 'Pending').filter(order =>
+                !schedule.schedule_items.filter(collectionPoint => collectionPoint.operation_type == 'Order')
+                  .some(scheduleOrder => scheduleOrder.order_id === order.id)
+              )"
               :item-title="order => `ID ordine: ${order.id}`"
               item-value="id"
               append-icon="mdi-plus"
@@ -79,24 +88,31 @@
               @click="addOrder"
             />
             <draggable
-              v-model="schedule.orders"
+              v-model="schedule.schedule_items"
               item-key="id"
               class="mb-4"
               handle=".drag-handle"
             >
               <template #item="{ element }">
-                <div class="d-flex align-center order-item">
-                  <div
-                    class="drag-handle"
-                    style="cursor: grab;"
-                  >
-                    <v-icon>mdi-drag</v-icon>
-                  </div>
-                  <div
-                    :class="['d-flex', 'justify-space-between', isMobile ? '' : 'align-center', isMobile ? 'flex-column' : '']"
-                    style="width: 100%;"
-                  >
-                    <p>{{ element.schedule_index + 1 }}: Ordine ID {{ element.id }}</p>
+                <v-row
+                  no-gutters
+                  class="mt-2"
+                >
+                  <v-col cols="1">
+                    <div
+                      class="drag-handle"
+                      style="cursor: grab;"
+                    >
+                      <v-icon>mdi-drag</v-icon>
+                    </div>
+                  </v-col>
+                  <v-col cols="4">
+                    <p>
+                      {{ element.index + 1 }}: 
+                      {{ element.operation_type == 'Order' ? 'Ordine' : 'Punto di ritiro' }} ID {{ element.id }}
+                    </p>
+                  </v-col>
+                  <v-col cols="6">
                     <div :class="['d-flex', 'align-center', isMobile ? 'flex-column' : '']">
                       <v-text-field 
                         v-model="element.start_time_slot" 
@@ -116,15 +132,18 @@
                         hide-details 
                         :style="isMobile ? { width: '' }: { width: '200px' }"
                       />
-                      <v-btn
-                        variant="text"
-                        icon="mdi-delete"
-                        :color="theme.current.value.primaryColor"
-                        @click="removeOrder(element.id)"
-                      />
                     </div>
-                  </div>
-                </div>
+                  </v-col>
+                  <v-col cols="1">
+                    <v-btn
+                      v-if="element.operation_type === 'Order'"
+                      variant="text"
+                      icon="mdi-delete"
+                      :color="theme.current.value.primaryColor"
+                      @click="removeOrder(element)"
+                    />
+                  </v-col>
+                </v-row>
               </template>
             </draggable>
             <FormButtons
@@ -133,9 +152,12 @@
             />
           </v-form>
         </v-col>
-        <v-col cols="5">
+        <v-col
+          cols="12"
+          md="5"
+        >
           <div style="height: 100%; border-radius: 12px; overflow: hidden;">
-            <GoogleMap :orders="schedule.orders" />
+            <GoogleMap v-if="schedule.schedule_items && schedule.schedule_items.length > 0" />
           </div>
         </v-col>
       </v-row>
@@ -153,10 +175,10 @@ import { storeToRefs } from 'pinia';
 import draggable from 'vuedraggable';
 import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
+import { ref, watch, onMounted } from 'vue';
 import validation from '@/utils/validation';
 import { useOrderStore } from '@/stores/order';
 import { useScheduleStore } from '@/stores/schedule';
-import { ref, watch, computed, onMounted } from 'vue';
 import { useTransportStore } from '@/stores/transport';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
@@ -200,28 +222,36 @@ const addOrder = () => {
   const orderToAdd = orders.value.find(o => o.id === selectedOrderId.value);
   if (!orderToAdd) return;
 
-  schedule.value.orders.push({
-    ...orderToAdd,
-    start_time_slot: '',
-    end_time_slot: '',
-    schedule_index: schedule.value.orders.length
-  });
+  if (
+    !schedule.value.schedule_items.filter(scheduleItem => scheduleItem.operation_type == 'CollectionPoint')
+      .map(collectionPoint => collectionPoint.collection_point_id).includes(orderToAdd.collection_point.id)
+  )
+    schedule.value.schedule_items.push(createScheduleItem(
+      orderToAdd.collection_point, 'CollectionPoint', schedule.value.schedule_items.length
+    ));
+
+  schedule.value.schedule_items.push(createScheduleItem(
+    orderToAdd, 'Order', schedule.value.schedule_items.length
+  ));
   selectedOrderId.value = null;
 };
 
-const removeOrder = (orderId) => {
-  schedule.value.orders = schedule.value.orders.filter(o => o.id !== orderId);
-  schedule.value.orders.forEach((o, i) => o.schedule_index = i);
-  if (!schedule.value.deleted_orders)
-    schedule.value.deleted_orders = [];
-  schedule.value.deleted_orders.push(orderId);
-};
+const removeOrder = (order) => {
+  schedule.value.schedule_items = schedule.value.schedule_items.filter(
+    item => !(item.operation_type == 'Order' && item.order_id == order.order_id)
+  );
 
-const availableOrders = computed(() => {
-  return orders.value
-    .filter(o => o.status === 'Pending')
-    .filter(o => !schedule.value.orders.some(so => so.id === o.id));
-});
+  const otherCollectionPointIds = schedule.value.schedule_items.filter(
+    item => item.operation_type == 'Order'
+  ).flatMap(
+    item => Object.values(item.products).map(product => product.collection_point.id)
+  );
+  for (const collectionPointId of Object.values(order.products).map(product => product.collection_point.id))
+    if (!otherCollectionPointIds.includes(collectionPointId))
+      schedule.value.schedule_items = schedule.value.schedule_items.filter(
+        item => !(item.operation_type == 'CollectionPoint' && item.collection_point_id == collectionPointId)
+      );
+};
 
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
@@ -249,25 +279,45 @@ const callback = (data) => {
     error.value.date = data.error;
 };
 
+const createScheduleItem = (element, type, index = undefined) => {
+  const item = {
+    ...element,
+    end_time_slot: '',
+    start_time_slot: '',
+    operation_type: type
+  };
+  if (index) item.index = index;
+  delete item.id;
+  if (type == 'Order') item.order_id = element.id;
+  else item.collection_point_id = element.id;
+  return item;
+};
+
 onMounted(() => {
-  if (!schedule.value.id)
-    schedule.value.orders = schedule.value.orders.map((order, index) => {
-      return {
-        ...order,
-        start_time_slot: '',
-        end_time_slot: '',
-        schedule_index: index
-      };
+  if (!schedule.value.id) {
+    const collectionPoints = [];
+    const orders = schedule.value.orders.map(order => {
+      Object.values(order.products).map(product => product.collection_point).forEach((collectionPoint) => {
+        if (!collectionPoints.map(collectionPoint => collectionPoint.collection_point_id).includes(collectionPoint.id))
+          collectionPoints.push(createScheduleItem(collectionPoint, 'CollectionPoint'));
+      });
+      return createScheduleItem(order, 'Order');
     });
 
-  schedule.value.orders.sort((a, b) => a.schedule_index - b.schedule_index);
+    schedule.value.schedule_items = collectionPoints.concat(orders).map((scheduleItem, index) => {
+      return {...scheduleItem, index};
+    });
+  }
+
+  schedule.value.schedule_items.sort((a, b) => a.index - b.index);
 });
 
 watch(
-  () => schedule.value.orders,
-  (newOrders) => newOrders?.forEach((o, i) => o.schedule_index = i),
+  () => schedule.value.schedule_items,
+  (newItems) => newItems?.forEach((item, index) => item.index = index),
   { deep: true }
 );
+
 
 watch(() => schedule.value.date, () => {
   error.value.date = null;
@@ -277,16 +327,3 @@ watch(() => schedule.value.users, () => {
   error.value.user = null;
 });
 </script>
-
-<style scoped>
-.order-item {
-  border-bottom: 1px solid #ccc;
-  padding-bottom: 8px;
-  margin-bottom: 8px;
-}
-.order-item:last-child {
-  border-bottom: none;
-  margin-bottom: 0;
-  padding-bottom: 0;
-}
-</style>
