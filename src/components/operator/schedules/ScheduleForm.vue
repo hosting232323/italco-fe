@@ -15,7 +15,10 @@
   >
     <v-card-text>
       <v-row>
-        <v-col cols="12" md="7">
+        <v-col
+          cols="12"
+          md="7"
+        >
           <v-form
             ref="form"
             @submit.prevent="submitForm"
@@ -91,7 +94,10 @@
               handle=".drag-handle"
             >
               <template #item="{ element }">
-                <v-row no-gutters class="mt-2">
+                <v-row
+                  no-gutters
+                  class="mt-2"
+                >
                   <v-col cols="1">
                     <div
                       class="drag-handle"
@@ -101,8 +107,10 @@
                     </div>
                   </v-col>
                   <v-col cols="4">
-                    <p>{{ element.index + 1 }}: 
-                    {{ element.operation_type == 'Order' ? 'Ordine' : 'Punto di ritiro' }} ID {{ element.id }}</p>
+                    <p>
+                      {{ element.index + 1 }}: 
+                      {{ element.operation_type == 'Order' ? 'Ordine' : 'Punto di ritiro' }} ID {{ element.id }}
+                    </p>
                   </v-col>
                   <v-col cols="6">
                     <div :class="['d-flex', 'align-center', isMobile ? 'flex-column' : '']">
@@ -144,9 +152,12 @@
             />
           </v-form>
         </v-col>
-        <v-col cols="12" md="5">
+        <v-col
+          cols="12"
+          md="5"
+        >
           <div style="height: 100%; border-radius: 12px; overflow: hidden;">
-            <GoogleMap v-if="schedule.schedule_items && schedule.schedule_items.length > 0"/>
+            <GoogleMap v-if="schedule.schedule_items && schedule.schedule_items.length > 0" />
           </div>
         </v-col>
       </v-row>
