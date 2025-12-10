@@ -28,7 +28,7 @@
         >
           {{ scheduleItem.operation_type == 'Order' ? 'Ordine' : 'Punto di ritiro' }}
           ID: <b>{{ scheduleItem.id }}</b>
-          Destinatario: <b>{{ scheduleItem.address }}</b>
+          Indirizzo: <b>{{ scheduleItem.address }}</b>
         </div>
       </template>
       <template #[`item.users`]="{ item }">
