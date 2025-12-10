@@ -109,7 +109,8 @@
                   <v-col cols="4">
                     <p>
                       {{ element.index + 1 }}: 
-                      {{ element.operation_type == 'Order' ? 'Ordine' : 'Punto di ritiro' }} ID {{ element.id }}
+                      {{ element.operation_type == 'Order' ? 'Ordine' : 'Punto di ritiro' }}
+                      ID {{ element.operation_type == 'Order' ? element.order_id : element.collection_point_id }}
                     </p>
                   </v-col>
                   <v-col cols="6">
@@ -222,13 +223,15 @@ const addOrder = () => {
   const orderToAdd = orders.value.find(o => o.id === selectedOrderId.value);
   if (!orderToAdd) return;
 
-  if (
-    !schedule.value.schedule_items.filter(scheduleItem => scheduleItem.operation_type == 'CollectionPoint')
-      .map(collectionPoint => collectionPoint.collection_point_id).includes(orderToAdd.collection_point.id)
-  )
-    schedule.value.schedule_items.push(createScheduleItem(
-      orderToAdd.collection_point, 'CollectionPoint', schedule.value.schedule_items.length
-    ));
+  Object.values(orderToAdd.products).forEach((product) => {
+    if (
+      !schedule.value.schedule_items.filter(scheduleItem => scheduleItem.operation_type == 'CollectionPoint')
+        .map(collectionPoint => collectionPoint.collection_point_id).includes(product.collection_point.id)
+    )
+      schedule.value.schedule_items.push(createScheduleItem(
+        product.collection_point, 'CollectionPoint', schedule.value.schedule_items.length
+      ));
+  });
 
   schedule.value.schedule_items.push(createScheduleItem(
     orderToAdd, 'Order', schedule.value.schedule_items.length
@@ -290,6 +293,7 @@ const createScheduleItem = (element, type, index = undefined) => {
   delete item.id;
   if (type == 'Order') item.order_id = element.id;
   else item.collection_point_id = element.id;
+  console.log(item)
   return item;
 };
 
