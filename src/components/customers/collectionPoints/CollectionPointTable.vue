@@ -10,12 +10,12 @@
     :items="collectionPoints"
     :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
     :headers="[
-      { title: 'ID', value: 'id' },
-      { title: 'Nominativo', value: 'name' },
-      { title: 'Indirizzo', value: 'address' },
-      { title: 'Cap', value: 'cap' },
-      { title: 'Orari', value: 'opening_closing' },
-      { title: 'Azioni', key: 'actions' },
+      { title: 'ID', value: 'id', sortable: false },
+      { title: 'Nominativo', value: 'name', sortable: false },
+      { title: 'Indirizzo', value: 'address', sortable: false },
+      { title: 'Cap', value: 'cap', sortable: false },
+      { title: 'Orari', value: 'opening_closing', sortable: false },
+      { title: 'Azioni', key: 'actions', sortable: false },
     ]"
   >
     <template #[`item.opening_closing`]="{ item }">

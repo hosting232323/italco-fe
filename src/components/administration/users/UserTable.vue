@@ -15,12 +15,12 @@
         :items="users"
         :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
         :headers="[
-          { title: 'ID', value: 'id' },
-          { title: 'Nickname', value: 'nickname' },
-          { title: 'Password', value: 'password' },
-          { title: 'Email', value: 'email' },
-          { title: 'Ruolo', value: 'role' },
-          { title: 'Azioni', key: 'actions' }
+          { title: 'ID', value: 'id', sortable: false },
+          { title: 'Nickname', value: 'nickname', sortable: false },
+          { title: 'Password', value: 'password', sortable: false },
+          { title: 'Email', value: 'email', sortable: false },
+          { title: 'Ruolo', value: 'role', sortable: false },
+          { title: 'Azioni', key: 'actions', sortable: false }
         ]"
       >
         <template #[`item.password`]="{ item }">

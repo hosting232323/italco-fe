@@ -110,25 +110,25 @@ const orders = storesUtils.getStoreList(orderStore, router);
 
 const getHeaders = () => {
   const headers = [
-    { title: 'ID', value: 'id' },
-    { title: 'Tipo', value: 'type' },
-    { title: 'Stato', value: 'status' },
-    { title: 'Prodotti Servizi', value: 'productsServices' },
-    { title: 'Destinatario', value: 'addressee' },
-    { title: 'Recapito', value: 'addressee_contact' }
+    { title: 'ID', value: 'id', sortable: false },
+    { title: 'Tipo', value: 'type', sortable: false },
+    { title: 'Stato', value: 'status', sortable: false },
+    { title: 'Prodotti Servizi', value: 'productsServices', sortable: false },
+    { title: 'Destinatario', value: 'addressee', sortable: false },
+    { title: 'Recapito', value: 'addressee_contact', sortable: false }
   ];
   if (role.value != 'Customer')
-    headers.push({ title: 'Punto Vendita', value: 'user.nickname' });
+    headers.push({ title: 'Punto Vendita', value: 'user.nickname', sortable: false });
   headers.push(
-    { title: 'D.P.C.', value: 'dpc' },
-    { title: 'D.R.C.', value: 'drc' },
-    { title: 'Data Assegnazione', value: 'assignament_date' },
-    { title: 'Data Consegna', value: 'booking_date' },
-    { title: 'Data Creazione', value: 'created_at' }
+    { title: 'D.P.C.', value: 'dpc', sortable: false },
+    { title: 'D.R.C.', value: 'drc', sortable: false },
+    { title: 'Data Assegnazione', value: 'assignament_date', sortable: false },
+    { title: 'Data Consegna', value: 'booking_date', sortable: false },
+    { title: 'Data Creazione', value: 'created_at', sortable: false }
   );
   if (role.value == 'Admin')
-    headers.push({ title: 'Prezzo', value: 'price' });
-  headers.push({ title: 'Azioni', key: 'actions' });
+    headers.push({ title: 'Prezzo', value: 'price', sortable: false });
+  headers.push({ title: 'Azioni', key: 'actions', sortable: false });
   return headers;
 };
 

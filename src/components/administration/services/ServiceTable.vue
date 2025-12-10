@@ -10,13 +10,13 @@
     :items="services"
     :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
     :headers="[
-      { title: 'ID', value: 'id' },
-      { title: 'Nome', value: 'name' },
-      { title:'Tipo', value: 'type' },
-      { title: 'Descrizione', value: 'description' },
-      { title: 'Durata', value: 'duration' },
-      { title: 'Max Giornaieri', value: 'max_services' },
-      { title: 'Azioni', key: 'actions' }
+      { title: 'ID', value: 'id', sortable: false },
+      { title: 'Nome', value: 'name', sortable: false },
+      { title:'Tipo', value: 'type', sortable: false },
+      { title: 'Descrizione', value: 'description', sortable: false },
+      { title: 'Durata', value: 'duration', sortable: false },
+      { title: 'Max Giornaieri', value: 'max_services', sortable: false },
+      { title: 'Azioni', key: 'actions', sortable: false }
     ]"
   >
     <template #[`item.type`]="{ item }">

@@ -10,9 +10,9 @@
     :items="customerRules"
     :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
     :headers="[
-      { title: 'Utente', value: 'nickname' },
-      { title: 'Regole', value: 'rules' },
-      { title: 'Azioni', key: 'actions' }
+      { title: 'Utente', value: 'nickname', sortable: false },
+      { title: 'Regole', value: 'rules', sortable: false },
+      { title: 'Azioni', key: 'actions', sortable: false }
     ]"
   >
     <template #[`item.rules`]="{ item }">

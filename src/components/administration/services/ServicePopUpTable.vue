@@ -2,10 +2,10 @@
   <v-data-table
     :items="service.users"
     :headers="[
-      { title: 'Nickname', value: 'nickname' },
-      { title: 'Prezzo', value: 'price' },
-      { title: 'Codice', value: 'code' },
-      { title: 'Azioni', key: 'actions' }
+      { title: 'Nickname', value: 'nickname', sortable: false },
+      { title: 'Prezzo', value: 'price', sortable: false },
+      { title: 'Codice', value: 'code', sortable: false },
+      { title: 'Azioni', key: 'actions', sortable: false }
     ]"
   >
     <template #[`item.actions`]="{ item }">

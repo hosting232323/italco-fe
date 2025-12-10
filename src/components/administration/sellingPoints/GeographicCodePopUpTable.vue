@@ -2,9 +2,9 @@
   <v-data-table
     :items="geographicZone.codes"
     :headers="[
-      { title: 'CAP', value: 'code' },
-      { title: 'Tipo', value: 'type' },
-      { title: 'Azioni', key: 'actions' }
+      { title: 'CAP', value: 'code', sortable: false },
+      { title: 'Tipo', value: 'type', sortable: false },
+      { title: 'Azioni', key: 'actions', sortable: false }
     ]"
   >
     <template #[`item.type`]="{ item }">

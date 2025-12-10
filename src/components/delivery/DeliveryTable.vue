@@ -10,16 +10,16 @@
         :items="filteredOrders"
         :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
         :headers="[
-          { title: 'ID', value: 'id' },
-          { title: 'Tipo', value: 'type' },
-          { title: 'Prodotti e Servizi', value: 'productsServices' },
-          { title: 'Prodotti e Punti di Ritiro', value: 'productsCollectionPoint' },
-          { title: 'Punto Vendita', value: 'user.nickname' },
-          { title: 'Destinatario', value: 'addressee' },
-          { title: 'Recapito', value: 'addressee_contact' },
-          { title: 'Note Punto Vendita', value: 'customer_note' },
-          { title: 'Note Operatori', value: 'operator_note' },
-          { title: 'Azioni', key: 'actions' }
+          { title: 'ID', value: 'id', sortable: false },
+          { title: 'Tipo', value: 'type', sortable: false },
+          { title: 'Prodotti e Servizi', value: 'productsServices', sortable: false },
+          { title: 'Prodotti e Punti di Ritiro', value: 'productsCollectionPoint', sortable: false },
+          { title: 'Punto Vendita', value: 'user.nickname', sortable: false },
+          { title: 'Destinatario', value: 'addressee', sortable: false },
+          { title: 'Recapito', value: 'addressee_contact', sortable: false },
+          { title: 'Note Punto Vendita', value: 'customer_note', sortable: false },
+          { title: 'Note Operatori', value: 'operator_note', sortable: false },
+          { title: 'Azioni', key: 'actions', sortable: false }
         ]"
       >
         <template #[`item.type`]="{ item }">

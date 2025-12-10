@@ -10,10 +10,10 @@
     :items="transports"
     :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
     :headers="[
-      { title: 'ID', value: 'id' },
-      { title: 'Nome', value: 'name' },
-      { title: 'Targa', value: 'plate' },
-      { title: 'Azioni', key: 'actions' }
+      { title: 'ID', value: 'id', sortable: false },
+      { title: 'Nome', value: 'name', sortable: false },
+      { title: 'Targa', value: 'plate', sortable: false },
+      { title: 'Azioni', key: 'actions', sortable: false }
     ]"
   >
     <template #[`item.actions`]="{ item }">

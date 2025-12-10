@@ -10,10 +10,10 @@
     :items="geographicZones"
     :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
     :headers="[
-      { title: 'Nome', value: 'name' },
-      { title: 'CAP aggiunti e rimossi', value: 'codes' },
-      { title: 'Vincoli', value: 'constraints' },
-      { title: 'Azioni', key: 'actions' }
+      { title: 'Nome', value: 'name', sortable: false },
+      { title: 'CAP aggiunti e rimossi', value: 'codes', sortable: false },
+      { title: 'Vincoli', value: 'constraints', sortable: false },
+      { title: 'Azioni', key: 'actions', sortable: false }
     ]"
   >
     <template #[`item.codes`]="{ item }">

@@ -13,12 +13,12 @@
       :items="schedules"
       :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
       :headers="[
-        { title: 'ID', value: 'id' },
-        { title: 'Data', value: 'date' },
-        { title: 'Utenti Delivery', value: 'users' },
-        { title: 'Veicolo', key: 'transport.name' },
-        { title: 'Pianificazione', key: 'schedule_items' },
-        { title: 'Azioni', key: 'actions' }
+        { title: 'ID', value: 'id', sortable: false },
+        { title: 'Data', value: 'date', sortable: false },
+        { title: 'Utenti Delivery', value: 'users', sortable: false },
+        { title: 'Veicolo', key: 'transport.name', sortable: false },
+        { title: 'Pianificazione', key: 'schedule_items', sortable: false },
+        { title: 'Azioni', key: 'actions', sortable: false }
       ]"
     >
       <template #[`item.schedule_items`]="{ item }">

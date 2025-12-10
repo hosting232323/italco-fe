@@ -2,8 +2,8 @@
   <v-data-table
     :items="customerGroup.users"
     :headers="[
-      { title: 'Nickname', value: 'nickname' },
-      { title: 'Azioni', key: 'actions' }
+      { title: 'Nickname', value: 'nickname', sortable: false },
+      { title: 'Azioni', key: 'actions', sortable: false }
     ]"
   >
     <template #[`item.actions`]="{ item }">

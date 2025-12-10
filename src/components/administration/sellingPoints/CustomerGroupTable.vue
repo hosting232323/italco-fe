@@ -10,9 +10,9 @@
     :items="customerGroups"
     :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
     :headers="[
-      { title: 'Nome', value: 'name' },
-      { title: 'Utenti', value: 'users' },
-      { title: 'Azioni', key: 'actions' }
+      { title: 'Nome', value: 'name', sortable: false },
+      { title: 'Utenti', value: 'users', sortable: false },
+      { title: 'Azioni', key: 'actions', sortable: false }
     ]"
   >
     <template #[`item.users`]="{ item }">

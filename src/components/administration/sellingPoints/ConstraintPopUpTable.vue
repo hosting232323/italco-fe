@@ -2,9 +2,9 @@
   <v-data-table
     :items="geographicZone.constraints"
     :headers="[
-      { title: 'Giorno', value: 'day_of_week' },
-      { title: 'Ordini massimi', value: 'max_orders' },
-      { title: 'Azioni', key: 'actions' }
+      { title: 'Giorno', value: 'day_of_week', sortable: false },
+      { title: 'Ordini massimi', value: 'max_orders', sortable: false },
+      { title: 'Azioni', key: 'actions', sortable: false }
     ]"
   >
     <template #[`item.day_of_week`]="{ item }">
