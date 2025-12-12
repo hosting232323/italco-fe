@@ -27,7 +27,7 @@
           :key="scheduleItem.index"
         >
           {{ scheduleItem.operation_type == 'Order' ? 'Ordine' : 'Punto di ritiro' }}
-          ID: <b>{{ scheduleItem.id }}</b>
+          ID: <b>{{ scheduleItem.operation_type == 'Order' ? scheduleItem.order_id : scheduleItem.collection_point_id }}</b>
           Indirizzo: <b>{{ scheduleItem.address }}</b>
         </div>
       </template>
