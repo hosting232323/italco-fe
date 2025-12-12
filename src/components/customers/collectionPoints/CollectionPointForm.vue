@@ -72,6 +72,7 @@
 
 <script setup>
 import FormButtons from '@/components/FormButtons';
+import GooglePlacesAutocomplete from '@/components/GooglePlacesAutocomplete.vue';
 
 import { ref } from 'vue';
 import mobile from '@/utils/mobile';
@@ -79,7 +80,6 @@ import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import validation from '@/utils/validation';
 import { useCollectionPointStore } from '@/stores/collectionPoint';
-import GooglePlacesAutocomplete from '@/components/GooglePlacesAutocomplete.vue';
 
 const form = ref(null);
 const loading = ref(false);

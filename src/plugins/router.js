@@ -55,7 +55,7 @@ const routes = [
       {
         path: 'transports',
         name: 'Veicoli',
-        component: () => import('@/views/administration/AdministrationTransports.vue')
+        component: () => import('@/views/administration/AdministrationDelivery.vue')
       },
       {
         path: 'schedules',

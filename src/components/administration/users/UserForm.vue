@@ -55,6 +55,33 @@
               label="Ruolo"
               :items="['Operator', 'Customer', 'Delivery']"
               :rules="validation.requiredRules"
+              :disabled="true"
+            />
+          </v-col>
+        </v-row>
+        <v-row no-gutters>
+          <v-col
+            cols="12"
+            md="6"
+          >
+            <GooglePlacesAutocomplete
+              v-if="settedRole == 'Delivery'"
+              v-model="user.address"
+              :custom-class="isMobile ? '' : 'mr-2'"
+              label="Località"
+              :rules="validation.address"
+              @address-components="handleAddressComponents"
+            />
+          </v-col>
+          <v-col
+            cols="12"
+            md="6"
+          >
+            <v-text-field
+              v-model="user.cap"
+              :class="isMobile ? '' : 'ml-2'"
+              label="Cap"
+              :rules="validation.capRules"
             />
           </v-col>
         </v-row>
@@ -69,6 +96,7 @@
 
 <script setup>
 import FormButtons from '@/components/FormButtons';
+import GooglePlacesAutocomplete from '@/components/GooglePlacesAutocomplete.vue';
 
 import { ref } from 'vue';
 import mobile from '@/utils/mobile';
@@ -78,6 +106,13 @@ import storesUtils from '@/utils/stores';
 import validation from '@/utils/validation';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
+const { settedRole } = defineProps({
+  settedRole: {
+    type: String,
+    required: true
+  }
+});
+
 const MAX_USERS = 40;
 
 const form = ref(null);
@@ -86,6 +121,8 @@ const router = useRouter();
 const isMobile = mobile.setupMobileUtils();
 const administrationUserStore = useAdministrationUserStore();
 const { element: user, activeForm } = storeToRefs(administrationUserStore);
+
+user.role = settedRole;
 const users = storesUtils.getStoreList(administrationUserStore, router);
 
 const submitForm = async () => {
@@ -100,5 +137,10 @@ const submitForm = async () => {
       activeForm.value = false;
     }
   });
+};
+
+const handleAddressComponents = (components) => {
+  user.value.address = components.address;
+  user.value.cap = components.cap;
 };
 </script>

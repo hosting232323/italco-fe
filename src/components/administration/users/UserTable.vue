@@ -86,8 +86,15 @@ import { storeToRefs } from 'pinia';
 import { ref, reactive  } from 'vue';
 import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
-import { useAdministrationUserStore } from '@/stores/administrationUser';
 import { decryptPassword } from 'generic-module';
+import { useAdministrationUserStore } from '@/stores/administrationUser';
+
+const { settedRole } = defineProps({
+  settedRole: {
+    type: String,
+    required: true
+  }
+});
 
 const secretKey = import.meta.env.VITE_SECRET_KEY;
 
