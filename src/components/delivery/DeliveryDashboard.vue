@@ -60,20 +60,22 @@
 </template>
 
 <script setup>
+import Table from '@/components/delivery/DeliveryTable';
+
+import http from '@/utils/http';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import mobile from '@/utils/mobile';
 import { useRouter } from 'vue-router';
 import { useOrderStore } from '@/stores/order';
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 
-import Table from '@/components/delivery/DeliveryTable';
-
-const locationError = ref(false); 
-const selectedCard = ref('In Progress');
+let watcherId = null;
 const theme = useTheme();
 const router = useRouter();
+const locationError = ref(false); 
 const orderStore = useOrderStore();
+const selectedCard = ref('In Progress');
 const { list: orders, ready } = storeToRefs(orderStore);
 
 const isMobile = mobile.setupMobileUtils();
@@ -148,14 +150,36 @@ onMounted(() => {
     return;
   }
 
-  navigator.geolocation.getCurrentPosition(
-    () => {
-      if (!ready.value) orderStore.initListDelivery(router);
+  let firstPositionHandled = false;
+  watcherId = navigator.geolocation.watchPosition(
+    position => {
+      if (!firstPositionHandled) {
+        firstPositionHandled = true;
+        if (!ready.value) orderStore.initListDelivery(router);
+      }
+
+      http.postRequest(
+        'user/update_position', 
+        {
+          lat: position.coords.latitude,
+          lon: position.coords.longitude
+        }, 
+        () => {}, 
+        'POST', 
+        router
+      );
     },
-    () => {
-      locationError.value = true;
+    () => locationError.value = true,
+    {
+      enableHighAccuracy: true,
+      maximumAge: 5000,
+      timeout: 10000
     }
   );
+
+  onUnmounted(() => {
+    if (watcherId != null) navigator.geolocation.clearWatch(watcherId);
+  });
 });
 </script>
 

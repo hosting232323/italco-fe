@@ -57,10 +57,14 @@
           >
           <p>{{ index % 2 === 0 ? 'Italco.mi Bot' : 'Tu' }}</p>
         </div>
+
+        <!-- eslint-disable vue/no-v-html -->
         <div
           :class="{msg: true, bot: index % 2 === 0, user: index % 2 !== 0}"
           v-html="marked.parse(message)"
         />
+        <!-- eslint-enable vue/no-v-html -->
+
         <div
           v-if="loading && index == messages.length - 1"
           class="msg bot"
