@@ -293,7 +293,6 @@ const createScheduleItem = (element, type, index = undefined) => {
   delete item.id;
   if (type == 'Order') item.order_id = element.id;
   else item.collection_point_id = element.id;
-  console.log(item)
   return item;
 };
 

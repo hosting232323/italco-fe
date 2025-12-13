@@ -1,8 +1,6 @@
 /* eslint-disable no-console */
 
-import { storeToRefs } from 'pinia';
 import logoutModule from '@/utils/logout';
-import { useUserStore } from '@/stores/user';
 
 const hostname = import.meta.env.VITE_HOSTNAME;
 
@@ -67,27 +65,8 @@ const createHeader = async (router, file = false) => {
     headers['Accept'] = '*/*';
   else
     headers['Content-Type'] = 'application/json';
-
   if (router)
     headers['Authorization'] = localStorage.getItem('token');
-
-  const userStore = useUserStore();
-  const { role } = storeToRefs(userStore);
-  if (role.value === 'Delivery' && navigator.geolocation) {
-    try {
-      const position = await new Promise((resolve, reject) =>
-        navigator.geolocation.getCurrentPosition(resolve, reject, {
-          timeout: 5000,
-          enableHighAccuracy: true
-        })
-      );
-      headers['X-Lat'] = position.coords.latitude;
-      headers['X-Lon'] = position.coords.longitude;
-    } catch (error) {
-      console.warn('Posizione non disponibile:', error.message);
-    }
-  }
-
   return headers;
 };
 
