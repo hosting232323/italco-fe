@@ -164,12 +164,12 @@ onMounted(() => {
           lat: position.coords.latitude,
           lon: position.coords.longitude
         }, 
-        (data) => console.log(data), 
+        () => {}, 
         'POST', 
         router
       );
     },
-    _ => locationError.value = true,
+    () => locationError.value = true,
     {
       enableHighAccuracy: true,
       maximumAge: 5000,
