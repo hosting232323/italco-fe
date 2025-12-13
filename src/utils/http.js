@@ -1,8 +1,6 @@
 /* eslint-disable no-console */
 
-import { storeToRefs } from 'pinia';
 import logoutModule from '@/utils/logout';
-import { useUserStore } from '@/stores/user';
 
 const hostname = import.meta.env.VITE_HOSTNAME;
 
@@ -67,13 +65,8 @@ const createHeader = async (router, file = false) => {
     headers['Accept'] = '*/*';
   else
     headers['Content-Type'] = 'application/json';
-
   if (router)
     headers['Authorization'] = localStorage.getItem('token');
-
-  const userStore = useUserStore();
-  const { role } = storeToRefs(userStore);
-
   return headers;
 };
 
