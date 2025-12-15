@@ -33,8 +33,8 @@
     />
     <v-list-item
       v-if="role === 'Admin'"
-      to="/transports"
-      title="Veicoli"
+      to="/delivery"
+      title="Delivery"
       prepend-icon="mdi-truck-delivery"
     />
     <v-list-item

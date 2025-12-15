@@ -33,6 +33,10 @@
             />
           </v-col>
         </v-row>
+        <v-text-field
+          v-model="transport.location"
+          label="Località"
+        />
         <FormButtons
           :loading="loading"
           @cancel="activeForm = false"

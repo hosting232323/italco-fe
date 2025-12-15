@@ -13,6 +13,7 @@
       { title: 'ID', value: 'id', sortable: false },
       { title: 'Nome', value: 'name', sortable: false },
       { title: 'Targa', value: 'plate', sortable: false },
+      { title: 'Località', value: 'location', sortable: false },
       { title: 'Azioni', key: 'actions', sortable: false }
     ]"
   >

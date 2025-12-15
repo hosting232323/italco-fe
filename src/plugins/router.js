@@ -53,9 +53,9 @@ const routes = [
         component: () => import('@/views/administration/AdministrationCustomerPoints.vue')
       },
       {
-        path: 'transports',
-        name: 'Veicoli',
-        component: () => import('@/views/administration/AdministrationTransports.vue')
+        path: 'delivery',
+        name: 'Deliver',
+        component: () => import('@/views/administration/AdministrationDelivery.vue')
       },
       {
         path: 'schedules',

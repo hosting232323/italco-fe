@@ -6,26 +6,33 @@
         icon="mdi-plus"
         style="float: right;"
         variant="text"
-        @click="openForm"
+        @click="openTransportForm"
       />
     </h1><hr>
     <TransportForm />
     <TransportTable />
+    <h1>
+      Utenti Delivery
+    </h1><hr>
+    <DeliveryUserInfoForm />
+    <DeliveryUserInfoTable />
   </v-container>
 </template>
 
 <script setup>
 import TransportForm from '@/components/administration/transports/TransportForm';
 import TransportTable from '@/components/administration/transports/TransportTable';
+import DeliveryUserInfoForm from '@/components/administration/transports/DeliveryUserInfoForm';
+import DeliveryUserInfoTable from '@/components/administration/transports/DeliveryUserInfoTable';
 
 import { storeToRefs } from 'pinia';
 import { useTransportStore } from '@/stores/transport';
 
 const transportStore = useTransportStore();
-const { activeForm, element: transport } = storeToRefs(transportStore);
+const { activeForm: activeTransportForm, element: transport } = storeToRefs(transportStore);
 
-const openForm = () => {
+const openTransportForm = () => {
   transport.value = {};
-  activeForm.value = true;
+  activeTransportForm.value = true;
 };
 </script>

@@ -158,16 +158,10 @@ onMounted(() => {
         if (!ready.value) orderStore.initListDelivery(router);
       }
 
-      http.postRequest(
-        'user/update_position', 
-        {
-          lat: position.coords.latitude,
-          lon: position.coords.longitude
-        }, 
-        () => {}, 
-        'POST', 
-        router
-      );
+      http.postRequest('user/position', {
+        lat: position.coords.latitude,
+        lon: position.coords.longitude
+      }, () => {}, 'POST', router);
     },
     () => locationError.value = true,
     {
