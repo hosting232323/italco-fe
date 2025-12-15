@@ -26,7 +26,6 @@
       <v-data-table
         v-else
         v-model="schedule.orders"
-        return-object
         :items="orders"
         :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
         :headers="getHeaders()"
@@ -77,16 +76,10 @@
       </v-data-table>
     </template>
     <template #default>
-      <template v-if="popUpType == 'form'">
-        <v-card
-          v-if="schedule.orders?.some(order => order.status !== 'Pending')"
-          title="Hai selezionato degli ordini già assegnati"
-        />
-        <ScheduleForm
-          v-else
-          @cancel="dialog = false"
-        />
-      </template>
+      <ScheduleForm
+        v-if="popUpType == 'form'"
+        @cancel="dialog = false"
+      />
       <SchedulationForm
         v-else-if="popUpType == 'schedulation'"
         @cancel="dialog = false"

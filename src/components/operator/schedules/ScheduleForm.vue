@@ -3,6 +3,13 @@
     v-if="!schedule.id && !schedule.orders && !schedule.schedulation"
     title="Seleziona degli ordini per creare un Borderò"
   />
+  <div v-if="loadingForm">
+    Loading...
+  </div>
+  <v-card
+    v-if="orderStatusError"
+    :title="orderStatusError"
+  />
   <v-card
     v-else
     :title="schedule.id ? 'Modifica Borderò' : 'Crea Borderò'"
@@ -166,6 +173,7 @@
 import GoogleMap from '@/components/GoogleMap.vue';
 import FormButtons from '@/components/FormButtons';
 
+import http from '@/utils/http';
 import { useTheme } from 'vuetify';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
@@ -183,7 +191,9 @@ const form = ref(null);
 const theme = useTheme();
 const router = useRouter();
 const loading = ref(false);
+const loadingForm = ref(false);
 const selectedUser = ref(null);
+const orderStatusError = ref('');
 const selectedOrderId = ref(null);
 const orderStore = useOrderStore();
 const emits = defineEmits(['cancel']);
@@ -241,16 +251,17 @@ const removeOrder = (order) => {
     item => !(item.operation_type == 'Order' && item.order_id == order.order_id)
   );
 
-  const otherCollectionPointIds = schedule.value.schedule_items.filter(
-    item => item.operation_type == 'Order'
-  ).flatMap(
-    item => Object.values(item.products).map(product => product.collection_point.id)
-  );
-  for (const collectionPointId of Object.values(order.products).map(product => product.collection_point.id))
-    if (!otherCollectionPointIds.includes(collectionPointId))
+  const usedCpIds = schedule.value.schedule_items
+    .filter(item => item.operation_type === 'Order')
+    .flatMap(item => item.collection_point_ids || []);
+
+  order.collection_point_ids.forEach(cpId => {
+    if (!usedCpIds.includes(cpId)) {
       schedule.value.schedule_items = schedule.value.schedule_items.filter(
-        item => !(item.operation_type == 'CollectionPoint' && item.collection_point_id == collectionPointId)
+        item => !(item.operation_type === 'CollectionPoint' && item.collection_point_id === cpId)
       );
+    }
+  });
 };
 
 const submitForm = async () => {
@@ -294,22 +305,15 @@ const createScheduleItem = (element, type, index = undefined) => {
 };
 
 onMounted(() => {
-  if (!schedule.value.id && !schedule.value.schedulation) {
-    const collectionPoints = [];
-    const orders = schedule.value.orders.map(order => {
-      Object.values(order.products).map(product => product.collection_point).forEach((collectionPoint) => {
-        if (!collectionPoints.map(collectionPoint => collectionPoint.collection_point_id).includes(collectionPoint.id))
-          collectionPoints.push(createScheduleItem(collectionPoint, 'CollectionPoint'));
-      });
-      return createScheduleItem(order, 'Order');
-    });
-
-    schedule.value.schedule_items = collectionPoints.concat(orders).map((scheduleItem, index) => {
-      return {...scheduleItem, index};
-    });
-  }
-
-  schedule.value.schedule_items.sort((a, b) => a.index - b.index);
+  loadingForm.value = true;
+  http.postRequest('schedule/pianification', {
+    orders_id: schedule.value.orders
+  }, (data) => {
+    if (data.status == 'ok')
+      schedule.value.schedule_items = data.schedule_items;
+    else orderStatusError.value = data.message;
+    loadingForm.value = false;
+  }, 'POST', router);
 });
 
 watch(
