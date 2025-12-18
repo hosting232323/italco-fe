@@ -11,37 +11,60 @@
     <p>La piattaforma tratta le seguenti categorie di dati personali:</p>
     <ul style="margin-left:20px;">
       <li>
-        <strong>Dati dei clienti finali</strong>
+        <strong>Dati degli utenti registrati (amministratori, clienti, delivery, operatori)</strong>
         <ul style="margin-left:20px;">
-          <li>Nome e cognome</li>
-          <li>Indirizzo di consegna</li>
-          <li>Recapiti di contatto (email, telefono)</li>
-          <li>Informazioni relative all’ordine (numero ordine, stato della spedizione)</li>
-          <li>Dati di tracciamento dell’ordine</li>
+          <li>Nickname</li>
+          <li>Indirizzo email</li>
+          <li>Password (in forma cifrata)</li>
+          <li>Ruolo utente all’interno della piattaforma</li>
+          <li>Appartenenza a gruppi cliente o delivery</li>
         </ul>
       </li>
       <li>
-        <strong>Dati degli utenti delivery</strong>
+        <strong>Dati operativi degli utenti delivery</strong>
         <ul style="margin-left:20px;">
-          <li>Nome e cognome</li>
-          <li>Dati di contatto</li>
-          <li>Informazioni operative relative alle consegne assegnate</li>
-          <li>Storico delle attività di consegna</li>
+          <li>Località operativa</li>
+          <li>Coordinate geografiche (latitudine e longitudine)</li>
+          <li>Associazione a gruppi di consegna e pianificazioni</li>
         </ul>
       </li>
       <li>
-        <strong>Dati dei fornitori</strong>
+        <strong>Dati relativi agli ordini</strong>
         <ul style="margin-left:20px;">
-          <li>Dati identificativi e di contatto</li>
-          <li>Informazioni sugli ordini e sulla logistica</li>
+          <li>Nominativo del destinatario</li>
+          <li>Indirizzo di consegna e CAP</li>
+          <li>Date di consegna previste e reali</li>
+          <li>Stato e tipologia dell’ordine</li>
+          <li>Note del cliente e dell’operatore</li>
+          <li>Eventuali anomalie o ritardi</li>
+          <li>Firma del destinatario e documentazione fotografica</li>
+          <li>Identificativi esterni dell’ordine</li>
         </ul>
       </li>
       <li>
-        <strong>Dati tecnici</strong>
+        <strong>Dati logistici e di pianificazione</strong>
         <ul style="margin-left:20px;">
-          <li>Indirizzo IP</li>
-          <li>Log di accesso alla piattaforma</li>
-          <li>Dati di navigazione necessari al funzionamento del servizio</li>
+          <li>Programmazioni giornaliere delle attività</li>
+          <li>Fasce orarie operative</li>
+          <li>Mezzi di trasporto utilizzati (nome, targa)</li>
+          <li>Punti di ritiro e consegna</li>
+        </ul>
+      </li>
+      <li>
+        <strong>Dati relativi a servizi e prodotti</strong>
+        <ul style="margin-left:20px;">
+          <li>Tipologia di servizio richiesto</li>
+          <li>Prezzo del servizio</li>
+          <li>Prodotti associati all’ordine</li>
+          <li>Punti di ritiro associati ai prodotti</li>
+        </ul>
+      </li>
+      <li>
+        <strong>Dati di organizzazione territoriale</strong>
+        <ul style="margin-left:20px;">
+          <li>Zone geografiche</li>
+          <li>Codici territoriali (es. CAP)</li>
+          <li>Vincoli operativi per giorno della settimana</li>
         </ul>
       </li>
     </ul>
