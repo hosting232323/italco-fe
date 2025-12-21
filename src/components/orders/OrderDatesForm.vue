@@ -53,6 +53,7 @@ import DateField from '@/components/DateField';
 import FormButtons from '@/components/FormButtons';
 
 import { ref } from 'vue';
+import days from '@/utils/days';
 import http from '@/utils/http';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
@@ -69,26 +70,10 @@ const allowedDpcDates = ref([]);
 const userStore = useUserStore();
 const orderStore = useOrderStore();
 const isMobile = mobile.setupMobileUtils();
+const nextTwoMonths = days.getDateRangeArray();
+
 const { role } = storeToRefs(userStore);
 const { element: order, activeForm } = storeToRefs(orderStore);
-
-const getDateRangeArray = () => {
-  const result = [];
-  const today = new Date();
-  const endDate = new Date(today);
-  endDate.setMonth(endDate.getMonth() + 2);
-
-  for (let date = new Date(today); date <= endDate; date.setDate(date.getDate() + 1)) {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // mesi da 0 a 11
-    const day = String(date.getDate()).padStart(2, '0');
-    result.push(`${year}-${month}-${day}`);
-  }
-
-  return result;
-};
-
-const nextTwoMonths = getDateRangeArray();
 
 if (role.value == 'Customer')
   http.postRequest('check-constraints', {
