@@ -17,21 +17,45 @@
         />
         <v-row>
           <v-col
-            cols="4"
             v-for="(suggestion, index) in suggestions"
+            :key="index"
+            cols="12"
+            md="4"
           >
-            <v-card :color="theme.current.value.primaryColor">
-              <v-card-title>
-                Proposta Borderò {{ index + 1 }}
-              </v-card-title>
+            <v-card
+              :color="theme.current.value.primaryColor"
+              :title="`Proposta Borderò ${index + 1}`"
+            >
+              <template #append>
+                <v-btn
+                  icon="mdi-open-in-new"
+                  variant="text"
+                  @click="openSchedule()"
+                />
+              </template>
               <v-card-text>
                 <v-list style="border-radius: 5px;">
-                  <v-list-item v-for="order in suggestion.orders">
+                  <p class="ml-4">
+                    Punti di Ritiro:
+                  </p>
+                  <v-list-item
+                    v-for="item in suggestion.filter(element => element.operation_type == 'CollectionPoint')"
+                    :key="item.collection_point_id"
+                  >
                     <v-list-item-title class="no-truncate">
-                      Ordine ID {{ order.id }}: {{ order.address }} ({{ order.cap }})<br>
-                      Punti di ritiro: {{ Object.values(order.products).map(
-                        product => `${product.collection_point.address} (${product.collection_point.cap})`
-                      ).join(', ') }}
+                      ID {{ item.collection_point_id }}: {{ item.address }} ({{ item.cap }})
+                    </v-list-item-title>
+                  </v-list-item>
+                  <v-divider />
+                  <p class="ml-4 mt-4">
+                    Ordini:
+                  </p>
+                  <v-list-item
+                    v-for="item in suggestion.filter(element => element.operation_type == 'Order')"
+                    :key="item.order_id"
+                  >
+                    <v-list-item-title class="no-truncate">
+                      ID {{ item.order_id }}: {{ item.address }} ({{ item.cap }})
                     </v-list-item-title>
                   </v-list-item>
                 </v-list>
@@ -75,12 +99,8 @@ const submitDpcForm = async () => {
   }, 'GET', router);
 };
 
-const printOrderAddresses = (order) => {
-  return [`${order.address} (${order.cap})`].concat(
-    Object.values(order.products).map(
-      product => `${product.collection_point.address} (${product.collection_point.cap})`
-    )
-  ).join(', ');
+const openSchedule = () => {
+  alert('In sviluppo');
 };
 </script>
 
