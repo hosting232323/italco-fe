@@ -34,6 +34,6 @@ const { loading } = defineProps({
   },
 });
 
-const emits = defineEmits(['cancel']);
 const theme = useTheme();
+const emits = defineEmits(['cancel']);
 </script>

@@ -5,10 +5,17 @@
   >
     <template #activator>
       <v-btn
+        v-if="role == 'Admin'"
+        text="Pianificazione Automatica"
+        class="mr-5"
+        :color="theme.current.value.primaryColor"
+        @click="openPopUp('schedulation')"
+      />
+      <v-btn
         v-if="['Admin', 'Operator'].includes(role) && schedule.orders?.length"
         text="Assegna Gruppo Delivery"
         :color="theme.current.value.primaryColor"
-        @click="dialog = true"
+        @click="openPopUp('form')"
       />
       <v-skeleton-loader
         v-if="!ready"
@@ -70,13 +77,20 @@
       </v-data-table>
     </template>
     <template #default>
-      <v-card
-        v-if="schedule.orders?.some(order => order.status !== 'Pending')"
-        title="Hai selezionato degli ordini già assegnati"
-      />
-      <ScheduleForm
-        v-else
+      <template v-if="popUpType == 'form'">
+        <v-card
+          v-if="schedule.orders?.some(order => order.status !== 'Pending')"
+          title="Hai selezionato degli ordini già assegnati"
+        />
+        <ScheduleForm
+          v-else
+          @cancel="dialog = false"
+        />
+      </template>
+      <SchedulationForm
+        v-else-if="popUpType == 'schedulation'"
         @cancel="dialog = false"
+        @go-to-shedule-form="popUpType = 'form'"
       />
     </template>
   </v-dialog>
@@ -85,6 +99,7 @@
 <script setup>
 import Action from '@/components/orders/OrderActions';
 import ScheduleForm from '@/components/operator/schedules/ScheduleForm';
+import SchedulationForm from '@/components/operator/schedules/SchedulationForm';
 
 import { ref } from 'vue';
 import { useTheme } from 'vuetify';
@@ -99,6 +114,7 @@ import { useScheduleStore } from '@/stores/schedule';
 const theme = useTheme();
 const dialog = ref(false);
 const router = useRouter();
+const popUpType = ref(null);
 const userStore = useUserStore();
 const orderStore = useOrderStore();
 const scheduleStore = useScheduleStore();
@@ -136,6 +152,11 @@ const createdAt = (input) => {
   const [datePart] = input.split(' ');
   const [day, month, year] = datePart.split('/');
   return `${year}-${month}-${day}`;
+};
+
+const openPopUp = (type) => {
+  popUpType.value = type;
+  dialog.value = true;
 };
 </script>
 

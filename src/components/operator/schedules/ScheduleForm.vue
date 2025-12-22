@@ -1,17 +1,14 @@
 <template>
   <v-card
-    v-if="!schedule.id && !schedule.orders"
+    v-if="!schedule.id && !schedule.orders && !schedule.schedulation"
     title="Seleziona degli ordini per creare un Borderò"
   />
   <v-card
     v-else
     :title="schedule.id ? 'Modifica Borderò' : 'Crea Borderò'"
-    :subtitle="schedule.id 
-      ? `ID: ${schedule.id}\nOrdini: ${
-        schedule.schedule_items.filter(item => item.operation_type == 'Order')
-          .map(item => item.order_id).join(', ')
-      }` 
-      : `Ordini: ${schedule.orders.map(order => order.id).join(', ')}`"
+    :subtitle="(schedule.id ? `ID: ${schedule.id} - ` : '') + 'Ordini: ' +
+      schedule.schedule_items.filter(item => item.operation_type == 'Order')
+        .map(item => item.order_id).join(', ')"
   >
     <v-card-text>
       <v-row>
@@ -74,7 +71,6 @@
               </v-col>
             </v-row>
             <v-autocomplete
-              v-if="schedule.id"
               v-model="selectedOrderId"
               label="Aggiungi Ordine"
               :items="orders.filter(order => order.status === 'Pending').filter(order =>
@@ -195,9 +191,10 @@ const scheduleStore = useScheduleStore();
 const transportStore = useTransportStore();
 const isMobile = mobile.setupMobileUtils();
 const error = ref({user: null, date: null});
+const administrationUserStore = useAdministrationUserStore();
+
 const { element: schedule } = storeToRefs(scheduleStore);
 const orders = storesUtils.getStoreList(orderStore, router);
-const administrationUserStore = useAdministrationUserStore();
 const transports = storesUtils.getStoreList(transportStore, router);
 const users = storesUtils.getStoreList(administrationUserStore, router);
 
@@ -297,7 +294,7 @@ const createScheduleItem = (element, type, index = undefined) => {
 };
 
 onMounted(() => {
-  if (!schedule.value.id) {
+  if (!schedule.value.id && !schedule.value.schedulation) {
     const collectionPoints = [];
     const orders = schedule.value.orders.map(order => {
       Object.values(order.products).map(product => product.collection_point).forEach((collectionPoint) => {
