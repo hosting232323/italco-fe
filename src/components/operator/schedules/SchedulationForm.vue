@@ -30,7 +30,7 @@
                 <v-btn
                   icon="mdi-open-in-new"
                   variant="text"
-                  @click="openSchedule()"
+                  @click="openSchedule(suggestion)"
                 />
               </template>
               <v-card-text>
@@ -76,8 +76,10 @@ import { ref } from 'vue';
 import http from '@/utils/http';
 import days from '@/utils/days';
 import { useTheme } from 'vuetify';
+import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import validation from '@/utils/validation';
+import { useScheduleStore } from '@/stores/schedule';
 
 const dpc = ref(null);
 const theme = useTheme();
@@ -85,7 +87,9 @@ const dpcForm = ref(null);
 const loading = ref(false);
 const router = useRouter();
 const suggestions = ref([]);
-const emits = defineEmits(['cancel']);
+const scheduleStore = useScheduleStore();
+const emits = defineEmits(['cancel', 'goToSheduleForm']);
+const { element: schedule } = storeToRefs(scheduleStore);
 
 const submitDpcForm = async () => {
   if (!(await dpcForm.value.validate()).valid) return;
@@ -99,8 +103,11 @@ const submitDpcForm = async () => {
   }, 'GET', router);
 };
 
-const openSchedule = () => {
-  alert('In sviluppo');
+const openSchedule = (scheduleItems) => {
+  schedule.value.date = dpc.value;
+  schedule.value.schedule_items = scheduleItems;
+  schedule.value.schedulation = true;
+  emits('goToSheduleForm');
 };
 </script>
 

@@ -87,11 +87,11 @@
           @cancel="dialog = false"
         />
       </template>
-      <template v-else-if="popUpType == 'schedulation'">
-        <SchedulationForm
-          @cancel="dialog = false"
-        />
-      </template>
+      <SchedulationForm
+        v-else-if="popUpType == 'schedulation'"
+        @cancel="dialog = false"
+        @go-to-shedule-form="popUpType = 'form'"
+      />
     </template>
   </v-dialog>
 </template>
