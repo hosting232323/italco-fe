@@ -133,7 +133,8 @@
                   </v-col>
                   <v-col cols="1">
                     <v-btn
-                      v-if="element.operation_type === 'Order'"
+                      v-if="element.operation_type === 'Order' &&
+                        schedule.schedule_items.filter(item => item.operation_type == 'Order').length > 1"
                       variant="text"
                       icon="mdi-delete"
                       :color="theme.current.value.primaryColor"
