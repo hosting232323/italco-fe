@@ -9,13 +9,13 @@
         text="Pianificazione Automatica"
         class="mr-5"
         :color="theme.current.value.primaryColor"
-        @click="openPopUp('schedulation')"
+        @click="openSchedulationPopUp()"
       />
       <v-btn
         v-if="['Admin', 'Operator'].includes(role) && schedule.orders?.length"
         text="Assegna Gruppo Delivery"
         :color="theme.current.value.primaryColor"
-        @click="openPopUp('form')"
+        @click="openFormPopUp()"
       />
       <v-skeleton-loader
         v-if="!ready"
@@ -85,6 +85,10 @@
         @cancel="dialog = false"
         @go-to-shedule-form="popUpType = 'form'"
       />
+      <v-card
+        v-else-if="popUpType == 'message' && scheduleFormMessage"
+        :title="scheduleFormMessage"
+      />
     </template>
   </v-dialog>
 </template>
@@ -95,6 +99,7 @@ import ScheduleForm from '@/components/operator/schedules/ScheduleForm';
 import SchedulationForm from '@/components/operator/schedules/SchedulationForm';
 
 import { ref } from 'vue';
+import http from '@/utils/http';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import orderUtils from '@/utils/order';
@@ -110,12 +115,14 @@ const router = useRouter();
 const popUpType = ref(null);
 const userStore = useUserStore();
 const orderStore = useOrderStore();
+const scheduleFormMessage = ref('');
 const scheduleStore = useScheduleStore();
+
 const { role } = storeToRefs(userStore);
 const { ready } = storeToRefs(orderStore);
 const { element: schedule } = storeToRefs(scheduleStore);
-schedule.value = {};
 const orders = storesUtils.getStoreList(orderStore, router);
+schedule.value = {};
 
 const getHeaders = () => {
   const headers = [
@@ -147,9 +154,25 @@ const createdAt = (input) => {
   return `${year}-${month}-${day}`;
 };
 
-const openPopUp = (type) => {
-  popUpType.value = type;
+const openFormPopUp = () => {
   dialog.value = true;
+  popUpType.value = 'message';
+  scheduleFormMessage.value = 'Loading...';
+
+  http.postRequest('schedule/pianification', {
+    orders_id: schedule.value.orders
+  }, (data) => {
+    if (data.status == 'ok') {
+      popUpType.value = 'form';
+      schedule.value.schedule_items = data.schedule_items;
+    } else
+      scheduleFormMessage.value = data.error;
+  }, 'POST', router);
+};
+
+const openSchedulationPopUp = () => {
+  dialog.value = true;
+  popUpType.value = 'schedulation';
 };
 </script>
 
