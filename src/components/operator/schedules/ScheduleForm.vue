@@ -245,20 +245,13 @@ const removeOrder = (order) => {
   const otherCollectionPointIds = schedule.value.schedule_items.filter(
     item => item.operation_type == 'Order'
   ).flatMap(
-    item => Object.values(getOrderProducts(item)).map(product => product.collection_point.id)
+    item => Object.values(item.products).map(product => product.collection_point.id)
   );
-  for (const collectionPointId of Object.values(getOrderProducts(order)).map(product => product.collection_point.id))
+  for (const collectionPointId of Object.values(order.products).map(product => product.collection_point.id))
     if (!otherCollectionPointIds.includes(collectionPointId))
       schedule.value.schedule_items = schedule.value.schedule_items.filter(
         item => !(item.operation_type == 'CollectionPoint' && item.collection_point_id == collectionPointId)
       );
-};
-
-const getOrderProducts = (selectedOrder) => {
-  if (!schedule.value.id)
-    return order.products;
-  else
-    return orders.value.find(order => order.id === selectedOrder.order_id).products;
 };
 
 const submitForm = async () => {
