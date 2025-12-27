@@ -4,7 +4,6 @@
     title="Login"
     logo="/logo.png"
     :secondary-color="theme.current.value.primaryColor"
-    redirect-link="/dashboard"
     :sign-up="false"
     :hostname="hostname"
     :iv="iv"
