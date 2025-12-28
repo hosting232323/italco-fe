@@ -105,6 +105,9 @@
                       {{ element.operation_type == 'Order' ? 'Ordine' : 'Punto di ritiro' }}
                       ID {{ element.operation_type == 'Order' ? element.order_id : element.collection_point_id }}
                     </p>
+                    <p style="font-size: smaller; padding-right: 5px;">
+                      {{ element.address }}, {{ element.cap }}
+                    </p>
                   </v-col>
                   <v-col cols="6">
                     <div :class="['d-flex', 'align-center', isMobile ? 'flex-column' : '']">
