@@ -7,8 +7,7 @@
     v-else
     :title="schedule.id ? 'Modifica Borderò' : 'Crea Borderò'"
     :subtitle="(schedule.id ? `ID: ${schedule.id} - ` : '') + 'Ordini: ' +
-      schedule.schedule_items.filter(item => item.operation_type == 'Order')
-        .map(item => item.order_id).join(', ')"
+      schedule.schedule_items.flatMap(item => item.operation_type === 'Order' ? [item.order_id] : []).join(', ')"
   >
     <v-card-text>
       <v-row>
@@ -73,10 +72,8 @@
             <v-autocomplete
               v-model="selectedOrderId"
               label="Aggiungi Ordine"
-              :items="orders.filter(order => order.status === 'Pending').filter(order =>
-                !schedule.schedule_items.filter(collectionPoint => collectionPoint.operation_type == 'Order')
-                  .some(scheduleOrder => scheduleOrder.order_id === order.id)
-              )"
+              :items="orders.filter(order => order.status === 'Pending' &&
+                !schedule.schedule_items.some(item => item.operation_type === 'Order' && item.order_id === order.id))"
               :item-title="order => `ID ordine: ${order.id}`"
               item-value="id"
               append-icon="mdi-plus"
@@ -223,8 +220,8 @@ const addOrder = () => {
 
   Object.values(orderToAdd.products).forEach((product) => {
     if (
-      !schedule.value.schedule_items.filter(scheduleItem => scheduleItem.operation_type == 'CollectionPoint')
-        .map(collectionPoint => collectionPoint.collection_point_id).includes(product.collection_point.id)
+      !schedule.value.schedule_items.some(collectionPoint =>
+        collectionPoint.operation_type === 'CollectionPoint' && collectionPoint.collection_point_id === product.collection_point.id)
     )
       schedule.value.schedule_items.push(createScheduleItem(
         product.collection_point, 'CollectionPoint', schedule.value.schedule_items.length
@@ -238,20 +235,19 @@ const addOrder = () => {
 };
 
 const removeOrder = (order) => {
-  schedule.value.schedule_items = schedule.value.schedule_items.filter(
-    item => !(item.operation_type == 'Order' && item.order_id == order.order_id)
-  );
+  const remainingItems = schedule.value.schedule_items.filter(
+    item => !(item.operation_type === 'Order' && item.order_id === order.order_id));
 
-  const otherCollectionPointIds = schedule.value.schedule_items.filter(
-    item => item.operation_type == 'Order'
-  ).flatMap(
-    item => Object.values(item.products).map(product => product.collection_point.id)
+  const usedCollectionPointIds = new Set(remainingItems.filter(item => item.operation_type === 'Order')
+    .flatMap(item => Object.values(item.products).map(product => product.collection_point.id)));
+
+  const removedOrderCollectionPointIds = new Set(Object.values(order.products).map(product => product.collection_point.id));
+
+  schedule.value.schedule_items = remainingItems.filter(item =>
+    item.operation_type !== 'CollectionPoint' ||
+    usedCollectionPointIds.has(item.collection_point_id) ||
+    !removedOrderCollectionPointIds.has(item.collection_point_id)
   );
-  for (const collectionPointId of Object.values(order.products).map(product => product.collection_point.id))
-    if (!otherCollectionPointIds.includes(collectionPointId))
-      schedule.value.schedule_items = schedule.value.schedule_items.filter(
-        item => !(item.operation_type == 'CollectionPoint' && item.collection_point_id == collectionPointId)
-      );
 };
 
 const submitForm = async () => {
