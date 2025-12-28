@@ -13,57 +13,64 @@
         />
         <FormButtons
           :loading="loading"
+          class="mb-5"
           @cancel="emits('cancel')"
         />
-        <v-row>
-          <v-col
-            v-for="(suggestion, index) in suggestions"
-            :key="index"
-            cols="12"
-            md="4"
-          >
-            <v-card
-              :color="theme.current.value.primaryColor"
-              :title="`Proposta Borderò ${index + 1}`"
-            >
-              <template #append>
-                <v-btn
-                  icon="mdi-open-in-new"
-                  variant="text"
-                  @click="openSchedule(suggestion)"
-                />
-              </template>
-              <v-card-text>
-                <v-list style="border-radius: 5px;">
-                  <p class="ml-4">
-                    Punti di Ritiro:
-                  </p>
-                  <v-list-item
-                    v-for="item in suggestion.filter(element => element.operation_type == 'CollectionPoint')"
-                    :key="item.collection_point_id"
-                  >
-                    <v-list-item-title class="no-truncate">
-                      ID {{ item.collection_point_id }}: {{ item.address }} ({{ item.cap }})
-                    </v-list-item-title>
-                  </v-list-item>
-                  <v-divider />
-                  <p class="ml-4 mt-4">
-                    Ordini:
-                  </p>
-                  <v-list-item
-                    v-for="item in suggestion.filter(element => element.operation_type == 'Order')"
-                    :key="item.order_id"
-                  >
-                    <v-list-item-title class="no-truncate">
-                      ID {{ item.order_id }}: {{ item.address }} ({{ item.cap }})
-                    </v-list-item-title>
-                  </v-list-item>
-                </v-list>
-              </v-card-text>
-            </v-card>
-          </v-col>
-        </v-row>
       </v-form>
+      <v-alert
+        v-if="message"
+        class="mt-5 mb-5"
+      >
+        {{ message }}
+      </v-alert>
+      <v-row>
+        <v-col
+          v-for="(suggestion, index) in suggestions"
+          :key="index"
+          cols="12"
+          md="4"
+        >
+          <v-card
+            :color="theme.current.value.primaryColor"
+            :title="`Proposta Borderò ${index + 1}`"
+          >
+            <template #append>
+              <v-btn
+                icon="mdi-open-in-new"
+                variant="text"
+                @click="openSchedule(suggestion)"
+              />
+            </template>
+            <v-card-text>
+              <v-list style="border-radius: 5px;">
+                <p class="ml-4">
+                  Punti di Ritiro:
+                </p>
+                <v-list-item
+                  v-for="item in suggestion.filter(element => element.operation_type == 'CollectionPoint')"
+                  :key="item.collection_point_id"
+                >
+                  <v-list-item-title class="no-truncate">
+                    ID {{ item.collection_point_id }}: {{ item.address }} ({{ item.cap }})
+                  </v-list-item-title>
+                </v-list-item>
+                <v-divider />
+                <p class="ml-4 mt-4">
+                  Ordini:
+                </p>
+                <v-list-item
+                  v-for="item in suggestion.filter(element => element.operation_type == 'Order')"
+                  :key="item.order_id"
+                >
+                  <v-list-item-title class="no-truncate">
+                    ID {{ item.order_id }}: {{ item.address }} ({{ item.cap }})
+                  </v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
     </v-card-text>
   </v-card>
 </template>
@@ -82,6 +89,7 @@ import validation from '@/utils/validation';
 import { useScheduleStore } from '@/stores/schedule';
 
 const dpc = ref(null);
+const message = ref('');
 const theme = useTheme();
 const dpcForm = ref(null);
 const loading = ref(false);
@@ -94,12 +102,16 @@ const { element: schedule } = storeToRefs(scheduleStore);
 const submitDpcForm = async () => {
   if (!(await dpcForm.value.validate()).valid) return;
 
+  message.value = '';
   loading.value = true;
   http.getRequest('schedule/suggestions', {
     dpc: dpc.value
   }, function (data) {
     loading.value = false;
-    suggestions.value = data.groups;
+    if (data.status == 'ok')
+      suggestions.value = data.groups;
+    else
+      message.value = data.error;
   }, 'GET', router);
 };
 

@@ -7,7 +7,6 @@
       :title="`${product} [${order.products[product].collection_point.name}]`"
       append-icon="mdi-delete"
       :subtitle="order.products[product].services.map(service => service.name).join(', ')"
-      @click:append="addProduct"
     >
       <template #append>
         <v-icon
@@ -133,27 +132,27 @@ watch([filteredCollectionPoints, () => selectedCollectionPoint.value], async ([l
   }
 }, { immediate: true });
 
-const addProduct = async () => {
-  if (!(await form.value.validate()).valid) return;
-
-  if (!order.value.products)
-    order.value.products = {};
-
-  order.value.products[selectedProduct.value] = {
-    services: selectedServices.value,
-    collection_point: selectedCollectionPoint.value
-  };
+const resetFormRow = () => {
   selectedServices.value = [];
+  selectedService.value = null;
   selectedProduct.value = null;
   selectedCollectionPoint.value = null;
 };
 
+const addProduct = async () => {
+  if (!(await form.value.validate()).valid) return;
+
+  if (!order.value.products) order.value.products = {};
+  order.value.products[selectedProduct.value] = {
+    services: selectedServices.value,
+    collection_point: selectedCollectionPoint.value
+  };
+  resetFormRow();
+};
+
 const resetFields = () => {
   order.value.products = {};
-  selectedServices.value = [];
-  selectedProduct.value = null;
-  selectedService.value = null;
-  selectedCollectionPoint.value = null;
+  resetFormRow();
 };
 
 defineExpose({ resetFields });

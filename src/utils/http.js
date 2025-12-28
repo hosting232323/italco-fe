@@ -1,6 +1,8 @@
 /* eslint-disable no-console */
 
+import { storeToRefs } from 'pinia';
 import logoutModule from '@/utils/logout';
+import { useUserStore } from '@/stores/user';
 
 const hostname = import.meta.env.VITE_HOSTNAME;
 
@@ -59,6 +61,13 @@ const getRequest = async (endpoint, params, func, method = 'GET', router = undef
 };
 
 
+const getToken = () => {
+  const userStore = useUserStore();
+  const { token } = storeToRefs(userStore);
+  return token;
+};
+
+
 const createHeader = async (router, file = false) => {
   let headers = {};
   if (file)
@@ -66,7 +75,7 @@ const createHeader = async (router, file = false) => {
   else
     headers['Content-Type'] = 'application/json';
   if (router)
-    headers['Authorization'] = localStorage.getItem('token');
+    headers['Authorization'] = getToken().value;
   return headers;
 };
 
@@ -76,7 +85,7 @@ const sessionHandler = (data, func, router) => {
     logoutModule.logout(router);
   } else {
     if (data.new_token)
-      localStorage.setItem('token', data.new_token);
+      getToken().value = data.new_token;
     func(data);
   }
 };

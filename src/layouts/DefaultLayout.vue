@@ -1,5 +1,5 @@
 <template>
-  <v-app v-if="isReady">
+  <v-app>
     <NavigationDrawer />
     <v-main :style="{ backgroundColor: theme.current.value.secondaryColor }">
       <router-view />
@@ -10,25 +10,15 @@
 </template>
 
 <script setup>
+import Footer from '@/layouts/FooterBar';
 import ChattyBot from '@/layouts/ChattyBot';
-import Footer from '@/layouts/FooterBar.vue';
 import NavigationDrawer from '@/layouts/NavigationDrawer';
 
+import { onMounted } from 'vue';
 import { useTheme } from 'vuetify';
-import { storeToRefs } from 'pinia';
-import { ref, onMounted } from 'vue';
-import { useUserStore } from '@/stores/user';
 import { loadGoogleMapsScript } from '@/utils/googleMapsScript';
 
 const theme = useTheme();
-const userStore = useUserStore();
-const { role, userId } = storeToRefs(userStore);
-const isReady = ref(false);
 
-onMounted(() => {
-  role.value = localStorage.getItem('user_role');
-  userId.value = localStorage.getItem('user_id');
-  isReady.value = true;
-  loadGoogleMapsScript();
-});
+onMounted(() => loadGoogleMapsScript());
 </script>
