@@ -71,6 +71,14 @@
           </v-card>
         </v-col>
       </v-row>
+      <template v-if="deliveryUsers.length > 0">
+        <h2>Utenti disponibili</h2>
+        <v-chip
+          v-for="deliveryUser in deliveryUsers"
+          :text="deliveryUser.nickname"
+          class="mr-1 mb-1"
+        />
+      </template>
     </v-card-text>
   </v-card>
 </template>
@@ -84,6 +92,7 @@ import http from '@/utils/http';
 import days from '@/utils/days';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
+import draggable from 'vuedraggable';
 import { useRouter } from 'vue-router';
 import validation from '@/utils/validation';
 import { useScheduleStore } from '@/stores/schedule';
@@ -95,6 +104,7 @@ const dpcForm = ref(null);
 const loading = ref(false);
 const router = useRouter();
 const suggestions = ref([]);
+const deliveryUsers = ref([]);
 const scheduleStore = useScheduleStore();
 const emits = defineEmits(['cancel', 'goToSheduleForm']);
 const { element: schedule } = storeToRefs(scheduleStore);
@@ -108,9 +118,10 @@ const submitDpcForm = async () => {
     dpc: dpc.value
   }, function (data) {
     loading.value = false;
-    if (data.status == 'ok')
+    if (data.status == 'ok') {
       suggestions.value = data.groups;
-    else
+      deliveryUsers.value = data.delivery_users;
+    } else
       message.value = data.error;
   }, 'GET', router);
 };

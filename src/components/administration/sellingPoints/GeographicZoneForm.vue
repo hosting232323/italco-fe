@@ -11,15 +11,10 @@
       >
         <v-autocomplete
           v-model="geographicZone.name"
-          v-model:search="search"
-          :items="filteredProvinces"
-          item-title="name"
+          :items="addressUtils.getProvinces()"
           label="Provincia"
           :rules="validation.requiredRules"
           clearable
-          hide-no-data
-          hide-selected
-          return-object
         />
         <FormButtons
           :loading="loading"
@@ -32,27 +27,19 @@
 
 <script setup>
 import FormButtons from '@/components/FormButtons';
-import { ref, computed } from 'vue';
+
+import { ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
+import addressUtils from '@/utils/address';
 import validation from '@/utils/validation';
 import { useGeographicZoneStore } from '@/stores/geographicZone';
-import provinces from '@/utils/provinces';
 
-const search = ref('');
 const form = ref(null);
 const loading = ref(false);
 const router = useRouter();
 const geographicZoneStore = useGeographicZoneStore();
 const { element: geographicZone, activeForm } = storeToRefs(geographicZoneStore);
-
-const filteredProvinces = computed(() => {
-  if (search.value.length < 2) return [];
-  const lowerSearch = search.value.toLowerCase();
-  return provinces.filter(prov =>
-    prov.toLowerCase().includes(lowerSearch)
-  );
-});
 
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;

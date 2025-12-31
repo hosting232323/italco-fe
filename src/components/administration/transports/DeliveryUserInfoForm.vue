@@ -9,9 +9,10 @@
         ref="form"
         @submit.prevent="submitForm"
       >
-        <v-text-field
-          v-model="location"
+        <v-autocomplete
+          v-model="cap"
           label="Località"
+          :items="addressUtils.getCapItems()"
           :rules="validation.requiredRules"
         />
         <FormButtons
@@ -30,11 +31,12 @@ import { ref } from 'vue';
 import http from '@/utils/http';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
+import addressUtils from '@/utils/address';
 import validation from '@/utils/validation';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
+const cap = ref(null);
 const form = ref(null);
-const location = ref(null);
 const loading = ref(false);
 const router = useRouter();
 const administrationUserStore = useAdministrationUserStore();
@@ -45,11 +47,11 @@ const submitForm = async () => {
 
   loading.value = true;
   http.postRequest('user/delivery-user-info', {
-    user_id: user.value.id,
-    location: location.value
+    cap: cap.value,
+    user_id: user.value.id
   }, function () {
     loading.value = false;
-    location.value = null;
+    cap.value = null;
     administrationUserStore.initList(router);
     activeForm.value = false;
   }, 'POST', router);
