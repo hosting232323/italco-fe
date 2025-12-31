@@ -49,7 +49,7 @@
               icon="mdi-pencil"
               variant="text"
               :color="theme.current.value.primaryColor"
-              @click="openFormPopUp(item)"
+              @click="editElement(item)"
             />
           </v-col>
           <v-col cols="4">
@@ -78,14 +78,7 @@
     v-model="dialog"
     max-width="1200"
   >
-    <ScheduleForm
-      v-if="popUpType == 'form'"
-      @cancel="dialog = false"
-    />
-    <v-card
-      v-else-if="popUpType == 'message' && scheduleFormMessage"
-      :title="scheduleFormMessage"
-    />
+    <ScheduleForm @cancel="dialog = false" />
   </v-dialog>
 </template>
 
@@ -105,15 +98,18 @@ import { useScheduleStore } from '@/stores/schedule';
 const theme = useTheme();
 const dialog = ref(false);
 const router = useRouter();
-const popUpType = ref(null);
 const deleteLoading = reactive({});
 const exportLoading = reactive({});
-const scheduleFormMessage = ref('');
 
 const orderStore = useOrderStore();
 const scheduleStore = useScheduleStore();
 const { ready, element: schedule } = storeToRefs(scheduleStore);
 const schedules = storesUtils.getStoreList(scheduleStore, router);
+
+const editElement = (item) => {
+  schedule.value = item;
+  dialog.value = true;
+};
 
 const deleteItem = (item) => {
   deleteLoading[item.id] = true;
@@ -138,24 +134,6 @@ const exportElement = async (item) => {
     a.click();
     window.URL.revokeObjectURL(url);
   }, 'GET', router, true);
-};
-
-const openFormPopUp = (item) => {
-  schedule.value = item;
-  dialog.value = true;
-  popUpType.value = 'message';
-  scheduleFormMessage.value = 'Loading...';
-
-  http.postRequest('schedule/pianification', {
-    updating: true,
-    orders_id: schedule.value.schedule_items.flatMap(item => item.operation_type === 'Order' ? [item.order_id] : [])
-  }, (data) => {
-    if (data.status == 'ok') {
-      popUpType.value = 'form';
-      schedule.value.schedule_items = data.schedule_items;
-    } else
-      scheduleFormMessage.value = data.error;
-  }, 'POST', router);
 };
 </script>
 
