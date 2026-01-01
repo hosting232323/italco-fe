@@ -47,7 +47,7 @@
                   Punti di Ritiro:
                 </p>
                 <v-list-item
-                  v-for="item in suggestion.filter(element => element.operation_type == 'CollectionPoint')"
+                  v-for="item in suggestion.schedule_items.filter(element => element.operation_type == 'CollectionPoint')"
                   :key="item.collection_point_id"
                 >
                   <v-list-item-title class="no-truncate">
@@ -59,25 +59,55 @@
                   Ordini:
                 </p>
                 <v-list-item
-                  v-for="item in suggestion.filter(element => element.operation_type == 'Order')"
+                  v-for="item in suggestion.schedule_items.filter(element => element.operation_type == 'Order')"
                   :key="item.order_id"
                 >
                   <v-list-item-title class="no-truncate">
                     ID {{ item.order_id }}: {{ item.address }} ({{ item.cap }})
                   </v-list-item-title>
                 </v-list-item>
+                <v-divider />
+                <p class="ml-4 mt-4">
+                  Utenti Delivery:
+                </p>
+                <draggable
+                  v-model="suggestion.delivery_users"
+                  :group="{ name: 'users', pull: false, put: true }"
+                  item-key="id"
+                  class="draggable-area ml-3 mr-3"
+                >
+                  <template #item="{ element }">
+                    <v-chip
+                      :text="element.nickname"
+                      closable
+                      class="mr-2 mt-2"
+                      @click:close="suggestion.delivery_users = []"
+                    />
+                  </template>
+                </draggable>
               </v-list>
             </v-card-text>
           </v-card>
         </v-col>
       </v-row>
       <template v-if="deliveryUsers.length > 0">
-        <h2>Utenti disponibili</h2>
-        <v-chip
-          v-for="deliveryUser in deliveryUsers"
-          :text="deliveryUser.nickname"
-          class="mr-1 mb-1"
-        />
+        <h2 class="mt-4">
+          Utenti disponibili
+        </h2>
+        <draggable
+          v-model="deliveryUsers"
+          :group="{ name: 'users', pull: 'clone', put: false }"
+          :clone="cloneUser"
+          item-key="id"
+        >
+          <template #item="{ element }">
+            <v-chip
+              :text="element.nickname"
+              class="ma-1"
+              draggable
+            />
+          </template>
+        </draggable>
       </template>
     </v-card-text>
   </v-card>
@@ -109,6 +139,10 @@ const scheduleStore = useScheduleStore();
 const emits = defineEmits(['cancel', 'goToSheduleForm']);
 const { element: schedule } = storeToRefs(scheduleStore);
 
+const cloneUser = (user) => {
+  return { ...user };
+};
+
 const submitDpcForm = async () => {
   if (!(await dpcForm.value.validate()).valid) return;
 
@@ -126,10 +160,11 @@ const submitDpcForm = async () => {
   }, 'GET', router);
 };
 
-const openSchedule = (scheduleItems) => {
+const openSchedule = (suggestion) => {
   schedule.value.date = dpc.value;
-  schedule.value.schedule_items = scheduleItems;
   schedule.value.schedulation = true;
+  schedule.value.users = suggestion.delivery_users;
+  schedule.value.schedule_items = suggestion.schedule_items;
   emits('goToSheduleForm');
 };
 </script>
@@ -139,5 +174,19 @@ const openSchedule = (scheduleItems) => {
   white-space: normal !important;
   overflow: visible !important;
   text-overflow: unset !important;
+}
+
+.draggable-area {
+  min-height: 40px;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.v-chip {
+  cursor: grab;
+}
+
+.v-chip:active {
+  cursor: grabbing;
 }
 </style>

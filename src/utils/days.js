@@ -36,24 +36,18 @@ const getDayByValue = (value) => {
 
 
 const getDateRangeArray = () => {
-  const today = new Date();
-  const startUTC = Date.UTC(
-    today.getUTCFullYear(),
-    today.getUTCMonth(),
-    today.getUTCDate()
-  );
-
   const result = [];
-  const endDate = new Date(startUTC);
-  endDate.setUTCMonth(endDate.getUTCMonth() + 2);
-  const endUTC = endDate.getTime();
-  for (let ts = startUTC; ts <= endUTC; ts += 86400000) {
-    const d = new Date(ts);
-    const year = d.getUTCFullYear();
-    const month = String(d.getUTCMonth() + 1).padStart(2, '0');
-    const day = String(d.getUTCDate()).padStart(2, '0');
+  const today = new Date();
+  const endDate = new Date(today);
+  endDate.setMonth(endDate.getMonth() + 2);
+
+  for (let date = new Date(today); date <= endDate; date.setDate(date.getDate() + 1)) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
     result.push(`${year}-${month}-${day}`);
   }
+
   return result;
 };
 
