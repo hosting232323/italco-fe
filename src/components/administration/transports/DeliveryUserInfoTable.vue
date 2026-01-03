@@ -12,10 +12,13 @@
     :headers="[
       { title: 'ID', value: 'id', sortable: false },
       { title: 'Nickname', value: 'nickname', sortable: false },
-      { title: 'Località', value: 'delivery_user_info.location', sortable: false },
+      { title: 'Località', value: 'cap', sortable: false },
       { title: 'Azioni', key: 'actions', sortable: false }
     ]"
   >
+    <template #[`item.cap`]="{ item }">
+      {{ item.delivery_user_info ? addressUtils.getCityByCap(item.delivery_user_info.cap) : '' }}
+    </template>
     <template #[`item.actions`]="{ item }">
       <v-btn
         icon="mdi-pencil"
@@ -32,6 +35,7 @@ import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
+import addressUtils from '@/utils/address';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
 const theme = useTheme();

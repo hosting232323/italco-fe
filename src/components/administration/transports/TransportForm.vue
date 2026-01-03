@@ -33,9 +33,10 @@
             />
           </v-col>
         </v-row>
-        <v-text-field
-          v-model="transport.location"
+        <v-autocomplete
+          v-model="transport.cap"
           label="Località"
+          :items="addressUtils.getCapItems()"
         />
         <FormButtons
           :loading="loading"
@@ -53,6 +54,7 @@ import { ref } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
+import addressUtils from '@/utils/address';
 import validation from '@/utils/validation';
 import { useTransportStore } from '@/stores/transport';
 
