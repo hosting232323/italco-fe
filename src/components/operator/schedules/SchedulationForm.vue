@@ -81,7 +81,26 @@
                       :text="element.nickname"
                       closable
                       class="mr-2 mt-2"
-                      @click:close="suggestion.delivery_users = []"
+                      @click:close="removeDeliveryUser(suggestion, element)"
+                    />
+                  </template>
+                </draggable>
+                <v-divider class="mt-4 mb-4" />
+                <p class="ml-4 mt-4">
+                  Trasporti:
+                </p>
+                <draggable
+                  v-model="suggestion.transports"
+                  :group="{ name: 'transports', pull: false, put: true }"
+                  item-key="id"
+                  class="draggable-area ml-3 mr-3"
+                >
+                  <template #item="{ element }">
+                    <v-chip
+                      :text="element.name"
+                      closable
+                      class="mr-2 mt-2"
+                      @click:close="removeTransport(suggestion, element)"
                     />
                   </template>
                 </draggable>
@@ -90,12 +109,12 @@
           </v-card>
         </v-col>
       </v-row>
-      <template v-if="deliveryUsers.length > 0">
+      <template v-if="availableDeliveryUsers.length > 0">
         <h2 class="mt-4">
           Utenti disponibili
         </h2>
         <draggable
-          v-model="deliveryUsers"
+          :list="availableDeliveryUsers"
           :group="{ name: 'users', pull: 'clone', put: false }"
           :clone="cloneUser"
           item-key="id"
@@ -103,6 +122,26 @@
           <template #item="{ element }">
             <v-chip
               :text="element.nickname"
+              class="ma-1"
+              draggable
+            />
+          </template>
+        </draggable>
+      </template>
+      <template v-if="availableTransports.length > 0">
+        <h2 class="mt-4">
+          Trasporti disponibili
+        </h2>
+
+        <draggable
+          :list="availableTransports"
+          :group="{ name: 'transports', pull: 'clone', put: false }"
+          :clone="cloneTransport"
+          item-key="id"
+        >
+          <template #item="{ element }">
+            <v-chip
+              :text="element.name"
               class="ma-1"
               draggable
             />
@@ -117,7 +156,7 @@
 import DateField from '@/components/DateField';
 import FormButtons from '@/components/FormButtons';
 
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import http from '@/utils/http';
 import days from '@/utils/days';
 import { useTheme } from 'vuetify';
@@ -133,6 +172,7 @@ const theme = useTheme();
 const dpcForm = ref(null);
 const loading = ref(false);
 const router = useRouter();
+const transports = ref([]);
 const suggestions = ref([]);
 const deliveryUsers = ref([]);
 const scheduleStore = useScheduleStore();
@@ -142,6 +182,9 @@ const { element: schedule } = storeToRefs(scheduleStore);
 const cloneUser = (user) => {
   return { ...user };
 };
+const cloneTransport = (transport) => {
+  return { ...transport };
+}; 
 
 const submitDpcForm = async () => {
   if (!(await dpcForm.value.validate()).valid) return;
@@ -154,6 +197,7 @@ const submitDpcForm = async () => {
     loading.value = false;
     if (data.status == 'ok') {
       suggestions.value = data.groups;
+      transports.value = data.transports;
       deliveryUsers.value = data.delivery_users;
     } else
       message.value = data.error;
@@ -166,6 +210,42 @@ const openSchedule = (suggestion) => {
   schedule.value.users = suggestion.delivery_users;
   schedule.value.schedule_items = suggestion.schedule_items;
   emits('goToSheduleForm');
+};
+
+const assignedUserIds = computed(() => {
+  return suggestions.value
+    .flatMap(s => s.delivery_users)
+    .map(u => u.id);
+});
+
+const assignedTransportIds = computed(() => {
+  return suggestions.value
+    .flatMap(s => s.transports || [])
+    .map(t => t.id);
+});
+
+const availableDeliveryUsers = computed(() => {
+  return deliveryUsers.value.filter(
+    user => !assignedUserIds.value.includes(user.id)
+  );
+});
+
+const availableTransports = computed(() => {
+  return transports.value.filter(
+    transport => !assignedTransportIds.value.includes(transport.id)
+  );
+});
+
+const removeDeliveryUser = (suggestion, user) => {
+  suggestion.delivery_users = suggestion.delivery_users.filter(
+    u => u.id !== user.id
+  );
+};
+
+const removeTransport = (suggestion, transport) => {
+  suggestion.transports = suggestion.transports.filter(
+    t => t.id !== transport.id
+  );
 };
 </script>
 
