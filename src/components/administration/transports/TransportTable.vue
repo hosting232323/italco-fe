@@ -13,10 +13,13 @@
       { title: 'ID', value: 'id', sortable: false },
       { title: 'Nome', value: 'name', sortable: false },
       { title: 'Targa', value: 'plate', sortable: false },
-      { title: 'Località', value: 'location', sortable: false },
+      { title: 'Località', value: 'cap', sortable: false },
       { title: 'Azioni', key: 'actions', sortable: false }
     ]"
   >
+    <template #[`item.cap`]="{ item }">
+      {{ addressUtils.getCityByCap(item.cap) }}
+    </template>
     <template #[`item.actions`]="{ item }">
       <v-row no-gutters>
         <v-col cols="6">
@@ -47,6 +50,7 @@ import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
+import addressUtils from '@/utils/address';
 import { useTransportStore } from '@/stores/transport';
 
 const theme = useTheme();
