@@ -4,7 +4,9 @@ import { storeToRefs } from 'pinia';
 import logoutModule from '@/utils/logout';
 import { useUserStore } from '@/stores/user';
 
+
 const hostname = import.meta.env.VITE_HOSTNAME;
+
 
 const postRequest = async (endpoint, body, func, method = 'POST', router = undefined, file = false) => {
   fetch(`${hostname}${endpoint}`, {
@@ -21,6 +23,7 @@ const postRequest = async (endpoint, body, func, method = 'POST', router = undef
     console.error('Errore nella richiesta:', error);
   });
 };
+
 
 const formDataRequest = async (endpoint, data, func, method = 'POST', router = undefined) => {
   const formData = new FormData();
@@ -61,13 +64,6 @@ const getRequest = async (endpoint, params, func, method = 'GET', router = undef
 };
 
 
-const getToken = () => {
-  const userStore = useUserStore();
-  const { token } = storeToRefs(userStore);
-  return token;
-};
-
-
 const createHeader = async (router, file = false) => {
   let headers = {};
   if (file)
@@ -77,6 +73,13 @@ const createHeader = async (router, file = false) => {
   if (router)
     headers['Authorization'] = getToken().value;
   return headers;
+};
+
+
+const getToken = () => {
+  const userStore = useUserStore();
+  const { token } = storeToRefs(userStore);
+  return token;
 };
 
 const sessionHandler = (data, func, router) => {
