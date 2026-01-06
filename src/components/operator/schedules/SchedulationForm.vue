@@ -87,7 +87,7 @@
                 </draggable>
                 <v-divider class="mt-4 mb-4" />
                 <p class="ml-4 mt-4">
-                  Trasporti:
+                  Veicoli:
                 </p>
                 <draggable
                   v-model="suggestion.transports"
@@ -130,9 +130,8 @@
       </template>
       <template v-if="availableTransports.length > 0">
         <h2 class="mt-4">
-          Trasporti disponibili
+          Veicoli disponibili
         </h2>
-
         <draggable
           :list="availableTransports"
           :group="{ name: 'transports', pull: 'clone', put: false }"
@@ -196,7 +195,10 @@ const submitDpcForm = async () => {
   }, function (data) {
     loading.value = false;
     if (data.status == 'ok') {
-      suggestions.value = data.groups;
+      suggestions.value = data.groups.map(group => ({
+        ...group,
+        transports: []
+      }));
       transports.value = data.transports;
       deliveryUsers.value = data.delivery_users;
     } else
@@ -208,6 +210,7 @@ const openSchedule = (suggestion) => {
   schedule.value.date = dpc.value;
   schedule.value.schedulation = true;
   schedule.value.users = suggestion.delivery_users;
+  schedule.value.transports = suggestion.transports;
   schedule.value.schedule_items = suggestion.schedule_items;
   emits('goToSheduleForm');
 };
@@ -218,23 +221,23 @@ const assignedUserIds = computed(() => {
     .map(u => u.id);
 });
 
-const assignedTransportIds = computed(() => {
-  return suggestions.value
-    .flatMap(s => s.transports || [])
-    .map(t => t.id);
-});
-
 const availableDeliveryUsers = computed(() => {
   return deliveryUsers.value.filter(
     user => !assignedUserIds.value.includes(user.id)
   );
 });
 
-const availableTransports = computed(() => {
-  return transports.value.filter(
-    transport => !assignedTransportIds.value.includes(transport.id)
-  );
+const assignedTransportIds = computed(() => {
+  return suggestions.value
+    .flatMap(s => s.transports)
+    .map(t => t.id);
 });
+
+const availableTransports = computed(() =>
+  transports.value.filter(
+    t => !assignedTransportIds.value.includes(t.id)
+  )
+);
 
 const removeDeliveryUser = (suggestion, user) => {
   suggestion.delivery_users = suggestion.delivery_users.filter(
