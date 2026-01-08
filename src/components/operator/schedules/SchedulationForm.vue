@@ -72,7 +72,7 @@
                 </p>
                 <draggable
                   v-model="suggestion.delivery_users"
-                  :group="{ name: 'users', pull: false, put: true }"
+                  :group="{ name: 'users', pull: false, put: 'users' }"
                   item-key="id"
                   class="draggable-area ml-3 mr-3"
                 >
@@ -91,7 +91,7 @@
                 </p>
                 <draggable
                   v-model="suggestion.transports"
-                  :group="{ name: 'transports', pull: false, put: true }"
+                  :group="{ name: 'transports', pull: false, put: suggestion.transports.length === 0 }"
                   item-key="id"
                   class="draggable-area ml-3 mr-3"
                 >
@@ -210,8 +210,8 @@ const openSchedule = (suggestion) => {
   schedule.value.date = dpc.value;
   schedule.value.schedulation = true;
   schedule.value.users = suggestion.delivery_users;
-  schedule.value.transports = suggestion.transports;
   schedule.value.schedule_items = suggestion.schedule_items;
+  schedule.value.transport_id = suggestion.transports.length ? suggestion.transports[0].id : null;
   emits('goToSheduleForm');
 };
 
