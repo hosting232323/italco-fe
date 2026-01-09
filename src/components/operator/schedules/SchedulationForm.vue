@@ -81,7 +81,9 @@
                       :text="element.nickname"
                       closable
                       class="mr-2 mt-2"
-                      @click:close="removeDeliveryUser(suggestion, element)"
+                      @click:close="suggestion.delivery_users = suggestion.delivery_users.filter(
+                        user => user.id !== element.id
+                      )"
                     />
                   </template>
                 </draggable>
@@ -100,7 +102,7 @@
                       :text="element.name"
                       closable
                       class="mr-2 mt-2"
-                      @click:close="removeTransport(suggestion, element)"
+                      @click:close="suggestion.transports = []"
                     />
                   </template>
                 </draggable>
@@ -155,10 +157,10 @@
 import DateField from '@/components/DateField';
 import FormButtons from '@/components/FormButtons';
 
-import { ref, computed } from 'vue';
 import http from '@/utils/http';
 import days from '@/utils/days';
 import { useTheme } from 'vuetify';
+import { ref, computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import draggable from 'vuedraggable';
 import { useRouter } from 'vue-router';
@@ -195,10 +197,7 @@ const submitDpcForm = async () => {
   }, function (data) {
     loading.value = false;
     if (data.status == 'ok') {
-      suggestions.value = data.groups.map(group => ({
-        ...group,
-        transports: []
-      }));
+      suggestions.value = data.groups;
       transports.value = data.transports;
       deliveryUsers.value = data.delivery_users;
     } else
@@ -215,41 +214,25 @@ const openSchedule = (suggestion) => {
   emits('goToSheduleForm');
 };
 
-const assignedUserIds = computed(() => {
-  return suggestions.value
-    .flatMap(s => s.delivery_users)
-    .map(u => u.id);
-});
-
 const availableDeliveryUsers = computed(() => {
-  return deliveryUsers.value.filter(
-    user => !assignedUserIds.value.includes(user.id)
+  const assignedIds = new Set(
+    suggestions.value.flatMap(
+      suggestion => suggestion.delivery_users?.map(user => user.id) ?? []
+    )
   );
+
+  return deliveryUsers.value.filter(user => !assignedIds.has(user.id));
 });
 
-const assignedTransportIds = computed(() => {
-  return suggestions.value
-    .flatMap(s => s.transports)
-    .map(t => t.id);
+const availableTransports = computed(() => {
+  const assignedIds = new Set(
+    suggestions.value.flatMap(
+      suggestion => suggestion.transports?.map(transport => transport.id) ?? []
+    )
+  );
+
+  return transports.value.filter(t => !assignedIds.has(t.id));
 });
-
-const availableTransports = computed(() =>
-  transports.value.filter(
-    t => !assignedTransportIds.value.includes(t.id)
-  )
-);
-
-const removeDeliveryUser = (suggestion, user) => {
-  suggestion.delivery_users = suggestion.delivery_users.filter(
-    u => u.id !== user.id
-  );
-};
-
-const removeTransport = (suggestion, transport) => {
-  suggestion.transports = suggestion.transports.filter(
-    t => t.id !== transport.id
-  );
-};
 </script>
 
 <style scoped>
@@ -260,7 +243,7 @@ const removeTransport = (suggestion, transport) => {
 }
 
 .draggable-area {
-  min-height: 40px;
+  min-height: 30px;
   display: flex;
   flex-wrap: wrap;
 }
