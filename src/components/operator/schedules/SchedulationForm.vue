@@ -87,7 +87,7 @@
                 </draggable>
                 <v-divider class="mt-4 mb-4" />
                 <p class="ml-4 mt-4">
-                  Veicoli:
+                  Veicolo:
                 </p>
                 <draggable
                   v-model="suggestion.transports"
@@ -110,7 +110,7 @@
         </v-col>
       </v-row>
       <template v-if="availableDeliveryUsers.length > 0">
-        <h2 class="mt-4">
+        <h2 class="mt-5">
           Utenti disponibili
         </h2>
         <draggable
@@ -129,7 +129,7 @@
         </draggable>
       </template>
       <template v-if="availableTransports.length > 0">
-        <h2 class="mt-4">
+        <h2 class="mt-5">
           Veicoli disponibili
         </h2>
         <draggable
