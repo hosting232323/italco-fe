@@ -72,7 +72,7 @@
                 </p>
                 <draggable
                   v-model="suggestion.delivery_users"
-                  :group="{ name: 'users', pull: false, put: true }"
+                  :group="{ name: 'users', pull: false, put: 'users' }"
                   item-key="id"
                   class="draggable-area ml-3 mr-3"
                 >
@@ -81,7 +81,28 @@
                       :text="element.nickname"
                       closable
                       class="mr-2 mt-2"
-                      @click:close="suggestion.delivery_users = []"
+                      @click:close="suggestion.delivery_users = suggestion.delivery_users.filter(
+                        user => user.id !== element.id
+                      )"
+                    />
+                  </template>
+                </draggable>
+                <v-divider class="mt-4 mb-4" />
+                <p class="ml-4 mt-4">
+                  Veicolo:
+                </p>
+                <draggable
+                  v-model="suggestion.transports"
+                  :group="{ name: 'transports', pull: false, put: suggestion.transports.length === 0 }"
+                  item-key="id"
+                  class="draggable-area ml-3 mr-3"
+                >
+                  <template #item="{ element }">
+                    <v-chip
+                      :text="element.name"
+                      closable
+                      class="mr-2 mt-2"
+                      @click:close="suggestion.transports = []"
                     />
                   </template>
                 </draggable>
@@ -90,12 +111,12 @@
           </v-card>
         </v-col>
       </v-row>
-      <template v-if="deliveryUsers.length > 0">
-        <h2 class="mt-4">
+      <template v-if="availableDeliveryUsers.length > 0">
+        <h2 class="mt-5">
           Utenti disponibili
         </h2>
         <draggable
-          v-model="deliveryUsers"
+          :list="availableDeliveryUsers"
           :group="{ name: 'users', pull: 'clone', put: false }"
           :clone="cloneUser"
           item-key="id"
@@ -103,6 +124,25 @@
           <template #item="{ element }">
             <v-chip
               :text="element.nickname"
+              class="ma-1"
+              draggable
+            />
+          </template>
+        </draggable>
+      </template>
+      <template v-if="availableTransports.length > 0">
+        <h2 class="mt-5">
+          Veicoli disponibili
+        </h2>
+        <draggable
+          :list="availableTransports"
+          :group="{ name: 'transports', pull: 'clone', put: false }"
+          :clone="cloneTransport"
+          item-key="id"
+        >
+          <template #item="{ element }">
+            <v-chip
+              :text="element.name"
               class="ma-1"
               draggable
             />
@@ -117,10 +157,10 @@
 import DateField from '@/components/DateField';
 import FormButtons from '@/components/FormButtons';
 
-import { ref } from 'vue';
 import http from '@/utils/http';
 import days from '@/utils/days';
 import { useTheme } from 'vuetify';
+import { ref, computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import draggable from 'vuedraggable';
 import { useRouter } from 'vue-router';
@@ -133,6 +173,7 @@ const theme = useTheme();
 const dpcForm = ref(null);
 const loading = ref(false);
 const router = useRouter();
+const transports = ref([]);
 const suggestions = ref([]);
 const deliveryUsers = ref([]);
 const scheduleStore = useScheduleStore();
@@ -142,6 +183,9 @@ const { element: schedule } = storeToRefs(scheduleStore);
 const cloneUser = (user) => {
   return { ...user };
 };
+const cloneTransport = (transport) => {
+  return { ...transport };
+}; 
 
 const submitDpcForm = async () => {
   if (!(await dpcForm.value.validate()).valid) return;
@@ -154,6 +198,7 @@ const submitDpcForm = async () => {
     loading.value = false;
     if (data.status == 'ok') {
       suggestions.value = data.groups;
+      transports.value = data.transports;
       deliveryUsers.value = data.delivery_users;
     } else
       message.value = data.error;
@@ -165,8 +210,29 @@ const openSchedule = (suggestion) => {
   schedule.value.schedulation = true;
   schedule.value.users = suggestion.delivery_users;
   schedule.value.schedule_items = suggestion.schedule_items;
+  schedule.value.transport_id = suggestion.transports.length ? suggestion.transports[0].id : null;
   emits('goToSheduleForm');
 };
+
+const availableDeliveryUsers = computed(() => {
+  const assignedIds = new Set(
+    suggestions.value.flatMap(
+      suggestion => suggestion.delivery_users?.map(user => user.id) ?? []
+    )
+  );
+
+  return deliveryUsers.value.filter(user => !assignedIds.has(user.id));
+});
+
+const availableTransports = computed(() => {
+  const assignedIds = new Set(
+    suggestions.value.flatMap(
+      suggestion => suggestion.transports?.map(transport => transport.id) ?? []
+    )
+  );
+
+  return transports.value.filter(t => !assignedIds.has(t.id));
+});
 </script>
 
 <style scoped>
@@ -177,7 +243,7 @@ const openSchedule = (suggestion) => {
 }
 
 .draggable-area {
-  min-height: 40px;
+  min-height: 30px;
   display: flex;
   flex-wrap: wrap;
 }

@@ -57,7 +57,7 @@ const props = defineProps({
   },
   classStyle: {
     type: String,
-    required: true
+    default: null
   },
   disabled: {
     type: Boolean,
