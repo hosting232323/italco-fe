@@ -93,7 +93,13 @@
                 </p>
                 <draggable
                   v-model="suggestion.transports"
-                  :group="{ name: 'transports', pull: false, put: suggestion.transports.length === 0 }"
+                  :group="{ 
+                    name: 'transports', 
+                    pull: false, 
+                    put: (to, from) =>
+                      from.options.group.name === 'transports' &&
+                      suggestion.transports.length === 0 
+                  }"
                   item-key="id"
                   class="draggable-area ml-3 mr-3"
                 >
