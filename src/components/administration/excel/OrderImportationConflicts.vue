@@ -129,7 +129,7 @@
 </template>
 
 <script setup>
-import OrderImportationNewProduct from '@/components/administration/OrderImportationNewProduct';
+import OrderImportationNewProduct from '@/components/administration/excel/OrderImportationNewProduct';
 
 import { ref } from 'vue';
 import http from '@/utils/http';

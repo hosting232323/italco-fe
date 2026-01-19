@@ -2,7 +2,7 @@
   <v-dialog max-width="1500">
     <template #activator="{ props: activatorProps }">
       <v-btn
-        icon="mdi-import"
+        icon="mdi-file-pdf-box"
         style="float: right;"
         variant="text"
         v-bind="activatorProps"
@@ -17,10 +17,61 @@
             @submit.prevent="submitForm(isActive)"
           >
             <v-file-input
-              v-model="file"
-              label="File Excel"
+              label="File PDF"
+              accept="application/pdf"
+              multiple
+              @update:modelValue="onFilesSelected"
               :rules="validation.requiredRules"
             />
+
+            <div v-if="files.length > 0" class="mb-4">
+              <strong>PDF selezionati</strong>
+
+              <v-row>
+                <v-col
+                  v-for="(file, index) in files"
+                  :key="index"
+                  cols="12"
+                  sm="6"
+                  md="4"
+                  lg="3"
+                >
+                  <v-card
+                    class="pdf-card"
+                  >
+                    <v-card-text class="text-center">
+                      <v-icon
+                        size="64"
+                        color="red"
+                      >
+                        mdi-file-pdf-box
+                      </v-icon>
+
+                      <div class="pdf-name mt-2">
+                        {{ file.name }}
+                      </div>
+                    </v-card-text>
+
+                    <v-divider />
+
+                    <v-card-actions class="justify-center">
+                      <v-btn
+                        icon="mdi-eye"
+                        variant="text"
+                        @click="openPdf(file)"
+                      />
+                      <v-btn
+                        icon="mdi-delete"
+                        variant="text"
+                        color="red"
+                        @click="removeFile(index)"
+                      />
+                    </v-card-actions>
+                  </v-card>
+                </v-col>
+              </v-row>
+            </div>
+
             <v-autocomplete
               v-model="user"
               label="Punto Vendita"
@@ -50,7 +101,7 @@
 
 <script setup>
 import FormButtons from '@/components/FormButtons';
-import OrderImportationConflicts from '@/components/administration/OrderImportationConflicts';
+import OrderImportationConflicts from '@/components/administration/excel/OrderImportationConflicts';
 
 import { ref } from 'vue';
 import http from '@/utils/http';
@@ -61,7 +112,7 @@ import validation from '@/utils/validation';
 import { useOrderStore } from '@/stores/order';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
-const file = ref(null);
+const files = ref([]);
 const form = ref(null);
 const user = ref(null);
 const loading = ref(false);
@@ -106,5 +157,27 @@ const deleteOrder = (isActive, order) => {
   conflictsOrders.value.splice(conflictsOrders.value.indexOf(order), 1);
   if (conflictsOrders.value.length == 0)
     isActive.value = false;
+};
+
+const onFilesSelected = (newFiles) => {
+  if (!newFiles) return;
+
+  const filesArray = Array.isArray(newFiles)
+    ? newFiles
+    : [newFiles];
+
+  files.value = [
+    ...files.value,
+    ...filesArray
+  ];
+};
+
+const openPdf = (file) => {
+  const url = URL.createObjectURL(file);
+  window.open(url, '_blank');
+};
+
+const removeFile = (index) => {
+  files.value.splice(index, 1);
 };
 </script>
