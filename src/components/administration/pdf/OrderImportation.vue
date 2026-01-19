@@ -101,7 +101,7 @@
 
 <script setup>
 import FormButtons from '@/components/FormButtons';
-import OrderImportationConflicts from '@/components/administration/excel/OrderImportationConflicts';
+import OrderImportationConflicts from '@/components/administration/pdf/OrderImportationConflicts';
 
 import { ref } from 'vue';
 import http from '@/utils/http';
@@ -129,7 +129,7 @@ const submitForm = async (isActive) => {
 
   loading.value = true;
   http.formDataRequest('import', {
-    file: file.value,
+    file: files.value,
     customer_id: user.value
   }, function (data) {
     loading.value = false;
