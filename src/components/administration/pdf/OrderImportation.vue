@@ -20,11 +20,14 @@
               label="File PDF"
               accept="application/pdf"
               multiple
-              @update:modelValue="onFilesSelected"
               :rules="validation.requiredRules"
+              @update:model-value="onFilesSelected"
             />
 
-            <div v-if="files.length > 0" class="mb-4">
+            <div
+              v-if="files.length > 0"
+              class="mb-4"
+            >
               <strong>PDF selezionati</strong>
 
               <v-row>
@@ -129,6 +132,7 @@ const submitForm = async (isActive) => {
 
   loading.value = true;
   http.formDataRequest('import', {
+    type: 'pdf',
     file: files.value,
     customer_id: user.value
   }, function (data) {

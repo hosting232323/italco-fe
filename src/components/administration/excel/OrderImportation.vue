@@ -78,6 +78,7 @@ const submitForm = async (isActive) => {
 
   loading.value = true;
   http.formDataRequest('import', {
+    type: 'excel',
     file: file.value,
     customer_id: user.value
   }, function (data) {
