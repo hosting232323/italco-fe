@@ -11,20 +11,27 @@
           :rules="validation.requiredRules"
           :allowed-dates="days.getDateRangeArray()"
         />
-        <v-row no-gutters class="mb-4">
-          <v-col cols="6">
+        <v-row no-gutters>
+          <v-col
+            cols="12"
+            md="6"
+          >
             <v-text-field
               v-model="minSizeGroup"
-              hide-details
+              type="number"
               label="Distanza minima gruppo"
               :class="isMobile ? '' : 'mr-2'"
             />
           </v-col>
-          <v-col cols="6">
+          <v-col
+            cols="12"
+            md="6"
+          >
             <v-text-field
               v-model="maxDistanceKm"
-              hide-details
+              type="number"
               label="Massima distanza (KM)"
+              :class="isMobile ? '' : 'ml-2'"
             />
           </v-col>
         </v-row>
