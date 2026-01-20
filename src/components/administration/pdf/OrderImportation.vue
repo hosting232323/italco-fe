@@ -12,16 +12,14 @@
       <v-card title="Importa Ordini">
         <v-card-text>
           <v-form
-            v-if="conflictsOrders.length == 0"
             ref="form"
             @submit.prevent="submitForm(isActive)"
           >
             <v-file-input
               label="File PDF"
               accept="application/pdf"
-              multiple
               :rules="validation.requiredRules"
-              @update:model-value="onFilesSelected"
+              @change="onFilesSelected"
             />
 
             <div
@@ -51,7 +49,7 @@
                       </v-icon>
 
                       <div class="pdf-name mt-2">
-                        {{ file.name }}
+                        {{ file.selectedFile.name }}
                       </div>
                     </v-card-text>
 
@@ -88,14 +86,6 @@
               @cancel="isActive.value = false"
             />
           </v-form>
-          <OrderImportationConflicts
-            v-else
-            :is-active="isActive"
-            :customer-id="user"
-            :conflicts-orders="conflictsOrders"
-            @cancel="closeConflictsForm"
-            @delete-order="deleteOrder"
-          />
         </v-card-text>
       </v-card>
     </template>
@@ -104,7 +94,6 @@
 
 <script setup>
 import FormButtons from '@/components/FormButtons';
-import OrderImportationConflicts from '@/components/administration/pdf/OrderImportationConflicts';
 
 import { ref } from 'vue';
 import http from '@/utils/http';
@@ -131,11 +120,20 @@ const submitForm = async (isActive) => {
   if (!(await form.value.validate()).valid) return;
 
   loading.value = true;
-  http.formDataRequest('import', {
-    type: 'pdf',
-    file: files.value,
+
+  const content = {
     customer_id: user.value
-  }, function (data) {
+  }
+
+  files.value.forEach(file => {
+    if (file.selectedFile)
+      content[file.selectedFile.name] = file.selectedFile;
+  });
+
+  http.formDataRequest(
+    'pdf-import',
+    content, 
+    function (data) {
     loading.value = false;
     if (data.status == 'ok') {
       if (data.imported_orders_count > 0)
@@ -152,33 +150,18 @@ const submitForm = async (isActive) => {
   }, 'POST', router);
 };
 
-const closeConflictsForm = (isActive) => {
-  isActive.value = false;
-  conflictsOrders.value = [];
-};
+const onFilesSelected = (event) => {
+  const selectedFile = event.target.files[0];
+  if (!selectedFile) return;
 
-const deleteOrder = (isActive, order) => {
-  conflictsOrders.value.splice(conflictsOrders.value.indexOf(order), 1);
-  if (conflictsOrders.value.length == 0)
-    isActive.value = false;
-};
-
-const onFilesSelected = (newFiles) => {
-  if (!newFiles) return;
-
-  const filesArray = Array.isArray(newFiles)
-    ? newFiles
-    : [newFiles];
-
-  files.value = [
-    ...files.value,
-    ...filesArray
-  ];
+  files.value.push({
+    selectedFile,
+    preview: URL.createObjectURL(selectedFile)
+  })
 };
 
 const openPdf = (file) => {
-  const url = URL.createObjectURL(file);
-  window.open(url, '_blank');
+  window.open(file.preview, '_blank');
 };
 
 const removeFile = (index) => {
