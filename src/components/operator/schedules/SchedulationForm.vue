@@ -11,6 +11,30 @@
           :rules="validation.requiredRules"
           :allowed-dates="days.getDateRangeArray()"
         />
+        <v-row no-gutters>
+          <v-col
+            cols="12"
+            md="6"
+          >
+            <v-text-field
+              v-model="minSizeGroup"
+              type="number"
+              label="Distanza minima gruppo"
+              :class="isMobile ? '' : 'mr-2'"
+            />
+          </v-col>
+          <v-col
+            cols="12"
+            md="6"
+          >
+            <v-text-field
+              v-model="maxDistanceKm"
+              type="number"
+              label="Massima distanza (KM)"
+              :class="isMobile ? '' : 'ml-2'"
+            />
+          </v-col>
+        </v-row>
         <FormButtons
           :loading="loading"
           class="mb-5"
@@ -166,6 +190,7 @@ import FormButtons from '@/components/FormButtons';
 import http from '@/utils/http';
 import days from '@/utils/days';
 import { useTheme } from 'vuetify';
+import mobile from '@/utils/mobile';
 import { ref, computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import draggable from 'vuedraggable';
@@ -182,7 +207,10 @@ const router = useRouter();
 const transports = ref([]);
 const suggestions = ref([]);
 const deliveryUsers = ref([]);
+const minSizeGroup = ref(12);
+const maxDistanceKm = ref(50);
 const scheduleStore = useScheduleStore();
+const isMobile = mobile.setupMobileUtils();
 const emits = defineEmits(['cancel', 'goToSheduleForm']);
 const { element: schedule } = storeToRefs(scheduleStore);
 
@@ -199,7 +227,9 @@ const submitDpcForm = async () => {
   message.value = '';
   loading.value = true;
   http.getRequest('schedule/suggestions', {
-    dpc: dpc.value
+    dpc: dpc.value,
+    min_size_group: minSizeGroup.value,
+    max_distance_km: maxDistanceKm.value
   }, function (data) {
     loading.value = false;
     if (data.status == 'ok') {
