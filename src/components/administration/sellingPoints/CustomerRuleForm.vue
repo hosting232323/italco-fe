@@ -32,7 +32,7 @@
               type="number"
               min="1"
               :rules="validation.requiredRules"
-              :class="isMobile ? '' : 'mr-2'"
+              :class="isMobile ? '' : 'ml-2'"
             />
           </v-col>
         </v-row>
