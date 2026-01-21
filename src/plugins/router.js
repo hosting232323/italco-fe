@@ -58,6 +58,11 @@ const routes = [
         component: () => import('@/views/administration/AdministrationDelivery.vue')
       },
       {
+        path: 'log',
+        name: 'Log',
+        component: () => import('@/views/administration/AdministrationLog.vue')
+      },
+      {
         path: 'schedules',
         name: 'Borderò',
         component: () => import('@/views/operator/OperatorSchedules.vue')

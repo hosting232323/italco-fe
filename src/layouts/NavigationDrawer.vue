@@ -50,6 +50,12 @@
       prepend-icon="mdi-store-marker"
     />
     <v-list-item
+      v-if="role === 'Admin'"
+      to="/log"
+      title="Log"
+      prepend-icon="mdi-math-log"
+    />
+    <v-list-item
       v-if="role === 'Customer'"
       to="/collection-points"
       title="Punti di Ritiro"
