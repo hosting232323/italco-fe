@@ -20,6 +20,7 @@
               accept="application/pdf"
               :rules="validation.requiredRules"
               @change="onFilesSelected"
+              multiple
             />
 
             <div
@@ -120,18 +121,14 @@ const submitForm = async (isActive) => {
   if (!(await form.value.validate()).valid) return;
 
   loading.value = true;
-
-  const content = {
-    customer_id: user.value
-  }
-
+  const content = {customer_id: user.value};
   files.value.forEach(file => {
     if (file.selectedFile)
       content[file.selectedFile.name] = file.selectedFile;
   });
 
   http.formDataRequest(
-    'pdf-import',
+    'import/pdf',
     content, 
     function (data) {
     loading.value = false;

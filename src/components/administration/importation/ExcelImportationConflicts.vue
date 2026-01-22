@@ -185,7 +185,7 @@ const submitConflictsForm = async () => {
   }
 
   loading.value = true;
-  http.postRequest('import/conflict', {
+  http.postRequest('import/excel/conflict', {
     orders: conflictsOrders,
     customer_id: customerId
   }, function (data) {

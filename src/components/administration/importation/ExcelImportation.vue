@@ -77,7 +77,7 @@ const submitForm = async (isActive) => {
   if (!(await form.value.validate()).valid) return;
 
   loading.value = true;
-  http.formDataRequest('excel-import', {
+  http.formDataRequest('import/excel', {
     file: file.value,
     customer_id: user.value
   }, function (data) {
