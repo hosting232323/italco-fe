@@ -22,7 +22,7 @@
           block
           @click="emits('deleteOrder', isActive, order)"
         />
-        <OrderImportationNewProduct
+        <ExcelImportationNewProduct
           v-if="activeNewProductForm[order['Rif. Com']]"
           :order="order"
           :customer-id="customerId"
@@ -129,7 +129,7 @@
 </template>
 
 <script setup>
-import OrderImportationNewProduct from '@/components/administration/OrderImportationNewProduct';
+import ExcelImportationNewProduct from '@/components/administration/importation/ExcelImportationNewProduct';
 
 import { ref } from 'vue';
 import http from '@/utils/http';
@@ -185,7 +185,7 @@ const submitConflictsForm = async () => {
   }
 
   loading.value = true;
-  http.postRequest('import/conflict', {
+  http.postRequest('import/excel/conflict', {
     orders: conflictsOrders,
     customer_id: customerId
   }, function (data) {
