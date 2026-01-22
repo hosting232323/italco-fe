@@ -154,7 +154,7 @@ const onFilesSelected = (event) => {
       selectedFile,
       preview: URL.createObjectURL(selectedFile)
     });
-  })
+  });
 };
 
 const openPdf = (file) => {
