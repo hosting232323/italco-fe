@@ -14,8 +14,8 @@
             variant="text"
             @click="openForm"
           />
-          <ExcelOrderImportation v-if="role == 'Admin'" />
-          <PDFOrderImportation v-if="role == 'Admin'" />
+          <ExcelImportation v-if="role == 'Admin'" />
+          <PdfImportation v-if="role == 'Admin'" />
         </h1><hr>
         <template v-if="role && role != 'Delivery'">
           <OrdersFilters />
@@ -35,8 +35,8 @@ import OrderTable from '@/components/orders/OrderTable';
 import OrderForm from '@/components/orders/OrderFormCard';
 import OrdersFilters from '@/components/orders/OrderFilters';
 import DeliveryDashboard from '@/components/delivery/DeliveryDashboard';
-import ExcelOrderImportation from '@/components/administration/excel/OrderImportation';
-import PDFOrderImportation from '@/components/administration/pdf/OrderImportation';
+import PdfImportation from '@/components/administration/importation/PdfImportation';
+import ExcelImportation from '@/components/administration/importation/ExcelImportation';
 
 import { storeToRefs } from 'pinia';
 import { useUserStore } from '@/stores/user';

@@ -34,7 +34,7 @@
               @cancel="isActive.value = false"
             />
           </v-form>
-          <OrderImportationConflicts
+          <ExcelImportationConflicts
             v-else
             :is-active="isActive"
             :customer-id="user"
@@ -50,7 +50,7 @@
 
 <script setup>
 import FormButtons from '@/components/FormButtons';
-import OrderImportationConflicts from '@/components/administration/excel/OrderImportationConflicts';
+import ExcelImportationConflicts from '@/components/administration/importation/ExcelImportationConflicts';
 
 import { ref } from 'vue';
 import http from '@/utils/http';
