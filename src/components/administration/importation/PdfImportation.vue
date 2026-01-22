@@ -110,7 +110,6 @@ const form = ref(null);
 const user = ref(null);
 const loading = ref(false);
 const router = useRouter();
-const conflictsOrders = ref([]);
 const orderStore = useOrderStore();
 const administrationUserStore = useAdministrationUserStore();
 
@@ -132,17 +131,15 @@ const submitForm = async (isActive) => {
     content, 
     function (data) {
       loading.value = false;
-      if (data.status == 'ok') {
-        if (data.imported_orders_count > 0)
-          alert(`Importati ${data.imported_orders_count} ordini con successo.`);
+      if (data.status == 'ok' && data.imported_orders_count > 0) {
+        alert(`Importati ${data.imported_orders_count} ordini con successo.`);
 
-        if (data.conflicted_orders && Object.keys(data.conflicted_orders).length > 0)
-          conflictsOrders.value = data.conflicted_orders;
-        else {
-          ready.value = false;
-          orderStore.initList(router);
-          isActive.value = false;
-        }
+        files.value = [];
+        user.value = null;
+
+        ready.value = false;
+        orderStore.initList(router);
+        isActive.value = false;
       }
     }, 'POST', router);
 };
