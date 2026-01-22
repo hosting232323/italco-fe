@@ -148,13 +148,16 @@ const submitForm = async (isActive) => {
 };
 
 const onFilesSelected = (event) => {
-  const selectedFile = event.target.files[0];
-  if (!selectedFile) return;
+  const selectedFiles = event.target.files;
+  if (selectedFiles.length == 0) return;
 
-  files.value.push({
-    selectedFile,
-    preview: URL.createObjectURL(selectedFile)
-  });
+  selectedFiles.forEach(selectedFile => {
+    if (selectedFile.type != 'application/pdf') return;
+    files.value.push({
+      selectedFile,
+      preview: URL.createObjectURL(selectedFile)
+    });
+  })
 };
 
 const openPdf = (file) => {
