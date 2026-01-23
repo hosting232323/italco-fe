@@ -17,10 +17,49 @@
             @submit.prevent="submitForm(isActive)"
           >
             <v-file-input
-              v-model="file"
               label="File Excel"
               :rules="validation.requiredRules"
+              @change="onFilesSelected"
             />
+            <div
+              v-if="file.name"
+              class="mb-4"
+            >
+              <strong>File Excel selezionati</strong>
+              <v-row>
+                <v-col
+                  cols="12"
+                  sm="6"
+                  md="4"
+                  lg="3"
+                >
+                  <v-card
+                    class="pdf-card"
+                  >
+                    <v-card-text class="text-center">
+                      <v-icon
+                        size="64"
+                        color="green"
+                      >
+                        mdi-microsoft-excel
+                      </v-icon>
+                      <div class="pdf-name mt-2">
+                        {{ file.name }}
+                      </div>
+                    </v-card-text>
+                    <v-divider />
+                    <v-card-actions class="justify-center">
+                      <v-btn
+                        icon="mdi-delete"
+                        variant="text"
+                        color="red"
+                        @click="file = {}"
+                      />
+                    </v-card-actions>
+                  </v-card>
+                </v-col>
+              </v-row>
+            </div>
             <v-autocomplete
               v-model="user"
               label="Punto Vendita"
@@ -61,7 +100,7 @@ import validation from '@/utils/validation';
 import { useOrderStore } from '@/stores/order';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
-const file = ref(null);
+const file = ref({});
 const form = ref(null);
 const user = ref(null);
 const loading = ref(false);
@@ -95,6 +134,12 @@ const submitForm = async (isActive) => {
       }
     }
   }, 'POST', router);
+};
+
+const onFilesSelected = (event) => {
+  const selectedFile = event.target.files[0];
+  if (selectedFile.length == 0) return;
+  file.value = selectedFile;
 };
 
 const closeConflictsForm = (isActive) => {
