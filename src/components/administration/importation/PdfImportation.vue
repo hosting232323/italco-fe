@@ -22,13 +22,11 @@
               multiple
               @change="onFilesSelected"
             />
-
             <div
               v-if="files.length > 0"
               class="mb-4"
             >
               <strong>PDF selezionati</strong>
-
               <v-row>
                 <v-col
                   v-for="(file, index) in files"
@@ -48,14 +46,11 @@
                       >
                         mdi-file-pdf-box
                       </v-icon>
-
                       <div class="pdf-name mt-2">
                         {{ file.selectedFile.name }}
                       </div>
                     </v-card-text>
-
                     <v-divider />
-
                     <v-card-actions class="justify-center">
                       <v-btn
                         icon="mdi-eye"
@@ -66,14 +61,13 @@
                         icon="mdi-delete"
                         variant="text"
                         color="red"
-                        @click="removeFile(index)"
+                        @click="files.splice(index, 1)"
                       />
                     </v-card-actions>
                   </v-card>
                 </v-col>
               </v-row>
             </div>
-
             <v-autocomplete
               v-model="user"
               label="Punto Vendita"
@@ -110,7 +104,6 @@ const form = ref(null);
 const user = ref(null);
 const loading = ref(false);
 const router = useRouter();
-const conflictsOrders = ref([]);
 const orderStore = useOrderStore();
 const administrationUserStore = useAdministrationUserStore();
 
@@ -132,36 +125,33 @@ const submitForm = async (isActive) => {
     content, 
     function (data) {
       loading.value = false;
-      if (data.status == 'ok') {
-        if (data.imported_orders_count > 0)
-          alert(`Importati ${data.imported_orders_count} ordini con successo.`);
+      if (data.status == 'ok' && data.imported_orders_count > 0) {
+        alert(`Importati ${data.imported_orders_count} ordini con successo.`);
 
-        if (data.conflicted_orders && Object.keys(data.conflicted_orders).length > 0)
-          conflictsOrders.value = data.conflicted_orders;
-        else {
-          ready.value = false;
-          orderStore.initList(router);
-          isActive.value = false;
-        }
+        files.value = [];
+        user.value = null;
+
+        ready.value = false;
+        orderStore.initList(router);
+        isActive.value = false;
       }
     }, 'POST', router);
 };
 
 const onFilesSelected = (event) => {
-  const selectedFile = event.target.files[0];
-  if (!selectedFile) return;
+  const selectedFiles = event.target.files;
+  if (selectedFiles.length == 0) return;
 
-  files.value.push({
-    selectedFile,
-    preview: URL.createObjectURL(selectedFile)
+  selectedFiles.forEach(selectedFile => {
+    if (selectedFile.type != 'application/pdf') return;
+    files.value.push({
+      selectedFile,
+      preview: URL.createObjectURL(selectedFile)
+    });
   });
 };
 
 const openPdf = (file) => {
   window.open(file.preview, '_blank');
-};
-
-const removeFile = (index) => {
-  files.value.splice(index, 1);
 };
 </script>
