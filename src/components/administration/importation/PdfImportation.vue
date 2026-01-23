@@ -22,13 +22,11 @@
               multiple
               @change="onFilesSelected"
             />
-
             <div
               v-if="files.length > 0"
               class="mb-4"
             >
               <strong>PDF selezionati</strong>
-
               <v-row>
                 <v-col
                   v-for="(file, index) in files"
@@ -48,14 +46,11 @@
                       >
                         mdi-file-pdf-box
                       </v-icon>
-
                       <div class="pdf-name mt-2">
                         {{ file.selectedFile.name }}
                       </div>
                     </v-card-text>
-
                     <v-divider />
-
                     <v-card-actions class="justify-center">
                       <v-btn
                         icon="mdi-eye"
@@ -66,14 +61,13 @@
                         icon="mdi-delete"
                         variant="text"
                         color="red"
-                        @click="removeFile(index)"
+                        @click="files.splice(index, 1)"
                       />
                     </v-card-actions>
                   </v-card>
                 </v-col>
               </v-row>
             </div>
-
             <v-autocomplete
               v-model="user"
               label="Punto Vendita"
@@ -159,9 +153,5 @@ const onFilesSelected = (event) => {
 
 const openPdf = (file) => {
   window.open(file.preview, '_blank');
-};
-
-const removeFile = (index) => {
-  files.value.splice(index, 1);
 };
 </script>

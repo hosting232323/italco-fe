@@ -26,7 +26,6 @@
               class="mb-4"
             >
               <strong>File Excel selezionati</strong>
-
               <v-row>
                 <v-col
                   cols="12"
@@ -44,14 +43,11 @@
                       >
                         mdi-microsoft-excel
                       </v-icon>
-
                       <div class="pdf-name mt-2">
                         {{ file.name }}
                       </div>
                     </v-card-text>
-
                     <v-divider />
-
                     <v-card-actions class="justify-center">
                       <v-btn
                         icon="mdi-delete"
