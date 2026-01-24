@@ -47,10 +47,11 @@ import { useCustomerRuleStore } from '@/stores/customerRule';
 
 const theme = useTheme();
 const router = useRouter();
+const deleteLoading = reactive({});
+
 const customerRuleStore = useCustomerRuleStore();
 const { ready } = storeToRefs(customerRuleStore);
 const customerRules = storesUtils.getStoreList(customerRuleStore, router);
-const deleteLoading = reactive({});
 
 const deleteItem = (item) => {
   deleteLoading[item.id] = true;

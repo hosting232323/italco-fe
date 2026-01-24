@@ -52,11 +52,12 @@ import { useDeliveryGroupStore } from '@/stores/deliveryGroup';
 
 const theme = useTheme();
 const router = useRouter();
+const deleteLoading = reactive({});
 const emits = defineEmits(['openPopUp']);
+
 const deliveryGroupStore = useDeliveryGroupStore();
 const { ready } = storeToRefs(deliveryGroupStore);
 const deliveryGroups = storesUtils.getStoreList(deliveryGroupStore, router);
-const deleteLoading = reactive({});
 
 const deleteItem = (item) => {
   deleteLoading[item.id] = true;

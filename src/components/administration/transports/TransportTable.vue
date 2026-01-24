@@ -55,10 +55,11 @@ import { useTransportStore } from '@/stores/transport';
 
 const theme = useTheme();
 const router = useRouter();
+const deleteLoading = reactive({});
+
 const transportStore = useTransportStore();
 const { element: transport, activeForm, ready } = storeToRefs(transportStore);
 const transports = storesUtils.getStoreList(transportStore, router);
-const deleteLoading = reactive({});
 
 const openForm = (item) => {
   transport.value = item;

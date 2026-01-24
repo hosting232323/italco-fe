@@ -31,9 +31,10 @@ import { useGeographicZoneStore } from '@/stores/geographicZone';
 
 const theme = useTheme();
 const router = useRouter();
+const deleteLoading = reactive({});
+
 const geographicZoneStore = useGeographicZoneStore();
 const { element: geographicZone } = storeToRefs(geographicZoneStore);
-const deleteLoading = reactive({});
 
 const deleteItem = (item) => {
   deleteLoading[item.id] = true;

@@ -77,6 +77,7 @@ const { activatorProps } = defineProps({
 const theme = useTheme();
 const router = useRouter();
 const deleteLoading = reactive({});
+
 const serviceStore = useServiceStore();
 const { element: service, activeForm, ready } = storeToRefs(serviceStore);
 const services = storesUtils.getStoreList(serviceStore, router);

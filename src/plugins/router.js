@@ -66,6 +66,11 @@ const routes = [
         path: 'collection-points',
         name: 'Punti di ritiro',
         component: () => import('@/views/customer/CollectionPoints.vue')
+      },
+      {
+        path: 'rae-products',
+        name: 'Prodotti Rae',
+        component: () => import('@/views/administration/AdministrationRaeProducts.vue')
       }
     ]
   }

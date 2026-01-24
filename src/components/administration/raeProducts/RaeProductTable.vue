@@ -7,20 +7,15 @@
   />
   <v-data-table
     v-else
-    :items="collectionPoints"
+    :items="raeProducts"
     :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
     :headers="[
       { title: 'ID', value: 'id', sortable: false },
       { title: 'Nome', value: 'name', sortable: false },
-      { title: 'Indirizzo', value: 'address', sortable: false },
-      { title: 'Cap', value: 'cap', sortable: false },
-      { title: 'Orari', value: 'opening_closing', sortable: false },
-      { title: 'Azioni', key: 'actions', sortable: false },
+      { title: 'Codice', value: 'code', sortable: false },
+      { title: 'Azioni', key: 'actions', sortable: false }
     ]"
   >
-    <template #[`item.opening_closing`]="{ item }">
-      {{ formatTime(item.opening_time) }} - {{ formatTime(item.closing_time) }}
-    </template>
     <template #[`item.actions`]="{ item }">
       <v-row no-gutters>
         <v-col cols="6">
@@ -51,33 +46,27 @@ import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
-import { useCollectionPointStore } from '@/stores/collectionPoint';
+import { useRaeProductStore } from '@/stores/raeProduct';
 
 const theme = useTheme();
 const router = useRouter();
 const deleteLoading = reactive({});
 
-const collectionPointStore = useCollectionPointStore();
-const { element: collectionPoint, activeForm, ready } = storeToRefs(collectionPointStore);
-const collectionPoints = storesUtils.getStoreList(collectionPointStore, router);
+const raeProductStore = useRaeProductStore();
+const { element: raeProduct, activeForm, ready } = storeToRefs(raeProductStore);
+const raeProducts = storesUtils.getStoreList(raeProductStore, router);
 
 const openForm = (item) => {
-  collectionPoint.value = item;
+  raeProduct.value = item;
   activeForm.value = true;
 };
 
 const deleteItem = (item) => {
   deleteLoading[item.id] = true;
-  collectionPointStore.deleteElement(item, router, function() {
-    collectionPointStore.initList(router);
+  raeProductStore.deleteElement(item, router, function() {
+    raeProductStore.initList(router);
     deleteLoading[item.id] = false;
   });
-};
-
-const formatTime = (value) => {
-  if (!value) return '-';
-  const [h, m] = value.split(':');
-  return `${h}:${m}`;
 };
 </script>
 

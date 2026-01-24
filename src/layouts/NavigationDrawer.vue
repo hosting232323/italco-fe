@@ -50,6 +50,12 @@
       prepend-icon="mdi-store-marker"
     />
     <v-list-item
+      v-if="role === 'Admin'"
+      to="/rae-products"
+      title="Prodotti Rae"
+      prepend-icon="mdi-file-code"
+    />
+    <v-list-item
       v-if="role === 'Customer'"
       to="/collection-points"
       title="Punti di Ritiro"

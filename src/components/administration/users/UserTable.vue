@@ -95,13 +95,13 @@ const element = ref({});
 const theme = useTheme();
 const dialog = ref(false);
 const router = useRouter();
-const administrationUserStore = useAdministrationUserStore();
-const { ready } = storeToRefs(administrationUserStore);
-const users = storesUtils.getStoreList(administrationUserStore, router);
-
 const deleteLoading = reactive({});
 const visiblePasswords = reactive({});
 const decryptedPasswords = reactive({});
+
+const administrationUserStore = useAdministrationUserStore();
+const { ready } = storeToRefs(administrationUserStore);
+const users = storesUtils.getStoreList(administrationUserStore, router);
 
 const togglePassword = (id, encrypted) => {
   if (!visiblePasswords[id]) {

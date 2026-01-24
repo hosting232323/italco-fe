@@ -27,9 +27,10 @@ import { useCustomerGroupStore } from '@/stores/customerGroup';
 
 const theme = useTheme();
 const router = useRouter();
+const deleteLoading = reactive({});
+
 const customerGroupStore = useCustomerGroupStore();
 const { element: customerGroup } = storeToRefs(customerGroupStore);
-const deleteLoading = reactive({});
 
 const deleteItem = (item) => {
   deleteLoading[item.id] = true;
