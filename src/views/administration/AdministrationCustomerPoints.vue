@@ -13,7 +13,7 @@
             variant="text"
             @click="openCustomerGroupForm"
           />
-        </h1><hr class="mt-2">
+        </h1><hr>
         <CustomerGroupForm />
         <CustomerGroupTable @open-pop-up="openPopUp" />
         <h1>
@@ -24,7 +24,7 @@
             variant="text"
             @click="openGeographicZoneForm"
           />
-        </h1><hr class="mt-2">
+        </h1><hr>
         Attenzione: Se non vengono configurate regole per una certa area geografica,
         i punti vendita non potranno effettuare ordini per i clienti di quella zona.
         <GeographicZoneForm />
@@ -37,9 +37,14 @@
             variant="text"
             @click="openCustomerRuleForm"
           />
-        </h1><hr class="mt-2">
+        </h1><hr>
         <CustomerRuleForm />
         <CustomerRuleTable />
+        <h1>
+          Informazioni Raee
+        </h1><hr>
+        <CustomerUserInfoForm />
+        <CustomerUserInfoTable />
       </v-container>
     </template>
     <template #default>
@@ -60,6 +65,8 @@ import CustomerGroupTable from '@/components/administration/sellingPoints/Custom
 import GeographicZoneForm from '@/components/administration/sellingPoints/GeographicZoneForm';
 import GeographicZoneTable from '@/components/administration/sellingPoints/GeographicZoneTable';
 import GeographicCodePopUp from '@/components/administration/sellingPoints/GeographicCodePopUp';
+import CustomerUserInfoForm from '@/components/administration/sellingPoints/CustomerUserInfoForm';
+import CustomerUserInfoTable from '@/components/administration/sellingPoints/CustomerUserInfoTable';
 
 import { ref } from 'vue';
 import { storeToRefs } from 'pinia';

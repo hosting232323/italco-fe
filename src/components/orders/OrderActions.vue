@@ -64,14 +64,29 @@
             />
           </v-col>
         </v-row>
-        <v-btn
-          v-if="item.status == 'To Reschedule'"
-          icon="mdi-content-copy"
-          variant="text"
-          :color="theme.current.value.primaryColor"
-          title="Clona ordine"
-          @click="copyOrder(item)"
-        />
+        <v-row no-gutters>
+          <v-col cols="6">
+            <v-btn
+              v-if="item.status == 'To Reschedule'"
+              icon="mdi-content-copy"
+              variant="text"
+              :color="theme.current.value.primaryColor"
+              title="Clona ordine"
+              @click="copyOrder(item)"
+            />
+          </v-col>
+          <v-col cols="6">
+            <v-btn
+              v-if="Object.values(item.products).some(product => product.rae_product_id)"
+              icon="mdi-human-dolly"
+              variant="text"
+              :loading="raeLoading"
+              :color="theme.current.value.primaryColor"
+              title="Esportazione Raee"
+              @click="raeExport(item)"
+            />
+          </v-col>
+        </v-row>
       </template>
     </template>
     <template #default="{ isActive }">
@@ -112,8 +127,10 @@ const order = ref({});
 const theme = useTheme();
 const popUpType = ref('');
 const router = useRouter();
+const raeLoading = ref(false);
 const loadingExport = ref(false);
 const loadingDelete = ref(false);
+
 const userStore = useUserStore();
 const orderStore = useOrderStore();
 const { role } = storeToRefs(userStore);
@@ -130,7 +147,7 @@ const openPopUp = (item, type) => {
   popUpType.value = type;
 };
 
-const exportPdf = async (item) => {
+const exportPdf = (item) => {
   loadingExport.value = true;
 
   http.getRequest(`export/order/${item.id}`, {}, function (data) {
@@ -181,5 +198,20 @@ const deleteOrder = (item) => {
     } else
       alert(data.error);
   }, 'DELETE', router);
+};
+
+const raeExport = (item) => {
+  raeLoading.value = true;
+
+  http.getRequest(`export/rae/${item.id}`, {}, function (data) {
+    raeLoading.value = false;
+    const blob = new Blob([data], { type: 'application/pdf' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `raee_${item.id}.pdf`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  }, 'GET', router, true);
 };
 </script>

@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <h1>
-      Prodotti Rae
+      Prodotti Raee
       <v-btn
         icon="mdi-plus"
         style="float: right;"

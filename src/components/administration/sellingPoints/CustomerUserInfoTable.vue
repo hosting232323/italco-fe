@@ -7,17 +7,29 @@
   />
   <v-data-table
     v-else
-    :items="users.filter(user => user.role == 'Delivery')"
+    :items="users.filter(user => user.role == 'Customer')"
     :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
     :headers="[
       { title: 'ID', value: 'id', sortable: false },
       { title: 'Nickname', value: 'nickname', sortable: false },
-      { title: 'Località', value: 'cap', sortable: false },
+      { title: 'Città', value: 'city', sortable: false },
+      { title: 'Indirizzo', value: 'address', sortable: false },
+      { title: 'Codice Fiscale', value: 'tax_code', sortable: false },
+      { title: 'Ragione Sociale', value: 'company_name', sortable: false },
       { title: 'Azioni', key: 'actions', sortable: false }
     ]"
   >
-    <template #[`item.cap`]="{ item }">
-      {{ item.delivery_user_info ? addressUtils.getCityByCap(item.delivery_user_info.cap) : '' }}
+    <template #[`item.city`]="{ item }">
+      {{ item.customer_user_info?.city }}
+    </template>
+    <template #[`item.address`]="{ item }">
+      {{ item.customer_user_info?.address }}
+    </template>
+    <template #[`item.tax_code`]="{ item }">
+      {{ item.customer_user_info?.tax_code }}
+    </template>
+    <template #[`item.company_name`]="{ item }">
+      {{ item.customer_user_info?.company_name }}
     </template>
     <template #[`item.actions`]="{ item }">
       <v-btn
@@ -35,7 +47,6 @@ import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
-import addressUtils from '@/utils/address';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
 const theme = useTheme();

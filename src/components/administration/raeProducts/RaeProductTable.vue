@@ -12,7 +12,8 @@
     :headers="[
       { title: 'ID', value: 'id', sortable: false },
       { title: 'Nome', value: 'name', sortable: false },
-      { title: 'Codice', value: 'code', sortable: false },
+      { title: 'Codice CER', value: 'cer_code', sortable: false },
+      { title: 'Codice Raggruppamento', value: 'group_code', sortable: false },
       { title: 'Azioni', key: 'actions', sortable: false }
     ]"
   >

@@ -4,10 +4,18 @@
     <v-list-item
       v-for="product in Object.keys(order.products)"
       :key="product"
-      :title="`${product} [${order.products[product].collection_point.name}]`"
       append-icon="mdi-delete"
-      :subtitle="order.products[product].services.map(service => service.name).join(', ')"
     >
+      <v-list-item-title>
+        {{ product }}
+        <i v-if="order.products[product].rae_product">
+          RAEE
+        </i>
+        [{{ order.products[product].collection_point.name }}]
+      </v-list-item-title>
+      <v-list-item-subtitle>
+        {{ order.products[product].services.map(service => service.name).join(', ') }}
+      </v-list-item-subtitle>
       <template #append>
         <v-icon
           icon="mdi-delete"
@@ -26,6 +34,7 @@
         md="4"
       >
         <v-text-field
+          v-if="!isRae"
           v-model="selectedProduct"
           :class="isMobile ? '' : 'mr-2'"
           label="Prodotto"
@@ -33,10 +42,22 @@
           :rules="validation.requiredRules"
           @click:prepend="addProduct"
         />
+        <v-autocomplete
+          v-else
+          v-model="selectedRaeProduct"
+          :class="isMobile ? '' : 'mr-2'"
+          label="Prodotto Rae"
+          :items="raeProducts"
+          item-title="name"
+          item-value="id"
+          prepend-icon="mdi-plus"
+          :rules="validation.requiredRules"
+          @click:prepend="addProduct"
+        />
       </v-col>
       <v-col
         cols="12"
-        md="4"
+        md="3"
       >
         <v-select
           v-model="selectedService"
@@ -58,7 +79,7 @@
       </v-col>
       <v-col
         cols="12"
-        md="4"
+        md="3"
       >
         <v-autocomplete
           v-model="selectedCollectionPoint"
@@ -69,6 +90,15 @@
           :rules="validation.requiredRules"
           return-object
           :disabled="filteredCollectionPoints.length == 1"
+        />
+      </v-col>
+      <v-col
+        cols="12"
+        md="2"
+      >
+        <v-checkbox
+          v-model="isRae"
+          label="Ritiro Rae"
         />
       </v-col>
     </v-row>
@@ -100,24 +130,30 @@ import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
 import { useServiceStore } from '@/stores/service';
 import { ref, computed, watch, nextTick } from 'vue';
+import { useRaeProductStore } from '@/stores/raeProduct';
 import { useCollectionPointStore } from '@/stores/collectionPoint';
 
 const form = ref(null);
+const isRae = ref(false);
 const router = useRouter();
-const userStore = useUserStore();
-const orderStore = useOrderStore();
-const serviceStore = useServiceStore();
-const { role } = storeToRefs(userStore);
-const isMobile = mobile.setupMobileUtils();
-const collectionPointStore = useCollectionPointStore();
-const { element: order } = storeToRefs(orderStore);
-const services = storesUtils.getStoreList(serviceStore, router);
-const collectionPoints = storesUtils.getStoreList(collectionPointStore, router);
-
 const selectedServices = ref([]);
 const selectedProduct = ref(null);
 const selectedService = ref(null);
+const selectedRaeProduct = ref(null);
 const selectedCollectionPoint = ref(null);
+const isMobile = mobile.setupMobileUtils();
+
+const userStore = useUserStore();
+const orderStore = useOrderStore();
+const serviceStore = useServiceStore();
+const raeProductStore = useRaeProductStore();
+const collectionPointStore = useCollectionPointStore();
+
+const { role } = storeToRefs(userStore);
+const { element: order } = storeToRefs(orderStore);
+const services = storesUtils.getStoreList(serviceStore, router);
+const raeProducts = storesUtils.getStoreList(raeProductStore, router);
+const collectionPoints = storesUtils.getStoreList(collectionPointStore, router);
 
 const filteredCollectionPoints = computed(() => {
   return role.value === 'Customer'
@@ -133,9 +169,11 @@ watch([filteredCollectionPoints, () => selectedCollectionPoint.value], async ([l
 }, { immediate: true });
 
 const resetFormRow = () => {
+  isRae.value = false;
   selectedServices.value = [];
   selectedService.value = null;
   selectedProduct.value = null;
+  selectedRaeProduct.value = null;
   selectedCollectionPoint.value = null;
 };
 
@@ -143,10 +181,13 @@ const addProduct = async () => {
   if (!(await form.value.validate()).valid) return;
 
   if (!order.value.products) order.value.products = {};
+  if (isRae.value) selectedProduct.value = raeProducts.value.find(product => product.id == selectedRaeProduct.value).name;
+
   order.value.products[selectedProduct.value] = {
     services: selectedServices.value,
     collection_point: selectedCollectionPoint.value
   };
+  if (isRae.value) order.value.products[selectedProduct.value].rae_product = selectedRaeProduct.value;
   resetFormRow();
 };
 
