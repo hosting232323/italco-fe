@@ -52,7 +52,7 @@
     <v-list-item
       v-if="role === 'Admin'"
       to="/rae-products"
-      title="Prodotti Rae"
+      title="Prodotti Raee"
       prepend-icon="mdi-file-code"
     />
     <v-list-item

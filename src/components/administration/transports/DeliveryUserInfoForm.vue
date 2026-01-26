@@ -39,6 +39,7 @@ const cap = ref(null);
 const form = ref(null);
 const loading = ref(false);
 const router = useRouter();
+
 const administrationUserStore = useAdministrationUserStore();
 const { element: user, activeForm } = storeToRefs(administrationUserStore);
 
@@ -46,8 +47,9 @@ const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
 
   loading.value = true;
-  http.postRequest('user/delivery-user-info', {
-    cap: cap.value,
+  http.postRequest('user/info', {
+    class: 'Delivery',
+    data: {cap: cap.value},
     user_id: user.value.id
   }, function () {
     loading.value = false;

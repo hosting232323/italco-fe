@@ -47,6 +47,9 @@
               :key="product"
             >
               <b>{{ product }}</b>
+              <i v-if="item.products[product].rae_product_id">
+                RAEE
+              </i>
               [{{ item.products[product].collection_point.name }}] :
               {{ item.products[product].services.map(service => service.name).join(', ') }}
               <br>

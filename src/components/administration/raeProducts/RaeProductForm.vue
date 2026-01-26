@@ -1,7 +1,7 @@
 <template>
   <v-card
     v-if="activeForm"
-    :title="raeProduct.id ? `Modifica Prodotto Rae ${raeProduct.id}` : 'Crea Prodotto Rae'"
+    :title="raeProduct.id ? `Modifica Prodotto Raee ${raeProduct.id}` : 'Crea Prodotto Raee'"
     class="mt-10 mb-5"
   >
     <v-card-text>
@@ -9,14 +9,20 @@
         ref="form"
         @submit.prevent="submitForm"
       >
+        <v-text-field
+          v-model="raeProduct.name"
+          label="Nome"
+          :rules="validation.requiredRules"
+        />
         <v-row no-gutters>
           <v-col
             cols="12"
             md="6"
           >
             <v-text-field
-              v-model="raeProduct.name"
-              label="Nome"
+              v-model="raeProduct.cer_code"
+              :class="isMobile ? '' : 'mr-2'"
+              label="Codice CER"
               :rules="validation.requiredRules"
             />
           </v-col>
@@ -25,9 +31,9 @@
             md="6"
           >
             <v-text-field
-              v-model="raeProduct.code"
+              v-model="raeProduct.group_code"
               :class="isMobile ? '' : 'ml-2'"
-              label="Codice"
+              label="Codice Raggruppamento"
               :rules="validation.requiredRules"
             />
           </v-col>
