@@ -110,8 +110,9 @@ import { useServiceStore } from '@/stores/service';
 const form = ref(null);
 const loading = ref(false);
 const router = useRouter();
-const serviceStore = useServiceStore();
 const isMobile = mobile.setupMobileUtils();
+
+const serviceStore = useServiceStore();
 const { element: service, activeForm } = storeToRefs(serviceStore);
 
 const submitForm = async () => {
