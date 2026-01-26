@@ -14,10 +14,11 @@
             cols="12"
             md="4"
           >
-            <v-text-field
-              v-model="service.name"
+            <v-select
+              v-model="service.type"
+              label="Tipo"
               :class="isMobile ? '' : 'mr-2'"
-              label="Nome"
+              :items="orderUtils.TYPES"
               :rules="validation.requiredRules"
             />
           </v-col>
@@ -25,11 +26,10 @@
             cols="12"
             md="4"
           >
-            <v-select
-              v-model="service.type"
-              label="Tipo"
+            <v-text-field
+              v-model="service.name"
               :class="isMobile ? '' : 'mr-2'"
-              :items="orderUtils.TYPES"
+              label="Nome"
               :rules="validation.requiredRules"
             />
           </v-col>
