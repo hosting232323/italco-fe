@@ -99,7 +99,7 @@
 <script setup>
 import FormButtons from '@/components/FormButtons';
 
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import orderUtils from '@/utils/order';
@@ -133,4 +133,10 @@ const callback = (data) => {
     activeForm.value = false;
   }
 };
+
+watch(activeForm, (val) => {
+  if (val && service.value.professional == undefined) {
+    service.value.professional = false;
+  }
+});
 </script>
