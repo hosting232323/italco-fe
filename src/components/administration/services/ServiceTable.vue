@@ -12,9 +12,10 @@
     :headers="[
       { title: 'ID', value: 'id', sortable: false },
       { title: 'Nome', value: 'name', sortable: false },
-      { title:'Tipo', value: 'type', sortable: false },
+      { title: 'Tipo', value: 'type', sortable: false },
       { title: 'Descrizione', value: 'description', sortable: false },
       { title: 'Durata', value: 'duration', sortable: false },
+      { title: 'Professionale', value: 'professional', sortable: false },
       { title: 'Max Giornaieri', value: 'max_services', sortable: false },
       { title: 'Azioni', key: 'actions', sortable: false }
     ]"
@@ -24,6 +25,9 @@
     </template>
     <template #[`item.duration`]="{ item }">
       {{ formatTime(item.duration) }}
+    </template>
+    <template #[`item.professional`]="{ item }">
+      {{ item.professional ? 'Si' : 'No' }}
     </template>
     <template #[`item.actions`]="{ item }">
       <v-row no-gutters>
