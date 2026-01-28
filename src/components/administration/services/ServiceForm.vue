@@ -12,7 +12,19 @@
         <v-row no-gutters>
           <v-col
             cols="12"
-            md="6"
+            md="4"
+          >
+            <v-select
+              v-model="service.type"
+              label="Tipo"
+              :class="isMobile ? '' : 'mr-2'"
+              :items="orderUtils.TYPES"
+              :rules="validation.requiredRules"
+            />
+          </v-col>
+          <v-col
+            cols="12"
+            md="4"
           >
             <v-text-field
               v-model="service.name"
@@ -23,48 +35,56 @@
           </v-col>
           <v-col
             cols="12"
-            md="6"
+            md="4"
           >
-            <v-select
-              v-model="service.type"
-              label="Tipo"
-              :items="orderUtils.TYPES"
-              :rules="validation.requiredRules"
+            <v-text-field
+              v-model="service.description"
+              label="Descrizione"
             />
           </v-col>
         </v-row>
         <v-row no-gutters>
           <v-col
             cols="12"
-            md="4"
-          >
-            <v-text-field
-              v-model="service.description"
-              :class="isMobile ? '' : 'mr-2'"
-              label="Descrizione"
-            />
-          </v-col>
-          <v-col
-            cols="12"
-            md="4"
+            md="5"
           >
             <v-text-field
               v-model="service.duration"
               label="Durata (minuti)"
-              :class="isMobile ? '' : 'mr-2 ml-2'"
+              :class="isMobile ? '' : 'mr-2'"
+
               type="number"
             />
           </v-col>
           <v-col
             cols="12"
-            md="4"
+            md="5"
           >
             <v-text-field
               v-model="service.max_services"
               label="Max Servizi Giornalieri"
-              :class="isMobile ? '' : 'ml-2'"
+              :class="isMobile ? '' : 'mr-2'"
               type="number"
             />
+          </v-col>
+          <v-col
+            cols="12"
+            md="2"
+          >
+            <label class="mr-2">Professionale</label>
+            <v-radio-group
+              v-model="service.professional"
+              inline
+            >
+              <v-radio
+                label="Sì"
+                :value="true"
+              />
+              <v-radio
+                label="No"
+                :value="false"
+              />
+            </v-radio-group>
           </v-col>
         </v-row>
         <FormButtons
@@ -79,7 +99,7 @@
 <script setup>
 import FormButtons from '@/components/FormButtons';
 
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import orderUtils from '@/utils/order';
@@ -90,8 +110,9 @@ import { useServiceStore } from '@/stores/service';
 const form = ref(null);
 const loading = ref(false);
 const router = useRouter();
-const serviceStore = useServiceStore();
 const isMobile = mobile.setupMobileUtils();
+
+const serviceStore = useServiceStore();
 const { element: service, activeForm } = storeToRefs(serviceStore);
 
 const submitForm = async () => {
@@ -112,4 +133,10 @@ const callback = (data) => {
     activeForm.value = false;
   }
 };
+
+watch(activeForm, (val) => {
+  if (val && service.value.professional == undefined) {
+    service.value.professional = false;
+  }
+});
 </script>
