@@ -10,37 +10,42 @@
       <br><b>
         Totale ordini: {{ totOrder }}
       </b><br><br>
-      <v-item-group
-        v-model="selectedCard"
-        selected-class="selected"
-        :style="{ '--item-bg-color': theme.current.value.primaryColor }"
-      >
-        <v-row>
-          <v-col
-            v-for="card in cards"
-            :key="card.key"
-            :cols="isMobile ? 6 :
-              (['Delay', 'Anomaly', 'Cancelled', 'To Reschedule'].includes(card.key) ? 2 : 4)"
-          >
-            <v-item
-              v-slot="{ selectedClass, toggle }"
-              :value="card.key"
-            >
-              <v-card
-                :class="['d-flex align-center', selectedClass]"
-                height="100"
-                @click="toggle"
-              >
-                <v-card-text style="font-size: larger;">
-                  {{ card.title }}: <b>{{ cardCounts[card.key] }}</b>
-                </v-card-text>
-              </v-card>
-            </v-item>
-          </v-col>
-        </v-row>
-      </v-item-group>
     </div>
-    <Table :key-name="selectedCard" />
+    <template>
+    <v-timeline side="end">
+      <v-timeline-item
+        v-for="order in timelineOrders"
+        :key="order.id"
+        :dot-color="timelineColor(order)"
+        size="small"
+      >
+        <v-alert
+          :color="timelineColor(order)"
+          :icon="timelineIcon(order)"
+          border="start"
+          variant="tonal"
+        >
+          <b>#{{ order.id }}</b> — {{ order.addressee }}<br>
+
+          <small>
+            {{ order.address }} ({{ order.cap }})
+          </small><br>
+
+          <small>
+            Sequenza: {{ order.schedule_index }}
+          </small>
+
+          <div v-if="order.anomaly" class="mt-1">
+            ⚠️ <b>Anomalia</b>
+          </div>
+
+          <div v-if="order.delay" class="mt-1">
+            ⏱️ <b>Ritardo</b>
+          </div>
+        </v-alert>
+      </v-timeline-item>
+    </v-timeline>
+    </template>
   </div>
 
   <div
@@ -84,6 +89,44 @@ const totOrder = computed(() => {
   else
     return Object.values(orders.value).reduce((sum, arr) => sum + arr.length, 0);
 });
+
+
+const timelineOrders = computed(() => {
+  if (!orders.value) return [];
+
+  console.log(Object.values(orders.value).flat());
+  return Object.values(orders.value)
+    .flat()
+    .filter(o => o.schedule_index !== null && o.schedule_index !== undefined)
+    .sort((a, b) => a.schedule_index - b.schedule_index);
+});
+
+const timelineColor = order => {
+  if (order.anomaly) return 'red';
+  if (order.delay) return 'orange';
+
+  switch (order.status) {
+    case 'In Progress': return 'blue';
+    case 'On Board': return 'indigo';
+    case 'At Warehouse': return 'cyan';
+    case 'Completed': return 'green';
+    case 'Cancelled': return 'grey';
+    default: return 'primary';
+  }
+};
+
+const timelineIcon = order => {
+  if (order.anomaly) return 'mdi-alert-circle';
+  if (order.delay) return 'mdi-clock-alert';
+
+  switch (order.status) {
+    case 'In Progress': return 'mdi-truck-outline';
+    case 'On Board': return 'mdi-truck-fast';
+    case 'Completed': return 'mdi-check-circle';
+    case 'Cancelled': return 'mdi-close-circle';
+    default: return 'mdi-package-variant';
+  }
+};
 
 
 const cards = [
