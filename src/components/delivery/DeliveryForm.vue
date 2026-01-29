@@ -8,6 +8,7 @@
         <v-select
           v-if="!['Delivered', 'Not Delivered', 'To Reschedule'].includes(actualStatus)"
           v-model="status"
+          :disabled="!!order.preselectedStatus"
           label="Stato"
           :items="STATUS_MAP[actualStatus].map(status => ({
             value: status,
@@ -168,14 +169,15 @@
 import SignaturePad from 'vue3-signature-pad';
 import FormButtons from '@/components/FormButtons';
 
-import { ref } from 'vue';
 import { useTheme } from 'vuetify';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
+import { ref, onMounted } from 'vue';
 import orderUtils from '@/utils/order';
 import { useRouter } from 'vue-router';
 import validation from '@/utils/validation';
 import { useOrderStore } from '@/stores/order';
+import { useScheduleItemStore } from '@/stores/scheduleItem';
 
 const form = ref(null);
 const theme = useTheme();
@@ -188,7 +190,8 @@ const signaturePad = ref(null);
 const orderStore = useOrderStore();
 const emits = defineEmits(['cancel']);
 const isMobile = mobile.setupMobileUtils();
-const { element: order } = storeToRefs(orderStore);
+const scheduleItemStore = useScheduleItemStore();
+const { element: order } = storeToRefs(scheduleItemStore);
 
 const STATUS_MAP = {
   'Scheduled': ['Booking', 'Not Delivered', 'At Warehouse', 'To Reschedule'],
@@ -211,7 +214,7 @@ const submitForm = async () => {
   orderStore.updateElementWithFormData(router, function (data) {
     loading.value = false;
     if (data.status == 'ok') {
-      orderStore.initListDelivery(router);
+      scheduleItemStore.initList(router);
       order.value = {};
       emits('cancel');
     }
@@ -245,4 +248,10 @@ const saveSignature = () => {
   order.value.signature = file;
   signatureSuccess.value = 'Firma salvata correttamente';
 };
+
+onMounted(() => {
+  if (order.value.preselectedStatus) {
+    status.value = order.value.preselectedStatus;
+  }
+});
 </script>
