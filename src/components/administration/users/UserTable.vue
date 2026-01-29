@@ -36,6 +36,9 @@
             </span>
           </template>
         </template>
+        <template #[`item.email`]="{ item }">
+          {{ item.customer_user_info?.email }}
+        </template>
         <template #[`item.actions`]="{ item }">
           <v-btn
             v-if="item.role !== 'Admin'"
