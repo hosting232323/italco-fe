@@ -78,7 +78,7 @@ import storesUtils from '@/utils/stores';
 import validation from '@/utils/validation';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
-const MAX_USERS = 50;
+const MAX_USERS = 75;
 
 const form = ref(null);
 const loading = ref(false);
