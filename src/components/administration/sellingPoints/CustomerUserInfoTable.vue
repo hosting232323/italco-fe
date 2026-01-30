@@ -16,6 +16,7 @@
       { title: 'Indirizzo', value: 'address', sortable: false },
       { title: 'Codice Fiscale', value: 'tax_code', sortable: false },
       { title: 'Ragione Sociale', value: 'company_name', sortable: false },
+      { title: 'Email', value: 'email', sortable: false },
       { title: 'Azioni', key: 'actions', sortable: false }
     ]"
   >
@@ -30,6 +31,9 @@
     </template>
     <template #[`item.company_name`]="{ item }">
       {{ item.customer_user_info?.company_name }}
+    </template>
+    <template #[`item.email`]="{ item }">
+      {{ item.customer_user_info?.email }}
     </template>
     <template #[`item.actions`]="{ item }">
       <v-btn
