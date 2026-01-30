@@ -1,7 +1,7 @@
 <template>
   <v-card
     v-if="activeForm"
-    :title="`Modifica Informazioni Raee per ${user.nickname} ID ${user.id}`"
+    :title="`Modifica Dati Punto Vendita per ${user.nickname} ID ${user.id}`"
     class="mt-10 mb-5"
   >
     <v-card-text>
@@ -17,7 +17,6 @@
             <v-text-field
               v-model="data.city"
               label="Città"
-              :rules="validation.requiredRules"
               :class="isMobile ? '' : 'mr-2'"
             />
           </v-col>
@@ -28,7 +27,6 @@
             <v-text-field
               v-model="data.address"
               label="Indirizzo"
-              :rules="validation.requiredRules"
               :class="isMobile ? '' : 'ml-2'"
             />
           </v-col>
@@ -41,7 +39,6 @@
             <v-text-field
               v-model="data.tax_code"
               label="Codice Fiscale"
-              :rules="validation.requiredRules"
               :class="isMobile ? '' : 'mr-2'"
             />
           </v-col>
@@ -52,11 +49,14 @@
             <v-text-field
               v-model="data.company_name"
               label="Ragione Sociale"
-              :rules="validation.requiredRules"
               :class="isMobile ? '' : 'ml-2'"
             />
           </v-col>
         </v-row>
+        <v-text-field
+          v-model="data.email"
+          label="Email"
+        />
         <FormButtons
           :loading="loading"
           @cancel="activeForm = false"
@@ -74,7 +74,6 @@ import http from '@/utils/http';
 import { storeToRefs } from 'pinia';
 import mobile from '@/utils/mobile';
 import { useRouter } from 'vue-router';
-import validation from '@/utils/validation';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
 const data = ref({});

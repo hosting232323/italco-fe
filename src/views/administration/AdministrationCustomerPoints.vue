@@ -41,7 +41,7 @@
         <CustomerRuleForm />
         <CustomerRuleTable />
         <h1>
-          Informazioni Raee
+          Dati Punti Vendita
         </h1><hr>
         <CustomerUserInfoForm />
         <CustomerUserInfoTable />
