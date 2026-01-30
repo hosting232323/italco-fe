@@ -1,63 +1,50 @@
 <template>
   <div v-if="!locationError">
-    <v-skeleton-loader
-      v-if="!ready"
-      type="table"
-      :color="theme.current.value.secondaryColor"
-      class="mt-5"
-    />
+    <v-skeleton-loader v-if="!ready" type="table" :color="theme.current.value.secondaryColor" class="mt-5" />
     <div v-else>
       <br><b>
         Totale ordini: {{ totOrder }}
       </b><br><br>
     </div>
     <template>
-    <v-timeline side="end">
-      <v-timeline-item
-        v-for="order in timelineOrders"
-        :key="order.id"
-        :dot-color="timelineColor(order)"
-        size="small"
-      >
-        <v-alert
-          :color="timelineColor(order)"
-          :icon="timelineIcon(order)"
-          border="start"
-          variant="tonal"
-        >
-          <b>#{{ order.id }}</b> — {{ order.addressee }}<br>
+      <v-timeline side="end">
+        <v-timeline-item v-for="(item, index) in timelineOrders" :key="index" :dot-color="timelineColor(item)"
+          size="small">
+          <template #icon>
+            <span class="dot-index">
+              {{ item.index + 1 }}
+            </span>
+          </template>
+          <v-alert :color="timelineColor(item)" :icon="timelineIcon(item)" border="start" variant="tonal">
+            <b>#{{ item.id }}</b>
 
-          <small>
-            {{ order.address }} ({{ order.cap }})
-          </small><br>
+            <template v-if="item.operation_type === 'Order'">
+              — {{ item.addressee }}<br>
+              <small>{{ item.address }} ({{ item.cap }})</small><br>
+              <small>Ordine ID: {{ item.order_id }}</small>
+            </template>
 
-          <small>
-            Sequenza: {{ order.schedule_index }}
-          </small>
+            <template v-else>
+              — Punto di ritiro<br>
+              <small>{{ item.address }} ({{ item.cap }})</small>
+            </template>
 
-          <div v-if="order.anomaly" class="mt-1">
-            ⚠️ <b>Anomalia</b>
-          </div>
+            <div v-if="item.anomaly" class="mt-1">
+              ⚠️ <b>Anomalia</b>
+            </div>
 
-          <div v-if="order.delay" class="mt-1">
-            ⏱️ <b>Ritardo</b>
-          </div>
-        </v-alert>
-      </v-timeline-item>
-    </v-timeline>
+            <div v-if="item.delay" class="mt-1">
+              ⏱️ <b>Ritardo</b>
+            </div>
+          </v-alert>
+
+        </v-timeline-item>
+      </v-timeline>
     </template>
   </div>
 
-  <div
-    v-else-if="locationError"
-    class="text-center mt-10"
-  >
-    <v-alert
-      type="error"
-      border="start"
-      color="red"
-      prominent
-    >
+  <div v-else-if="locationError" class="text-center mt-10">
+    <v-alert type="error" border="start" color="red" prominent>
       ⚠️ Per usare questa funzionalità devi <strong>abilitare la geolocalizzazione</strong>.<br>
       Ricarica la pagina e consenti i permessi quando richiesto.
     </v-alert>
@@ -65,8 +52,6 @@
 </template>
 
 <script setup>
-import Table from '@/components/delivery/DeliveryTable';
-
 import http from '@/utils/http';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
@@ -78,27 +63,27 @@ import { ref, computed, onMounted, onUnmounted } from 'vue';
 let watcherId = null;
 const theme = useTheme();
 const router = useRouter();
-const locationError = ref(false); 
+const locationError = ref(false);
 const orderStore = useOrderStore();
 const selectedCard = ref('In Progress');
 const { list: orders, ready } = storeToRefs(orderStore);
 
 const isMobile = mobile.setupMobileUtils();
-const totOrder = computed(() => {
-  if (!orders.value) return 0;
-  else
-    return Object.values(orders.value).reduce((sum, arr) => sum + arr.length, 0);
-});
-
 
 const timelineOrders = computed(() => {
   if (!orders.value) return [];
 
-  console.log(Object.values(orders.value).flat());
   return Object.values(orders.value)
     .flat()
-    .filter(o => o.schedule_index !== null && o.schedule_index !== undefined)
-    .sort((a, b) => a.schedule_index - b.schedule_index);
+    .sort((a, b) => a.index - b.index);
+});
+
+const totOrder = computed(() => {
+  if (!orders.value || !Array.isArray(orders.value)) return 0;
+
+  return orders.value.reduce((total, group) => {
+    return total + (group.schedule_items?.length || 0);
+  }, 0);
 });
 
 const timelineColor = order => {
@@ -204,7 +189,7 @@ onMounted(() => {
       http.postRequest('user/position', {
         lat: position.coords.latitude,
         lon: position.coords.longitude
-      }, () => {}, 'POST', router);
+      }, () => { }, 'POST', router);
     },
     () => locationError.value = true,
     {
