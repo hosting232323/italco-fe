@@ -18,7 +18,6 @@
           { title: 'ID', value: 'id', sortable: false },
           { title: 'Nickname', value: 'nickname', sortable: false },
           { title: 'Password', value: 'password', sortable: false },
-          { title: 'Email', value: 'email', sortable: false },
           { title: 'Ruolo', value: 'role', sortable: false },
           { title: 'Azioni', key: 'actions', sortable: false }
         ]"
