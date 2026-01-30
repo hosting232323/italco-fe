@@ -9,8 +9,7 @@
       { title: 'User', value: 'user.nickname', sortable: false },
       { title: 'Log', value: 'logs.content', sortable: false }
     ]"
-  >
-  </v-data-table>
+  />
 </template>
 
 <script setup>

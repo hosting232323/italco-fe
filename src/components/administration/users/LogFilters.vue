@@ -15,14 +15,26 @@
           <v-row no-gutters>
             <v-col
               cols="12"
-              md="3"
+              md="6"
+            >
+              <v-autocomplete
+                v-model="filters['User.id']"
+                :class="isMobile ? '' : 'mr-2'"
+                label="Utente"
+                :items="users"
+                item-title="nickname"
+                item-value="id"
+                clearable
+              />
+            </v-col>
+            <v-col
+              cols="12"
+              md="6"
             >
               <v-text-field
-                v-model="filters['Log.id']"
-                :class="isMobile ? '' : 'mr-2'"
-                label="ID Ordine"
-                type="number"
-                clearable
+                v-model="filters['Log.data']"
+                label="Data"
+                type="date"
               />
             </v-col>
           </v-row>
@@ -39,19 +51,23 @@
 <script setup>
 import { ref } from 'vue';
 import { useTheme } from 'vuetify';
-import FormButtons from '@/components/FormButtons';
-import { useLogStore } from '@/stores/log';
 import { storeToRefs } from 'pinia';
-
-import http from '@/utils/http';
+import mobile from '@/utils/mobile';
 import { useRouter } from 'vue-router';
+import storesUtils from '@/utils/stores';
+import { useLogStore } from '@/stores/log';
+import FormButtons from '@/components/FormButtons';
+import { useAdministrationUserStore } from '@/stores/administrationUser';
 
-const logStore = useLogStore();
-const { ready } = storeToRefs(logStore);
-
+const form = ref(null);
 const panel = ref(null);
 const theme = useTheme();
 const router = useRouter();
+const logStore = useLogStore();
+const isMobile = mobile.setupMobileUtils();
+const { filters, ready } = storeToRefs(logStore);
+const administrationUserStore = useAdministrationUserStore();
+const users = storesUtils.getStoreList(administrationUserStore, router);
 
 const filterLogs = async () => {
   if (!(await form.value.validate()).valid) return;
