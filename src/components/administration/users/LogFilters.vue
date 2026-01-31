@@ -32,7 +32,7 @@
               md="6"
             >
               <v-text-field
-                v-model="filters['Log.data']"
+                v-model="filters['Log.created_at']"
                 label="Data"
                 type="date"
               />

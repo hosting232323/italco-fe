@@ -14,11 +14,11 @@ export const useLogStore = defineStore('log', {
         if (!this.filters[key]) delete this.filters[key];
       });
 
-      http.getRequest(
+      http.postRequest(
         'log',
         {filters: storeUtils.formatFilters({ ...this.filters }, 'Log.created_at')},
         this.setList,
-        'GET',
+        'POST',
         router
       );
     },
