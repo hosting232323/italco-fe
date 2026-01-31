@@ -6,41 +6,23 @@
         Totale ordini: {{ totOrder }}
       </b><br><br>
     </div>
-    <template>
-      <v-timeline side="end">
-        <v-timeline-item v-for="(item, index) in timelineOrders" :key="index" :dot-color="timelineColor(item)"
-          size="small">
-          <template #icon>
-            <span class="dot-index">
-              {{ item.index + 1 }}
-            </span>
-          </template>
-          <v-alert :color="timelineColor(item)" :icon="timelineIcon(item)" border="start" variant="tonal">
-            <b>#{{ item.id }}</b>
-
-            <template v-if="item.operation_type === 'Order'">
-              — {{ item.addressee }}<br>
-              <small>{{ item.address }} ({{ item.cap }})</small><br>
-              <small>Ordine ID: {{ item.order_id }}</small>
-            </template>
-
-            <template v-else>
-              — Punto di ritiro<br>
-              <small>{{ item.address }} ({{ item.cap }})</small>
-            </template>
-
-            <div v-if="item.anomaly" class="mt-1">
-              ⚠️ <b>Anomalia</b>
-            </div>
-
-            <div v-if="item.delay" class="mt-1">
-              ⏱️ <b>Ritardo</b>
-            </div>
-          </v-alert>
-
-        </v-timeline-item>
-      </v-timeline>
-    </template>
+    <v-timeline align="start" side="end">
+      <v-timeline-item
+        v-for="item in timelineOrders"
+        :key="item.id"
+        :color="timelineColor(item)"
+        :dot-color="timelineColor(item)"
+        :icon="timelineIcon(item)"
+      >
+        <div>
+          <b>Ordine #{{ item.orderId }}</b><br>
+          {{ item.type }} - {{ item.status }}<br>
+          {{ item.addressee || item.name }}<br>
+          {{ item.address }}<br>
+          <small>Slot: {{ item.start_time_slot }} - {{ item.end_time_slot }}</small>
+        </div>
+      </v-timeline-item>
+    </v-timeline>
   </div>
 
   <div v-else-if="locationError" class="text-center mt-10">
@@ -73,8 +55,16 @@ const isMobile = mobile.setupMobileUtils();
 const timelineOrders = computed(() => {
   if (!orders.value) return [];
 
-  return Object.values(orders.value)
-    .flat()
+  return orders.value
+    .flatMap(order => 
+      order.schedule_items
+        .map(item => ({
+          ...item,
+          orderId: order.id,
+          orderStatus: order.status,
+          orderUsers: order.users
+        })) || []
+    )
     .sort((a, b) => a.index - b.index);
 });
 
@@ -82,7 +72,10 @@ const totOrder = computed(() => {
   if (!orders.value || !Array.isArray(orders.value)) return 0;
 
   return orders.value.reduce((total, group) => {
-    return total + (group.schedule_items?.length || 0);
+    const validItems = group.schedule_items?.filter(
+      item => item.operation_type !== "CollectionPoint"
+    ) || [];
+    return total + validItems.length;
   }, 0);
 });
 
@@ -112,65 +105,6 @@ const timelineIcon = order => {
     default: return 'mdi-package-variant';
   }
 };
-
-
-const cards = [
-  {
-    title: 'Da caricare',
-    key: 'In Progress'
-  },
-  {
-    title: 'A bordo',
-    key: 'On Board'
-  },
-  {
-    title: 'In Magazzino',
-    key: 'At Warehouse'
-  },
-  {
-    title: 'Completato',
-    key: 'Completed'
-  },
-  {
-    title: 'Non Consegnato',
-    key: 'Cancelled'
-  },
-  {
-    title: 'Da Riprogrammare',
-    key: 'To Reschedule'
-  },
-  {
-    title: 'Anomalia',
-    key: 'Anomaly'
-  },
-  {
-    title: 'Ritardo',
-    key: 'Delay'
-  },
-];
-
-const cardCounts = computed(() => {
-  const anomalyOrders = [];
-  const delayOrders = [];
-
-  for (const key of ['In Progress', 'On Board']) {
-    const list = orders.value?.[key] || [];
-    list.forEach(order => {
-      if (order.anomaly) anomalyOrders.push(order);
-      if (order.delay) delayOrders.push(order);
-    });
-  }
-  return {
-    'In Progress': orders.value?.['In Progress']?.length || 0,
-    'On Board': orders.value?.['On Board']?.length || 0,
-    'Completed': orders.value?.['Completed']?.length || 0,
-    'Cancelled': orders.value?.['Cancelled']?.length || 0,
-    'At Warehouse': orders.value?.['At Warehouse']?.length || 0,
-    'To Reschedule': orders.value?.['To Reschedule']?.length || 0,
-    'Anomaly': anomalyOrders.length,
-    'Delay': delayOrders.length
-  };
-});
 
 onMounted(() => {
   if (!navigator.geolocation) {
