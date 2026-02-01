@@ -154,7 +154,7 @@
           md="5"
         >
           <div style="height: 100%; border-radius: 12px; overflow: hidden;">
-            <GoogleMap v-if="schedule.schedule_items && schedule.schedule_items.length > 0" />
+            <!-- <GoogleMap v-if="schedule.schedule_items && schedule.schedule_items.length > 0" /> -->
           </div>
         </v-col>
       </v-row>
@@ -163,7 +163,7 @@
 </template>
 
 <script setup>
-import GoogleMap from '@/components/GoogleMap.vue';
+// import GoogleMap from '@/components/GoogleMap.vue';
 import FormButtons from '@/components/FormButtons';
 
 import { ref, watch } from 'vue';
