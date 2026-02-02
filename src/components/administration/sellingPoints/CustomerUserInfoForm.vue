@@ -53,10 +53,28 @@
             />
           </v-col>
         </v-row>
-        <v-text-field
-          v-model="data.email"
-          label="Email"
-        />
+        <v-row no-gutters>
+          <v-col
+            cols="12"
+            md="6"
+          >
+            <v-text-field
+              v-model="data.email"
+              label="Email"
+              :class="isMobile ? '' : 'mr-2'"
+            />
+          </v-col>
+          <v-col
+            cols="12"
+            md="6"
+          >
+            <v-text-field
+              v-model="data.code"
+              label="Codice"
+              :class="isMobile ? '' : 'ml-2'"
+            />
+          </v-col>
+        </v-row>
         <FormButtons
           :loading="loading"
           @cancel="activeForm = false"
