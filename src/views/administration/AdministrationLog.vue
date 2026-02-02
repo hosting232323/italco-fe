@@ -9,6 +9,6 @@
 </template>
 
 <script setup>
-import LogFilters from '@/components/administration/users/LogFilters';
-import LogTable from '@/components/administration/users/LogTable';
+import LogTable from '@/components/administration/logs/LogTable';
+import LogFilters from '@/components/administration/logs/LogFilters';
 </script>

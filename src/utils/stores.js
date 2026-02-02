@@ -22,7 +22,6 @@ const formatFilters = (filters, key) => {
     delete filters[key + '_1'];
   }
 
-  console.log(filters, key);
   return Object.keys(filters)
     .filter(key => filters[key] !== null)
     .map(key => {
