@@ -1,4 +1,3 @@
-
 <template>
   <v-expansion-panels
     v-model="panel"
