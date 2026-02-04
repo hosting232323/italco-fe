@@ -69,21 +69,28 @@
 <script setup>
 import FormButtons from '@/components/FormButtons';
 
-import { ref } from 'vue';
 import http from '@/utils/http';
+import { ref, computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import mobile from '@/utils/mobile';
 import { useRouter } from 'vue-router';
+import storesUtils from '@/utils/stores';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
-const data = ref({});
 const form = ref(null);
 const loading = ref(false);
 const router = useRouter();
 const isMobile = mobile.setupMobileUtils();
 
 const administrationUserStore = useAdministrationUserStore();
-const { element: user, activeForm } = storeToRefs(administrationUserStore);
+const users = storesUtils.getStoreList(administrationUserStore, router);
+const { element: user, activeForm, ready } = storeToRefs(administrationUserStore);
+
+const data = computed(() => {
+  if (!ready.value) return {};
+
+  return users.value.find(u => u.id === user.value.id).customer_user_info;
+});
 
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
