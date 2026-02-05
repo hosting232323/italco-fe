@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="popUp" max-width="1500">
+  <v-dialog v-model="activePopUp" max-width="1500">
     <template #activator>
       <v-container>
         <h1>
@@ -7,14 +7,12 @@
         </h1>
         <hr>
         <LogFilters />
-        <LogTable 
-          @open-pop-up="popUp = true" 
-        />
+        <LogTable />
       </v-container>
     </template>
 
     <template #default>
-      <LogPopUp v-if="popUp" />
+      <LogPopUp v-if="activePopUp" />
     </template>
   </v-dialog>
 </template>
@@ -24,7 +22,9 @@ import LogTable from '@/components/administration/logs/LogTable';
 import LogPopUp from '@/components/administration/logs/LogPopUp';
 import LogFilters from '@/components/administration/logs/LogFilters';
 
-import { ref } from 'vue';
+import { storeToRefs } from 'pinia';
+import { useLogStore } from '@/stores/log';
 
-const popUp = ref(false);
+const logStore = useLogStore();
+const { activePopUp } = storeToRefs(logStore);
 </script>

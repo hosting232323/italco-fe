@@ -16,7 +16,7 @@
         icon="mdi-magnify-plus-outline"
         variant="text"
         :color="theme.current.value.primaryColor"
-        @click="emits('openPopUp')"
+        @click="openForm(item.logs)"
       />
     </template>
   </v-data-table>
@@ -32,9 +32,13 @@ import { useLogStore } from '@/stores/log';
 const theme = useTheme();
 const router = useRouter();
 const logStore = useLogStore();
-const { ready } = storeToRefs(logStore);
-const emits = defineEmits(['openPopUp']);
+const { ready, activePopUp, element: log } = storeToRefs(logStore);
 const logs = storesUtils.getStoreList(logStore, router);
+
+const openForm = (item) => {
+  log.value = JSON.parse(JSON.stringify(item))
+  activePopUp.value = true;
+};
 </script>
 
 <style scoped>
