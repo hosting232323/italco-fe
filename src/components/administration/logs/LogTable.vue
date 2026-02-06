@@ -7,7 +7,6 @@
       { title: 'ID', value: 'logs.id', sortable: false },
       { title: 'Data', value: 'logs.created_at', sortable: false },
       { title: 'User', value: 'user.nickname', sortable: false },
-      { title: 'Log', value: 'logs.content', sortable: false },
       { title: 'Azioni', key: 'actions', sortable: false }
     ]"
   >
