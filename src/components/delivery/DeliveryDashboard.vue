@@ -16,7 +16,8 @@
       >
       <v-card>
         <v-card-text>
-          <b>Ordine #{{ item.orderId }}</b><br>
+          <b>Ordine #{{ item.id }}</b><br>
+          {{ item.operation_type }}
           {{ item.type }} - {{ item.status }}<br>
           Destinatario: {{ item.addressee || item.name }}<br>
           Indirizzo: {{ item.address }}<br>
@@ -60,15 +61,7 @@ const timelineOrders = computed(() => {
   if (!orders.value) return [];
 
   return orders.value
-    .flatMap(order => 
-      order.schedule_items
-        .map(item => ({
-          ...item,
-          orderId: order.id,
-          orderStatus: order.status,
-          orderUsers: order.users
-        })) || []
-    )
+    .flatMap(order => order.schedule_items || [])
     .sort((a, b) => a.index - b.index);
 });
 
