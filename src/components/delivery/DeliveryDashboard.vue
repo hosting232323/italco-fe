@@ -21,7 +21,15 @@
           {{ item.type }} - {{ item.status }}<br>
           Destinatario: {{ item.addressee || item.name }}<br>
           Indirizzo: {{ item.address }}<br>
-          Prodotti: {{ item.products }}<br>
+
+          <div v-for="[productName, product] in Object.entries(item.products || {})" :key="productName">
+            <p>
+              <b>{{ productName }}</b>:
+              Collection Point: {{ product.collection_point?.id || 'N/A' }}<br>
+              Servizi: {{ product.services?.map(service => service.name).join(', ') || 'Nessuno' }}
+            </p>
+          </div>
+
           <small>Slot: {{ item.start_time_slot }} - {{ item.end_time_slot }}</small>
         </v-card-text>
       </v-card>
@@ -37,7 +45,6 @@
   </div>
 </template>
 
-<!-- MOstrare prodotti e servizi -->
 <script setup>
 import http from '@/utils/http';
 import { useTheme } from 'vuetify';
@@ -52,10 +59,7 @@ const theme = useTheme();
 const router = useRouter();
 const locationError = ref(false);
 const orderStore = useOrderStore();
-const selectedCard = ref('In Progress');
 const { list: orders, ready } = storeToRefs(orderStore);
-
-const isMobile = mobile.setupMobileUtils();
 
 const timelineOrders = computed(() => {
   if (!orders.value) return [];
