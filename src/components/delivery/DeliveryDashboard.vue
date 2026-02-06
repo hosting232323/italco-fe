@@ -14,13 +14,16 @@
         :dot-color="timelineColor(item)"
         :icon="timelineIcon(item)"
       >
-        <div>
+      <v-card>
+        <v-card-text>
           <b>Ordine #{{ item.orderId }}</b><br>
           {{ item.type }} - {{ item.status }}<br>
-          {{ item.addressee || item.name }}<br>
-          {{ item.address }}<br>
+          Destinatario: {{ item.addressee || item.name }}<br>
+          Indirizzo: {{ item.address }}<br>
+          Prodotti: {{ item.products }}<br>
           <small>Slot: {{ item.start_time_slot }} - {{ item.end_time_slot }}</small>
-        </div>
+        </v-card-text>
+      </v-card>
       </v-timeline-item>
     </v-timeline>
   </div>
