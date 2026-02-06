@@ -33,6 +33,7 @@
   </div>
 </template>
 
+<!-- MOstrare prodotti e servizi -->
 <script setup>
 import http from '@/utils/http';
 import { useTheme } from 'vuetify';
