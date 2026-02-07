@@ -1,5 +1,46 @@
 <template>
-  <div ref="mapContainer" style="width:100%; height:100%" />
+  <div style="position: relative; width:100%; height:100%">
+    <div ref="mapContainer" style="width:100%; height:100%" />
+
+    <div
+      style="
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 8px 12px;
+        border-radius: 6px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        font-weight: bold;
+        font-size: 13px;
+        z-index: 1000;
+      "
+    >
+      <div>🚗 Distanza: {{ distanceKm }} km</div>
+      <div>🕒 Tempo: {{ durationMin }} min</div>
+    </div>
+
+    <div
+      style="
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: #4285F4;
+        color: white;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-weight: bold;
+        font-size: 13px;
+        cursor: pointer;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        z-index: 1000;
+      "
+      @click="openInGoogleMaps"
+    >
+      Apri in Google Maps
+    </div>
+
+  </div>
 </template>
 
 <script setup>
@@ -9,6 +50,7 @@ import 'leaflet/dist/leaflet.css'
 import { storeToRefs } from 'pinia'
 import { useScheduleStore } from '@/stores/schedule'
 
+const locations = ref([])
 const map = ref(null)
 const mapContainer = ref(null)
 const markers = ref([])
@@ -63,30 +105,54 @@ const updateMap = async () => {
   markers.value.forEach(m => map.value.removeLayer(m))
   markers.value = []
 
-  const locations = (await Promise.all(
+  locations.value = (await Promise.all(
     schedule.value.schedule_items.map(i =>
       i.address ? geocode(i.address) : null
     )
   )).filter(Boolean)
 
-  locations.forEach((pos, i) => {
-    const marker = L.marker([pos.lat, pos.lng], {
-      title: (i + 1).toString()
-    }).addTo(map.value)
+  locations.value.forEach((pos, i) => {
+    const marker = L.marker([pos.lat, pos.lng], { icon: redIcon }).addTo(map.value)
 
     marker.bindTooltip(`${i + 1}`, {
       permanent: true,
-      direction: 'top'
+      direction: 'top',
+      className: 'number-tooltip'
     })
 
     markers.value.push(marker)
   })
 
-  if (locations.length) {
-    const bounds = L.latLngBounds(locations.map(p => [p.lat, p.lng]))
+  if (locations.value.length) {
+    const bounds = L.latLngBounds(locations.value.map(p => [p.lat, p.lng]))
     map.value.fitBounds(bounds)
-    await drawRoute(locations)
+    await drawRoute(locations.value)
   }
+}
+
+const redIcon = L.icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+})
+
+const openInGoogleMaps = () => {
+  if (locations.value.length < 2) return
+
+  const origin = `${locations.value[0].lat},${locations.value[0].lng}`
+  const destination = `${locations.value[locations.value.length - 1].lat},${locations.value[locations.value.length - 1].lng}`
+  const waypoints = locations.value
+    .slice(1, -1)
+    .map(p => `${p.lat},${p.lng}`)
+    .join('|')
+
+  let url = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}`
+  if (waypoints) url += `&waypoints=${waypoints}`
+
+  window.open(url, '_blank')
 }
 
 onMounted(() => {
@@ -105,3 +171,15 @@ watch(
   { deep: true }
 )
 </script>
+
+<style>
+.number-tooltip {
+  background: none;
+  border: none;
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+  text-align: center;
+  padding: 0;
+}
+</style>
