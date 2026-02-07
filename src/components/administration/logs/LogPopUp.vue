@@ -3,9 +3,17 @@
     v-if="!loading"
     :title="`Log id: ${log.id}`"
   >
-    <pre class="json">
-{{ formattedLog }}
-    </pre>
+    <v-card-text>
+      <h3 class="section-title">Request</h3>
+      <pre class="json">
+{{ formattedRequest }}
+      </pre>
+
+      <h3 class="section-title">Response</h3>
+      <pre class="json">
+{{ formattedResponse }}
+      </pre>
+    </v-card-text>
   </v-card>
 </template>
 
@@ -32,9 +40,14 @@ http.getRequest('log', {
   }
 }, 'GET', router);
 
-const formattedLog = computed(() => {
-  return JSON.stringify(JSON.parse(log.value.content), null, 2)
-})
+const formattedRequest = computed(() => {
+  return JSON.stringify(JSON.parse(log.value.content).request, null, 2)
+});
+
+const formattedResponse = computed(() => {
+  return JSON.stringify(JSON.parse(log.value.content).response, null, 2)
+
+});
 </script>
 
 <style scoped>
@@ -45,5 +58,12 @@ const formattedLog = computed(() => {
   line-height: 1.5;
   overflow-x: auto;
   max-height: 600px;
+}
+
+.section-title {
+  margin: 16px 0 8px;
+  font-weight: 600;
+  font-size: 14px;
+  opacity: 0.8;
 }
 </style>
