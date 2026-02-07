@@ -46,7 +46,6 @@ const formattedRequest = computed(() => {
 
 const formattedResponse = computed(() => {
   return JSON.stringify(JSON.parse(log.value.content).response, null, 2)
-
 });
 </script>
 
