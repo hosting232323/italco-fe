@@ -4,12 +4,16 @@
     :title="`Log id: ${log.id}`"
   >
     <v-card-text>
-      <h3 class="section-title">Request</h3>
+      <h3 class="section-title">
+        Request
+      </h3>
       <pre class="json">
 {{ formattedRequest }}
       </pre>
 
-      <h3 class="section-title">Response</h3>
+      <h3 class="section-title">
+        Response
+      </h3>
       <pre class="json">
 {{ formattedResponse }}
       </pre>
@@ -41,12 +45,38 @@ http.getRequest('log', {
 }, 'GET', router);
 
 const formattedRequest = computed(() => {
-  return JSON.stringify(JSON.parse(log.value.content).request, null, 2)
+  return JSON.stringify(JSON.parse(log.value.content).request, null, 2);
 });
 
 const formattedResponse = computed(() => {
-  return JSON.stringify(JSON.parse(log.value.content).response, null, 2)
+  if (!log.value?.content) return '';
+
+  const parsedContent = JSON.parse(log.value.content);
+
+  const parsedResponse = deepParse(parsedContent.response);
+
+  return JSON.stringify(parsedResponse, null, 2);
 });
+
+function deepParse(value) {
+  if (typeof value === 'string') {
+    try {
+      return deepParse(JSON.parse(value));
+    } catch {
+      return value;
+    }
+  }
+
+  if (Array.isArray(value))
+    return value.map(deepParse);
+
+  if (value && typeof value === 'object')
+    return Object.fromEntries(
+      Object.entries(value).map(([k, v]) => [k, deepParse(v)])
+    );
+
+  return value;
+}
 </script>
 
 <style scoped>

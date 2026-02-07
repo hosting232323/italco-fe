@@ -1,5 +1,8 @@
 <template>
-  <v-dialog v-model="activePopUp" max-width="1500">
+  <v-dialog
+    v-model="activePopUp"
+    max-width="1500"
+  >
     <template #activator>
       <v-container>
         <h1>
