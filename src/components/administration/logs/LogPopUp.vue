@@ -23,7 +23,6 @@
 
 <script setup>
 import http from '@/utils/http';
-import { useTheme } from 'vuetify';
 import { ref, computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
