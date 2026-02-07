@@ -31,11 +31,11 @@ import { useLogStore } from '@/stores/log';
 const theme = useTheme();
 const router = useRouter();
 const logStore = useLogStore();
-const { ready, activePopUp, element: log } = storeToRefs(logStore);
+const { ready, activePopUp, selectedLog } = storeToRefs(logStore);
 const logs = storesUtils.getStoreList(logStore, router);
 
 const openForm = (item) => {
-  log.value = JSON.parse(JSON.stringify(item))
+  selectedLog.value = item.id;
   activePopUp.value = true;
 };
 </script>

@@ -5,10 +5,10 @@ import storeUtils from '@/utils/stores';
 export const useLogStore = defineStore('log', {
   state: () => ({
     list: [],
-    element: {},
     filters: {},
     ready: false,
-    activePopUp: false
+    activePopUp: false,
+    selectedLog: false
   }),
   actions: {
     initList(router) {

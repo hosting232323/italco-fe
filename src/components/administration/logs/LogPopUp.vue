@@ -1,5 +1,6 @@
 <template>
   <v-card
+    v-if="!loading"
     :title="`Log id: ${log.id}`"
   >
     <pre class="json">
@@ -9,29 +10,30 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import http from '@/utils/http';
 import { useTheme } from 'vuetify';
+import { ref, computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
-import storesUtils from '@/utils/stores';
 import { useLogStore } from '@/stores/log';
 
-const theme = useTheme();
+const log = ref({});
+const loading = ref(true);
 const router = useRouter();
 const logStore = useLogStore();
-const { element: log } = storeToRefs(logStore);
+const { selectedLog } = storeToRefs(logStore);
+
+http.getRequest('log', {
+  log_id: selectedLog.value
+}, (data) => {
+  if(data.status == 'ok') {
+    log.value = data.log;
+    loading.value = false;
+  }
+}, 'GET', router);
 
 const formattedLog = computed(() => {
-  if (!log.value) return ''
-
-  return JSON.stringify(
-    {
-      ...log.value,
-      content: JSON.parse(log.value.content)
-    },
-    null,
-    2
-  )
+  return JSON.stringify(JSON.parse(log.value.content), null, 2)
 })
 </script>
 
