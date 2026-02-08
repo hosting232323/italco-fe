@@ -14,6 +14,7 @@
     "express": "^4.19.2",
     "generic-module": "git+https://github.com/hosting232323/generic-module.git",
     "hashids": "^2.3.0",
+    "leaflet": "^1.9.4",
     "marked": "^16.4.1",
     "ol": "^10.6.1",
     "pinia": "^3.0.0",
