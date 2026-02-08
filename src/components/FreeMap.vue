@@ -1,6 +1,9 @@
 <template>
   <div style="position: relative; width:100%; height:100%">
-    <div ref="mapContainer" style="width:100%; height:100%" />
+    <div
+      ref="mapContainer"
+      style="width:100%; height:100%"
+    />
 
     <div
       style="
@@ -39,96 +42,95 @@
     >
       Apri in Google Maps
     </div>
-
   </div>
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from 'vue'
-import L from 'leaflet'
-import 'leaflet/dist/leaflet.css'
-import { storeToRefs } from 'pinia'
-import { useScheduleStore } from '@/stores/schedule'
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import { storeToRefs } from 'pinia';
+import { onMounted, ref, watch } from 'vue';
+import { useScheduleStore } from '@/stores/schedule';
 
-const locations = ref([])
-const map = ref(null)
-const mapContainer = ref(null)
-const markers = ref([])
-const routeLine = ref(null)
+const locations = ref([]);
+const map = ref(null);
+const mapContainer = ref(null);
+const markers = ref([]);
+const routeLine = ref(null);
 
-const distanceKm = ref(0)
-const durationMin = ref(0)
-const osmUrl = ref('')
+const distanceKm = ref(0);
+const durationMin = ref(0);
+const osmUrl = ref('');
 
-const scheduleStore = useScheduleStore()
-const { element: schedule } = storeToRefs(scheduleStore)
+const scheduleStore = useScheduleStore();
+const { element: schedule } = storeToRefs(scheduleStore);
 
 const geocode = async (address) => {
   const res = await fetch(
     `https://panificio-mulinobianco.it/nominatim/search?format=json&q=${encodeURIComponent(address)}`
-  )
-  const data = await res.json()
+  );
+  const data = await res.json();
   return data[0]
     ? { lat: +data[0].lat, lng: +data[0].lon }
-    : null
-}
+    : null;
+};
 
 const drawRoute = async (coords) => {
-  if (coords.length < 2) return
+  if (coords.length < 2) return;
 
-  const coordStr = coords.map(c => `${c.lng},${c.lat}`).join(';')
+  const coordStr = coords.map(c => `${c.lng},${c.lat}`).join(';');
 
   osmUrl.value =
-    `https://www.openstreetmap.org/directions?engine=fossgis_osrm_car&route=` +
-    coords.map(c => `${c.lat},${c.lng}`).join(';')
+    'https://www.openstreetmap.org/directions?engine=fossgis_osrm_car&route=' +
+    coords.map(c => `${c.lat},${c.lng}`).join(';');
 
   const res = await fetch(
     `https://router.project-osrm.org/route/v1/driving/${coordStr}?overview=full&geometries=geojson`
-  )
-  const data = await res.json()
+  );
+  const data = await res.json();
 
-  if (!data.routes?.length) return
+  if (!data.routes?.length) return;
 
-  const route = data.routes[0]
-  distanceKm.value = (route.distance / 1000).toFixed(2)
-  durationMin.value = Math.round(route.duration / 60)
+  const route = data.routes[0];
+  distanceKm.value = (route.distance / 1000).toFixed(2);
+  durationMin.value = Math.round(route.duration / 60);
 
   if (routeLine.value)
-    map.value.removeLayer(routeLine.value)
+    map.value.removeLayer(routeLine.value);
 
-  routeLine.value = L.geoJSON(route.geometry).addTo(map.value)
-}
+  routeLine.value = L.geoJSON(route.geometry).addTo(map.value);
+};
 
 const updateMap = async () => {
-  if (!map.value) return
+  if (!map.value) return;
 
-  markers.value.forEach(m => map.value.removeLayer(m))
-  markers.value = []
+  markers.value.forEach(m => map.value.removeLayer(m));
+  markers.value = [];
 
   locations.value = (await Promise.all(
     schedule.value.schedule_items.map(i =>
       i.address ? geocode(i.address) : null
     )
-  )).filter(Boolean)
+  )).filter(Boolean);
 
   locations.value.forEach((pos, i) => {
-    const marker = L.marker([pos.lat, pos.lng], { icon: redIcon }).addTo(map.value)
+    const marker = L.marker([pos.lat, pos.lng], { icon: redIcon }).addTo(map.value);
 
     marker.bindTooltip(`${i + 1}`, {
       permanent: true,
       direction: 'top',
       className: 'number-tooltip'
-    })
+    });
 
-    markers.value.push(marker)
-  })
+    markers.value.push(marker);
+  });
 
   if (locations.value.length) {
-    const bounds = L.latLngBounds(locations.value.map(p => [p.lat, p.lng]))
-    map.value.fitBounds(bounds)
-    await drawRoute(locations.value)
+    const bounds = L.latLngBounds(locations.value.map(p => [p.lat, p.lng]));
+    map.value.fitBounds(bounds);
+    await drawRoute(locations.value);
   }
-}
+};
 
 const redIcon = L.icon({
   iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
@@ -137,39 +139,39 @@ const redIcon = L.icon({
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
   shadowSize: [41, 41]
-})
+});
 
 const openInGoogleMaps = () => {
-  if (locations.value.length < 2) return
+  if (locations.value.length < 2) return;
 
-  const origin = `${locations.value[0].lat},${locations.value[0].lng}`
-  const destination = `${locations.value[locations.value.length - 1].lat},${locations.value[locations.value.length - 1].lng}`
+  const origin = `${locations.value[0].lat},${locations.value[0].lng}`;
+  const destination = `${locations.value[locations.value.length - 1].lat},${locations.value[locations.value.length - 1].lng}`;
   const waypoints = locations.value
     .slice(1, -1)
     .map(p => `${p.lat},${p.lng}`)
-    .join('|')
+    .join('|');
 
-  let url = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}`
-  if (waypoints) url += `&waypoints=${waypoints}`
+  let url = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}`;
+  if (waypoints) url += `&waypoints=${waypoints}`;
 
-  window.open(url, '_blank')
-}
+  window.open(url, '_blank');
+};
 
 onMounted(() => {
-  map.value = L.map(mapContainer.value).setView([41.8719, 12.5674], 6)
+  map.value = L.map(mapContainer.value).setView([41.8719, 12.5674], 6);
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap'
-  }).addTo(map.value)
+  }).addTo(map.value);
 
-  updateMap()
-})
+  updateMap();
+});
 
 watch(
   () => schedule.value.schedule_items,
   updateMap,
   { deep: true }
-)
+);
 </script>
 
 <style>
