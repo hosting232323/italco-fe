@@ -58,7 +58,7 @@ export const useOrderStore = defineStore('order', {
 
       http.postRequest(
         'order/filter',
-        {filters: storeUtils.formatFilters({ ...this.filters }, 'Order.booking_date')},
+        {filters: storeUtils.formatFilters({ ...this.filters }, 'Order.dpc')},
         this.setList,
         'POST',
         router

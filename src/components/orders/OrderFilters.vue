@@ -77,9 +77,9 @@
                   md="6"
                 >
                   <v-text-field
-                    v-model="filters['Order.dpc']"
+                    v-model="filters['Order.booking_date']"
                     :class="isMobile ? '' : 'mr-2'"
-                    label="Data Prevista dal Cliente"
+                    label="Data Consegna"
                     type="date"
                   />
                 </v-col>
@@ -106,10 +106,9 @@
                   md="6"
                 >
                   <v-text-field
-                    v-model="filters['Order.booking_date_0']"
+                    v-model="filters['Order.dpc_0']"
                     :class="isMobile ? '' : 'mr-2 ml-2'"
-                    :rules="intervallRules('Order.booking_date_1')"
-                    label="Inizio Intervallo Data Consegna"
+                    label="Data Prevista dal Cliente (Inizio)"
                     type="date"
                   />
                 </v-col>
@@ -118,10 +117,10 @@
                   md="6"
                 >
                   <v-text-field
-                    v-model="filters['Order.booking_date_1']"
+                    v-model="filters['Order.dpc_1']"
                     :class="isMobile ? '' : 'ml-2'"
-                    :rules="intervallRules('Order.booking_date_0')"
-                    label="Fine Intervallo Data Consegna"
+                    :rules="intervallRules()"
+                    label="Data Prevista dal Cliente (Fine)"
                     type="date"
                   />
                 </v-col>
@@ -137,7 +136,7 @@
     </v-expansion-panel>
   </v-expansion-panels>
   <v-row
-    v-if="role == 'Admin' && !panel && filters['CustomerUser.id'] && filters['Order.booking_date_0'] && filters['Order.booking_date_1']"
+    v-if="role == 'Admin' && !panel && filters['CustomerUser.id'] && filters['Order.dpc_0'] && filters['Order.dpc_1']"
     no-gutters
   >
     <v-col
@@ -145,8 +144,8 @@
       style="font-size: smaller;"
     >
       Punto Vendita: {{ filters['CustomerUser.id'] }}<br>
-      Data di Inizio Intervallo: {{ filters['Order.booking_date_0'] }}<br>
-      Data di Fine Intervallo: {{ filters['Order.booking_date_1'] }}
+      Data di Inizio Intervallo: {{ filters['Order.dpc_0'] }}<br>
+      Data di Fine Intervallo: {{ filters['Order.dpc_1'] }}
     </v-col>
     <v-col cols="4">
       <v-btn
@@ -181,10 +180,11 @@ const panel = ref(null);
 const theme = useTheme();
 const router = useRouter();
 const loading = ref(false);
+const isMobile = mobile.setupMobileUtils();
+
 const userStore = useUserStore();
 const orderStore = useOrderStore();
 const serviceStore = useServiceStore();
-const isMobile = mobile.setupMobileUtils();
 const collectionPointStore = useCollectionPointStore();
 const { role } = storeToRefs(userStore);
 const { filters, ready } = storeToRefs(orderStore);
@@ -199,10 +199,11 @@ const filterOrder = async () => {
   panel.value = null;
 };
 
-const intervallRules = (otherKey) => {
+const intervallRules = () => {
   return [
     (value) => {
-      if (value && !filters.value[otherKey]) return 'Usare entrambe le date per filtrare';
+      if (value && !filters.value['Order.dpc_0']) return 'Usare entrambe le date per filtrare';
+
       return true;
     }
   ];
@@ -212,14 +213,14 @@ const exportInvoice = async () => {
   loading.value = true;
 
   http.postRequest('export/invoice', {
-    filters: storesUtils.formatFilters({ ...filters.value }, 'Order.booking_date')
+    filters: storesUtils.formatFilters({ ...filters.value }, 'Order.dpc')
   }, function (data) {
     loading.value = false;
     const blob = new Blob([data], { type: 'application/pdf' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `ordini_${filters.value['Order.booking_date_0']}_${filters.value['Order.booking_date_1']}.pdf`;
+    a.download = `ordini_${filters.value['Order.dpc_0']}_${filters.value['Order.dpc_1']}.pdf`;
     a.click();
     window.URL.revokeObjectURL(url);
   }, 'POST', router, true);

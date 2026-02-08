@@ -68,7 +68,7 @@
           </v-chip>
         </template>
         <template #[`item.price`]="{ item }">
-          {{ item.price ? item.price.toFixed(2) : '' }}€
+          {{ item.price == 0 ? '0' : (item.price ? item.price.toFixed(2) : '') }}€
         </template>
         <template #[`item.actions`]="{ item }">
           <Action :item="item" />

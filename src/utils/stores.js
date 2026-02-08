@@ -17,9 +17,12 @@ const exclude_keys = (obj, keys) => {
 
 const formatFilters = (filters, key) => {
   if (filters[key + '_0'] && filters[key + '_1']) {
-    filters[key + ''] = [filters[key + '_0'], filters[key + '_1']];
+    filters[key] = [filters[key + '_0'], filters[key + '_1']];
     delete filters[key + '_0'];
     delete filters[key + '_1'];
+  } else if (filters[key + '_0']) {
+    filters[key] = filters[key + '_0'];
+    delete filters[key + '_0'];
   }
 
   return Object.keys(filters)
