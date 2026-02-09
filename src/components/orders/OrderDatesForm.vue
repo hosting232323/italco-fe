@@ -37,7 +37,7 @@
           :class-style="isMobile ? '' : 'ml-2'"
           :rules="validation.requiredRules"
           :allowed-dates="nextTwoMonths"
-          :disabled="role == 'Operator' && order.id"
+          :disabled="role == 'Operator' && !!order.id"
         />
       </v-col>
     </v-row>
