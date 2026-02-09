@@ -189,7 +189,6 @@ const formatServices = (services) => {
     .map(([name, count]) => count > 3 ? `${name} x${count}` : name)
     .join(', ');
 };
-
 </script>
 
 <style scoped>
