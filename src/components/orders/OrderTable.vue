@@ -186,7 +186,13 @@ const formatServices = (services) => {
   });
 
   return Object.entries(counter)
-    .map(([name, count]) => count > 3 ? `${name} x${count}` : name)
+    .flatMap(([name, count]) => {
+      if (count > 3) {
+        return `${name} x${count}`;
+      } else {
+        return Array(count).fill(name);
+      }
+    })
     .join(', ');
 };
 </script>
