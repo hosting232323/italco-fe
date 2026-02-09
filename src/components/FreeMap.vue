@@ -42,6 +42,9 @@
     >
       Apri in Google Maps
     </div>
+    <div v-if="loading" class="loading">
+      Caricamento...
+    </div>
   </div>
 </template>
 
@@ -52,6 +55,7 @@ import { storeToRefs } from 'pinia';
 import { onMounted, ref, watch } from 'vue';
 import { useScheduleStore } from '@/stores/schedule';
 
+const loading = ref(true);
 const locations = ref([]);
 const map = ref(null);
 const mapContainer = ref(null);
@@ -103,6 +107,7 @@ const drawRoute = async (coords) => {
 
 const updateMap = async () => {
   if (!map.value) return;
+  loading.value = true;
 
   markers.value.forEach(m => map.value.removeLayer(m));
   markers.value = [];
@@ -130,6 +135,7 @@ const updateMap = async () => {
     map.value.fitBounds(bounds);
     await drawRoute(locations.value);
   }
+  loading.value = false;
 };
 
 const redIcon = L.icon({
@@ -158,11 +164,15 @@ const openInGoogleMaps = () => {
 };
 
 onMounted(() => {
-  map.value = L.map(mapContainer.value).setView([41.8719, 12.5674], 6);
+  map.value = L.map(mapContainer.value, {
+    zoomControl: false
+  }).setView([41.1256, 16.8698], 6);
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap'
   }).addTo(map.value);
+
+  L.control.zoom({ position: 'bottomleft' }).addTo(map.value);
 
   updateMap();
 });
@@ -183,5 +193,21 @@ watch(
   font-size: 14px;
   text-align: center;
   padding: 0;
+}
+
+.loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
 }
 </style>
