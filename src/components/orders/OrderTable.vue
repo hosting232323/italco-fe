@@ -186,7 +186,7 @@ const formatServices = (services) => {
   });
 
   return Object.entries(counter)
-    .map(([name, count]) => count > 1 ? `${name} x${count}` : name)
+    .map(([name, count]) => count > 3 ? `${name} x${count}` : name)
     .join(', ');
 };
 
