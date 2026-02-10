@@ -56,7 +56,7 @@ const getRequest = async (endpoint, params, func, method = 'GET', router = undef
 
   fetch(url, {
     method: method,
-    headers: await createHeader(router, file)
+    headers: await createHeader(router)
   }).then(response => {
     if (!response.ok)
       throw new Error(`Errore nella risposta del server: ${response.status} - ${response.statusText}`);
