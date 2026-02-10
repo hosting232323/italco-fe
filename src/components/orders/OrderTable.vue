@@ -51,7 +51,7 @@
                 RAEE
               </i>
               [{{ item.products[product].collection_point.name }}] :
-              {{ item.products[product].services.map(service => service.name).join(', ') }}
+              {{ formatServices(item.products[product].services) }}
               <br>
             </template>
           </div>
@@ -176,6 +176,24 @@ const openFormPopUp = () => {
 const openSchedulationPopUp = () => {
   dialog.value = true;
   popUpType.value = 'schedulation';
+};
+
+const formatServices = (services) => {
+  const counter = {};
+
+  services.forEach(service => {
+    counter[service.name] = (counter[service.name] || 0) + 1;
+  });
+
+  return Object.entries(counter)
+    .flatMap(([name, count]) => {
+      if (count > 3) {
+        return `${name} x${count}`;
+      } else {
+        return Array(count).fill(name);
+      }
+    })
+    .join(', ');
 };
 </script>
 
