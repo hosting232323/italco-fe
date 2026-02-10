@@ -137,7 +137,7 @@ const exportElement = async (item) => {
       a.click();
       window.URL.revokeObjectURL(url);
     }
-  }, 'GET', router, true);
+  }, 'GET', router);
 };
 </script>
 

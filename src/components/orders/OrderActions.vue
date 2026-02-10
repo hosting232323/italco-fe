@@ -163,7 +163,7 @@ const exportPdf = (item) => {
       a.click();
       window.URL.revokeObjectURL(url);
     }
-  }, 'GET', router, true);
+  }, 'GET', router);
 };
 
 const copyOrderLink = (id) => {
@@ -220,6 +220,6 @@ const raeExport = (item) => {
       a.click();
       window.URL.revokeObjectURL(url);
     }
-  }, 'GET', router, true);
+  }, 'GET', router);
 };
 </script>

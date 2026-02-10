@@ -14,11 +14,10 @@ const postRequest = async (endpoint, body, func, method = 'POST', router = undef
     headers: await createHeader(router),
     body: JSON.stringify(body)
   }).then(response => {
-    const contentType = response.headers.get('content-type');
-
     if (!response.ok)
       throw new Error(`Errore nella risposta del server: ${response.status} - ${response.statusText}`);
 
+    const contentType = response.headers.get('content-type');
     if (contentType && contentType.includes('application/pdf'))
       return response.blob();
     else
@@ -51,7 +50,7 @@ const formDataRequest = async (endpoint, data, func, method = 'POST', router = u
 };
 
 
-const getRequest = async (endpoint, params, func, method = 'GET', router = undefined, file = false) => {
+const getRequest = async (endpoint, params, func, method = 'GET', router = undefined) => {
   const url = new URL(`${hostname}${endpoint}`);
   Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
 
@@ -61,7 +60,12 @@ const getRequest = async (endpoint, params, func, method = 'GET', router = undef
   }).then(response => {
     if (!response.ok)
       throw new Error(`Errore nella risposta del server: ${response.status} - ${response.statusText}`);
-    return file ? response.blob() : response.json();
+
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('application/pdf'))
+      return response.blob();
+    else
+      return response.json();
   }).then(data => {
     sessionHandler(data, func, router);
   }).catch(error => {
