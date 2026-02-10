@@ -23,11 +23,11 @@
     "vue-router": "^4.0.0",
     "vue3-signature-pad": "^1.0.7",
     "vuedraggable": "^4.1.0",
-    "vuetify": "^3.0.0"
+    "vuetify": "^3.11.8"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.3",
-    "eslint": "^8.57.1",
+    "eslint": "^9.39.2",
     "eslint-plugin-vue": "^9.33.0",
     "sass": "^1.60.0",
     "unplugin-fonts": "^1.1.1",
