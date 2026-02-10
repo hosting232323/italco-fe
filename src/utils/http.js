@@ -8,15 +8,21 @@ import { useUserStore } from '@/stores/user';
 const hostname = import.meta.env.VITE_HOSTNAME;
 
 
-const postRequest = async (endpoint, body, func, method = 'POST', router = undefined, file = false) => {
+const postRequest = async (endpoint, body, func, method = 'POST', router = undefined) => {
   fetch(`${hostname}${endpoint}`, {
     method: method,
     headers: await createHeader(router),
     body: JSON.stringify(body)
   }).then(response => {
+    const contentType = response.headers.get('content-type');
+
     if (!response.ok)
       throw new Error(`Errore nella risposta del server: ${response.status} - ${response.statusText}`);
-    return file ? response.blob() : response.json();
+
+    if (contentType && contentType.includes('application/pdf'))
+      return response.blob();
+    else
+      return response.json();
   }).then(data => {
     sessionHandler(data, func, router);
   }).catch(error => {

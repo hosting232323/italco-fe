@@ -216,13 +216,17 @@ const exportInvoice = async () => {
     filters: storesUtils.formatFilters({ ...filters.value }, 'Order.dpc')
   }, function (data) {
     loading.value = false;
-    const blob = new Blob([data], { type: 'application/pdf' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `ordini_${filters.value['Order.dpc_0']}_${filters.value['Order.dpc_1']}.pdf`;
-    a.click();
-    window.URL.revokeObjectURL(url);
-  }, 'POST', router, true);
+    if (data.status == 'ko')
+      alert(data.message)
+    else {
+      const blob = new Blob([data], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `ordini_${filters.value['Order.dpc_0']}_${filters.value['Order.dpc_1']}.pdf`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    }
+  }, 'POST', router);
 };
 </script>
