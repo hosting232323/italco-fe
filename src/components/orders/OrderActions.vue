@@ -152,14 +152,18 @@ const exportPdf = (item) => {
 
   http.getRequest(`export/order/${item.id}`, {}, function (data) {
     loadingExport.value = false;
-    const blob = new Blob([data], { type: 'application/pdf' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `ordine_${item.id}.pdf`;
-    a.click();
-    window.URL.revokeObjectURL(url);
-  }, 'GET', router, true);
+    if (data.status == 'ko')
+      alert(data.message);
+    else {
+      const blob = new Blob([data], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `ordine_${item.id}.pdf`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    }
+  }, 'GET', router);
 };
 
 const copyOrderLink = (id) => {
@@ -205,13 +209,17 @@ const raeExport = (item) => {
 
   http.getRequest(`export/rae/${item.id}`, {}, function (data) {
     raeLoading.value = false;
-    const blob = new Blob([data], { type: 'application/pdf' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `raee_${item.id}.pdf`;
-    a.click();
-    window.URL.revokeObjectURL(url);
-  }, 'GET', router, true);
+    if (data.status == 'ko')
+      alert(data.message);
+    else {
+      const blob = new Blob([data], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `raee_${item.id}.pdf`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    }
+  }, 'GET', router);
 };
 </script>
