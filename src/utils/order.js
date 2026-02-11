@@ -2,12 +2,12 @@
 const LABELS = [
   {
     value: 'New',
-    title: 'In Attesa',
+    title: 'Nuovo',
     icon: 'mdi-timer-sand'
   },
   {
     value: 'Confirmed',
-    title: 'In Consegna',
+    title: 'Confermato',
     color: 'blue',
     icon: 'mdi-progress-clock'
   },
@@ -42,6 +42,36 @@ const LABELS = [
     value: 'Redelivery',
     title: 'Riprogrammato',
     color: 'green'
+  },
+  { 
+    value: 'REPLACEMENT',
+    title: 'Sostituzione',
+    color: 'purple'
+  },
+  { 
+    value: 'CANCELLED', 
+    title: 'Annullato', 
+    color: 'red' 
+  },
+  { 
+    value: 'URGENT', 
+    title: 'Urgente', 
+    color: 'red' 
+  },
+  { 
+    value: 'VERIFICATION', 
+    title: 'In Verifica', 
+    color: 'yellow' 
+  },
+  { 
+    value: 'CANCELLED_TO_BE_REFUNDED', 
+    title: 'Annullato da rimborsare', 
+    color: 'red' 
+  },
+  { 
+    value: 'DELETED', 
+    title: 'Eliminato', 
+    color: 'grey' 
   }
 ];
 
