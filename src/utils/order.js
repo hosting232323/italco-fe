@@ -44,32 +44,32 @@ const LABELS = [
     color: 'green'
   },
   { 
-    value: 'REPLACEMENT',
+    value: 'Replacement',
     title: 'Sostituzione',
     color: 'purple'
   },
   { 
-    value: 'CANCELLED', 
+    value: 'Cancelled', 
     title: 'Annullato', 
     color: 'red' 
   },
   { 
-    value: 'URGENT', 
+    value: 'Urgent', 
     title: 'Urgente', 
     color: 'red' 
   },
   { 
-    value: 'VERIFICATION', 
+    value: 'Verification', 
     title: 'In Verifica', 
     color: 'yellow' 
   },
   { 
-    value: 'CANCELLED_TO_BE_REFUNDED', 
+    value: 'Cancelled to be Refunded', 
     title: 'Annullato da rimborsare', 
     color: 'red' 
   },
   { 
-    value: 'DELETED', 
+    value: 'Deleted', 
     title: 'Eliminato', 
     color: 'grey' 
   }
