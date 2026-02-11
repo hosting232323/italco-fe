@@ -103,7 +103,7 @@
         <v-timeline-item
           v-for="(step, index) in orderUtils.LABELS.filter(label => !!label.icon)"
           :key="index"
-          :dot-color="isStepCompleted(index) ? 'green' : 'grey lighten-1'"
+          :dot-color="isStepDelivered(index) ? 'green' : 'grey lighten-1'"
         >
           <template #icon>
             <v-icon :size="18">
@@ -125,7 +125,7 @@
       </v-timeline>
     </div>
     <Map
-      v-if="order.status === 'On Board'"
+      v-if="order.status === 'Booking'"
       :lat="order.lat"
       :lon="order.lon"
     />
@@ -153,7 +153,7 @@ const show = ref(false);
 const orderIdNumeric = ref(null);
 const isMobile = mobile.setupMobileUtils();
 
-const isStepCompleted = (index) => {
+const isStepDelivered = (index) => {
   if (!order.value.status) return false;
 
   return index <= orderUtils.LABELS.findIndex(status => status.value === order.value.status);
