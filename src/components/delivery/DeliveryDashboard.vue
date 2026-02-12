@@ -5,36 +5,56 @@
       <br><b>
         Totale ordini: {{ totOrder }}
       </b><br><br>
+      <v-timeline align="start" side="end">
+        <v-timeline-item
+          v-for="(item, index) in timelineOrders"
+          :key="index"
+          :color="timelineColor(item)"
+          :dot-color="timelineColor(item)"
+          :icon="timelineIcon(item)"
+        >
+          <v-card>
+            <v-card-text>
+              <b>Ordine #{{ item.id }}</b><br>
+              Tipo: {{ orderUtils.TYPES.find(type => type.value == item.type)?.title }}<br>
+
+              <!-- Prodotti e Servizi -->
+              <b>Prodotti e Servizi:</b>
+              <div v-for="(product, productName) in item.products" :key="productName">
+                <p>
+                  <b>{{ productName }}</b>:
+                  {{ product.services?.map(s => s.name).join(', ') || 'Nessuno' }}
+                </p>
+              </div>
+
+              <!-- Prodotti e Punti di Ritiro -->
+              <b>Prodotti e Punti di Ritiro:</b>
+              <div v-for="(product, productName) in item.products" :key="productName" style="font-size: smaller;">
+                Punto di Ritiro: {{ product.collection_point?.name || 'N/A' }},
+                {{ product.collection_point?.address || 'N/A' }}, {{ product.collection_point?.cap || 'N/A' }}
+              </div>
+
+              <!-- Punto Vendita -->
+              <b>Punto Vendita:</b>
+              {{ item.users?.map(u => u.nickname).join(', ') || 'N/A' }}<br>
+
+              <!-- Destinatario e Indirizzo -->
+              <b>Destinatario:</b> {{ item.addressee || item.name }}<br>
+              <span style="font-size: smaller;">
+                {{ item.address || 'N/A' }}, {{ item.cap || 'N/A' }}
+              </span><br>
+
+              <!-- Note -->
+              <b>Note Punto Vendita:</b> {{ item.customer_note || '-' }}<br>
+              <b>Note Operatori:</b> {{ item.operator_note || '-' }}<br>
+
+              <!-- Orario -->
+              <small>Slot: {{ item.start_time_slot }} - {{ item.end_time_slot }}</small>
+            </v-card-text>
+          </v-card>
+        </v-timeline-item>
+      </v-timeline>
     </div>
-    <v-timeline align="start" side="end">
-      <v-timeline-item
-        v-for="item in timelineOrders"
-        :key="item.id"
-        :color="timelineColor(item)"
-        :dot-color="timelineColor(item)"
-        :icon="timelineIcon(item)"
-      >
-      <v-card>
-        <v-card-text>
-          <b>Ordine #{{ item.id }}</b><br>
-          {{ item.operation_type }}
-          {{ item.type }} - {{ item.status }}<br>
-          Destinatario: {{ item.addressee || item.name }}<br>
-          Indirizzo: {{ item.address }}<br>
-
-          <div v-for="[productName, product] in Object.entries(item.products || {})" :key="productName">
-            <p>
-              <b>{{ productName }}</b>:
-              Collection Point: {{ product.collection_point?.id || 'N/A' }}<br>
-              Servizi: {{ product.services?.map(service => service.name).join(', ') || 'Nessuno' }}
-            </p>
-          </div>
-
-          <small>Slot: {{ item.start_time_slot }} - {{ item.end_time_slot }}</small>
-        </v-card-text>
-      </v-card>
-      </v-timeline-item>
-    </v-timeline>
   </div>
 
   <div v-else-if="locationError" class="text-center mt-10">
@@ -49,8 +69,8 @@
 import http from '@/utils/http';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
-import mobile from '@/utils/mobile';
 import { useRouter } from 'vue-router';
+import orderUtils from '@/utils/order';
 import { useOrderStore } from '@/stores/order';
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 
@@ -63,7 +83,7 @@ const { list: orders, ready } = storeToRefs(orderStore);
 
 const timelineOrders = computed(() => {
   if (!orders.value) return [];
-
+  console.log(orders.value);
   return orders.value
     .flatMap(order => order.schedule_items || [])
     .sort((a, b) => a.index - b.index);
