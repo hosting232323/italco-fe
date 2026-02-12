@@ -4,7 +4,7 @@
     @submit.prevent="submitForm"
   >
     <v-tabs
-      v-if="role == 'Admin' && order.id"
+      v-if="order.id"
       v-model="activeTab"
       background-color="primary"
       dark
