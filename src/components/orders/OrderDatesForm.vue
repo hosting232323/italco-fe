@@ -17,7 +17,7 @@
     >
       <v-col
         cols="12"
-        md="6"
+        md="4"
       >
         <DateField 
           v-model="order.dpc"
@@ -29,15 +29,26 @@
       </v-col>
       <v-col
         cols="12"
-        md="6"
+        md="4"
       >
         <DateField 
           v-model="order.drc"
           label="Data Richiesta dal Cliente"
-          :class-style="isMobile ? '' : 'ml-2'"
+          :class-style="isMobile ? '' : 'ml-2 mr-2'"
           :rules="validation.requiredRules"
           :allowed-dates="nextTwoMonths"
           :disabled="role == 'Operator' && order.id"
+        />
+      </v-col>
+      <v-col
+        cols="12"
+        md="4"
+      >
+        <DateField 
+          v-model="order.booking_date"
+          label="Data Consegna"
+          :allowed-dates="['all']"
+          :class-style="isMobile ? '' : 'ml-2'"
         />
       </v-col>
     </v-row>

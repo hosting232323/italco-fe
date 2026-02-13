@@ -72,6 +72,7 @@ const innerValue = ref(props.modelValue ? new Date(props.modelValue) : null);
 const formattedValue = ref(formatDate(innerValue.value));
 
 function allowedDatesFunction(date) {
+  if (props.allowedDates.includes('all')) return true;
   if (!props.allowedDates || props.allowedDates.length === 0) return false;
   const dateStr = toISODateString(date);
   return props.allowedDates.includes(dateStr);
