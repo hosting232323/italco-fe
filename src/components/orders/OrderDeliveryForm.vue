@@ -1,9 +1,9 @@
 <template>
   <v-select
     v-model="order.status"
-    :disabled="order.status == 'Pending'"
+    :disabled="order.status == 'New'"
     label="Stato"
-    :items="orderUtils.LABELS.filter(label => label.value != 'Pending')"
+    :items="orderUtils.LABELS.filter(label => label.value != 'New')"
   />
   <v-textarea
     v-model="order.motivation"

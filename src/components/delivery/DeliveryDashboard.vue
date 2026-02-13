@@ -20,7 +20,7 @@
             v-for="card in cards"
             :key="card.key"
             :cols="isMobile ? 6 :
-              (['Delay', 'Anomaly', 'Cancelled', 'To Reschedule'].includes(card.key) ? 2 : 4)"
+              (['Delay', 'Anomaly', 'Not Delivered', 'To Reschedule'].includes(card.key) ? 2 : 4)"
           >
             <v-item
               v-slot="{ selectedClass, toggle }"
@@ -75,7 +75,7 @@ const theme = useTheme();
 const router = useRouter();
 const locationError = ref(false); 
 const orderStore = useOrderStore();
-const selectedCard = ref('In Progress');
+const selectedCard = ref('Confirmed');
 const { list: orders, ready } = storeToRefs(orderStore);
 
 const isMobile = mobile.setupMobileUtils();
@@ -89,11 +89,11 @@ const totOrder = computed(() => {
 const cards = [
   {
     title: 'Da caricare',
-    key: 'In Progress'
+    key: 'Confirmed'
   },
   {
     title: 'A bordo',
-    key: 'On Board'
+    key: 'Booking'
   },
   {
     title: 'In Magazzino',
@@ -101,11 +101,11 @@ const cards = [
   },
   {
     title: 'Completato',
-    key: 'Completed'
+    key: 'Delivered'
   },
   {
     title: 'Non Consegnato',
-    key: 'Cancelled'
+    key: 'Not Delivered'
   },
   {
     title: 'Da Riprogrammare',
@@ -125,7 +125,7 @@ const cardCounts = computed(() => {
   const anomalyOrders = [];
   const delayOrders = [];
 
-  for (const key of ['In Progress', 'On Board']) {
+  for (const key of ['Confirmed', 'Booking']) {
     const list = orders.value?.[key] || [];
     list.forEach(order => {
       if (order.anomaly) anomalyOrders.push(order);
@@ -133,10 +133,10 @@ const cardCounts = computed(() => {
     });
   }
   return {
-    'In Progress': orders.value?.['In Progress']?.length || 0,
-    'On Board': orders.value?.['On Board']?.length || 0,
-    'Completed': orders.value?.['Completed']?.length || 0,
-    'Cancelled': orders.value?.['Cancelled']?.length || 0,
+    'Confirmed': orders.value?.['Confirmed']?.length || 0,
+    'Booking': orders.value?.['Booking']?.length || 0,
+    'Delivered': orders.value?.['Delivered']?.length || 0,
+    'Not Delivered': orders.value?.['Not Delivered']?.length || 0,
     'At Warehouse': orders.value?.['At Warehouse']?.length || 0,
     'To Reschedule': orders.value?.['To Reschedule']?.length || 0,
     'Anomaly': anomalyOrders.length,
