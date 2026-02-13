@@ -93,9 +93,9 @@ const { list: orders, element: order, ready } = storeToRefs(orderStore);
 const filteredOrders = computed(() => {
   let result = [];
   if (keyName === 'Anomaly')
-    result = [...(orders.value['In Progress'] || []), ...(orders.value['On Board'] || [])].filter(o => o.anomaly);
+    result = [...(orders.value['Confirmed'] || []), ...(orders.value['Booking'] || [])].filter(o => o.anomaly);
   else if (keyName === 'Delay')
-    result = [...(orders.value['In Progress'] || []), ...(orders.value['On Board'] || [])].filter(o => o.delay);
+    result = [...(orders.value['Confirmed'] || []), ...(orders.value['Booking'] || [])].filter(o => o.delay);
   else
     result = orders.value?.[keyName] || [];
   return result.slice().sort((a, b) => a.schedule_index - b.schedule_index);

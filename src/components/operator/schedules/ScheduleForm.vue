@@ -71,7 +71,7 @@
             <v-autocomplete
               v-model="selectedOrderId"
               label="Aggiungi Ordine"
-              :items="orders.filter(order => order.status === 'Pending' &&
+              :items="orders.filter(order => order.status === 'New' &&
                 !schedule.schedule_items.some(item => item.operation_type === 'Order' && item.order_id === order.id))"
               :item-title="order => `ID ordine: ${order.id}`"
               item-value="id"

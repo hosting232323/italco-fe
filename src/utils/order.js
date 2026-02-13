@@ -1,18 +1,18 @@
 // Property icon is used in @/views/OrderStatus
 const LABELS = [
   {
-    value: 'Pending',
-    title: 'In Attesa',
+    value: 'New',
+    title: 'Nuovo',
     icon: 'mdi-timer-sand'
   },
   {
-    value: 'In Progress',
-    title: 'In Consegna',
+    value: 'Confirmed',
+    title: 'Confermato',
     color: 'blue',
     icon: 'mdi-progress-clock'
   },
   {
-    value: 'On Board',
+    value: 'Booking',
     title: 'A Bordo',
     color: 'blue',
     icon: 'mdi-truck-delivery'
@@ -23,13 +23,13 @@ const LABELS = [
     color: 'orange'
   },
   {
-    value: 'Completed',
+    value: 'Delivered',
     title: 'Completato',
     color: 'green',
     icon: 'mdi-check-circle-outline'
   },
   {
-    value: 'Cancelled',
+    value: 'Not Delivered',
     title: 'Non Completato',
     color: 'red'
   },
@@ -39,9 +39,39 @@ const LABELS = [
     color: 'orange'
   },
   {
-    value: 'Rescheduled',
+    value: 'Redelivery',
     title: 'Riprogrammato',
     color: 'green'
+  },
+  { 
+    value: 'Replacement',
+    title: 'Sostituzione',
+    color: 'purple'
+  },
+  { 
+    value: 'Cancelled', 
+    title: 'Annullato', 
+    color: 'red' 
+  },
+  { 
+    value: 'Urgent', 
+    title: 'Urgente', 
+    color: 'red' 
+  },
+  { 
+    value: 'Verification', 
+    title: 'In Verifica', 
+    color: 'yellow' 
+  },
+  { 
+    value: 'Cancelled to be Refunded', 
+    title: 'Annullato da rimborsare', 
+    color: 'red' 
+  },
+  { 
+    value: 'Deleted', 
+    title: 'Eliminato', 
+    color: 'grey' 
   }
 ];
 

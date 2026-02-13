@@ -6,7 +6,7 @@
         @submit.prevent="submitForm"
       >
         <v-select
-          v-if="!['Completed', 'Cancelled', 'To Reschedule'].includes(actualStatus)"
+          v-if="!['Delivered', 'Not Delivered', 'To Reschedule'].includes(actualStatus)"
           v-model="status"
           label="Stato"
           :items="STATUS_MAP[actualStatus].map(status => ({
@@ -15,19 +15,19 @@
           }))"
         />
         <v-textarea
-          v-if="status === 'Cancelled' || order.delay || order.anomaly"
+          v-if="status === 'Not Delivered' || order.delay || order.anomaly"
           v-model="order.motivation"
           label="Motivazione"
           rows="3"
           :rules="validation.requiredRules"
         />
         <v-file-input
-          v-if="['Completed', 'Cancelled'].includes(status) || order.delay || order.anomaly"
+          v-if="['Delivered', 'Not Delivered'].includes(status) || order.delay || order.anomaly"
           v-model="order.photos"
           multiple
           accept="image/*"
           label="Foto"
-          :rules="(status === 'Completed' || order.anomaly) ? validation.arrayRules : []"
+          :rules="(status === 'Delivered' || order.anomaly) ? validation.arrayRules : []"
         />
         <v-row>
           <v-col
@@ -107,7 +107,7 @@
           </div>
         </v-row>
 
-        <div v-if="status === 'Completed'">
+        <div v-if="status === 'Delivered'">
           <label>Firma del cliente</label>
           <SignaturePad
             ref="signaturePad"
@@ -191,16 +191,16 @@ const isMobile = mobile.setupMobileUtils();
 const { element: order } = storeToRefs(orderStore);
 
 const STATUS_MAP = {
-  'In Progress': ['On Board', 'Cancelled', 'At Warehouse', 'To Reschedule'],
-  'On Board': ['Completed', 'Cancelled', 'At Warehouse', 'To Reschedule'],
-  'At Warehouse': ['On Board', 'To Reschedule']
+  'Confirmed': ['Booking', 'Not Delivered', 'At Warehouse', 'To Reschedule'],
+  'Booking': ['Delivered', 'Not Delivered', 'At Warehouse', 'To Reschedule'],
+  'At Warehouse': ['Booking', 'To Reschedule']
 };
 const actualStatus = order.value.status;
 
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
 
-  if (status.value === 'Completed' && signaturePad.value.isEmpty()) {
+  if (status.value === 'Delivered' && signaturePad.value.isEmpty()) {
     signatureError.value = 'La firma non può essere vuota';
     return;
   }
