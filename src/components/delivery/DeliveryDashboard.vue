@@ -5,7 +5,7 @@
       <br><b>
         Totale ordini: {{ totOrder }}
       </b><br><br>
-      <v-timeline align="start" side="end">
+      <v-timeline align="start" side="end" :style="{ marginLeft: isMobile ? '-30px' : '' }">
         <v-timeline-item
           v-for="(item, index) in timelineOrders"
           :key="index"
@@ -13,42 +13,44 @@
           :dot-color="timelineColor(item)"
           :icon="timelineIcon(item)"
         >
-          <v-card>
+        <v-card :style="{ width: isMobile ? '200px' : '400px', marginLeft: isMobile ? '-15px' : '' }">
             <v-card-text>
-              <b>Ordine #{{ item.id }}</b><br>
-              Tipo: {{ orderUtils.TYPES.find(type => type.value == item.type)?.title }}<br>
+              <span v-if="item.collection_point_id">
+                <b>Punto di ritiro</b><br><br>
 
-              <!-- Prodotti e Servizi -->
-              <b>Prodotti e Servizi:</b>
-              <div v-for="(product, productName) in item.products" :key="productName">
-                <p>
-                  <b>{{ productName }}</b>:
-                  {{ product.services?.map(s => s.name).join(', ') || 'Nessuno' }}
-                </p>
-              </div>
+                <b>Indirizzo</b>: <br> {{ item.address || 'N/A' }}, {{ item.cap || 'N/A' }}
 
-              <!-- Prodotti e Punti di Ritiro -->
-              <b>Prodotti e Punti di Ritiro:</b>
-              <div v-for="(product, productName) in item.products" :key="productName" style="font-size: smaller;">
-                Punto di Ritiro: {{ product.collection_point?.name || 'N/A' }},
-                {{ product.collection_point?.address || 'N/A' }}, {{ product.collection_point?.cap || 'N/A' }}
-              </div>
+              </span>
+              <span v-else>
+                <b>Ordine #{{ item.id }}</b><br>
 
-              <!-- Punto Vendita -->
-              <b>Punto Vendita:</b>
-              {{ item.users?.map(u => u.nickname).join(', ') || 'N/A' }}<br>
+                Tipo: {{ orderUtils.TYPES.find(type => type.value == item.type)?.title }}<br><br>
 
-              <!-- Destinatario e Indirizzo -->
-              <b>Destinatario:</b> {{ item.addressee || item.name }}<br>
-              <span style="font-size: smaller;">
-                {{ item.address || 'N/A' }}, {{ item.cap || 'N/A' }}
-              </span><br>
+                <b>Prodotti e Servizi:</b>
+                <div v-for="(product, productName) in item.products" :key="productName">
+                  <p>
+                    <b>{{ productName }}</b>:
+                    {{ product.services?.map(s => s.name).join(', ') || 'Nessuno' }}
+                  </p>
+                </div><br>
 
-              <!-- Note -->
-              <b>Note Punto Vendita:</b> {{ item.customer_note || '-' }}<br>
-              <b>Note Operatori:</b> {{ item.operator_note || '-' }}<br>
+                <b>Prodotti e Punti di Ritiro:</b>
+                <div v-for="(product, productName) in item.products" :key="productName" style="font-size: smaller;">
+                  Punto di Ritiro: {{ product.collection_point?.name || 'N/A' }},
+                  {{ product.collection_point?.address || 'N/A' }}, {{ product.collection_point?.cap || 'N/A' }}
+                </div><br>
 
-              <!-- Orario -->
+                <b>Punto Vendita:</b>
+                {{ item.users?.map(u => u.nickname).join(', ') || 'N/A' }}<br><br>
+
+                <b>Destinatario:</b> {{ item.addressee || item.name }}<br>
+                <span>
+                  {{ item.address || 'N/A' }}, {{ item.cap || 'N/A' }}
+                </span><br><br>
+
+                <b>Note Punto Vendita:</b> {{ item.customer_note || '-' }}<br>
+                <b>Note Operatori:</b> {{ item.operator_note || '-' }}<br>
+              </span>
               <small>Slot: {{ item.start_time_slot }} - {{ item.end_time_slot }}</small>
             </v-card-text>
           </v-card>
@@ -73,7 +75,10 @@ import { useRouter } from 'vue-router';
 import orderUtils from '@/utils/order';
 import { useOrderStore } from '@/stores/order';
 import { ref, computed, onMounted, onUnmounted } from 'vue';
+import mobile from '@/utils/mobile';
 
+
+const isMobile = mobile.setupMobileUtils();
 let watcherId = null;
 const theme = useTheme();
 const router = useRouter();
