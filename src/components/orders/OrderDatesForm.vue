@@ -47,6 +47,7 @@
         <DateField 
           v-model="order.booking_date"
           label="Data Consegna"
+          :rules="[]"
           :allowed-dates="['all']"
           :class-style="isMobile ? '' : 'ml-2'"
         />
