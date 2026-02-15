@@ -49,7 +49,7 @@
               </span>
             </template>
 
-            Data Consegna: {{ item.booking_date }}
+            Data Consegna: {{ item.booking_date ? item.booking_date : 'N/A'  }}
           </v-tooltip>
         </template>
         <template #[`item.type`]="{ item }">
