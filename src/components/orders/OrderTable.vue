@@ -35,7 +35,22 @@
       >
         <template #[`item.id`]="{ item }">
           {{ item.id }}
-          {{ item.external_id ? `[${item.external_id}]` : '' }}
+
+          <v-tooltip
+            v-if="item.external_id"
+            location="top"
+          >
+            <template #activator="{ props }">
+              <span
+                v-bind="props"
+                style="cursor: pointer; margin-left: 4px;"
+              >
+                [{{ item.external_id }}]
+              </span>
+            </template>
+
+            Data Consegna: {{ item.booking_date }}
+          </v-tooltip>
         </template>
         <template #[`item.type`]="{ item }">
           {{ orderUtils.TYPES.find(type => type.value == item.type)?.title }}
