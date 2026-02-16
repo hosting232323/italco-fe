@@ -103,7 +103,7 @@
               <v-row no-gutters>
                 <v-col
                   cols="12"
-                  md="6"
+                  md="4"
                 >
                   <v-text-field
                     v-model="filters['Order.dpc_0']"
@@ -114,13 +114,24 @@
                 </v-col>
                 <v-col
                   cols="12"
-                  md="6"
+                  md="4"
                 >
                   <v-text-field
                     v-model="filters['Order.dpc_1']"
                     :class="isMobile ? '' : 'ml-2'"
                     :rules="intervallRules()"
                     label="Data Prevista dal Cliente (Fine)"
+                    type="date"
+                  />
+                </v-col>
+                <v-col
+                  cols="12"
+                  md="4"
+                >
+                  <v-text-field
+                    v-model="filters['Order.work_date']"
+                    :class="isMobile ? '' : 'ml-2'"
+                    label="Data Work"
                     type="date"
                   />
                 </v-col>
