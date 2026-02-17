@@ -69,64 +69,55 @@
           <v-row no-gutters>
             <v-col
               cols="12"
-              md="6"
+              md="3"
             >
-              <v-row no-gutters>
-                <v-col
-                  cols="12"
-                  md="6"
-                >
-                  <v-text-field
-                    v-model="filters['Order.booking_date']"
-                    :class="isMobile ? '' : 'mr-2'"
-                    label="Data Consegna"
-                    type="date"
-                  />
-                </v-col>
-                <v-col
-                  cols="12"
-                  md="6"
-                >
-                  <v-text-field
-                    v-model="filters['Order.drc']"
-                    :class="isMobile ? '' : 'ml-2 mr-2'"
-                    label="Data Richiesta dal Cliente"
-                    type="date"
-                  />
-                </v-col>
-              </v-row>
+              <v-text-field
+                v-model="filters['Order.booking_date']"
+                :class="isMobile ? '' : 'mr-2'"
+                label="Data Consegna"
+                type="date"
+              />
             </v-col>
             <v-col
               cols="12"
-              md="6"
+              md="3"
             >
-              <v-row no-gutters>
-                <v-col
-                  cols="12"
-                  md="6"
-                >
-                  <v-text-field
-                    v-model="filters['Order.dpc_0']"
-                    :class="isMobile ? '' : 'mr-2 ml-2'"
-                    label="Data Prevista dal Cliente (Inizio)"
-                    type="date"
-                  />
-                </v-col>
-                <v-col
-                  cols="12"
-                  md="6"
-                >
-                  <v-text-field
-                    v-model="filters['Order.dpc_1']"
-                    :class="isMobile ? '' : 'ml-2'"
-                    :rules="intervallRules()"
-                    label="Data Prevista dal Cliente (Fine)"
-                    type="date"
-                  />
-                </v-col>
-              </v-row>
+              <v-text-field
+                v-model="filters['Order.drc']"
+                :class="isMobile ? '' : 'ml-2 mr-2'"
+                label="Data Richiesta dal Cliente"
+                type="date"
+              />
+            </v-col>
+            <v-col
+              cols="12"
+              md="3"
+            >
+              <v-text-field
+                v-model="filters['Order.dpc_0']"
+                :class="isMobile ? '' : 'mr-2 ml-2'"
+                label="Data Prevista dal Cliente (Inizio)"
+                type="date"
+              />
+            </v-col>
+            <v-col
+              cols="12"
+              md="3"
+            >
+              <v-text-field
+                v-model="filters['Order.dpc_1']"
+                :class="isMobile ? '' : 'ml-2'"
+                :rules="intervallRules()"
+                label="Data Prevista dal Cliente (Fine)"
+                type="date"
+              />
             </v-col>
           </v-row>
+          <v-text-field
+            v-model="filters['Order.work_date']"
+            label="Data Work"
+            type="date"
+          />
           <FormButtons
             :loading="false"
             @cancel="panel = null"
