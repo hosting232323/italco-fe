@@ -25,6 +25,7 @@
           :class-style="isMobile ? '' : 'ml-2 mr-2'"
           :allowed-dates="allowedDpcDates"
           :rules="validation.requiredRules"
+          :disabled="role == 'Operator' && order.id"
         />
       </v-col>
       <v-col
