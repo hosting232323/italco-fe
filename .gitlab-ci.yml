@@ -74,3 +74,70 @@ lint_frontend:
     - npx eslint "src/**/*.{js,vue}"
   tags:
     - linux
+
+
+.deploy_template: &deploy_template
+  stage: deploy
+  script:
+    - |
+      if [ "$CI_JOB_NAME" = "deploy_test" ]; then
+        PJ_NAME="${PROJECT_NAME}-test"
+        CONTAINER_ACTIVE="${PROJECT_NAME}-test"
+        CONTAINER_NEXT="${PROJECT_NAME}-test-next"
+        FIRST_PORT="${PORT_TEST%%-*}"
+        SECOND_PORT="${PORT_TEST#*-}"
+        VITE_HOSTNAME="${VITE_HOSTNAME_ITALCO_FE_TEST}"
+        VITE_GOOGLE_API_KEY="${VITE_GOOGLE_API_KEY_ITALCO_FE_TEST}"
+      else
+        PJ_NAME="${PROJECT_NAME}"
+        CONTAINER_ACTIVE="${PROJECT_NAME}"
+        CONTAINER_NEXT="${PROJECT_NAME}-next"
+        FIRST_PORT="${PORT_PROD%%-*}"
+        SECOND_PORT="${PORT_PROD#*-}"
+        VITE_HOSTNAME="${VITE_HOSTNAME_ITALCO_FE}"
+        VITE_GOOGLE_API_KEY="${VITE_GOOGLE_API_KEY_ITALCO_FE}"
+      fi
+    
+      docker build \
+        --build-arg VITE_IV=$VITE_IV_ITALCO_FE \
+        --build-arg VITE_HOSTNAME=$VITE_HOSTNAME \
+        --build-arg VITE_GOOGLE_API_KEY=$VITE_GOOGLE_API_KEY \
+        --build-arg VITE_SECRET_KEY=$VITE_SECRET_KEY_ITALCO_FE \
+        -t $PJ_NAME:latest .
+    
+      set -e
+      docker rm -f "${CONTAINER_NEXT}" 2>/dev/null || true
+
+      docker run -d --name ${CONTAINER_NEXT} \
+        -p ${SECOND_PORT}:3000 \
+        $PJ_NAME:latest
+
+      sleep 10
+
+      if curl -fs http://localhost:$SECOND_PORT; then
+        docker rm -f ${CONTAINER_ACTIVE} 2>/dev/null || true
+
+        docker run -d --restart unless-stopped \
+          --name ${CONTAINER_ACTIVE} \
+          -p ${FIRST_PORT}:3000 \
+          $PJ_NAME:latest
+
+        docker rm -f ${CONTAINER_NEXT} 2>/dev/null || true
+      else
+        docker logs ${CONTAINER_NEXT} || true
+        exit 1
+      fi
+
+deploy_test:
+  <<: *deploy_template
+  tags:
+    - deploy-local
+  when: manual
+
+deploy_prod:
+  <<: *deploy_template
+  tags:
+    - deploy-local
+  when: manual
+  only:
+    - main
