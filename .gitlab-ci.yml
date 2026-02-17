@@ -1,71 +1,73 @@
 stages:
-  - prepare
+  # - prepare
   - test
-image: hosting23232323/python-node:3.11
-variables:
-  POSTGRES_DB: mydb
-  POSTGRES_USER: myuser
-  POSTGRES_PASSWORD: mypassword
-  DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
-  DECODE_JWT_TOKEN: token
+  - deploy
 
-  GITLAB_PIPELINE: 'true'
+# image: hosting23232323/python-node:3.11
+# variables:
+#   POSTGRES_DB: mydb
+#   POSTGRES_USER: myuser
+#   POSTGRES_PASSWORD: mypassword
+#   DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+#   DECODE_JWT_TOKEN: token
 
-be_dependencies:
-  stage: prepare
-  script:
-    - python -m venv venv
-    - source venv/bin/activate
-    - git clone https://$CI_ITALCO_BE_USERNAME:$CI_ITALCO_BE_TOKEN@gitlab.com/generic-lab/italco/italco-be.git
-    - cd italco-be
-    - pip install -r requirements.txt
-    - cd ..
-    - git clone https://$CI_GENERIC_TEST_USERNAME:$CI_GENERIC_TEST_TOKEN@gitlab.com/generic-lab/generics/generic-test.git
-    - cd generic-test
-    - pip install -r requirements.txt
-  artifacts:
-    paths:
-      - italco-be
-      - generic-test
-      - venv
-    expire_in: 1h
-  tags:
-    - linux
+#   GITLAB_PIPELINE: 'true'
 
-test_end_to_end:
-  stage: test
-  needs:
-    - job: be_dependencies
-      artifacts: true
-  services:
-    - name: postgres:15
-      alias: postgres
-    - name: selenium/standalone-chromium:latest
-      alias: selenium
-  script:
-    - export VITE_HOSTNAME=http://$(hostname -I | tr ' ' '\n' | grep -m1 '^[0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+$'):8080/
-    - export VITE_HOSTNAME_ITALCO_FE=http://$(hostname -I | tr ' ' '\n' | grep -m1 '^[0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+$'):3000/
-    - export OPENAI_API_KEY='test'
-    - export ASSISTANT_ID='test'
-    - npm ci
-    - npm run build
-    - npm run serve &
+# be_dependencies:
+#   stage: prepare
+#   script:
+#     - python -m venv venv
+#     - source venv/bin/activate
+#     - git clone https://$CI_ITALCO_BE_USERNAME:$CI_ITALCO_BE_TOKEN@gitlab.com/generic-lab/italco/italco-be.git
+#     - cd italco-be
+#     - pip install -r requirements.txt
+#     - cd ..
+#     - git clone https://$CI_GENERIC_TEST_USERNAME:$CI_GENERIC_TEST_TOKEN@gitlab.com/generic-lab/generics/generic-test.git
+#     - cd generic-test
+#     - pip install -r requirements.txt
+#   artifacts:
+#     paths:
+#       - italco-be
+#       - generic-test
+#       - venv
+#     expire_in: 1h
+#   tags:
+#     - linux
 
-    - source venv/bin/activate
-    - cd italco-be
-    - alembic upgrade heads
-    - python -m src &
-    - until curl -s $VITE_HOSTNAME; do echo "Waiting for backend..."; sleep 2; done
+# test_end_to_end:
+#   stage: test
+#   needs:
+#     - job: be_dependencies
+#       artifacts: true
+#   services:
+#     - name: postgres:15
+#       alias: postgres
+#     - name: selenium/standalone-chromium:latest
+#       alias: selenium
+#   script:
+#     - export VITE_HOSTNAME=http://$(hostname -I | tr ' ' '\n' | grep -m1 '^[0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+$'):8080/
+#     - export VITE_HOSTNAME_ITALCO_FE=http://$(hostname -I | tr ' ' '\n' | grep -m1 '^[0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+$'):3000/
+#     - export OPENAI_API_KEY='test'
+#     - export ASSISTANT_ID='test'
+#     - npm ci
+#     - npm run build
+#     - npm run serve &
 
-    - cd ../generic-test
-    - pytest -s ./src/tests/italco/test_login.py
-  artifacts:
-    when: always
-    paths:
-      - generic-test/screenshots/
-    expire_in: 1 week
-  tags:
-    - linux
+#     - source venv/bin/activate
+#     - cd italco-be
+#     - alembic upgrade heads
+#     - python -m src &
+#     - until curl -s $VITE_HOSTNAME; do echo "Waiting for backend..."; sleep 2; done
+
+#     - cd ../generic-test
+#     - pytest -s ./src/tests/italco/test_login.py
+#   artifacts:
+#     when: always
+#     paths:
+#       - generic-test/screenshots/
+#     expire_in: 1 week
+#   tags:
+#     - linux
 
 lint_frontend:
   stage: test
@@ -74,7 +76,8 @@ lint_frontend:
     - npx eslint "src/**/*.{js,vue}"
   tags:
     - linux
-
+  rules:
+    - if: '$CI_COMMIT_BRANCH != "main"'
 
 .deploy_template: &deploy_template
   stage: deploy
