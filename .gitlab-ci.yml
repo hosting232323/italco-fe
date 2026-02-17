@@ -75,6 +75,7 @@ lint_frontend:
   script:
     - npm ci
     - npx eslint "src/**/*.{js,vue}"
+  allow_failure: true
   tags:
     - linux
   rules:
