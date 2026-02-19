@@ -79,6 +79,12 @@
           <v-chip :color="orderUtils.LABELS.find(label => label.value == item.status).color">
             {{ orderUtils.LABELS.find(label => label.value == item.status).title }}
           </v-chip>
+          <v-chip
+            v-if="item.external_status"
+            :color="orderUtils.LABELS.find(label => label.value == item.external_status).color"
+          >
+            Stato Esterno {{ orderUtils.LABELS.find(label => label.value == item.external_status).title }}
+          </v-chip>
         </template>
         <template #[`item.price`]="{ item }">
           {{ item.price == 0 ? '0' : (item.price ? item.price.toFixed(2) : '') }}€
