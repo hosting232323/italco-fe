@@ -178,11 +178,19 @@ const totOrder = computed(() => {
 });
 
 const isCollectionPointCompleted = (item) => {
-  for (const [productName, product] of Object.entries(item.products)) {
-    console.log(productName);
-    console.log(product.collection_point?.id);
-  }
-  return false;
+  const requiredCollectionPointIds = Object.values(item.products)
+    .map(p => p.collection_point?.id)
+    .filter(Boolean);
+
+  const collectionPointItems = timelineOrders.value.filter(
+    t =>
+      t.operation_type === "CollectionPoint" &&
+      requiredCollectionPointIds.includes(t.collection_point_id)
+  );
+
+  if (collectionPointItems.length === 0) return false;
+
+  return collectionPointItems.every(cp => cp.completed === true);
 }
 
 const startSwipe = (e, index, isMouse = false) => {
@@ -212,8 +220,14 @@ const endSwipe = (e, index) => {
 };
 
 const completeCollectionPoint = (item) => {
-  activeSwipeIndex.value = null;
-  swipeOffset[item.id] = 0;
+  http.postRequest(`schedule/item/${item.id}`, {
+    completed: true
+  }, () => {
+    ready.value = false;
+    orderStore.initListDelivery(router);
+    activeSwipeIndex.value = null;
+    swipeOffset[item.id] = 0;
+  }, 'PUT', router);
 };
 
 const completeOrder = (item) => {
