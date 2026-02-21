@@ -1,7 +1,7 @@
 <template>
   <v-dialog
     v-if="!locationError"
-    v-model="dialog"
+    v-model="showForm"
     max-width="1500"
   >
     <template #activator>
@@ -21,7 +21,7 @@
       </div>
     </template>
     <template #default>
-      <Form @cancel="dialog = false" />
+      <Form @cancel="showForm = false" />
     </template>
   </v-dialog>
 
@@ -53,11 +53,10 @@ import DeliveryTimeline from './DeliveryTimeline.vue';
 
 let watcherId = null;
 const theme = useTheme();
-const dialog = ref(false);
 const router = useRouter();
 const locationError = ref(false);
 const scheduleItemStore = useScheduleItemStore();
-const { list: orders, ready } = storeToRefs(scheduleItemStore);
+const { list: orders, ready, showForm } = storeToRefs(scheduleItemStore);
 
 const totOrder = computed(() => {
   if (!orders.value || !Array.isArray(orders.value)) return 0;

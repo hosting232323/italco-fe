@@ -190,7 +190,7 @@ const orderStore = useOrderStore();
 const emits = defineEmits(['cancel']);
 const isMobile = mobile.setupMobileUtils();
 const scheduleItemStore = useScheduleItemStore();
-const { element: order } = storeToRefs(orderStore);
+const { element: order } = storeToRefs(scheduleItemStore);
 
 const STATUS_MAP = {
   'Confirmed': ['Booking', 'Not Delivered', 'At Warehouse', 'To Reschedule'],

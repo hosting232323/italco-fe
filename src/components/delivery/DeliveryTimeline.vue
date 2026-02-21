@@ -25,10 +25,15 @@
           :class="{ active: activeSwipeIndex === index }"
         >
           <button
-            v-if="item.collection_point_id"
+            v-if="item.collection_point_id && !item.completed"
             @click="completeCollectionPoint(item)"
           >
             Completa punto di ritiro
+          </button>
+          <button
+            v-if="item.completed"
+          >
+            Punto di ritiro completato
           </button>
           <button
             v-else-if="isCollectionPointCompleted(item)"
@@ -105,7 +110,6 @@ import orderUtils from '@/utils/order';
 import { useScheduleItemStore } from '@/stores/scheduleItem';
 import { ref, computed, reactive } from 'vue';
 
-const dialog = ref(false);
 const router = useRouter();
 const startX = reactive({});
 const swipeOffset = reactive({});
@@ -113,11 +117,11 @@ const isMouseDown = reactive({});
 const activeSwipeIndex = ref(null);
 const scheduleItemStore = useScheduleItemStore();
 const isMobile = mobile.setupMobileUtils();
-const { list: orders, element: order, ready } = storeToRefs(scheduleItemStore);
+const { list: orders, element: order, ready, showForm } = storeToRefs(scheduleItemStore);
 
 const timelineOrders = computed(() => {
   if (!orders.value) return [];
-  return orders.value.sort((a, b) => a.index - b.index);
+  return orders.value.slice().sort((a, b) => a.index - b.index);
 });
 
 const isCollectionPointCompleted = (item) => {
@@ -175,13 +179,14 @@ const completeCollectionPoint = (item) => {
 
 const completeOrder = (item) => {
   order.value = item;
-  dialog.value = true;
+  showForm.value = true;
 
   activeSwipeIndex.value = null;
   swipeOffset[item.id] = 0;
 };
 
 const timelineColor = order => {
+  if (order.completed) return 'green';
   if (order.anomaly) return 'red';
   if (order.delay) return 'orange';
 

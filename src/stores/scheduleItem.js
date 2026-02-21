@@ -5,7 +5,8 @@ export const useScheduleItemStore = defineStore('schedule', {
   state: () => ({
     list: [],
     element: {},
-    ready: false
+    ready: false,
+    showForm: false
   }),
   actions: {
     updateElement(router, func) {
