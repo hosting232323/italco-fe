@@ -161,16 +161,14 @@ const { list: orders, element: order, ready } = storeToRefs(orderStore);
 
 const timelineOrders = computed(() => {
   if (!orders.value) return [];
-  return orders.value
-    .flatMap(order => order.schedule_items || [])
-    .sort((a, b) => a.index - b.index);
+  return orders.value.sort((a, b) => a.index - b.index);
 });
 
 const totOrder = computed(() => {
   if (!orders.value || !Array.isArray(orders.value)) return 0;
 
   return orders.value.reduce((total, group) => {
-    const validItems = group.schedule_items?.filter(
+    const validItems = group.filter(
       item => item.operation_type !== 'CollectionPoint'
     ) || [];
     return total + validItems.length;
