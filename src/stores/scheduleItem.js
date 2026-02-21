@@ -1,6 +1,5 @@
 import http from '@/utils/http';
 import { defineStore } from 'pinia';
-import storeUtils from '@/utils/stores';
 
 export const useScheduleItemStore = defineStore('schedule', {
   state: () => ({
@@ -12,7 +11,7 @@ export const useScheduleItemStore = defineStore('schedule', {
     updateElement(router, func) {
       http.postRequest(
         `schedule/${this.element.id}`,
-        storeUtils.exclude_keys(this.element, EXCLUDED_KEYS),
+        {},
         func,
         'PUT',
         router
@@ -25,7 +24,7 @@ export const useScheduleItemStore = defineStore('schedule', {
         this.setList,
         'GET',
         router
-      )
+      );
     },
     setList(data) {
       this.list = data.schedule_items;
