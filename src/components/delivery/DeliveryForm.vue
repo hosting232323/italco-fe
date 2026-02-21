@@ -176,6 +176,7 @@ import orderUtils from '@/utils/order';
 import { useRouter } from 'vue-router';
 import validation from '@/utils/validation';
 import { useOrderStore } from '@/stores/order';
+import { useScheduleItemStore } from '@/stores/scheduleItem';
 
 const form = ref(null);
 const theme = useTheme();
@@ -188,6 +189,7 @@ const signaturePad = ref(null);
 const orderStore = useOrderStore();
 const emits = defineEmits(['cancel']);
 const isMobile = mobile.setupMobileUtils();
+const scheduleItemStore = useScheduleItemStore();
 const { element: order } = storeToRefs(orderStore);
 
 const STATUS_MAP = {
@@ -211,7 +213,7 @@ const submitForm = async () => {
   orderStore.updateElementWithFormData(router, function (data) {
     loading.value = false;
     if (data.status == 'ok') {
-      orderStore.initListDelivery(router);
+      scheduleItemStore.initList(router);
       order.value = {};
       emits('cancel');
     }

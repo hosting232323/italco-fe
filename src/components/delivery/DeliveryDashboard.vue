@@ -142,7 +142,7 @@ import { storeToRefs } from 'pinia';
 import mobile from '@/utils/mobile';
 import { useRouter } from 'vue-router';
 import orderUtils from '@/utils/order';
-import { useOrderStore } from '@/stores/order';
+import { useScheduleItemStore } from '@/stores/scheduleItem';
 import Form from '@/components/delivery/DeliveryForm';
 import { ref, computed, onMounted, onUnmounted, reactive } from 'vue';
 
@@ -155,9 +155,9 @@ const swipeOffset = reactive({});
 const isMouseDown = reactive({});
 const locationError = ref(false);
 const activeSwipeIndex = ref(null);
-const orderStore = useOrderStore();
+const scheduleItemStore = useScheduleItemStore();
 const isMobile = mobile.setupMobileUtils();
-const { list: orders, element: order, ready } = storeToRefs(orderStore);
+const { list: orders, element: order, ready } = storeToRefs(scheduleItemStore);
 
 const timelineOrders = computed(() => {
   if (!orders.value) return [];
@@ -167,12 +167,9 @@ const timelineOrders = computed(() => {
 const totOrder = computed(() => {
   if (!orders.value || !Array.isArray(orders.value)) return 0;
 
-  return orders.value.reduce((total, group) => {
-    const validItems = group.filter(
-      item => item.operation_type !== 'CollectionPoint'
-    ) || [];
-    return total + validItems.length;
-  }, 0);
+  return orders.value.filter(
+    item => item.operation_type !== 'CollectionPoint'
+  ).length;
 });
 
 const isCollectionPointCompleted = (item) => {
@@ -222,7 +219,7 @@ const completeCollectionPoint = (item) => {
     completed: true
   }, () => {
     ready.value = false;
-    orderStore.initListDelivery(router);
+    scheduleItemStore.initList(router);
     activeSwipeIndex.value = null;
     swipeOffset[item.id] = 0;
   }, 'PUT', router);
@@ -274,7 +271,7 @@ onMounted(() => {
     position => {
       if (!firstPositionHandled) {
         firstPositionHandled = true;
-        if (!ready.value) orderStore.initListDelivery(router);
+        if (!ready.value) scheduleItemStore.initList(router);
       }
 
       http.postRequest('user/position', {
