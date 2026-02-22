@@ -154,8 +154,7 @@
           md="5"
         >
           <div style="height: 100%; border-radius: 12px; overflow: hidden;">
-            <!-- <GoogleMap v-if="schedule.schedule_items && schedule.schedule_items.length > 0" /> -->
-            <FreeMap v-if="schedule.schedule_items && schedule.schedule_items.length > 0" />
+            <OverStreetMap v-if="schedule.schedule_items && schedule.schedule_items.length > 0" />
           </div>
         </v-col>
       </v-row>
@@ -164,9 +163,8 @@
 </template>
 
 <script setup>
-// import GoogleMap from '@/components/GoogleMap.vue';
-import FreeMap from '@/components/FreeMap.vue';
 import FormButtons from '@/components/FormButtons';
+import OverStreetMap from '@/components/OverStreetMap.vue';
 
 import { ref, watch } from 'vue';
 import { useTheme } from 'vuetify';
