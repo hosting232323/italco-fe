@@ -98,7 +98,7 @@
                       <v-icon>mdi-drag</v-icon>
                     </div>
                   </v-col>
-                  <v-col cols="4">
+                  <v-col :cols="editingAddressId === (element.order_id || element.collection_point_id) ? 10 : 4">
                     <p>
                       {{ element.index + 1 }}: 
                       {{ element.operation_type == 'Order' ? 'Ordine' : 'Punto di ritiro' }}
@@ -106,13 +106,8 @@
                     </p>
 
                     <div style="font-size: smaller; padding-right: 5px;">
-                      
-                      <!-- 🔹 MODALITÀ VISUALIZZAZIONE -->
                       <template v-if="editingAddressId !== (element.order_id || element.collection_point_id)">
-                        
                         {{ element.address }}, {{ element.cap }}
-
-                        <!-- ⚠️ Warning -->
                         <v-icon
                           v-if="notFoundAddresses.includes(element.address)"
                           color="warning"
@@ -122,7 +117,6 @@
                           mdi-alert-circle
                         </v-icon>
 
-                        <!-- ✏️ Edit -->
                         <v-icon
                           v-if="notFoundAddresses.includes(element.address)"
                           size="16"
@@ -132,12 +126,9 @@
                         >
                           mdi-pencil
                         </v-icon>
-
                       </template>
 
-                      <!-- 🔹 MODALITÀ EDIT -->
                       <template v-else>
-
                         <GooglePlacesAutocomplete
                           v-model="element.address"
                           label="Modifica indirizzo"
@@ -145,20 +136,19 @@
                           custom-class="mt-2"
                           @addressComponents="(data) => updateAddress(element, data)"
                         />
-
                         <v-btn
                           icon="mdi-close"
                           size="x-small"
                           variant="text"
                           @click="stopEditAddress"
                         />
-
                       </template>
-
                     </div>
-
                   </v-col>
-                  <v-col cols="6">
+                  <v-col   
+                    v-if="editingAddressId !== (element.order_id || element.collection_point_id)"
+                    cols="6"
+                  >
                     <div :class="['d-flex', 'align-center', isMobile ? 'flex-column' : '']">
                       <v-text-field 
                         v-model="element.start_time_slot" 
