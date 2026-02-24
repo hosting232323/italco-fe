@@ -104,9 +104,59 @@
                       {{ element.operation_type == 'Order' ? 'Ordine' : 'Punto di ritiro' }}
                       ID {{ element.operation_type == 'Order' ? element.order_id : element.collection_point_id }}
                     </p>
-                    <p style="font-size: smaller; padding-right: 5px;">
-                      {{ element.address }}, {{ element.cap }}
-                    </p>
+
+                    <div style="font-size: smaller; padding-right: 5px;">
+                      
+                      <!-- 🔹 MODALITÀ VISUALIZZAZIONE -->
+                      <template v-if="editingAddressId !== (element.order_id || element.collection_point_id)">
+                        
+                        {{ element.address }}, {{ element.cap }}
+
+                        <!-- ⚠️ Warning -->
+                        <v-icon
+                          v-if="notFoundAddresses.includes(element.address)"
+                          color="warning"
+                          size="16"
+                          class="ml-1"
+                        >
+                          mdi-alert-circle
+                        </v-icon>
+
+                        <!-- ✏️ Edit -->
+                        <v-icon
+                          v-if="notFoundAddresses.includes(element.address)"
+                          size="16"
+                          class="ml-1"
+                          style="cursor:pointer"
+                          @click="startEditAddress(element)"
+                        >
+                          mdi-pencil
+                        </v-icon>
+
+                      </template>
+
+                      <!-- 🔹 MODALITÀ EDIT -->
+                      <template v-else>
+
+                        <GooglePlacesAutocomplete
+                          v-model="element.address"
+                          label="Modifica indirizzo"
+                          :rules="validation.requiredRules"
+                          custom-class="mt-2"
+                          @addressComponents="(data) => updateAddress(element, data)"
+                        />
+
+                        <v-btn
+                          icon="mdi-close"
+                          size="x-small"
+                          variant="text"
+                          @click="stopEditAddress"
+                        />
+
+                      </template>
+
+                    </div>
+
                   </v-col>
                   <v-col cols="6">
                     <div :class="['d-flex', 'align-center', isMobile ? 'flex-column' : '']">
@@ -154,7 +204,7 @@
           md="5"
         >
           <div style="height: 100%; border-radius: 12px; overflow: hidden;">
-            <OverStreetMap v-if="schedule.schedule_items && schedule.schedule_items.length > 0" />
+            <OverStreetMap v-if="schedule.schedule_items && schedule.schedule_items.length > 0" @not-found-addresses="handleNotFound" />
           </div>
         </v-col>
       </v-row>
@@ -178,6 +228,7 @@ import { useOrderStore } from '@/stores/order';
 import { useScheduleStore } from '@/stores/schedule';
 import { useTransportStore } from '@/stores/transport';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
+import GooglePlacesAutocomplete from '@/components/GooglePlacesAutocomplete';
 
 const form = ref(null);
 const error = ref(null);
@@ -197,6 +248,28 @@ const { element: schedule } = storeToRefs(scheduleStore);
 const orders = storesUtils.getStoreList(orderStore, router);
 const transports = storesUtils.getStoreList(transportStore, router);
 const users = storesUtils.getStoreList(administrationUserStore, router);
+
+const notFoundAddresses = ref([]);
+
+const handleNotFound = (addresses) => {
+  notFoundAddresses.value = addresses;
+};
+
+const editingAddressId = ref(null);
+
+const startEditAddress = (element) => {
+  editingAddressId.value = element.order_id || element.collection_point_id;
+};
+
+const stopEditAddress = () => {
+  editingAddressId.value = null;
+};
+
+const updateAddress = (element, data) => {
+  element.address = data.address;
+  element.cap = data.cap;
+  editingAddressId.value = null;
+};
 
 const addUser = () => {
   if (!selectedUser.value) return;

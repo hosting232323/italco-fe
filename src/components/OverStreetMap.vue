@@ -72,6 +72,8 @@ const osmUrl = ref('');
 const scheduleStore = useScheduleStore();
 const { element: schedule } = storeToRefs(scheduleStore);
 
+const emits = defineEmits(['not-found-addresses']);
+
 const geocode = async (address) => {
   const res = await fetch(
     `https://panificio-mulinobianco.it/nominatim/search?format=json&q=${encodeURIComponent(address)}`
@@ -115,11 +117,25 @@ const updateMap = async () => {
   markers.value.forEach(m => map.value.removeLayer(m));
   markers.value = [];
 
-  locations.value = (await Promise.all(
-    schedule.value.schedule_items.map(i =>
-      i.address ? geocode(i.address) : null
-    )
-  )).filter(Boolean);
+  const results = await Promise.all(
+    schedule.value.schedule_items.map(async (item) => {
+      if (!item.address) return null;
+
+      const coords = await geocode(item.address);
+
+      return {
+        address: item.address,
+        coords
+      };
+    })
+  );
+
+  emits(
+    'not-found-addresses',
+    results.filter(r => r && !r.coords).map(r => r.address)
+  );
+
+  locations.value = results.filter(r => r && r.coords).map(r => r.coords);
 
   locations.value.forEach((pos, i) => {
     const marker = L.marker([pos.lat, pos.lng], { icon: redIcon }).addTo(map.value);
