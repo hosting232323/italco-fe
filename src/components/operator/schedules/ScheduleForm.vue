@@ -129,19 +129,22 @@
                       </template>
 
                       <template v-else>
-                        <GooglePlacesAutocomplete
-                          v-model="element.address"
-                          label="Modifica indirizzo"
-                          :rules="validation.requiredRules"
-                          custom-class="mt-2"
-                          @addressComponents="(data) => updateAddress(element, data)"
-                        />
-                        <v-btn
-                          icon="mdi-close"
-                          size="x-small"
-                          variant="text"
-                          @click="stopEditAddress"
-                        />
+                        <div class="d-flex justify-center align-center">
+                          <GooglePlacesAutocomplete
+                            v-model="element.address"
+                            label="Modifica indirizzo"
+                            :rules="validation.requiredRules"
+                            custom-class="mt-2"
+                            @addressComponents="(data) => updateAddress(data, element)"
+                          />
+                          <v-btn
+                            icon="mdi-close"
+                            variant="text"
+                            style="margin-bottom: 22px;"
+                            @click="stopEditAddress"
+                          />
+                        </div>
+
                       </template>
                     </div>
                   </v-col>
@@ -206,6 +209,7 @@
 import FormButtons from '@/components/FormButtons';
 import OverStreetMap from '@/components/OverStreetMap.vue';
 
+import http from '@/utils/http';
 import { ref, watch } from 'vue';
 import { useTheme } from 'vuetify';
 import mobile from '@/utils/mobile';
@@ -255,9 +259,22 @@ const stopEditAddress = () => {
   editingAddressId.value = null;
 };
 
-const updateAddress = (element, data) => {
-  element.address = data.address;
-  element.cap = data.cap;
+const updateAddress = (value, element) => {
+  console.log(element.operation_type);
+  if(element.operation_type == 'CollectionPoint'){
+    console.log('object');
+    http.postRequest(`collection-point/${element.collection_point_id}`,{ 
+      address: value.address + value.cap 
+    }, (data) => {
+      console.log(data)
+    },'PUT', router);
+  }
+  else
+    http.postRequest(`order/${element.order_id}`,{ 
+      address: value.address + value.cap 
+    }, (data) => {
+      console.log(data)
+    },'PUT', router);
   editingAddressId.value = null;
 };
 
