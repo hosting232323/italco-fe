@@ -76,7 +76,7 @@
           </p>
         </template>
         <template #[`item.status`]="{ item }">
-          <v-chip :color="orderUtils.LABELS.find(label => label.value == item.status).color">
+          <v-chip :color="orderUtils.LABELS.find(label => label.value == item.status).color" @click="openStatusesPopup(item)">
             {{ orderUtils.LABELS.find(label => label.value == item.status).title }}
           </v-chip>
           <v-chip
@@ -195,6 +195,14 @@ const openFormPopUp = () => {
 const openSchedulationPopUp = () => {
   dialog.value = true;
   popUpType.value = 'schedulation';
+};
+
+const openStatusesPopup = (item) => {
+  http.getRequest(`order/get-statuses/${item.id}`, {}, (data) => {
+    console.log(data);
+  }, 'GET', router)
+  dialog.value = true;
+  popUpType.value = 'statuses';
 };
 
 const formatServices = (services) => {
