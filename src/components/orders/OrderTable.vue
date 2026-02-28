@@ -198,7 +198,9 @@ const openSchedulationPopUp = () => {
 };
 
 const openStatusesPopup = (item) => {
-  http.getRequest(`order/get-statuses/${item.id}`, {}, (data) => {
+  http.getRequest(`order/get-statuses/${item.id}`, {
+    order_id: item.id
+  }, (data) => {
     console.log(data);
   }, 'GET', router)
   dialog.value = true;
