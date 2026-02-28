@@ -260,20 +260,23 @@ const stopEditAddress = () => {
 };
 
 const updateAddress = (value, element) => {
-  console.log(element.operation_type);
+  element.address = value.address;
+  element.cap = value.cap;
   if(element.operation_type == 'CollectionPoint'){
     console.log('object');
     http.postRequest(`collection-point/${element.collection_point_id}`,{ 
-      address: value.address + value.cap 
-    }, (data) => {
-      console.log(data)
+      address: value.address,
+      cap: value.cap
+    }, () => {
+      orderStore.initList(router);
     },'PUT', router);
   }
   else
     http.postRequest(`order/${element.order_id}`,{ 
-      address: value.address + value.cap 
-    }, (data) => {
-      console.log(data)
+      address: value.address,
+      cap: value.cap
+    }, () => {
+      orderStore.initList(router);
     },'PUT', router);
   editingAddressId.value = null;
 };
