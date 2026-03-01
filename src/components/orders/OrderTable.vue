@@ -76,7 +76,10 @@
           </p>
         </template>
         <template #[`item.status`]="{ item }">
-          <v-chip :color="orderUtils.LABELS.find(label => label.value == item.status).color">
+          <v-chip
+            :color="orderUtils.LABELS.find(label => label.value == item.status).color"
+            @click="openStatusesPopup(item)"
+          >
             {{ orderUtils.LABELS.find(label => label.value == item.status).title }}
           </v-chip>
           <v-chip
@@ -107,6 +110,11 @@
         @cancel="dialog = false"
         @go-to-shedule-form="popUpType = 'form'"
       />
+      <StatusPopup
+        v-else-if="popUpType == 'statuses'"
+        :statuses="statuses"
+        @cancel="dialog = false"
+      />
       <v-card
         v-else-if="popUpType == 'message' && scheduleFormMessage"
         :title="scheduleFormMessage"
@@ -117,6 +125,7 @@
 
 <script setup>
 import Action from '@/components/orders/OrderActions';
+import StatusPopup from '@/components/orders/StatusPopup';
 import ScheduleForm from '@/components/operator/schedules/ScheduleForm';
 import SchedulationForm from '@/components/operator/schedules/SchedulationForm';
 
@@ -131,6 +140,7 @@ import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
 import { useScheduleStore } from '@/stores/schedule';
 
+const statuses = ref([]);
 const theme = useTheme();
 const dialog = ref(false);
 const router = useRouter();
@@ -195,6 +205,19 @@ const openFormPopUp = () => {
 const openSchedulationPopUp = () => {
   dialog.value = true;
   popUpType.value = 'schedulation';
+};
+
+const openStatusesPopup = (item) => {
+  dialog.value = true;
+  popUpType.value = 'message';
+  scheduleFormMessage.value = 'Loading...';
+
+  http.getRequest(`order/get-statuses/${item.id}`, {
+    order_id: item.id
+  }, (data) => {
+    popUpType.value = 'statuses';
+    statuses.value = data.statuses;
+  }, 'GET', router);
 };
 
 const formatServices = (services) => {
