@@ -86,104 +86,10 @@
               handle=".drag-handle"
             >
               <template #item="{ element }">
-                <v-row
-                  no-gutters
-                  class="mt-2"
-                >
-                  <v-col cols="1">
-                    <div
-                      class="drag-handle"
-                      style="cursor: grab;"
-                    >
-                      <v-icon>mdi-drag</v-icon>
-                    </div>
-                  </v-col>
-                  <v-col :cols="editingAddressId === (element.order_id || element.collection_point_id) ? 10 : 4">
-                    <p>
-                      {{ element.index + 1 }}: 
-                      {{ element.operation_type == 'Order' ? 'Ordine' : 'Punto di ritiro' }}
-                      ID {{ element.operation_type == 'Order' ? element.order_id : element.collection_point_id }}
-                    </p>
-
-                    <div style="font-size: smaller; padding-right: 5px;">
-                      <template v-if="editingAddressId !== (element.order_id || element.collection_point_id)">
-                        {{ element.address }}, {{ element.cap }}
-                        <v-icon
-                          v-if="notFoundAddresses.includes(element.address)"
-                          color="warning"
-                          size="16"
-                          class="ml-1"
-                        >
-                          mdi-alert-circle
-                        </v-icon>
-
-                        <v-icon
-                          v-if="notFoundAddresses.includes(element.address)"
-                          size="16"
-                          class="ml-1"
-                          style="cursor:pointer"
-                          @click="startEditAddress(element)"
-                        >
-                          mdi-pencil
-                        </v-icon>
-                      </template>
-
-                      <template v-else>
-                        <div class="d-flex justify-center align-center">
-                          <GooglePlacesAutocomplete
-                            v-model="element.address"
-                            label="Modifica indirizzo"
-                            :rules="validation.requiredRules"
-                            custom-class="mt-2"
-                            @addressComponents="(data) => updateAddress(data, element)"
-                          />
-                          <v-btn
-                            icon="mdi-close"
-                            variant="text"
-                            style="margin-bottom: 22px;"
-                            @click="stopEditAddress"
-                          />
-                        </div>
-
-                      </template>
-                    </div>
-                  </v-col>
-                  <v-col   
-                    v-if="editingAddressId !== (element.order_id || element.collection_point_id)"
-                    cols="6"
-                  >
-                    <div :class="['d-flex', 'align-center', isMobile ? 'flex-column' : '']">
-                      <v-text-field 
-                        v-model="element.start_time_slot" 
-                        label="Time Slot Start"
-                        type="time"
-                        :rules="validation.requiredRules" 
-                        dense
-                        hide-details 
-                        :style="isMobile ? { margin: '15px 0', width: '' }: { width: '200px', marginRight: '15px' }"
-                      />
-                      <v-text-field 
-                        v-model="element.end_time_slot" 
-                        label="Time Slot End"
-                        type="time"
-                        :rules="validation.futureTime(element.start_time_slot)" 
-                        dense
-                        hide-details 
-                        :style="isMobile ? { width: '' }: { width: '200px' }"
-                      />
-                    </div>
-                  </v-col>
-                  <v-col cols="1">
-                    <v-btn
-                      v-if="element.operation_type === 'Order' &&
-                        schedule.schedule_items.filter(item => item.operation_type == 'Order').length > 1"
-                      variant="text"
-                      icon="mdi-delete"
-                      :color="theme.current.value.primaryColor"
-                      @click="removeOrder(element)"
-                    />
-                  </v-col>
-                </v-row>
+                <ScheduleItem
+                  :element="element"
+                  :notFoundAddresses="notFoundAddresses"
+                />
               </template>
             </draggable>
             <FormButtons
@@ -197,7 +103,10 @@
           md="5"
         >
           <div style="height: 100%; border-radius: 12px; overflow: hidden;">
-            <OverStreetMap v-if="schedule.schedule_items && schedule.schedule_items.length > 0" @not-found-addresses="handleNotFound" />
+            <OverStreetMap
+              v-if="schedule.schedule_items && schedule.schedule_items.length > 0"
+              @not-found-addresses="handleNotFound"
+            />
           </div>
         </v-col>
       </v-row>
@@ -208,10 +117,9 @@
 <script setup>
 import FormButtons from '@/components/FormButtons';
 import OverStreetMap from '@/components/OverStreetMap.vue';
+import ScheduleItem from '@/components/operator/schedules/ScheduleItem.vue';
 
-import http from '@/utils/http';
 import { ref, watch } from 'vue';
-import { useTheme } from 'vuetify';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import draggable from 'vuedraggable';
@@ -222,63 +130,28 @@ import { useOrderStore } from '@/stores/order';
 import { useScheduleStore } from '@/stores/schedule';
 import { useTransportStore } from '@/stores/transport';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
-import GooglePlacesAutocomplete from '@/components/GooglePlacesAutocomplete';
 
 const form = ref(null);
 const error = ref(null);
-const theme = useTheme();
 const router = useRouter();
 const loading = ref(false);
 const selectedUser = ref(null);
+const notFoundAddresses = ref([]);
 const selectedOrderId = ref(null);
-const orderStore = useOrderStore();
 const emits = defineEmits(['cancel']);
+const isMobile = mobile.setupMobileUtils();
+
+const orderStore = useOrderStore();
 const scheduleStore = useScheduleStore();
 const transportStore = useTransportStore();
-const isMobile = mobile.setupMobileUtils();
 const administrationUserStore = useAdministrationUserStore();
-
 const { element: schedule } = storeToRefs(scheduleStore);
 const orders = storesUtils.getStoreList(orderStore, router);
 const transports = storesUtils.getStoreList(transportStore, router);
 const users = storesUtils.getStoreList(administrationUserStore, router);
 
-const notFoundAddresses = ref([]);
-
 const handleNotFound = (addresses) => {
   notFoundAddresses.value = addresses;
-};
-
-const editingAddressId = ref(null);
-
-const startEditAddress = (element) => {
-  editingAddressId.value = element.order_id || element.collection_point_id;
-};
-
-const stopEditAddress = () => {
-  editingAddressId.value = null;
-};
-
-const updateAddress = (value, element) => {
-  element.address = value.address;
-  element.cap = value.cap;
-  if(element.operation_type == 'CollectionPoint'){
-    console.log('object');
-    http.postRequest(`collection-point/${element.collection_point_id}`,{ 
-      address: value.address,
-      cap: value.cap
-    }, () => {
-      orderStore.initList(router);
-    },'PUT', router);
-  }
-  else
-    http.postRequest(`order/${element.order_id}`,{ 
-      address: value.address,
-      cap: value.cap
-    }, () => {
-      orderStore.initList(router);
-    },'PUT', router);
-  editingAddressId.value = null;
 };
 
 const addUser = () => {
@@ -317,22 +190,6 @@ const addOrder = () => {
     orderToAdd, 'Order', schedule.value.schedule_items.length
   ));
   selectedOrderId.value = null;
-};
-
-const removeOrder = (order) => {
-  const remainingItems = schedule.value.schedule_items.filter(
-    item => !(item.operation_type === 'Order' && item.order_id === order.order_id));
-
-  const usedCollectionPointIds = new Set(remainingItems.filter(item => item.operation_type === 'Order')
-    .flatMap(item => Object.values(item.products).map(product => product.collection_point.id)));
-
-  const removedOrderCollectionPointIds = new Set(Object.values(order.products).map(product => product.collection_point.id));
-
-  schedule.value.schedule_items = remainingItems.filter(item =>
-    item.operation_type !== 'CollectionPoint' ||
-    usedCollectionPointIds.has(item.collection_point_id) ||
-    !removedOrderCollectionPointIds.has(item.collection_point_id)
-  );
 };
 
 const submitForm = async () => {
