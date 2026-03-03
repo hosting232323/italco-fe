@@ -92,6 +92,12 @@
         <template #[`item.price`]="{ item }">
           {{ item.price == 0 ? '0' : (item.price ? item.price.toFixed(2) : '') }}€
         </template>
+        <template #[`item.delay`]="{ item }">
+          {{ item.delay ? 'Si' : 'No' }}
+        </template>
+        <template #[`item.anomaly`]="{ item }">
+          {{ item.delay ? 'Si' : 'No' }}
+        </template>
         <template #[`item.actions`]="{ item }">
           <Action :item="item" />
         </template>
@@ -163,7 +169,9 @@ const getHeaders = () => {
     { title: 'Stato', value: 'status', sortable: false },
     { title: 'Prodotti Servizi', value: 'productsServices', sortable: false },
     { title: 'Destinatario', value: 'addressee', sortable: false },
-    { title: 'Recapito', value: 'addressee_contact', sortable: false }
+    { title: 'Recapito', value: 'addressee_contact', sortable: false },
+    { title: 'Ritardo', value: 'delay', sortable: false },
+    { title: 'Anomalia', value: 'anomaly', sortable: false }
   ];
   if (role.value != 'Customer')
     headers.push({ title: 'Punto Vendita', value: 'user.nickname', sortable: false });
