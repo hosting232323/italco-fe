@@ -86,61 +86,10 @@
               handle=".drag-handle"
             >
               <template #item="{ element }">
-                <v-row
-                  no-gutters
-                  class="mt-2"
-                >
-                  <v-col cols="1">
-                    <div
-                      class="drag-handle"
-                      style="cursor: grab;"
-                    >
-                      <v-icon>mdi-drag</v-icon>
-                    </div>
-                  </v-col>
-                  <v-col cols="4">
-                    <p>
-                      {{ element.index + 1 }}: 
-                      {{ element.operation_type == 'Order' ? 'Ordine' : 'Punto di ritiro' }}
-                      ID {{ element.operation_type == 'Order' ? element.order_id : element.collection_point_id }}
-                    </p>
-                    <p style="font-size: smaller; padding-right: 5px;">
-                      {{ element.address }}, {{ element.cap }}
-                    </p>
-                  </v-col>
-                  <v-col cols="6">
-                    <div :class="['d-flex', 'align-center', isMobile ? 'flex-column' : '']">
-                      <v-text-field 
-                        v-model="element.start_time_slot" 
-                        label="Time Slot Start"
-                        type="time"
-                        :rules="validation.requiredRules" 
-                        dense
-                        hide-details 
-                        :style="isMobile ? { margin: '15px 0', width: '' }: { width: '200px', marginRight: '15px' }"
-                      />
-                      <v-text-field 
-                        v-model="element.end_time_slot" 
-                        label="Time Slot End"
-                        type="time"
-                        :rules="validation.futureTime(element.start_time_slot)" 
-                        dense
-                        hide-details 
-                        :style="isMobile ? { width: '' }: { width: '200px' }"
-                      />
-                    </div>
-                  </v-col>
-                  <v-col cols="1">
-                    <v-btn
-                      v-if="element.operation_type === 'Order' &&
-                        schedule.schedule_items.filter(item => item.operation_type == 'Order').length > 1"
-                      variant="text"
-                      icon="mdi-delete"
-                      :color="theme.current.value.primaryColor"
-                      @click="removeOrder(element)"
-                    />
-                  </v-col>
-                </v-row>
+                <ScheduleItem
+                  :element="element"
+                  :notFoundAddresses="notFoundAddresses"
+                />
               </template>
             </draggable>
             <FormButtons
@@ -154,7 +103,10 @@
           md="5"
         >
           <div style="height: 100%; border-radius: 12px; overflow: hidden;">
-            <OverStreetMap v-if="schedule.schedule_items && schedule.schedule_items.length > 0" />
+            <OverStreetMap
+              v-if="schedule.schedule_items && schedule.schedule_items.length > 0"
+              @not-found-addresses="handleNotFound"
+            />
           </div>
         </v-col>
       </v-row>
@@ -165,9 +117,9 @@
 <script setup>
 import FormButtons from '@/components/FormButtons';
 import OverStreetMap from '@/components/OverStreetMap.vue';
+import ScheduleItem from '@/components/operator/schedules/ScheduleItem.vue';
 
 import { ref, watch } from 'vue';
-import { useTheme } from 'vuetify';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import draggable from 'vuedraggable';
@@ -181,22 +133,26 @@ import { useAdministrationUserStore } from '@/stores/administrationUser';
 
 const form = ref(null);
 const error = ref(null);
-const theme = useTheme();
 const router = useRouter();
 const loading = ref(false);
 const selectedUser = ref(null);
+const notFoundAddresses = ref([]);
 const selectedOrderId = ref(null);
-const orderStore = useOrderStore();
 const emits = defineEmits(['cancel']);
+const isMobile = mobile.setupMobileUtils();
+
+const orderStore = useOrderStore();
 const scheduleStore = useScheduleStore();
 const transportStore = useTransportStore();
-const isMobile = mobile.setupMobileUtils();
 const administrationUserStore = useAdministrationUserStore();
-
 const { element: schedule } = storeToRefs(scheduleStore);
 const orders = storesUtils.getStoreList(orderStore, router);
 const transports = storesUtils.getStoreList(transportStore, router);
 const users = storesUtils.getStoreList(administrationUserStore, router);
+
+const handleNotFound = (addresses) => {
+  notFoundAddresses.value = addresses;
+};
 
 const addUser = () => {
   if (!selectedUser.value) return;
@@ -234,22 +190,6 @@ const addOrder = () => {
     orderToAdd, 'Order', schedule.value.schedule_items.length
   ));
   selectedOrderId.value = null;
-};
-
-const removeOrder = (order) => {
-  const remainingItems = schedule.value.schedule_items.filter(
-    item => !(item.operation_type === 'Order' && item.order_id === order.order_id));
-
-  const usedCollectionPointIds = new Set(remainingItems.filter(item => item.operation_type === 'Order')
-    .flatMap(item => Object.values(item.products).map(product => product.collection_point.id)));
-
-  const removedOrderCollectionPointIds = new Set(Object.values(order.products).map(product => product.collection_point.id));
-
-  schedule.value.schedule_items = remainingItems.filter(item =>
-    item.operation_type !== 'CollectionPoint' ||
-    usedCollectionPointIds.has(item.collection_point_id) ||
-    !removedOrderCollectionPointIds.has(item.collection_point_id)
-  );
 };
 
 const submitForm = async () => {
