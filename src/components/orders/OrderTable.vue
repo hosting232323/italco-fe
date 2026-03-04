@@ -82,6 +82,28 @@
           >
             {{ orderUtils.LABELS.find(label => label.value == item.status).title }}
           </v-chip>
+          <v-tooltip v-if="item.delay">
+            <template #activator="{ props }">
+              <v-btn
+                icon="mdi-clock-alert-outline"
+                variant="text"
+                :color="theme.current.value.primaryColor"
+                v-bind="props"
+              />
+            </template>
+            <span>Ordine in ritardo</span>
+          </v-tooltip>
+          <v-tooltip v-if="item.anomaly">
+            <template #activator="{ props }">
+              <v-btn
+                icon="mdi-alert-outline"
+                variant="text"
+                :color="theme.current.value.primaryColor"
+                v-bind="props"
+              />
+            </template>
+            <span>Anomalia</span>
+          </v-tooltip>
           <v-chip
             v-if="item.external_status"
             :color="orderUtils.LABELS.find(label => label.value == item.external_status).color"
