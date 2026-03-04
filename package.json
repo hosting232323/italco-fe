@@ -13,7 +13,7 @@
     "core-js": "^3.48.0",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
-    "generic-module": "git+https://github.com/hosting232323/generic-module.git#package",
+    "generic-module": "git+https://github.com/hosting232323/generic-module.git",
     "hashids": "^2.3.0",
     "leaflet": "^1.9.4",
     "marked": "^17.0.3",
