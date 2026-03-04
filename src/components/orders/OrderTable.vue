@@ -82,20 +82,28 @@
           >
             {{ orderUtils.LABELS.find(label => label.value == item.status).title }}
           </v-chip>
-          <div>
-            <v-tooltip v-if="item.delay">
-              <template #activator="{ props }">
-                <v-icon v-bind="props" class="mr-1">mdi-clock-alert-outline</v-icon>
-              </template>
-              <span>Ordine in ritardo</span>
-            </v-tooltip>
-            <v-tooltip  v-if="item.anomaly">
-              <template #activator="{ props }">
-                <v-icon v-bind="props">mdi-alert-outline</v-icon>
-              </template>
-              <span>Anomalia</span>
-            </v-tooltip>
-          </div>
+          <v-tooltip v-if="item.delay">
+            <template #activator="{ props }">
+              <v-btn
+                icon="mdi-clock-alert-outline"
+                variant="text"
+                :color="theme.current.value.primaryColor"
+                v-bind="props"
+              />
+            </template>
+            <span>Ordine in ritardo</span>
+          </v-tooltip>
+          <v-tooltip v-if="item.anomaly">
+            <template #activator="{ props }">
+              <v-btn
+                icon="mdi-alert-outline"
+                variant="text"
+                :color="theme.current.value.primaryColor"
+                v-bind="props"
+              />
+            </template>
+            <span>Anomalia</span>
+          </v-tooltip>
           <v-chip
             v-if="item.external_status"
             :color="orderUtils.LABELS.find(label => label.value == item.external_status).color"
@@ -106,12 +114,6 @@
         <template #[`item.price`]="{ item }">
           {{ item.price == 0 ? '0' : (item.price ? item.price.toFixed(2) : '') }}€
         </template>
-        <!-- <template #[`item.delay`]="{ item }">
-          {{ item.delay ? 'Si' : 'No' }}
-        </template>
-        <template #[`item.anomaly`]="{ item }">
-          {{ item.delay ? 'Si' : 'No' }}
-        </template> -->
         <template #[`item.actions`]="{ item }">
           <Action :item="item" />
         </template>
