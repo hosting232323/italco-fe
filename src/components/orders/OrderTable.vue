@@ -229,11 +229,10 @@ const formatServices = (services) => {
 
   return Object.entries(counter)
     .flatMap(([name, count]) => {
-      if (count > 3) {
+      if (count > 3)
         return `${name} x${count}`;
-      } else {
+      else
         return Array(count).fill(name);
-      }
     })
     .join(', ');
 };
