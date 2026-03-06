@@ -108,9 +108,9 @@ import { useScheduleStore } from '@/stores/schedule';
 
 import GooglePlacesAutocomplete from '@/components/GooglePlacesAutocomplete';
 
-const { element } = defineProps({
-  element: {
-    type: Object,
+const { index, notFoundAddresses } = defineProps({
+  index: {
+    type: Number,
     required: true
   },
   notFoundAddresses: {
@@ -127,6 +127,7 @@ const isMobile = mobile.setupMobileUtils();
 const orderStore = useOrderStore();
 const scheduleStore = useScheduleStore();
 const { element: schedule } = storeToRefs(scheduleStore);
+const element = schedule.value.schedule_items.find(item => item.index === index);
 
 const removeOrder = (order) => {
   const remainingItems = schedule.value.schedule_items.filter(

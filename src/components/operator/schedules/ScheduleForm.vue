@@ -87,8 +87,8 @@
             >
               <template #item="{ element }">
                 <ScheduleItem
-                  :element="element"
-                  :notFoundAddresses="notFoundAddresses"
+                  :index="element.index"
+                  :not-found-addresses="notFoundAddresses"
                 />
               </template>
             </draggable>
