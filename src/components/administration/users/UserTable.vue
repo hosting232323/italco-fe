@@ -106,7 +106,7 @@ const togglePassword = (id, encrypted) => {
   if (!visiblePasswords[id]) {
     try {
       decryptedPasswords[id] = decryptPassword(encrypted, secretKey);
-    } catch (e) {
+    } catch {
       decryptedPasswords[id] = '[ERRORE DECIFRATURA]';
     }
   }
