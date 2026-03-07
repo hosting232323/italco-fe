@@ -14,18 +14,29 @@
         <v-row no-gutters>
           <v-col
             cols="12"
-            md="6"
+            md="4"
           >
             <v-text-field
               v-model="minSizeGroup"
               type="number"
-              label="Distanza minima gruppo"
+              label="Dimensione minima gruppo"
               :class="isMobile ? '' : 'mr-2'"
             />
           </v-col>
           <v-col
             cols="12"
-            md="6"
+            md="4"
+          >
+            <v-text-field
+              v-model="maxSizeGroup"
+              type="number"
+              label="Dimensione massima gruppo"
+              :class="isMobile ? '' : 'mr-2 ml-2'"
+            />
+          </v-col>
+          <v-col
+            cols="12"
+            md="4"
           >
             <v-text-field
               v-model="maxDistanceKm"
@@ -207,11 +218,13 @@ const router = useRouter();
 const transports = ref([]);
 const suggestions = ref([]);
 const deliveryUsers = ref([]);
-const minSizeGroup = ref(12);
+const minSizeGroup = ref(10);
+const maxSizeGroup = ref(14);
 const maxDistanceKm = ref(50);
-const scheduleStore = useScheduleStore();
 const isMobile = mobile.setupMobileUtils();
 const emits = defineEmits(['cancel', 'goToSheduleForm']);
+
+const scheduleStore = useScheduleStore();
 const { element: schedule } = storeToRefs(scheduleStore);
 
 const cloneUser = (user) => {
@@ -229,6 +242,7 @@ const submitDpcForm = async () => {
   http.getRequest('schedule/suggestions', {
     dpc: dpc.value,
     min_size_group: minSizeGroup.value,
+    max_size_group: maxSizeGroup.value,
     max_distance_km: maxDistanceKm.value
   }, function (data) {
     loading.value = false;
