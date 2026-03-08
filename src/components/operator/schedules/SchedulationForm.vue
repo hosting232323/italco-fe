@@ -20,6 +20,7 @@
               v-model="minSizeGroup"
               type="number"
               label="Dimensione minima gruppo"
+              :rules="validation.minGroupSizeRule(maxSizeGroup)"
               :class="isMobile ? '' : 'mr-2'"
             />
           </v-col>
@@ -30,6 +31,7 @@
             <v-text-field
               v-model="maxSizeGroup"
               type="number"
+              :rules="validation.maxGroupSizeRule(minSizeGroup)"
               label="Dimensione massima gruppo"
               :class="isMobile ? '' : 'mr-2 ml-2'"
             />
