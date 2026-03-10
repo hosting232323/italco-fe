@@ -48,11 +48,33 @@ const futureTime = (element) => [
   }
 ];
 
+const minGroupSizeRule = (maxElement) => [
+  (value) => {
+    if (value === null || value === undefined || value === '') return true;
+    if (maxElement === null || maxElement === undefined || maxElement === '') return true;
+
+    return Number(value) <= Number(maxElement) || 
+      'La dimensione minima del gruppo non può essere maggiore della massima';
+  }
+];
+
+const maxGroupSizeRule = (minElement) => [
+  (value) => {
+    if (value === null || value === undefined || value === '') return true;
+    if (minElement === null || minElement === undefined || minElement === '') return true;
+
+    return Number(value) >= Number(minElement) || 
+      'La dimensione massima del gruppo non può essere minore della minima';
+  }
+];
+
 export default {
   positiveNumberRules,
   requiredRules,
   arrayRules,
   capRules,
   phoneRules,
-  futureTime
+  futureTime,
+  minGroupSizeRule,
+  maxGroupSizeRule
 };
