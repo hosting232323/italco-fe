@@ -68,7 +68,7 @@
           type="time"
           :rules="validation.requiredRules" 
           dense
-          hide-details 
+          hide-details
           :style="isMobile ? { margin: '15px 0', width: '' }: { width: '200px', marginRight: '15px' }"
         />
         <v-text-field 
@@ -77,7 +77,7 @@
           type="time"
           :rules="validation.futureTime(element.start_time_slot)" 
           dense
-          hide-details 
+          hide-details
           :style="isMobile ? { width: '' }: { width: '200px' }"
         />
       </div>
@@ -96,6 +96,8 @@
 </template>
 
 <script setup>
+import GooglePlacesAutocomplete from '@/components/GooglePlacesAutocomplete';
+
 import { ref } from 'vue';
 import http from '@/utils/http';
 import { useTheme } from 'vuetify';
@@ -105,8 +107,6 @@ import { useRouter } from 'vue-router';
 import validation from '@/utils/validation';
 import { useOrderStore } from '@/stores/order';
 import { useScheduleStore } from '@/stores/schedule';
-
-import GooglePlacesAutocomplete from '@/components/GooglePlacesAutocomplete';
 
 const { index, notFoundAddresses } = defineProps({
   index: {
@@ -128,6 +128,11 @@ const orderStore = useOrderStore();
 const scheduleStore = useScheduleStore();
 const { element: schedule } = storeToRefs(scheduleStore);
 const element = schedule.value.schedule_items.find(item => item.index === index);
+
+if (!element.id) {
+  element.start_time_slot = '08:00';
+  element.end_time_slot = '09:00';
+}
 
 const removeOrder = (order) => {
   const remainingItems = schedule.value.schedule_items.filter(
