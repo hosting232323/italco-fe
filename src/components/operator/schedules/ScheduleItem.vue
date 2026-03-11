@@ -33,20 +33,23 @@
             size="16"
             class="ml-1"
             style="cursor:pointer"
-            @click="editingAddressId = element.order_id || element.collection_point_id"
+            @click="startEditing(element)"
           >
             mdi-pencil
           </v-icon>
         </template>
         <template v-else>
           <div class="d-flex justify-center align-center">
-            <GooglePlacesAutocomplete
-              v-model="element.address"
-              label="Modifica indirizzo"
-              :rules="validation.requiredRules"
-              custom-class="mt-2"
-              @address-components="(data) => updateAddress(data, element)"
-            />
+            <div class="d-flex flex-column" style="width: 100%;">
+              {{ previousAddress }}
+              <GooglePlacesAutocomplete
+                v-model="element.address"
+                label="Modifica indirizzo"
+                :rules="validation.requiredRules"
+                custom-class="mt-2"
+                @address-components="(data) => updateAddress(data, element)"
+              />
+            </div>
             <v-btn
               icon="mdi-close"
               variant="text"
@@ -121,6 +124,7 @@ const { index, notFoundAddresses } = defineProps({
 
 const theme = useTheme();
 const router = useRouter();
+const previousAddress = ref('');
 const editingAddressId = ref(null);
 const isMobile = mobile.setupMobileUtils();
 
@@ -168,5 +172,11 @@ const updateAddress = (value, element) => {
 const callback = () => {
   orderStore.initList(router);
   editingAddressId.value = null;
+};
+
+const startEditing = (element) => {
+  previousAddress.value = element.address;
+  editingAddressId.value = element.order_id || element.collection_point_id;
+  element.address = '';
 };
 </script>
