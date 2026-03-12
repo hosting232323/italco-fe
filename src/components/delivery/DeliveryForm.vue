@@ -8,6 +8,7 @@
         <v-select
           v-if="!['Delivered', 'Not Delivered', 'To Reschedule'].includes(actualStatus)"
           v-model="status"
+          :disabled="!!order.preselectedStatus"
           label="Stato"
           :items="STATUS_MAP[actualStatus].map(status => ({
             value: status,
@@ -168,10 +169,10 @@
 import SignaturePad from 'vue3-signature-pad';
 import FormButtons from '@/components/FormButtons';
 
-import { ref } from 'vue';
 import { useTheme } from 'vuetify';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
+import { ref, onMounted } from 'vue';
 import orderUtils from '@/utils/order';
 import { useRouter } from 'vue-router';
 import validation from '@/utils/validation';
@@ -247,4 +248,10 @@ const saveSignature = () => {
   order.value.signature = file;
   signatureSuccess.value = 'Firma salvata correttamente';
 };
+
+onMounted(() => {
+  if (order.value.preselectedStatus) {
+    status.value = order.value.preselectedStatus;
+  }
+});
 </script>

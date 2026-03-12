@@ -36,12 +36,35 @@
           >
             Punto di ritiro completato
           </button>
-          <button
-            v-else-if="!item.collection_point_id && item.status == 'Delivered'"
-            @click="completeOrder(item)"
-          >
-            Completa ordine
-          </button>
+          <div  v-else-if="!item.collection_point_id && item.status == 'Booking'">
+            <button
+              style="background-color: indigo;"
+              @click="completeOrder(item, 'On Board')"
+            >
+              Stato A Bordo
+            </button>
+
+            <button
+              style="background-color: grey;"
+              @click="completeOrder(item, 'Not Delivered')"
+            >
+              Stato Non Completato
+            </button>
+
+            <button
+              style="background-color: cyan;"
+              @click="completeOrder(item, 'At Warehouse')"
+            >
+              Stato In Magazzino
+            </button>
+
+            <button
+              style="background-color: green;"
+              @click="completeOrder(item, 'To Reschedule')"
+            >
+              Stato Da Riprogrammare
+            </button>
+          </div>
           <button
             v-else
             style="cursor: default;"
@@ -163,8 +186,12 @@ const completeCollectionPoint = (item) => {
   }, 'PUT', router);
 };
 
-const completeOrder = (item) => {
+const completeOrder = (item, status = null) => {
   order.value = item;
+
+  if (status) {
+    order.value.preselectedStatus = status;
+  }
   showForm.value = true;
 
   activeSwipeIndex.value = null;
