@@ -6,8 +6,19 @@ const LABELS = [
     icon: 'mdi-timer-sand'
   },
   {
+    value: 'Acquired',
+    title: 'Acquisito',
+    icon: 'mdi-timer-sand'
+  },
+  {
     value: 'Confirmed',
     title: 'Confermato',
+    color: 'blue',
+    icon: 'mdi-progress-clock'
+  },
+  {
+    value: 'Scheduled',
+    title: 'In Bdx',
     color: 'blue',
     icon: 'mdi-progress-clock'
   },
