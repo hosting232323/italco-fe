@@ -258,7 +258,7 @@ const submitDpcForm = async () => {
 };
 
 const openSchedule = (suggestion) => {
-  schedule.value.date = dpc.value;
+  schedule.value.date = booking_date.value;
   schedule.value.schedulation = true;
   schedule.value.users = suggestion.delivery_users;
   schedule.value.schedule_items = suggestion.schedule_items;
