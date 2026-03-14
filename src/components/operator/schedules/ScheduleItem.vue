@@ -40,7 +40,10 @@
         </template>
         <template v-else>
           <div class="d-flex justify-center align-center">
-            <div class="d-flex flex-column" style="width: 100%;">
+            <div
+              class="d-flex flex-column"
+              style="width: 100%;"
+            >
               {{ previousAddress }}
               <GooglePlacesAutocomplete
                 v-model="element.address"
