@@ -104,11 +104,22 @@
             </template>
             <span>Anomalia</span>
           </v-tooltip>
+          <v-tooltip v-if="item.confirmed">
+            <template #activator="{ props }">
+              <v-btn
+                icon="mdi-clipboard-check-outline"
+                variant="text"
+                :color="theme.current.value.primaryColor"
+                v-bind="props"
+              />
+            </template>
+            <span>Confermato</span>
+          </v-tooltip>
           <v-chip
             v-if="item.external_status"
-            :color="orderUtils.LABELS.find(label => label.value == item.external_status).color"
+            :color="orderUtils.EXTERNAL_LABELS.find(label => label.value == item.external_status).color"
           >
-            Stato Esterno {{ orderUtils.LABELS.find(label => label.value == item.external_status).title }}
+            Stato Esterno {{ orderUtils.EXTERNAL_LABELS.find(label => label.value == item.external_status).title }}
           </v-chip>
         </template>
         <template #[`item.price`]="{ item }">
