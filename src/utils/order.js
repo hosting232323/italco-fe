@@ -1,13 +1,19 @@
 // Property icon is used in @/views/OrderStatus
 const LABELS = [
   {
-    value: 'New',
-    title: 'Nuovo',
+    value: 'Acquired',
+    title: 'Acquisito',
     icon: 'mdi-timer-sand'
   },
   {
-    value: 'Confirmed',
-    title: 'Confermato',
+    value: 'Booked',
+    title: 'Booked',
+    color: 'blue',
+    icon: 'mdi-calendar-check'
+  },
+  {
+    value: 'Scheduled',
+    title: 'In Bdx',
     color: 'blue',
     icon: 'mdi-progress-clock'
   },
@@ -27,6 +33,78 @@ const LABELS = [
     title: 'Completato',
     color: 'green',
     icon: 'mdi-check-circle-outline'
+  },
+  {
+    value: 'Not Delivered',
+    title: 'Non Completato',
+    color: 'red'
+  },
+  {
+    value: 'To Reschedule',
+    title: 'Da Riprogrammare',
+    color: 'orange'
+  },
+  {
+    value: 'Redelivery',
+    title: 'Riprogrammato',
+    color: 'green'
+  },
+  { 
+    value: 'Replacement',
+    title: 'Sostituzione',
+    color: 'purple'
+  },
+  { 
+    value: 'Cancelled', 
+    title: 'Annullato', 
+    color: 'red' 
+  },
+  { 
+    value: 'Urgent', 
+    title: 'Urgente', 
+    color: 'red' 
+  },
+  { 
+    value: 'Verification', 
+    title: 'In Verifica', 
+    color: 'yellow' 
+  },
+  { 
+    value: 'Cancelled to be Refunded', 
+    title: 'Annullato da rimborsare', 
+    color: 'red' 
+  },
+  { 
+    value: 'Deleted', 
+    title: 'Eliminato', 
+    color: 'grey' 
+  }
+];
+
+const EXTERNAL_LABELS = [
+  {
+    value: 'New',
+    title: 'Nuovo'
+  },
+  {
+    value: 'Confirmed',
+    title: 'Confermato',
+    color: 'blue'
+  },
+  {
+    value: 'Booking',
+    title: 'A Bordo',
+    color: 'blue'
+  },
+  {
+    value: 'At Warehouse',
+    title: 'In Magazzino',
+    color: 'orange'
+  },
+  {
+    value: 'Delivered',
+    title: 'Completato',
+    color: 'green'
   },
   {
     value: 'Not Delivered',
@@ -96,5 +174,6 @@ const TYPES = [
 
 export default {
   LABELS,
+  EXTERNAL_LABELS,
   TYPES
 };

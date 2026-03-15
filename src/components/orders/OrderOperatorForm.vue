@@ -74,26 +74,52 @@
       cols="12"
       md="6"
     >
-      <v-radio-group
-        v-model="order.elevator"
-        inline
-        :rules="[
-          (value) => {
-            if (value !== undefined) return true;
-            return 'Campo obbligatorio';
-          }
-        ]"
-      >
-        <label class="mr-2 mt-2 ml-5">Ascensore:</label>
-        <v-radio
-          label="Sì"
-          :value="true"
-        />
-        <v-radio
-          label="No"
-          :value="false"
-        />
-      </v-radio-group>
+      <v-row no-gutters>
+        <v-col
+          cols="12"
+          md="6"
+        >
+          <v-radio-group
+            v-model="order.elevator"
+            inline
+            :rules="[
+              (value) => value !== undefined ? true : 'Campo obbligatorio'
+            ]"
+          >
+            <label class="mr-2 mt-2 ml-5">Ascensore:</label>
+            <v-radio
+              label="Sì"
+              :value="true"
+            />
+            <v-radio
+              label="No"
+              :value="false"
+            />
+          </v-radio-group>
+        </v-col>
+        <v-col
+          cols="12"
+          md="6"
+        >
+          <v-radio-group
+            v-model="order.confirmed"
+            inline
+            :rules="[
+              (value) => value !== undefined ? true : 'Campo obbligatorio'
+            ]"
+          >
+            <label class="mr-2 mt-2 ml-5">Confermato:</label>
+            <v-radio
+              label="Sì"
+              :value="true"
+            />
+            <v-radio
+              label="No"
+              :value="false"
+            />
+          </v-radio-group>
+        </v-col>
+      </v-row>
     </v-col>
     <v-col
       cols="12"
