@@ -8,14 +8,13 @@
         Request
       </h3>
       <pre class="json">
-{{ formattedRequest }}
+        {{ formattedRequest }}
       </pre>
-
       <h3 class="section-title">
         Response
       </h3>
       <pre class="json">
-{{ formattedResponse }}
+        {{ formattedResponse }}
       </pre>
     </v-card-text>
   </v-card>
@@ -31,6 +30,7 @@ import { useLogStore } from '@/stores/log';
 const log = ref({});
 const loading = ref(true);
 const router = useRouter();
+
 const logStore = useLogStore();
 const { selectedLog } = storeToRefs(logStore);
 
@@ -44,16 +44,17 @@ http.getRequest('log', {
 }, 'GET', router);
 
 const formattedRequest = computed(() => {
-  return JSON.stringify(JSON.parse(log.value.content).request, null, 2);
+  if (!log.value?.content) return '';
+
+  const content = JSON.parse(log.value.content);
+  return JSON.stringify(content.request ? content.request : content, null, 2);
 });
 
 const formattedResponse = computed(() => {
   if (!log.value?.content) return '';
 
   const parsedContent = JSON.parse(log.value.content);
-
   const parsedResponse = deepParse(parsedContent.response);
-
   return JSON.stringify(parsedResponse, null, 2);
 });
 
