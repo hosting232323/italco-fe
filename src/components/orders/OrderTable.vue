@@ -34,6 +34,14 @@
         :items-per-page-options="[10, 25, 50, 100]"
       >
         <template #[`item.id`]="{ item }">
+          <v-btn
+            size="small"
+            variant="text"
+            icon="mdi-circle"
+            :loading="confirmLoading[item.id]"
+            @click="confirmOrder(item)"
+            :color="item.confirmed ? 'green' : 'red'"
+          />
           {{ item.id }}
           <v-tooltip
             v-if="item.external_id"
@@ -104,17 +112,6 @@
             </template>
             <span>Anomalia</span>
           </v-tooltip>
-          <v-tooltip v-if="item.confirmed">
-            <template #activator="{ props }">
-              <v-btn
-                icon="mdi-clipboard-check-outline"
-                variant="text"
-                :color="theme.current.value.primaryColor"
-                v-bind="props"
-              />
-            </template>
-            <span>Confermato</span>
-          </v-tooltip>
           <v-chip
             v-if="item.external_status"
             :color="orderUtils.EXTERNAL_LABELS.find(label => label.value == item.external_status).color"
@@ -178,6 +175,7 @@ const theme = useTheme();
 const dialog = ref(false);
 const router = useRouter();
 const popUpType = ref(null);
+const confirmLoading = ref({});
 const userStore = useUserStore();
 const orderStore = useOrderStore();
 const scheduleFormMessage = ref('');
@@ -203,7 +201,6 @@ const getHeaders = () => {
   headers.push(
     { title: 'D.P.C.', value: 'dpc', sortable: false },
     { title: 'D.R.C.', value: 'drc', sortable: false },
-    { title: 'Data Assegnazione', value: 'assignament_date', sortable: false },
     { title: 'Data Consegna', value: 'booking_date', sortable: false },
     { title: 'Data Creazione', value: 'created_at', sortable: false }
   );
@@ -233,6 +230,18 @@ const openFormPopUp = () => {
     } else
       scheduleFormMessage.value = data.error;
   }, 'POST', router);
+};
+
+const confirmOrder = (order) => {
+  confirmLoading.value[order.id] = true;
+  http.postRequest(`order/${order.id}`, {
+    order_id: order.id,
+    confirmed: !order.confirmed
+  }, (data) => {
+    confirmLoading.value[order.id] = false;
+    if (data.status == 'ok')
+      orderStore.initList(router);
+  }, 'PUT', router);
 };
 
 const openSchedulationPopUp = () => {
