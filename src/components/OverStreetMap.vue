@@ -76,7 +76,7 @@ const emits = defineEmits(['not-found-addresses']);
 
 const geocode = async (address) => {
   const res = await fetch(
-    `https://panificio-mulinobianco.it/nominatim/search?format=json&q=${encodeURIComponent(address)}`
+    `https://wooffy.it/nominatim/search?format=json&q=${encodeURIComponent(address)}`
   );
   const data = await res.json();
   return data[0]
