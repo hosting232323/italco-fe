@@ -39,8 +39,8 @@
             variant="text"
             icon="mdi-circle"
             :loading="confirmLoading[item.id]"
-            @click="confirmOrder(item)"
             :color="item.confirmed ? 'green' : 'red'"
+            @click="confirmOrder(item)"
           />
           {{ item.id }}
           <v-tooltip
