@@ -300,10 +300,12 @@ const availableTransports = computed(() => {
   flex-wrap: wrap;
 }
 
+/* eslint-disable-next-line vue-scoped-css/no-unused-selector */
 .v-chip {
   cursor: grab;
 }
 
+/* eslint-disable-next-line vue-scoped-css/no-unused-selector */
 .v-chip:active {
   cursor: grabbing;
 }

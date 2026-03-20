@@ -50,9 +50,3 @@ const openForm = (item) => {
   activeForm.value = true;
 };
 </script>
-
-<style scoped>
-.v-table {
-  background-color: var(--item-bg-color);
-}
-</style>

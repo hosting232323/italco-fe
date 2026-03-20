@@ -32,6 +32,7 @@
     "@vitejs/plugin-vue": "^6.0.4",
     "eslint": "^9.39.3",
     "eslint-plugin-vue": "^9.33.0",
+    "eslint-plugin-vue-scoped-css": "^3.0.0",
     "globals": "^17.4.0",
     "sass": "^1.97.3",
     "unplugin-fonts": "^1.4.0",

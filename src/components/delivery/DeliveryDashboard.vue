@@ -178,6 +178,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
+/* eslint-disable-next-line vue-scoped-css/no-unused-selector */
 .selected {
   background-color: var(--item-bg-color);
   color: white;

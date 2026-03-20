@@ -130,10 +130,6 @@ const deleteItem = (item, force = false) => {
 </script>
 
 <style scoped>
-.v-table {
-  background-color: var(--item-bg-color);
-}
-
 .blur-password {
   filter: blur(6px);
 }

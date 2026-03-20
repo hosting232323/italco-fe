@@ -101,9 +101,3 @@ const filteredOrders = computed(() => {
   return result.slice().sort((a, b) => a.schedule_index - b.schedule_index);
 });
 </script>
-
-<style scoped>
-.v-table {
-  background-color: var(--item-bg-color);
-}
-</style>

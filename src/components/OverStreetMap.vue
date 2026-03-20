@@ -203,7 +203,8 @@ watch(
 );
 </script>
 
-<style>
+<style scoped>
+/* eslint-disable-next-line vue-scoped-css/no-unused-selector */
 .number-tooltip {
   background: none;
   border: none;

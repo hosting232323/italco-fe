@@ -25,13 +25,3 @@ const logStore = useLogStore();
 const { ready } = storeToRefs(logStore);
 const logs = storesUtils.getStoreList(logStore, router);
 </script>
-
-<style scoped>
-.v-table {
-  background-color: var(--item-bg-color);
-}
-
-.blur-password {
-  filter: blur(6px);
-}
-</style>
