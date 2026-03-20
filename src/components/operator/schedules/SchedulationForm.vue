@@ -84,7 +84,7 @@
                   Punti di Ritiro:
                 </p>
                 <v-list-item
-                  v-for="item in suggestion.schedule_items.filter(element => element.operation_type == 'CollectionPoint')"
+                  v-for="item in getScheduleItemsByType(suggestion, 'CollectionPoint')"
                   :key="item.collection_point_id"
                 >
                   <v-list-item-title class="no-truncate">
@@ -95,14 +95,34 @@
                 <p class="ml-4 mt-4">
                   Ordini:
                 </p>
-                <v-list-item
-                  v-for="item in suggestion.schedule_items.filter(element => element.operation_type == 'Order')"
-                  :key="item.order_id"
+                <draggable
+                  v-model="suggestion.orders"
+                  :group="{ name: 'orders', pull: true, put: true }"
+                  item-key="order_id"
+                  class="draggable-order-list ml-3 mr-3"
+                  ghost-class="draggable-ghost"
+                  @change="syncSuggestionsAfterOrderMove"
                 >
-                  <v-list-item-title class="no-truncate">
-                    ID {{ item.order_id }}: {{ item.address }} ({{ item.cap }})
-                  </v-list-item-title>
-                </v-list-item>
+                  <template #item="{ element }">
+                    <v-list-item
+                      class="draggable-order-item mb-2"
+                      prepend-icon="mdi-drag"
+                      rounded="lg"
+                    >
+                      <v-list-item-title class="no-truncate">
+                        ID {{ element.order_id }}: {{ element.address }} ({{ element.cap }})
+                      </v-list-item-title>
+                    </v-list-item>
+                  </template>
+                  <template #footer>
+                    <div
+                      v-if="suggestion.orders.length === 0"
+                      class="text-medium-emphasis pa-3"
+                    >
+                      Trascina qui un ordine
+                    </div>
+                  </template>
+                </draggable>
                 <v-divider />
                 <p class="ml-4 mt-4">
                   Utenti Delivery:
@@ -236,6 +256,69 @@ const cloneTransport = (transport) => {
   return { ...transport };
 }; 
 
+const getScheduleItemsByType = (suggestion, operationType) => {
+  return suggestion.schedule_items?.filter(item => item.operation_type === operationType) ?? [];
+};
+
+const createCollectionPointScheduleItem = (collectionPoint) => {
+  const collectionPointId = collectionPoint.id ?? collectionPoint.collection_point_id;
+  const item = {
+    ...collectionPoint,
+    end_time_slot: '',
+    start_time_slot: '',
+    operation_type: 'CollectionPoint',
+    collection_point_id: collectionPointId
+  };
+
+  delete item.id;
+
+  return item;
+};
+
+const syncSuggestionScheduleItems = (suggestion) => {
+  const existingCollectionPoints = getScheduleItemsByType(suggestion, 'CollectionPoint');
+  const collectionPointItemsById = new Map(
+    existingCollectionPoints.map(item => [item.collection_point_id, item])
+  );
+  const collectionPoints = [];
+  const usedCollectionPointIds = new Set();
+
+  suggestion.orders.forEach((order) => {
+    Object.values(order.products ?? {}).forEach((product) => {
+      const collectionPoint = product.collection_point;
+      const collectionPointId = collectionPoint?.id ?? collectionPoint?.collection_point_id;
+
+      if (!collectionPointId || usedCollectionPointIds.has(collectionPointId)) return;
+
+      usedCollectionPointIds.add(collectionPointId);
+      collectionPoints.push(
+        collectionPointItemsById.get(collectionPointId) ??
+        createCollectionPointScheduleItem(collectionPoint)
+      );
+    });
+  });
+
+  suggestion.schedule_items = [...collectionPoints, ...suggestion.orders].map((item, index) => ({
+    ...item,
+    index
+  }));
+};
+
+const normalizeSuggestion = (suggestion) => {
+  const normalizedSuggestion = {
+    ...suggestion,
+    orders: getScheduleItemsByType(suggestion, 'Order').map(order => ({ ...order }))
+  };
+
+  syncSuggestionScheduleItems(normalizedSuggestion);
+
+  return normalizedSuggestion;
+};
+
+const syncSuggestionsAfterOrderMove = () => {
+  suggestions.value.forEach(syncSuggestionScheduleItems);
+};
+
 const submitDpcForm = async () => {
   if (!(await dpcForm.value.validate()).valid) return;
 
@@ -249,7 +332,7 @@ const submitDpcForm = async () => {
   }, function (data) {
     loading.value = false;
     if (data.status == 'ok') {
-      suggestions.value = data.groups;
+      suggestions.value = data.groups.map(normalizeSuggestion);
       transports.value = data.transports;
       deliveryUsers.value = data.delivery_users;
     } else
@@ -300,7 +383,19 @@ const availableTransports = computed(() => {
   flex-wrap: wrap;
 }
 
-/* eslint-disable-next-line vue-scoped-css/no-unused-selector */
+.draggable-order-list {
+  min-height: 56px;
+}
+
+.draggable-order-item {
+  border: 1px dashed rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+}
+
+.draggable-ghost {
+  opacity: 0.5;
+}
+
 .v-chip {
   cursor: grab;
 }
