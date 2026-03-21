@@ -12,15 +12,19 @@
     :headers="[
       { title: 'ID', value: 'id', sortable: false },
       { title: 'Nickname', value: 'nickname', sortable: false },
+      { title: 'Codice Importazioni', value: 'import_code', sortable: false },
       { title: 'Città', value: 'city', sortable: false },
       { title: 'Indirizzo', value: 'address', sortable: false },
       { title: 'Codice Fiscale', value: 'tax_code', sortable: false },
       { title: 'Ragione Sociale', value: 'company_name', sortable: false },
       { title: 'Email', value: 'email', sortable: false },
-      { title: 'Codice', value: 'code', sortable: false },
+      { title: 'Codice Distribuzione RAEE', value: 'rae_code', sortable: false },
       { title: 'Azioni', key: 'actions', sortable: false }
     ]"
   >
+    <template #[`item.import_code`]="{ item }">
+      {{ item.customer_user_info?.import_code }}
+    </template>
     <template #[`item.city`]="{ item }">
       {{ item.customer_user_info?.city }}
     </template>
@@ -36,8 +40,8 @@
     <template #[`item.email`]="{ item }">
       {{ item.customer_user_info?.email }}
     </template>
-    <template #[`item.code`]="{ item }">
-      {{ item.customer_user_info?.code }}
+    <template #[`item.rae_code`]="{ item }">
+      {{ item.customer_user_info?.rae_code }}
     </template>
     <template #[`item.actions`]="{ item }">
       <v-btn
