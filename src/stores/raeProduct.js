@@ -1,6 +1,6 @@
 import http from '@/utils/http';
 import { defineStore } from 'pinia';
-import storeUtils from '@/utils/stores';
+import storesUtils from '@/utils/stores';
 
 export const useRaeProductStore = defineStore('raeProduct', {
   state: () => ({
@@ -22,7 +22,7 @@ export const useRaeProductStore = defineStore('raeProduct', {
     updateElement(router, func) {
       http.postRequest(
         `rae-product/${this.element.id}`,
-        storeUtils.exclude_keys(this.element, ['created_at', 'updated_at']),
+        storesUtils.exclude_keys(this.element, ['created_at', 'updated_at']),
         func,
         'PUT',
         router

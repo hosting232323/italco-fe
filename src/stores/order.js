@@ -1,6 +1,6 @@
 import http from '@/utils/http';
 import { defineStore } from 'pinia';
-import storeUtils from '@/utils/stores';
+import storesUtils from '@/utils/stores';
 
 const EXCLUDED_KEYS = [
   'created_at', 'updated_at', 'delivery_group', 'services', 'user', 'dates_form'
@@ -18,7 +18,7 @@ export const useOrderStore = defineStore('order', {
     createElement(router, func) {
       http.postRequest(
         'order',
-        storeUtils.exclude_keys(this.element, EXCLUDED_KEYS),
+        storesUtils.exclude_keys(this.element, EXCLUDED_KEYS),
         func,
         'POST',
         router
@@ -27,7 +27,7 @@ export const useOrderStore = defineStore('order', {
     updateElement(router, func) {
       http.postRequest(
         `order/${this.element.id}`,
-        storeUtils.exclude_keys(this.element, EXCLUDED_KEYS),
+        storesUtils.exclude_keys(this.element, EXCLUDED_KEYS),
         func,
         'PUT',
         router
@@ -35,7 +35,7 @@ export const useOrderStore = defineStore('order', {
     },
     updateElementWithFormData(router, func) {
       const content = {
-        data: JSON.stringify(storeUtils.exclude_keys(this.element, EXCLUDED_KEYS.concat(['photo'])))
+        data: JSON.stringify(storesUtils.exclude_keys(this.element, EXCLUDED_KEYS.concat(['photo'])))
       };
 
       if (this.element.photos)
@@ -58,7 +58,7 @@ export const useOrderStore = defineStore('order', {
 
       http.postRequest(
         'order/filter',
-        {filters: storeUtils.formatFilters({ ...this.filters }, 'Order.dpc')},
+        {filters: storesUtils.formatFilters({ ...this.filters }, 'Order.dpc')},
         this.setList,
         'POST',
         router

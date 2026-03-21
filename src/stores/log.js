@@ -1,6 +1,6 @@
 import http from '@/utils/http';
 import { defineStore } from 'pinia';
-import storeUtils from '@/utils/stores';
+import storesUtils from '@/utils/stores';
 
 export const useLogStore = defineStore('log', {
   state: () => ({
@@ -16,7 +16,7 @@ export const useLogStore = defineStore('log', {
 
       http.postRequest(
         'log',
-        {filters: storeUtils.formatFilters({ ...this.filters }, 'Log.created_at')},
+        {filters: storesUtils.formatFilters({ ...this.filters }, 'Log.created_at')},
         this.setList,
         'POST',
         router

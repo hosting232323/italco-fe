@@ -1,6 +1,6 @@
 import http from '@/utils/http';
 import { defineStore } from 'pinia';
-import storeUtils from '@/utils/stores';
+import storesUtils from '@/utils/stores';
 
 export const useServiceStore = defineStore('service', {
   state: () => ({
@@ -24,7 +24,7 @@ export const useServiceStore = defineStore('service', {
     updateElement(router, func) {
       http.postRequest(
         `service/${this.element.id}`,
-        storeUtils.exclude_keys(this.element, ['created_at', 'updated_at', 'users']),
+        storesUtils.exclude_keys(this.element, ['created_at', 'updated_at', 'users']),
         func,
         'PUT',
         router
@@ -63,7 +63,7 @@ export const useServiceStore = defineStore('service', {
     updateServiceUserRelationships(object, router, func) {
       http.postRequest(
         `service/customer/${object.id}`,
-        storeUtils.exclude_keys(object, ['created_at', 'updated_at']),
+        storesUtils.exclude_keys(object, ['created_at', 'updated_at']),
         func,
         'PUT',
         router
