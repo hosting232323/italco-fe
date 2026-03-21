@@ -1,11 +1,13 @@
 import js from '@eslint/js';
 import globals from 'globals';
 import pluginVue from 'eslint-plugin-vue';
+import vueScopedCss from 'eslint-plugin-vue-scoped-css';
 
 export default [
   js.configs.recommended,
 
   ...pluginVue.configs['flat/recommended'],
+  ...vueScopedCss.configs['flat/recommended'],
 
   {
     files: ['**/*.{js,vue}'],
@@ -19,6 +21,10 @@ export default [
       }
     },
 
+    plugins: {
+      'vue-scoped-css': vueScopedCss
+    },
+
     rules: {
       quotes: ['error', 'single'],
       semi: ['error', 'always'],
@@ -27,7 +33,9 @@ export default [
       'no-console': 'warn',
       'no-unused-vars': 'warn',
       'eol-last': ['error', 'always'],
-      'vue/no-v-html': 'off'
+      'vue/no-v-html': 'off',
+      'vue-scoped-css/no-unused-selector': 'warn',
+      'vue-scoped-css/no-unused-keyframes': 'warn'
     }
   }
 ];
