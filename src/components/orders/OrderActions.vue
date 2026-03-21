@@ -2,7 +2,7 @@
   <v-dialog max-width="1500">
     <template #activator="{ props: activatorProps }">
       <v-row no-gutters>
-        <v-col cols="6">
+        <v-col cols="3">
           <v-btn
             icon="mdi-pencil"
             variant="text"
@@ -10,7 +10,7 @@
             @click="openForm(item)"
           />
         </v-col>
-        <v-col cols="6">
+        <v-col cols="3">
           <v-btn
             variant="text"
             icon="mdi-file-export"
@@ -19,9 +19,7 @@
             @click="exportPdf(item)"
           />
         </v-col>
-      </v-row>
-      <v-row no-gutters>
-        <v-col cols="6">
+        <v-col cols="3">
           <v-btn
             icon="mdi-truck-delivery"
             variant="text"
@@ -30,7 +28,7 @@
             @click="openPopUp(item, 'delivery')"
           />
         </v-col>
-        <v-col cols="6">
+        <v-col cols="3">
           <v-btn
             icon="mdi-link-variant"
             variant="text"
@@ -42,7 +40,7 @@
       </v-row>
       <template v-if="role != 'Customer'">
         <v-row no-gutters>
-          <v-col cols="6">
+          <v-col cols="3">
             <v-btn
               icon="mdi-account"
               variant="text"
@@ -52,7 +50,7 @@
               @click="openPopUp(item, 'customer')"
             />
           </v-col>
-          <v-col cols="6">
+          <v-col cols="3">
             <v-btn
               v-if="role == 'Admin'"
               icon="mdi-delete"
@@ -63,9 +61,7 @@
               @click="deleteOrder(item)"
             />
           </v-col>
-        </v-row>
-        <v-row no-gutters>
-          <v-col cols="6">
+          <v-col cols="3">
             <v-btn
               v-if="item.status == 'To Reschedule'"
               icon="mdi-content-copy"
@@ -75,7 +71,7 @@
               @click="copyOrder(item)"
             />
           </v-col>
-          <v-col cols="6">
+          <v-col cols="3">
             <v-btn
               v-if="Object.values(item.products).some(product => product.rae_product_id)"
               icon="mdi-human-dolly"

@@ -202,7 +202,6 @@ schedule.value = {};
 const getHeaders = () => {
   const headers = [
     { title: 'Info', value: 'info', sortable: false },
-    { title: 'Prodotti Servizi', value: 'productsServices', sortable: false },
     { title: 'Destinatario', value: 'addressee', sortable: false },
     { title: 'Recapito', value: 'addressee_contact', sortable: false }
   ];
