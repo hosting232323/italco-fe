@@ -45,7 +45,6 @@
             />
             <div>
               <b>ID:</b> {{ item.id }}<br>
-              
               <v-tooltip
                 v-if="item.external_id"
                 location="top"
@@ -55,12 +54,11 @@
                     v-bind="props"
                     style="cursor: pointer;"
                   >
-                    <b>ID Esterno:</b> [{{ item.external_id }}]<br>
+                    <b>Rif. Cliente:</b> [{{ item.external_id }}]<br>
                   </span>
                 </template>
                 Data Conferma: {{ item.confirmation_date ? item.confirmation_date : 'N/A' }}
               </v-tooltip>
-
               <b>Tipo:</b> {{ orderUtils.TYPES.find(type => type.value == item.type)?.title }}<br>
               <b style="margin-right: 5px;">Stato:</b>
               <v-chip
