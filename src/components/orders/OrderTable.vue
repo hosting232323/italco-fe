@@ -33,48 +33,42 @@
         :items-per-page="25"
         :items-per-page-options="[10, 25, 50, 100]"
       >
-        <template #[`item.id`]="{ item }">
-          <v-btn
-            size="small"
-            variant="text"
-            icon="mdi-circle"
-            :loading="confirmLoading[item.id]"
-            :color="item.confirmed ? 'green' : 'red'"
-            @click="confirmOrder(item)"
-          />
-          {{ item.id }}
-          <v-tooltip
-            v-if="item.external_id"
-            location="top"
-          >
-            <template #activator="{ props }">
-              <span
-                v-bind="props"
-                style="cursor: pointer; margin-left: 4px;"
+        <template #[`item.info`]="{ item }">
+          <div style="display: flex; gap: 2px; width: 230px; align-items: center;">
+            <v-btn
+              size="small"
+              variant="text"
+              icon="mdi-circle"
+              :loading="confirmLoading[item.id]"
+              :color="item.confirmed ? 'green' : 'red'"
+              @click="confirmOrder(item)"
+            />
+            <div>
+              <b>ID:</b> {{ item.id }}<br>
+              <v-tooltip
+                v-if="item.external_id"
+                location="top"
               >
-                [{{ item.external_id }}]
-              </span>
-            </template>
-            Data Conferma: {{ item.confirmation_date ? item.confirmation_date : 'N/A' }}
-          </v-tooltip>
-        </template>
-        <template #[`item.type`]="{ item }">
-          {{ orderUtils.TYPES.find(type => type.value == item.type)?.title }}
-        </template>
-        <template #[`item.productsServices`]="{ item }">
-          <div style="min-width: 250px;">
-            <template 
-              v-for="product in Object.keys(item.products)" 
-              :key="product"
-            >
-              <b>{{ product }}</b>
-              <i v-if="item.products[product].rae_product_id">
-                RAEE
-              </i>
-              [{{ item.products[product].collection_point.name }}] :
-              {{ formatServices(item.products[product].services) }}
-              <br>
-            </template>
+                <template #activator="{ props }">
+                  <span
+                    v-bind="props"
+                    style="cursor: pointer;"
+                  >
+                    <b>Rif. Cliente:</b> [{{ item.external_id }}]<br>
+                  </span>
+                </template>
+                Data Conferma: {{ item.confirmation_date ? item.confirmation_date : 'N/A' }}
+              </v-tooltip>
+              <b>Tipo:</b> {{ orderUtils.TYPES.find(type => type.value == item.type)?.title }}<br>
+              <b style="margin-right: 5px;">Stato:</b>
+              <v-chip
+                :color="orderUtils.LABELS.find(label => label.value == item.status).color"
+                style="font-size: 12px; height: 30px;"
+                @click="openStatusesPopup(item)"
+              >
+                {{ orderUtils.LABELS.find(label => label.value == item.status).title }}
+              </v-chip>
+            </div>
           </div>
         </template>
         <template #[`item.addressee`]="{ item }">
@@ -189,10 +183,7 @@ schedule.value = {};
 
 const getHeaders = () => {
   const headers = [
-    { title: 'ID', value: 'id', sortable: false },
-    { title: 'Tipo', value: 'type', sortable: false },
-    { title: 'Stato', value: 'status', sortable: false },
-    { title: 'Prodotti Servizi', value: 'productsServices', sortable: false },
+    { title: 'Info', value: 'info', sortable: false },
     { title: 'Destinatario', value: 'addressee', sortable: false },
     { title: 'Recapito', value: 'addressee_contact', sortable: false }
   ];
@@ -260,23 +251,6 @@ const openStatusesPopup = (item) => {
     popUpType.value = 'statuses';
     statuses.value = data.statuses;
   }, 'GET', router);
-};
-
-const formatServices = (services) => {
-  const counter = {};
-
-  services.forEach(service => {
-    counter[service.name] = (counter[service.name] || 0) + 1;
-  });
-
-  return Object.entries(counter)
-    .flatMap(([name, count]) => {
-      if (count > 3)
-        return `${name} x${count}`;
-      else
-        return Array(count).fill(name);
-    })
-    .join(', ');
 };
 </script>
 
