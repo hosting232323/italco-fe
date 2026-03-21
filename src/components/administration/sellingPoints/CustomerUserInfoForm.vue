@@ -9,6 +9,10 @@
         ref="form"
         @submit.prevent="submitForm"
       >
+        <v-text-field
+          v-model="data.import_code"
+          label="Codice Importazioni"
+        />
         <v-row no-gutters>
           <v-col
             cols="12"
@@ -69,8 +73,8 @@
             md="6"
           >
             <v-text-field
-              v-model="data.code"
-              label="Codice"
+              v-model="data.rae_code"
+              label="Codice Distribuzione RAEE"
               :class="isMobile ? '' : 'ml-2'"
             />
           </v-col>
@@ -115,7 +119,7 @@ const submitForm = async () => {
 
   loading.value = true;
   http.postRequest('user/info', {
-    data: data.value,
+    data: storesUtils.exclude_keys(data.value, ['created_at', 'updated_at']),
     class: 'Customer',
     user_id: user.value.id
   }, function () {
