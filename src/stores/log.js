@@ -6,7 +6,9 @@ export const useLogStore = defineStore('log', {
   state: () => ({
     list: [],
     filters: {},
-    ready: false
+    ready: false,
+    activePopUp: false,
+    selectedLog: false
   }),
   actions: {
     initList(router) {
