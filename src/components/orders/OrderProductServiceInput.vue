@@ -57,7 +57,7 @@
       </v-col>
       <v-col
         cols="12"
-        md="3"
+        :md="role === 'Customer' ? 4 : 3"
       >
         <v-select
           v-model="selectedService"
@@ -79,7 +79,7 @@
       </v-col>
       <v-col
         cols="12"
-        md="3"
+        :md="role === 'Customer' ? 4 : 3"
       >
         <v-autocomplete
           v-model="selectedCollectionPoint"
@@ -93,6 +93,7 @@
         />
       </v-col>
       <v-col
+        v-if="role != 'Customer'"
         cols="12"
         md="2"
       >
