@@ -191,7 +191,7 @@ const isMobile = mobile.setupMobileUtils();
 const { element: order } = storeToRefs(orderStore);
 
 const STATUS_MAP = {
-  'Confirmed': ['Booking', 'Not Delivered', 'At Warehouse', 'To Reschedule'],
+  'Scheduled': ['Booking', 'Not Delivered', 'At Warehouse', 'To Reschedule'],
   'Booking': ['Delivered', 'Not Delivered', 'At Warehouse', 'To Reschedule'],
   'At Warehouse': ['Booking', 'To Reschedule']
 };

@@ -75,7 +75,7 @@ const theme = useTheme();
 const router = useRouter();
 const locationError = ref(false); 
 const orderStore = useOrderStore();
-const selectedCard = ref('Confirmed');
+const selectedCard = ref('Scheduled');
 const { list: orders, ready } = storeToRefs(orderStore);
 
 const isMobile = mobile.setupMobileUtils();
@@ -89,7 +89,7 @@ const totOrder = computed(() => {
 const cards = [
   {
     title: 'Da caricare',
-    key: 'Confirmed'
+    key: 'Scheduled'
   },
   {
     title: 'A bordo',
@@ -125,7 +125,7 @@ const cardCounts = computed(() => {
   const anomalyOrders = [];
   const delayOrders = [];
 
-  for (const key of ['Confirmed', 'Booking']) {
+  for (const key of ['Scheduled', 'Booking']) {
     const list = orders.value?.[key] || [];
     list.forEach(order => {
       if (order.anomaly) anomalyOrders.push(order);
@@ -133,7 +133,7 @@ const cardCounts = computed(() => {
     });
   }
   return {
-    'Confirmed': orders.value?.['Confirmed']?.length || 0,
+    'Scheduled': orders.value?.['Scheduled']?.length || 0,
     'Booking': orders.value?.['Booking']?.length || 0,
     'Delivered': orders.value?.['Delivered']?.length || 0,
     'Not Delivered': orders.value?.['Not Delivered']?.length || 0,
