@@ -34,84 +34,16 @@
         :items-per-page-options="[10, 25, 50, 100]"
       >
         <template #[`item.info`]="{ item }">
-          <div style="display: flex; gap: 2px; width: 230px; align-items: center;">
-            <v-btn
-              size="small"
-              variant="text"
-              icon="mdi-circle"
-              :loading="confirmLoading[item.id]"
-              :color="item.confirmed ? 'green' : 'red'"
-              @click="confirmOrder(item)"
-            />
-            <div>
-              <b>ID:</b> {{ item.id }}<br>
-              <v-tooltip
-                v-if="item.external_id"
-                location="top"
-              >
-                <template #activator="{ props }">
-                  <span
-                    v-bind="props"
-                    style="cursor: pointer;"
-                  >
-                    <b>Rif. Cliente:</b> [{{ item.external_id }}]<br>
-                  </span>
-                </template>
-                Data Conferma: {{ item.confirmation_date ? item.confirmation_date : 'N/A' }}
-              </v-tooltip>
-              <b>Tipo:</b> {{ orderUtils.TYPES.find(type => type.value == item.type)?.title }}<br>
-              <b style="margin-right: 5px;">Stato:</b>
-              <v-chip
-                :color="orderUtils.LABELS.find(label => label.value == item.status).color"
-                style="font-size: 12px; height: 30px;"
-                @click="openStatusesPopup(item)"
-              >
-                {{ orderUtils.LABELS.find(label => label.value == item.status).title }}
-              </v-chip>
-            </div>
-          </div>
+          <OrderInfoRow
+            :item="item"
+            @open-statuses-popup="openStatusesPopup(item)"
+          />
         </template>
         <template #[`item.addressee`]="{ item }">
           {{ item.addressee }}<br>
           <p style="font-size: smaller;">
             {{ item.address }}, {{ item.cap }}
           </p>
-        </template>
-        <template #[`item.status`]="{ item }">
-          <v-chip
-            :color="orderUtils.LABELS.find(label => label.value == item.status).color"
-            @click="openStatusesPopup(item)"
-          >
-            {{ orderUtils.LABELS.find(label => label.value == item.status).title }}
-          </v-chip>
-          <v-tooltip v-if="item.delay">
-            <template #activator="{ props }">
-              <v-btn
-                icon="mdi-clock-alert-outline"
-                variant="text"
-                :color="theme.current.value.primaryColor"
-                v-bind="props"
-              />
-            </template>
-            <span>Ordine in ritardo</span>
-          </v-tooltip>
-          <v-tooltip v-if="item.anomaly">
-            <template #activator="{ props }">
-              <v-btn
-                icon="mdi-alert-outline"
-                variant="text"
-                :color="theme.current.value.primaryColor"
-                v-bind="props"
-              />
-            </template>
-            <span>Anomalia</span>
-          </v-tooltip>
-          <v-chip
-            v-if="item.external_status"
-            :color="orderUtils.EXTERNAL_LABELS.find(label => label.value == item.external_status).color"
-          >
-            Stato Esterno {{ orderUtils.EXTERNAL_LABELS.find(label => label.value == item.external_status).title }}
-          </v-chip>
         </template>
         <template #[`item.price`]="{ item }">
           {{ item.price == 0 ? '0' : (item.price ? item.price.toFixed(2) : '') }}€
@@ -150,6 +82,7 @@
 <script setup>
 import Action from '@/components/orders/OrderActions';
 import StatusPopup from '@/components/orders/StatusPopup';
+import OrderInfoRow from '@/components/orders/OrderInfoRow';
 import ScheduleForm from '@/components/operator/schedules/ScheduleForm';
 import SchedulationForm from '@/components/operator/schedules/SchedulationForm';
 
@@ -157,7 +90,6 @@ import { ref } from 'vue';
 import http from '@/utils/http';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
-import orderUtils from '@/utils/order';
 import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import { useUserStore } from '@/stores/user';
@@ -169,12 +101,11 @@ const theme = useTheme();
 const dialog = ref(false);
 const router = useRouter();
 const popUpType = ref(null);
-const confirmLoading = ref({});
 const userStore = useUserStore();
-const orderStore = useOrderStore();
 const scheduleFormMessage = ref('');
-const scheduleStore = useScheduleStore();
 
+const orderStore = useOrderStore();
+const scheduleStore = useScheduleStore();
 const { role } = storeToRefs(userStore);
 const { ready } = storeToRefs(orderStore);
 const { element: schedule } = storeToRefs(scheduleStore);
@@ -221,18 +152,6 @@ const openFormPopUp = () => {
     } else
       scheduleFormMessage.value = data.error;
   }, 'POST', router);
-};
-
-const confirmOrder = (order) => {
-  confirmLoading.value[order.id] = true;
-  http.postRequest(`order/${order.id}`, {
-    order_id: order.id,
-    confirmed: !order.confirmed
-  }, (data) => {
-    confirmLoading.value[order.id] = false;
-    if (data.status == 'ok')
-      orderStore.initList(router);
-  }, 'PUT', router);
 };
 
 const openSchedulationPopUp = () => {

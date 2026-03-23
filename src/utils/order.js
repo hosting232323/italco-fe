@@ -114,7 +114,7 @@ const EXTERNAL_LABELS = [
   {
     value: 'To Reschedule',
     title: 'Da Riprogrammare',
-    color: 'orange'
+    color: 'yellow'
   },
   {
     value: 'Redelivery',
@@ -139,7 +139,7 @@ const EXTERNAL_LABELS = [
   { 
     value: 'Verification', 
     title: 'In Verifica', 
-    color: 'yellow' 
+    color: 'pink' 
   },
   { 
     value: 'Cancelled to be Refunded', 
