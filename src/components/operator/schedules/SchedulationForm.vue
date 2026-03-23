@@ -260,19 +260,29 @@ const getScheduleItemsByType = (suggestion, operationType) => {
   return suggestion.schedule_items?.filter(item => item.operation_type === operationType) ?? [];
 };
 
-const createCollectionPointScheduleItem = (collectionPoint) => {
-  const collectionPointId = collectionPoint.id ?? collectionPoint.collection_point_id;
-  const item = {
-    ...collectionPoint,
-    end_time_slot: '',
-    start_time_slot: '',
-    operation_type: 'CollectionPoint',
-    collection_point_id: collectionPointId
+const DEFAULT_START_TIME_SLOT = '08:00';
+const DEFAULT_END_TIME_SLOT = '09:00';
+
+const normalizeScheduleItem = (item, operationType = item.operation_type) => {
+  const normalizedItem = {
+    ...item,
+    end_time_slot: item.end_time_slot || DEFAULT_END_TIME_SLOT,
+    start_time_slot: item.start_time_slot || DEFAULT_START_TIME_SLOT,
+    operation_type: operationType
   };
 
-  delete item.id;
+  if (operationType === 'Order')
+    normalizedItem.order_id = item.order_id ?? item.id;
+  else
+    normalizedItem.collection_point_id = item.collection_point_id ?? item.id;
 
-  return item;
+  delete normalizedItem.id;
+
+  return normalizedItem;
+};
+
+const createCollectionPointScheduleItem = (collectionPoint) => {
+  return normalizeScheduleItem(collectionPoint, 'CollectionPoint');
 };
 
 const syncSuggestionScheduleItems = (suggestion) => {
@@ -299,7 +309,7 @@ const syncSuggestionScheduleItems = (suggestion) => {
   });
 
   suggestion.schedule_items = [...collectionPoints, ...suggestion.orders].map((item, index) => ({
-    ...item,
+    ...normalizeScheduleItem(item),
     index
   }));
 };
@@ -307,7 +317,9 @@ const syncSuggestionScheduleItems = (suggestion) => {
 const normalizeSuggestion = (suggestion) => {
   const normalizedSuggestion = {
     ...suggestion,
-    orders: getScheduleItemsByType(suggestion, 'Order').map(order => ({ ...order }))
+    orders: getScheduleItemsByType(suggestion, 'Order').map(
+      order => normalizeScheduleItem(order, 'Order')
+    )
   };
 
   syncSuggestionScheduleItems(normalizedSuggestion);
