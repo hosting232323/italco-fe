@@ -173,6 +173,45 @@
             </v-card-text>
           </v-card>
         </v-col>
+        <v-col
+          v-if="suggestions.length > 0"
+          cols="12"
+          md="4"
+        >
+          <v-card
+            class="new-proposal-card"
+            variant="outlined"
+            title="Nuova proposta"
+          >
+            <v-card-text>
+              <draggable
+                v-model="newSuggestionOrders"
+                :group="{ name: 'orders', pull: false, put: true }"
+                item-key="order_id"
+                class="new-proposal-dropzone"
+                ghost-class="draggable-ghost"
+                @change="createSuggestionFromDroppedOrder"
+              >
+                <template #item="{ element }">
+                  <v-list-item
+                    class="draggable-order-item mb-2"
+                    prepend-icon="mdi-drag"
+                    rounded="lg"
+                  >
+                    <v-list-item-title class="no-truncate">
+                      ID {{ element.order_id }}: {{ element.address }} ({{ element.cap }})
+                    </v-list-item-title>
+                  </v-list-item>
+                </template>
+                <template #footer>
+                  <div class="text-medium-emphasis pa-4 text-center">
+                    Trascina qui un ordine per creare una nuova proposta
+                  </div>
+                </template>
+              </draggable>
+            </v-card-text>
+          </v-card>
+        </v-col>
       </v-row>
       <template v-if="availableDeliveryUsers.length > 0">
         <h2 class="mt-5">
@@ -242,6 +281,7 @@ const minSizeGroup = ref(10);
 const maxSizeGroup = ref(14);
 const maxDistanceKm = ref(50);
 const deliveryUsers = ref([]);
+const newSuggestionOrders = ref([]);
 const booking_date = ref(null);
 const isMobile = mobile.setupMobileUtils();
 const emits = defineEmits(['cancel', 'goToSheduleForm']);
@@ -331,6 +371,27 @@ const syncSuggestionsAfterOrderMove = () => {
   suggestions.value.forEach(syncSuggestionScheduleItems);
 };
 
+const createSuggestion = (orders = []) => {
+  const suggestion = {
+    delivery_users: [],
+    transports: [],
+    schedule_items: [],
+    orders: orders.map(order => normalizeScheduleItem(order, 'Order'))
+  };
+
+  syncSuggestionScheduleItems(suggestion);
+
+  return suggestion;
+};
+
+const createSuggestionFromDroppedOrder = (event) => {
+  if (!event.added?.element) return;
+
+  suggestions.value.push(createSuggestion([event.added.element]));
+  newSuggestionOrders.value = [];
+  syncSuggestionsAfterOrderMove();
+};
+
 const submitDpcForm = async () => {
   if (!(await dpcForm.value.validate()).valid) return;
 
@@ -345,6 +406,7 @@ const submitDpcForm = async () => {
     loading.value = false;
     if (data.status == 'ok') {
       suggestions.value = data.groups.map(normalizeSuggestion);
+      newSuggestionOrders.value = [];
       transports.value = data.transports;
       deliveryUsers.value = data.delivery_users;
     } else
@@ -397,6 +459,14 @@ const availableTransports = computed(() => {
 
 .draggable-order-list {
   min-height: 56px;
+}
+
+.new-proposal-card {
+  border-style: dashed;
+}
+
+.new-proposal-dropzone {
+  min-height: 120px;
 }
 
 .draggable-order-item {
