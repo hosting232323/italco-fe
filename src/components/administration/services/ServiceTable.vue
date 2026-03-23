@@ -89,6 +89,11 @@ const services = storesUtils.getStoreList(serviceStore, router);
 const openForm = (item) => {
   service.value = item;
   activeForm.value = true;
+
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  });
 };
 
 const deleteItem = (item) => {
