@@ -132,7 +132,7 @@ const submitForm = async (isActive) => {
       else {
         ready.value = false;
         orderStore.initList(router);
-        isActive.value = false;
+        resetForm();
       }
     }
   }, 'POST', router);
@@ -143,8 +143,8 @@ const onFilesSelected = (event) => {
   if (selectedFile.length == 0) return;
 
   const validTypes = [
-    'application/vnd.ms-excel', // .xls
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' // .xlsx
+    'application/vnd.ms-excel',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
   ];
   fileError.value = '';
   if (!validTypes.includes(selectedFile.type)) {
