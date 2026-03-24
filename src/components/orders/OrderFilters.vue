@@ -208,7 +208,7 @@ const exportInvoice = async () => {
   }, function (data) {
     loading.value = false;
     if (data.status == 'ko')
-      alert(data.message);
+      alert(data.error);
     else {
       const blob = new Blob([data], { type: 'application/pdf' });
       const url = window.URL.createObjectURL(blob);

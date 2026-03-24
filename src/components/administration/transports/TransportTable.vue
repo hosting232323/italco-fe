@@ -64,6 +64,11 @@ const transports = storesUtils.getStoreList(transportStore, router);
 const openForm = (item) => {
   transport.value = item;
   activeForm.value = true;
+
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  });
 };
 
 const deleteItem = (item) => {

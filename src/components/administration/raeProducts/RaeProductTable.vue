@@ -60,6 +60,11 @@ const raeProducts = storesUtils.getStoreList(raeProductStore, router);
 const openForm = (item) => {
   raeProduct.value = item;
   activeForm.value = true;
+
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  });
 };
 
 const deleteItem = (item) => {
