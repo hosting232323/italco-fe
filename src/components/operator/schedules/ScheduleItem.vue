@@ -114,9 +114,9 @@ import validation from '@/utils/validation';
 import { useOrderStore } from '@/stores/order';
 import { useScheduleStore } from '@/stores/schedule';
 
-const { index, notFoundAddresses } = defineProps({
-  index: {
-    type: Number,
+const { element, notFoundAddresses } = defineProps({
+  element: {
+    type: Object,
     required: true
   },
   notFoundAddresses: {
@@ -134,7 +134,6 @@ const isMobile = mobile.setupMobileUtils();
 const orderStore = useOrderStore();
 const scheduleStore = useScheduleStore();
 const { element: schedule } = storeToRefs(scheduleStore);
-const element = schedule.value.schedule_items.find(item => item.index === index);
 
 if (!element.id) {
   element.start_time_slot = '08:00';

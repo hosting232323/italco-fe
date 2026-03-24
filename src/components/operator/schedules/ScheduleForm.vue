@@ -79,19 +79,7 @@
               dense
               @click="addOrder"
             />
-            <draggable
-              v-model="schedule.schedule_items"
-              item-key="id"
-              class="mb-4"
-              handle=".drag-handle"
-            >
-              <template #item="{ element }">
-                <ScheduleItem
-                  :index="element.index"
-                  :not-found-addresses="notFoundAddresses"
-                />
-              </template>
-            </draggable>
+            <ScheduleItemsDraggable :not-found-addresses="notFoundAddresses" />
             <FormButtons
               :loading="loading"
               @cancel="emits('cancel')"
@@ -117,12 +105,11 @@
 <script setup>
 import FormButtons from '@/components/FormButtons';
 import OverStreetMap from '@/components/OverStreetMap.vue';
-import ScheduleItem from '@/components/operator/schedules/ScheduleItem.vue';
+import ScheduleItemsDraggable from '@/components/operator/schedules/ScheduleItemsDraggable.vue';
 
 import { ref, watch } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
-import draggable from 'vuedraggable';
 import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import validation from '@/utils/validation';
