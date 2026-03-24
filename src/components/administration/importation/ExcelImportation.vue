@@ -14,7 +14,7 @@
           <v-form
             v-if="conflictsOrders.length == 0"
             ref="form"
-            @submit.prevent="submitForm(isActive)"
+            @submit.prevent="submitForm()"
           >
             <v-file-input
               label="File Excel"
@@ -114,7 +114,7 @@ const administrationUserStore = useAdministrationUserStore();
 const { ready } = storeToRefs(orderStore);
 const users = storesUtils.getStoreList(administrationUserStore, router);
 
-const submitForm = async (isActive) => {
+const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
 
   loading.value = true;
