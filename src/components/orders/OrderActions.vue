@@ -149,7 +149,7 @@ const exportPdf = (item) => {
   http.getRequest(`export/order/${item.id}`, {}, function (data) {
     loadingExport.value = false;
     if (data.status == 'ko')
-      alert(data.message);
+      alert(data.error);
     else {
       const blob = new Blob([data], { type: 'application/pdf' });
       const url = window.URL.createObjectURL(blob);
@@ -206,7 +206,7 @@ const raeExport = (item) => {
   http.getRequest(`export/rae/${item.id}`, {}, function (data) {
     raeLoading.value = false;
     if (data.status == 'ko')
-      alert(data.message);
+      alert(data.error);
     else {
       const blob = new Blob([data], { type: 'application/pdf' });
       const url = window.URL.createObjectURL(blob);

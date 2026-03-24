@@ -126,7 +126,7 @@ const exportElement = async (item) => {
 
   http.getRequest(`export/schedule/${item.id}`, {}, function (data) {
     if (data.status == 'ko')
-      alert(data.message);
+      alert(data.error);
     else {
       exportLoading[item.id] = false;
       const blob = new Blob([data], { type: 'application/pdf' });

@@ -40,7 +40,7 @@
         </h1><hr>
         <CustomerRuleForm />
         <CustomerRuleTable />
-        <h1>
+        <h1 id="customer-user-form">
           Dati Punti Vendita
         </h1><hr>
         <CustomerUserInfoForm />

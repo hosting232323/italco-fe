@@ -71,5 +71,10 @@ const users = storesUtils.getStoreList(administrationUserStore, router);
 const openForm = (item) => {
   user.value = item;
   activeForm.value = true;
+
+  document.getElementById('customer-user-form')?.scrollIntoView({
+    behavior: 'smooth',
+    block: 'start'
+  });
 };
 </script>
