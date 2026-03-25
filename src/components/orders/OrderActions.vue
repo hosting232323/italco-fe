@@ -83,6 +83,18 @@
             />
           </v-col>
         </v-row>
+        <v-row no-gutters>
+          <v-col cols="3">
+            <v-btn
+              v-if="item.external_link"
+              icon="mdi-exit-to-app"
+              variant="text"
+              :color="theme.current.value.primaryColor"
+              title="Chudi ordine in piattaforma Euronics"
+              @click="openExternalLink(item.external_link)"
+            />
+          </v-col>
+        </v-row>
       </template>
     </template>
     <template #default="{ isActive }">
@@ -131,6 +143,10 @@ const userStore = useUserStore();
 const orderStore = useOrderStore();
 const { role } = storeToRefs(userStore);
 const { element: updatedOrder, activeForm, ready } = storeToRefs(orderStore);
+
+const openExternalLink = (link) => {
+  window.open(link, '_blank');
+};
 
 const openForm = (item) => {
   updatedOrder.value = item;
