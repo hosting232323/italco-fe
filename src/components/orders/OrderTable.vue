@@ -175,7 +175,7 @@ const openStatusesPopup = (item) => {
 };
 </script>
 
-<style>
+<style scoped>
 .actions-column {
   width: 200px;
 }
