@@ -49,7 +49,9 @@
           {{ item.price == 0 ? '0' : (item.price ? item.price.toFixed(2) : '') }}€
         </template>
         <template #[`item.actions`]="{ item }">
-          <Action :item="item" />
+          <div class="actions-column">
+            <Action :item="item" />
+          </div>
         </template>
         <template #[`item.created_at`]="{ item }">
           {{ createdAt(item.created_at) }}
@@ -172,3 +174,9 @@ const openStatusesPopup = (item) => {
   }, 'GET', router);
 };
 </script>
+
+<style>
+.actions-column {
+  width: 200px;
+}
+</style>
