@@ -84,7 +84,8 @@ const LABELS = [
 const EXTERNAL_LABELS = [
   {
     value: 'New',
-    title: 'Nuovo'
+    title: 'Nuovo',
+    color: 'grey'
   },
   {
     value: 'Confirmed',
