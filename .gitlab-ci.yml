@@ -8,6 +8,7 @@ lint_frontend:
   script:
     - npm ci
     - npx eslint "src/**/*.{js,vue}"
+  interruptible: true
   allow_failure: true
   tags:
     - linux
