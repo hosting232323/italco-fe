@@ -20,6 +20,7 @@
               accept="application/pdf"
               :rules="validation.requiredRules"
               multiple
+              :error-messages="fileError"
               @change="onFilesSelected"
             />
             <div
@@ -78,7 +79,7 @@
             />
             <FormButtons
               :loading="loading"
-              @cancel="isActive.value = false"
+              @cancel="() => { resetForm(); isActive.value = false; }"
             />
           </v-form>
         </v-card-text>
@@ -102,6 +103,7 @@ import { useAdministrationUserStore } from '@/stores/administrationUser';
 const files = ref([]);
 const form = ref(null);
 const user = ref(null);
+const fileError = ref('');
 const loading = ref(false);
 const router = useRouter();
 const orderStore = useOrderStore();
@@ -143,7 +145,11 @@ const onFilesSelected = (event) => {
   if (selectedFiles.length == 0) return;
 
   selectedFiles.forEach(selectedFile => {
-    if (selectedFile.type != 'application/pdf') return;
+    fileError.value = '';
+    if (selectedFile.type != 'application/pdf') {
+      fileError.value = 'Puoi caricare solo file Excel (.xls, .xlsx).';
+      return;
+    }
     files.value.push({
       selectedFile,
       preview: URL.createObjectURL(selectedFile)
@@ -153,5 +159,15 @@ const onFilesSelected = (event) => {
 
 const openPdf = (file) => {
   window.open(file.preview, '_blank');
+};
+
+const resetForm = () => {
+  files.value = [];
+  user.value = null;
+  fileError.value = '';
+  if (form.value) {
+    form.value.reset();
+    form.value.resetValidation();
+  }
 };
 </script>

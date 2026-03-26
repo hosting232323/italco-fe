@@ -169,7 +169,7 @@ const TYPES = [
   },
   {
     title: 'Verifica',
-    value: 'CHECK'
+    value: 'Check'
   }
 ];
 

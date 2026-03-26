@@ -26,6 +26,7 @@
           :allowed-dates="allowedDpcDates"
           :rules="validation.requiredRules"
           :disabled="role == 'Operator' && order.id"
+          :clearable="false"
         />
       </v-col>
       <v-col
@@ -39,6 +40,7 @@
           :rules="validation.requiredRules"
           :allowed-dates="nextTwoMonths"
           :disabled="role == 'Operator' && order.id"
+          :clearable="false"
         />
       </v-col>
       <v-col
@@ -51,6 +53,7 @@
           :rules="[]"
           :allowed-dates="['all']"
           :class-style="isMobile ? '' : 'ml-2'"
+          :clearable="false"
         />
       </v-col>
     </v-row>
