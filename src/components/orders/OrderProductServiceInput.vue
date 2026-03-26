@@ -8,7 +8,7 @@
     >
       <v-list-item-title>
         {{ product }}
-        <i v-if="order.products[product].rae_product">
+        <i v-if="order.products[product].rae_product_id">
           RAEE
         </i>
         [{{ order.products[product].collection_point.name }}]
@@ -188,7 +188,7 @@ const addProduct = async () => {
     services: selectedServices.value,
     collection_point: selectedCollectionPoint.value
   };
-  if (isRae.value) order.value.products[selectedProduct.value].rae_product = selectedRaeProduct.value;
+  if (isRae.value) order.value.products[selectedProduct.value].rae_product_id = selectedRaeProduct.value;
   resetFormRow();
 };
 
