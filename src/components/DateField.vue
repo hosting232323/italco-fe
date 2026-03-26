@@ -14,7 +14,7 @@
         :label="label"
         :class="classStyle"
         readonly
-        clearable
+        :clearable="clearable"
         :rules="rules"
         :disabled="disabled"
         @click:clear="clearDate"
@@ -62,6 +62,10 @@ const props = defineProps({
   disabled: {
     type: Boolean,
     default: false
+  },
+  clearable: {
+    type: Boolean,
+    default: true
   }
 });
 

@@ -14,11 +14,12 @@
           <v-form
             v-if="conflictsOrders.length == 0"
             ref="form"
-            @submit.prevent="submitForm(isActive)"
+            @submit.prevent="submitForm()"
           >
             <v-file-input
               label="File Excel"
               :rules="validation.requiredRules"
+              :error-messages="fileError"
               @change="onFilesSelected"
             />
             <div
@@ -70,7 +71,7 @@
             />
             <FormButtons
               :loading="loading"
-              @cancel="isActive.value = false"
+              @cancel="() => { resetForm(); isActive.value = false; }"
             />
           </v-form>
           <ExcelImportationConflicts
@@ -103,6 +104,7 @@ import { useAdministrationUserStore } from '@/stores/administrationUser';
 const file = ref({});
 const form = ref(null);
 const user = ref(null);
+const fileError = ref('');
 const loading = ref(false);
 const router = useRouter();
 const conflictsOrders = ref([]);
@@ -112,7 +114,7 @@ const administrationUserStore = useAdministrationUserStore();
 const { ready } = storeToRefs(orderStore);
 const users = storesUtils.getStoreList(administrationUserStore, router);
 
-const submitForm = async (isActive) => {
+const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
 
   loading.value = true;
@@ -130,7 +132,7 @@ const submitForm = async (isActive) => {
       else {
         ready.value = false;
         orderStore.initList(router);
-        isActive.value = false;
+        resetForm();
       }
     }
   }, 'POST', router);
@@ -139,17 +141,42 @@ const submitForm = async (isActive) => {
 const onFilesSelected = (event) => {
   const selectedFile = event.target.files[0];
   if (selectedFile.length == 0) return;
+
+  const validTypes = [
+    'application/vnd.ms-excel',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  ];
+  fileError.value = '';
+  if (!validTypes.includes(selectedFile.type)) {
+    fileError.value = 'Puoi caricare solo file Excel (.xls, .xlsx).';
+    return;
+  }
+
   file.value = selectedFile;
 };
 
 const closeConflictsForm = (isActive) => {
   isActive.value = false;
-  conflictsOrders.value = [];
+  resetForm();
 };
 
 const deleteOrder = (isActive, order) => {
   conflictsOrders.value.splice(conflictsOrders.value.indexOf(order), 1);
-  if (conflictsOrders.value.length == 0)
+  if (conflictsOrders.value.length == 0) {
+    resetForm();
     isActive.value = false;
+  }
+};
+
+const resetForm = () => {
+  file.value = {};
+  user.value = null;
+  fileError.value = '';
+  conflictsOrders.value = [];
+
+  if (form.value) {
+    form.value.reset();
+    form.value.resetValidation();
+  }
 };
 </script>
