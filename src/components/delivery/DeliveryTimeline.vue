@@ -1,5 +1,6 @@
 <template>
   <v-timeline
+    v-if="ready"
     align="start"
     side="end"
     :style="{ marginLeft: isMobile ? '-30px' : '' }"
@@ -38,33 +39,17 @@
           >
             Punto di ritiro completato
           </button>
-          <div  v-else-if="!item.collection_point_id && item.status == 'Booking'" class="d-flex flex-column align-center justify-center">
+          <div
+            v-else-if="!item.collection_point_id"
+            class="d-flex flex-column align-center justify-center"
+          >
             <button
+              v-for="statusOption in getAvailableStatuses(item)"
+              :key="statusOption"
               :style="{ color: theme.current.value.primaryColor }"
-              @click="completeOrder(item, 'On Board')"
+              @click="completeOrder(item, statusOption)"
             >
-              Stato A Bordo
-            </button>
-
-            <button
-              :style="{ color: theme.current.value.primaryColor }"
-              @click="completeOrder(item, 'Not Delivered')"
-            >
-              Stato Non Completato
-            </button>
-
-            <button
-              :style="{ color: theme.current.value.primaryColor }"
-              @click="completeOrder(item, 'At Warehouse')"
-            >
-              Stato In Magazzino
-            </button>
-
-            <button
-              :style="{ color: theme.current.value.primaryColor }"
-              @click="completeOrder(item, 'To Reschedule')"
-            >
-              Stato Da Riprogrammare
+              {{ getStatusLabel(statusOption) }}
             </button>
           </div>
           <button
@@ -155,10 +140,25 @@ const scheduleItemStore = useScheduleItemStore();
 const isMobile = mobile.setupMobileUtils();
 const { list: orders, element: order, ready, showForm } = storeToRefs(scheduleItemStore);
 
+const STATUS_MAP = {
+  'Scheduled': ['Booking', 'Not Delivered', 'At Warehouse', 'To Reschedule'],
+  'Booking': ['Delivered', 'Not Delivered', 'At Warehouse', 'To Reschedule'],
+  'At Warehouse': ['Booking', 'To Reschedule']
+};
+
 const timelineOrders = computed(() => {
   if (!orders.value) return [];
   return orders.value.slice().sort((a, b) => a.index - b.index);
 });
+
+const getAvailableStatuses = (item) => {
+  if (!STATUS_MAP[item.status]) return [];
+  return STATUS_MAP[item.status];
+};
+
+const getStatusLabel = (status) => {
+  return orderUtils.LABELS.find(l => l.value === status)?.title || status;
+};
 
 const startSwipe = (e, index, isMouse = false) => {
   const clientX = isMouse ? e.clientX : e.touches[0].clientX;
@@ -294,5 +294,4 @@ const timelineIcon = order => {
   display: flex;
   gap: 20px;
 }
-
 </style>
