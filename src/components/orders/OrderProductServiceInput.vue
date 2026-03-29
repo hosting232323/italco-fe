@@ -11,6 +11,9 @@
         <i v-if="order.products[product].rae_product_id">
           RAEE
         </i>
+        <i v-if="order.products[product].rae_product_quantity > 1">
+          x{{ order.products[product].rae_product_quantity }}
+        </i>
         [{{ order.products[product].collection_point.name }}]
       </v-list-item-title>
       <v-list-item-subtitle>
@@ -31,7 +34,7 @@
     >
       <v-col
         cols="12"
-        md="4"
+        :md="isRae ? 3 : 4"
       >
         <v-text-field
           v-if="!isRae"
@@ -79,17 +82,29 @@
       </v-col>
       <v-col
         cols="12"
-        :md="role === 'Customer' ? 4 : 3"
+        :md="role === 'Customer' ? 4 : (isRae ? 2 : 3)"
       >
         <v-autocomplete
           v-model="selectedCollectionPoint"
-          :class="isMobile ? '' : 'ml-2'"
+          :class="isMobile ? '' : (isRae ? 'ml-2 mr-2' : 'ml-2')"
           label="Punto di Ritiro"
           :items="filteredCollectionPoints"
           item-title="name"
           :rules="validation.requiredRules"
           return-object
           :disabled="filteredCollectionPoints.length == 1"
+        />
+      </v-col>
+      <v-col
+        v-if="role != 'Customer' && isRae"
+        cols="12"
+        md="2"
+      >
+        <v-text-field
+          v-model="raeQuantity"
+          :class="isMobile ? '' : 'ml-2'"
+          label="Quantità"
+          type="number"
         />
       </v-col>
       <v-col
@@ -137,6 +152,7 @@ import { useCollectionPointStore } from '@/stores/collectionPoint';
 const form = ref(null);
 const isRae = ref(false);
 const router = useRouter();
+const raeQuantity = ref(1);
 const selectedServices = ref([]);
 const selectedProduct = ref(null);
 const selectedService = ref(null);
@@ -188,7 +204,10 @@ const addProduct = async () => {
     services: selectedServices.value,
     collection_point: selectedCollectionPoint.value
   };
-  if (isRae.value) order.value.products[selectedProduct.value].rae_product_id = selectedRaeProduct.value;
+  if (isRae.value) {
+    order.value.products[selectedProduct.value].rae_product_id = selectedRaeProduct.value;
+    order.value.products[selectedProduct.value].rae_product_quantity = raeQuantity.value;
+  }
   resetFormRow();
 };
 
