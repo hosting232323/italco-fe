@@ -17,7 +17,7 @@
     >
       <v-col
         cols="12"
-        md="4"
+        :md="role == 'Customer' ? 6 : 4"
       >
         <DateField 
           v-model="order.dpc"
@@ -31,7 +31,7 @@
       </v-col>
       <v-col
         cols="12"
-        md="4"
+        :md="role == 'Customer' ? 6 : 4"
       >
         <DateField 
           v-model="order.drc"
@@ -44,6 +44,7 @@
         />
       </v-col>
       <v-col
+        v-if="role != 'Customer'"
         cols="12"
         md="4"
       >
