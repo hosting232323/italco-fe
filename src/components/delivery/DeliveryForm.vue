@@ -208,7 +208,6 @@ const submitForm = async () => {
     return;
   }
 
-  console.log(order.value)
   loading.value = true;
   order.value.user_id = order.value.user.id;
   if (status.value) order.value.status = status.value;

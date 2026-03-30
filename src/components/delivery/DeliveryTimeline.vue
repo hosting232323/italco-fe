@@ -6,7 +6,7 @@
     :style="{ marginLeft: isMobile ? '-30px' : '' }"
   >
     <v-timeline-item
-      v-for="(item, index) in timelineOrders"
+      v-for="(item, index) in timelineScheduleItems"
       :key="index"
       :color="timelineColor(item)"
       :dot-color="timelineColor(item)"
@@ -27,8 +27,8 @@
         >
           <button
             v-if="item.collection_point_id && !item.completed"
-            @click="completeCollectionPoint(item)"
             :style="{ color: theme.current.value.primaryColor }"
+            @click="completeCollectionPoint(item)"
           >
             Completa punto di ritiro
           </button>
@@ -59,20 +59,32 @@
             Completa prima il punto di ritiro
           </button>
         </div>
-        <v-card :style="{ width: isMobile ? '250px' : '600px' }">
+        <v-card :style="{ maxWidth: isMobile ? '200px' : '1000px' }">
           <v-card-text>
             <span v-if="item.collection_point_id">
               <b>Punto di ritiro</b><br><br>
-              <b>Indirizzo</b>: <br> {{ item.address || 'N/A' }}, {{ item.cap || 'N/A' }}<br><br>
-
+              <div
+                class="products-container"
+                :style="{ flexDirection: isMobile ? 'column' : ''}"
+              >
+                <div :style="{ width: isMobile ? '100%' : '50%'}">
+                  <b>Nome</b>: <br> {{ item.name || 'N/A' }}<br><br>
+                </div>
+                <div :style="{ width: isMobile ? '100%' : '50%'}">
+                  <b>Indirizzo</b>: <br> {{ item.address || 'N/A' }}, {{ item.cap || 'N/A' }}<br><br>
+                </div>
+              </div>
             </span>
             <span v-else>
               <b>Ordine #{{ item.id }}</b><br><br>
-              
-              Stato: {{ orderUtils.LABELS.find(label => label.value == item.status)?.title }}<br>
-              Tipo: {{ orderUtils.TYPES.find(type => type.value == item.type)?.title }}<br><br>
-
-              <div class="products-container" :style="{ flexDirection: isMobile ? 'column' : ''}">
+              <b>Destinatario:</b> {{ item.addressee || item.name }}<br>
+              <span>
+                {{ item.address || 'N/A' }}, {{ item.cap || 'N/A' }}
+              </span><br><br>
+              <div
+                class="products-container"
+                :style="{ flexDirection: isMobile ? 'column' : ''}"
+              >
                 <div :style="{ width: isMobile ? '100%' : '50%'}">
                   <b>Prodotti e Servizi:</b>
                   <div
@@ -81,34 +93,24 @@
                   >
                     <p>
                       <b>{{ productName }}</b>:
-                      {{ product.services?.map(s => s.name).join(', ') || 'Nessuno' }}
+                      {{ product.services?.join(', ') || 'N/A' }}
                     </p>
                   </div>
                 </div>
-
                 <div :style="{ width: isMobile ? '100%' : '50%'}">
+                  <b>Stato:</b> {{ orderUtils.LABELS.find(label => label.value == item.status)?.title }}<br>
+                  <b>Tipo:</b> {{ orderUtils.TYPES.find(type => type.value == item.type)?.title }}<br><br>
                   <b>Punti di Ritiro:</b>
-                  <div
-                    v-for="(product, productName) in item.products"
-                    :key="productName"
-                    style="font-size: smaller;"
-                  >
-                    {{ product.collection_point?.name || 'N/A' }}<br>
-                    {{ product.collection_point?.address || 'N/A' }},
-                    {{ product.collection_point?.cap || 'N/A' }}
+                  <div style="font-size: smaller;">
+                    {{ [...new Set(Object.values(item.products).map(
+                      product => scheduleItems.find(
+                        scheduleItem => scheduleItem.collection_point_id == product.collection_point.id
+                      ).name
+                    ))].join(', ') || 'N/A' }}
                   </div>
                 </div>
               </div>
-
               <br>
-              <b>Punto Vendita:</b>
-              {{ item.users?.map(u => u.nickname).join(', ') || 'N/A' }}<br><br>
-
-              <b>Destinatario:</b> {{ item.addressee || item.name }}<br>
-              <span>
-                {{ item.address || 'N/A' }}, {{ item.cap || 'N/A' }}
-              </span><br><br>
-
               <b>Note Punto Vendita:</b> {{ item.customer_note || '-' }}<br>
               <b>Note Operatori:</b> {{ item.operator_note || '-' }}<br><br>
             </span>
@@ -127,8 +129,8 @@ import { storeToRefs } from 'pinia';
 import mobile from '@/utils/mobile';
 import { useRouter } from 'vue-router';
 import orderUtils from '@/utils/order';
-import { useScheduleItemStore } from '@/stores/scheduleItem';
 import { ref, computed, reactive } from 'vue';
+import { useScheduleItemStore } from '@/stores/scheduleItem';
 
 const theme = useTheme();
 const router = useRouter();
@@ -136,9 +138,10 @@ const startX = reactive({});
 const swipeOffset = reactive({});
 const isMouseDown = reactive({});
 const activeSwipeIndex = ref(null);
-const scheduleItemStore = useScheduleItemStore();
 const isMobile = mobile.setupMobileUtils();
-const { list: orders, element: order, ready, showForm } = storeToRefs(scheduleItemStore);
+
+const scheduleItemStore = useScheduleItemStore();
+const { list: scheduleItems, element: order, ready, showForm } = storeToRefs(scheduleItemStore);
 
 const STATUS_MAP = {
   'Scheduled': ['Booking', 'Not Delivered', 'At Warehouse', 'To Reschedule'],
@@ -146,9 +149,9 @@ const STATUS_MAP = {
   'At Warehouse': ['Booking', 'To Reschedule']
 };
 
-const timelineOrders = computed(() => {
-  if (!orders.value) return [];
-  return orders.value.slice().sort((a, b) => a.index - b.index);
+const timelineScheduleItems = computed(() => {
+  if (!scheduleItems.value) return [];
+  return scheduleItems.value.slice().sort((a, b) => a.index - b.index);
 });
 
 const getAvailableStatuses = (item) => {
@@ -201,9 +204,8 @@ const completeCollectionPoint = (item) => {
 const completeOrder = (item, status = null) => {
   order.value = item;
 
-  if (status) {
+  if (status)
     order.value.preselectedStatus = status;
-  }
   showForm.value = true;
 
   activeSwipeIndex.value = null;
@@ -240,11 +242,6 @@ const timelineIcon = order => {
 </script>
 
 <style scoped>
-.selected {
-  background-color: var(--item-bg-color);
-  color: white;
-}
-
 .swipe-card-wrapper {
   position: relative;
   overflow: hidden;
@@ -256,12 +253,6 @@ const timelineIcon = order => {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
-}
-
-.swipe-card {
-  transition: transform 0.3s ease;
-  position: relative;
-  z-index: 2;
 }
 
 .swipe-actions {
