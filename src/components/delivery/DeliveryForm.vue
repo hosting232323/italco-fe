@@ -107,7 +107,6 @@
             />
           </div>
         </v-row>
-
         <div v-if="status === 'Delivered'">
           <label>Firma del cliente</label>
           <SignaturePad
@@ -155,7 +154,6 @@
             </v-col>
           </v-row>
         </div>
-
         <FormButtons
           :loading="loading"
           @cancel="emits('cancel')"
@@ -184,14 +182,15 @@ const theme = useTheme();
 const status = ref(null);
 const loading = ref(false);
 const router = useRouter();
+const signaturePad = ref(null);
 const signatureError = ref(null);
 const signatureSuccess = ref(null);
-const signaturePad = ref(null);
-const orderStore = useOrderStore();
 const emits = defineEmits(['cancel']);
 const isMobile = mobile.setupMobileUtils();
+
+const orderStore = useOrderStore();
 const scheduleItemStore = useScheduleItemStore();
-const { element: order } = storeToRefs(scheduleItemStore);
+const { element: order } = storeToRefs(orderStore);
 
 const STATUS_MAP = {
   'Scheduled': ['Booking', 'Not Delivered', 'At Warehouse', 'To Reschedule'],
@@ -209,7 +208,7 @@ const submitForm = async () => {
   }
 
   loading.value = true;
-  order.value.user_id = order.value.user.id;
+  order.value.id = order.value.order_id;
   if (status.value) order.value.status = status.value;
   orderStore.updateElementWithFormData(router, function (data) {
     loading.value = false;
@@ -240,9 +239,7 @@ const saveSignature = () => {
   const bstr = atob(arr[1]);
   let n = bstr.length;
   const u8arr = new Uint8Array(n);
-  while (n--) {
-    u8arr[n] = bstr.charCodeAt(n);
-  }
+  while (n--) u8arr[n] = bstr.charCodeAt(n);
   const file = new File([u8arr], `firma_${order.value.id}.png`, { type: mime });
 
   order.value.signature = file;
@@ -250,8 +247,7 @@ const saveSignature = () => {
 };
 
 onMounted(() => {
-  if (order.value.preselectedStatus) {
+  if (order.value.preselectedStatus)
     status.value = order.value.preselectedStatus;
-  }
 });
 </script>

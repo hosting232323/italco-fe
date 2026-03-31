@@ -130,6 +130,7 @@ import mobile from '@/utils/mobile';
 import { useRouter } from 'vue-router';
 import orderUtils from '@/utils/order';
 import { ref, computed, reactive } from 'vue';
+import { useOrderStore } from '@/stores/order';
 import { useScheduleItemStore } from '@/stores/scheduleItem';
 
 const theme = useTheme();
@@ -140,8 +141,10 @@ const isMouseDown = reactive({});
 const activeSwipeIndex = ref(null);
 const isMobile = mobile.setupMobileUtils();
 
+const orderStore = useOrderStore();
 const scheduleItemStore = useScheduleItemStore();
-const { list: scheduleItems, element: order, ready, showForm } = storeToRefs(scheduleItemStore);
+const { element: order } = storeToRefs(orderStore);
+const { list: scheduleItems, ready, showForm } = storeToRefs(scheduleItemStore);
 
 const STATUS_MAP = {
   'Scheduled': ['Booking', 'Not Delivered', 'At Warehouse', 'To Reschedule'],
@@ -203,16 +206,14 @@ const completeCollectionPoint = (item) => {
 
 const completeOrder = (item, status = null) => {
   order.value = item;
-
   if (status)
     order.value.preselectedStatus = status;
   showForm.value = true;
-
   activeSwipeIndex.value = null;
   swipeOffset[item.id] = 0;
 };
 
-const timelineColor = order => {
+const timelineColor = (order) => {
   if (order.completed) return 'green';
   if (order.anomaly) return 'red';
   if (order.delay) return 'orange';
@@ -227,7 +228,7 @@ const timelineColor = order => {
   }
 };
 
-const timelineIcon = order => {
+const timelineIcon = (order) => {
   if (order.anomaly) return 'mdi-alert-circle';
   if (order.delay) return 'mdi-clock-alert';
 

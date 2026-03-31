@@ -42,14 +42,15 @@
 </template>
 
 <script setup>
+import Form from '@/components/delivery/DeliveryForm';
+import DeliveryTimeline from '@/components/delivery/DeliveryTimeline.vue';
+
 import http from '@/utils/http';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
-import { useScheduleItemStore } from '@/stores/scheduleItem';
-import Form from '@/components/delivery/DeliveryForm';
 import { ref, computed, onMounted, onUnmounted } from 'vue';
-import DeliveryTimeline from './DeliveryTimeline.vue';
+import { useScheduleItemStore } from '@/stores/scheduleItem';
 
 let watcherId = null;
 const theme = useTheme();
