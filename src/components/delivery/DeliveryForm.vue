@@ -1,20 +1,10 @@
 <template>
-  <v-card :title="`ID Ordine: ${order.id}`">
+  <v-card :title="`ID Ordine: ${order.id} - Nuovo stato: ${newStatus}`">
     <v-card-text>
       <v-form
         ref="form"
         @submit.prevent="submitForm"
       >
-        <v-select
-          v-if="!['Delivered', 'Not Delivered', 'To Reschedule'].includes(actualStatus)"
-          v-model="status"
-          :disabled="!!order.preselectedStatus"
-          label="Stato"
-          :items="STATUS_MAP[actualStatus].map(status => ({
-            value: status,
-            title: orderUtils.LABELS.find(label => label.value == status).title
-          }))"
-        />
         <v-textarea
           v-if="status === 'Not Delivered' || order.delay || order.anomaly"
           v-model="order.motivation"
@@ -112,7 +102,7 @@
           <SignaturePad
             ref="signaturePad"
             width="auto"
-            height="200"
+            :height="200"
             pen-color="black"
             background-color="white"
             style="border: 1px solid #ccc;"
@@ -170,10 +160,10 @@ import FormButtons from '@/components/FormButtons';
 import { useTheme } from 'vuetify';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
-import { ref, onMounted } from 'vue';
 import orderUtils from '@/utils/order';
 import { useRouter } from 'vue-router';
 import validation from '@/utils/validation';
+import { ref, onMounted, computed } from 'vue';
 import { useOrderStore } from '@/stores/order';
 import { useScheduleItemStore } from '@/stores/scheduleItem';
 
@@ -192,12 +182,10 @@ const orderStore = useOrderStore();
 const scheduleItemStore = useScheduleItemStore();
 const { element: order } = storeToRefs(orderStore);
 
-const STATUS_MAP = {
-  'Scheduled': ['Booking', 'Not Delivered', 'At Warehouse', 'To Reschedule'],
-  'Booking': ['Delivered', 'Not Delivered', 'At Warehouse', 'To Reschedule'],
-  'At Warehouse': ['Booking', 'To Reschedule']
-};
-const actualStatus = order.value.status;
+const newStatus = computed(() => {
+  if (!status.value) return '';
+  return orderUtils.LABELS.find(label => label.value == status.value).title;
+});
 
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
