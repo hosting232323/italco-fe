@@ -33,14 +33,14 @@
             Completa punto di ritiro
           </button>
           <button
-            v-else-if="item.completed"
+            v-else-if="item.collection_point_id && item.completed"
             style="cursor: default;"
             :style="{ color: theme.current.value.primaryColor }"
           >
             Punto di ritiro completato
           </button>
           <div
-            v-else-if="!item.collection_point_id"
+            v-else-if="!item.collection_point_id && item.status != 'Scheduled'"
             class="d-flex flex-column align-center justify-center"
           >
             <button
