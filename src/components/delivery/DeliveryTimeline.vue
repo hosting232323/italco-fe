@@ -30,7 +30,6 @@
             <button
               v-if="!item.completed"
               @click="completeCollectionPoint(item)"
-              text="Completa punto di ritiro"
             >
               Completa punto di ritiro
             </button>
@@ -113,11 +112,13 @@
                   <b>Tipo:</b> {{ orderUtils.TYPES.find(type => type.value == item.type)?.title }}<br><br>
                   <b>Punti di Ritiro</b>
                   <div style="font-size: smaller;">
-                    {{ !item.products ? 'N/D' : [...new Set(Object.values(item.products).map(
-                      product => scheduleItems.find(
-                        scheduleItem => scheduleItem.collection_point_id == product.collection_point.id
-                      ).name
-                    ))].join(', ') }}
+                    {{
+                      !item.products ? 'N/D' : [...new Set(Object.values(item.products).map(
+                        product => scheduleItems.find(
+                          scheduleItem => scheduleItem.collection_point_id == product.collection_point.id
+                        ).name
+                      ))].join(', ')
+                    }}
                   </div>
                 </div>
               </div>
