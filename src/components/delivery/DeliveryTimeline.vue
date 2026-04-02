@@ -1,4 +1,13 @@
 <template>
+  <v-skeleton-loader
+    v-if="!ready"
+    type="table"
+    :color="theme.current.value.secondaryColor"
+    class="mt-5"
+  />
+  <br><b v-if="ready">
+    Totale ordini: {{ scheduleItems.filter(item => item.operation_type !== 'CollectionPoint').length }}
+  </b><br><br>
   <v-timeline
     v-if="ready"
     align="start"
@@ -6,7 +15,7 @@
     :style="{ marginLeft: isMobile ? '-30px' : '' }"
   >
     <v-timeline-item
-      v-for="(item, index) in timelineScheduleItems"
+      v-for="(item, index) in scheduleItems"
       :key="index"
       :color="timelineColor(item)"
       :dot-color="timelineColor(item)"
@@ -49,7 +58,7 @@
               Completa prima il punto di ritiro
             </button>
             <button
-              v-if="['Booking', 'Not Delivered', 'At Warehouse', 'To Reschedule'].includes(item.status)"
+              v-if="['Booked', 'Not Delivered', 'At Warehouse', 'To Reschedule'].includes(item.status)"
               style="cursor: default;"
             >
               Ordine completato
@@ -69,7 +78,7 @@
             </div>
           </template>
         </div>
-        <v-card :style="{ maxWidth: isMobile ? '300px' : '1000px' }">
+        <v-card style="max-width: 1200px;">
           <v-card-text>
             <span v-if="item.collection_point_id">
               <b>Punto di ritiro</b><br><br>
@@ -137,11 +146,12 @@
 <script setup>
 import http from '@/utils/http';
 import { useTheme } from 'vuetify';
+import { ref, reactive } from 'vue';
 import { storeToRefs } from 'pinia';
 import mobile from '@/utils/mobile';
 import { useRouter } from 'vue-router';
 import orderUtils from '@/utils/order';
-import { ref, computed, reactive } from 'vue';
+import storesUtils from '@/utils/stores';
 import { useOrderStore } from '@/stores/order';
 import { useScheduleItemStore } from '@/stores/scheduleItem';
 
@@ -156,18 +166,13 @@ const isMobile = mobile.setupMobileUtils();
 const orderStore = useOrderStore();
 const scheduleItemStore = useScheduleItemStore();
 const { element: order } = storeToRefs(orderStore);
-const { list: scheduleItems, ready, showForm } = storeToRefs(scheduleItemStore);
+const { ready, showForm } = storeToRefs(scheduleItemStore);
+const scheduleItems = storesUtils.getStoreList(scheduleItemStore, router);
 
 const STATUS_MAP = {
-  'Scheduled': ['Booking', 'Not Delivered', 'At Warehouse', 'To Reschedule'],
   'Booking': ['Delivered', 'Not Delivered', 'At Warehouse', 'To Reschedule'],
   'At Warehouse': ['Booking', 'To Reschedule']
 };
-
-const timelineScheduleItems = computed(() => {
-  if (!scheduleItems.value) return [];
-  return scheduleItems.value.slice().sort((a, b) => a.index - b.index);
-});
 
 const getAvailableStatuses = (item) => {
   if (!STATUS_MAP[item.status]) return [];
