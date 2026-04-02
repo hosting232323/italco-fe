@@ -106,7 +106,7 @@
                       product => scheduleItems.find(
                         scheduleItem => scheduleItem.collection_point_id == product.collection_point.id
                       ).name
-                    ))].join(', ') || 'N/A' }}
+                    ))].join(', ') }}
                   </div>
                 </div>
               </div>
@@ -159,6 +159,7 @@ const timelineScheduleItems = computed(() => {
 
 const getAvailableStatuses = (item) => {
   if (!STATUS_MAP[item.status]) return [];
+
   return STATUS_MAP[item.status];
 };
 
@@ -204,10 +205,9 @@ const completeCollectionPoint = (item) => {
   }, 'PUT', router);
 };
 
-const completeOrder = (item, status = null) => {
+const completeOrder = (item, status) => {
   order.value = item;
-  if (status)
-    order.value.preselectedStatus = status;
+  order.value.status = status;
   showForm.value = true;
   activeSwipeIndex.value = null;
   swipeOffset[item.id] = 0;

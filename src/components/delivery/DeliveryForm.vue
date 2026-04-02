@@ -1,24 +1,24 @@
 <template>
-  <v-card :title="`ID Ordine: ${order.id} - Nuovo stato: ${newStatus}`">
+  <v-card :title="`ID Ordine: ${order.id} - Nuovo stato: ${orderUtils.LABELS.find(label => label.value == order.status)?.title}`">
     <v-card-text>
       <v-form
         ref="form"
         @submit.prevent="submitForm"
       >
         <v-textarea
-          v-if="status === 'Not Delivered' || order.delay || order.anomaly"
+          v-if="order.status === 'Not Delivered' || order.delay || order.anomaly"
           v-model="order.motivation"
           label="Motivazione"
           rows="3"
           :rules="validation.requiredRules"
         />
         <v-file-input
-          v-if="['Delivered', 'Not Delivered'].includes(status) || order.delay || order.anomaly"
+          v-if="['Delivered', 'Not Delivered'].includes(order.status) || order.delay || order.anomaly"
           v-model="order.photos"
           multiple
           accept="image/*"
           label="Foto"
-          :rules="(status === 'Delivered' || order.anomaly) ? validation.arrayRules : []"
+          :rules="(order.status === 'Delivered' || order.anomaly) ? validation.arrayRules : []"
         />
         <v-row>
           <v-col
@@ -97,7 +97,7 @@
             />
           </div>
         </v-row>
-        <div v-if="status === 'Delivered'">
+        <div v-if="order.status === 'Delivered'">
           <label>Firma del cliente</label>
           <SignaturePad
             ref="signaturePad"
@@ -157,19 +157,18 @@
 import SignaturePad from 'vue3-signature-pad';
 import FormButtons from '@/components/FormButtons';
 
+import { ref } from 'vue';
 import { useTheme } from 'vuetify';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import orderUtils from '@/utils/order';
 import { useRouter } from 'vue-router';
 import validation from '@/utils/validation';
-import { ref, onMounted, computed } from 'vue';
 import { useOrderStore } from '@/stores/order';
 import { useScheduleItemStore } from '@/stores/scheduleItem';
 
 const form = ref(null);
 const theme = useTheme();
-const status = ref(null);
 const loading = ref(false);
 const router = useRouter();
 const signaturePad = ref(null);
@@ -182,22 +181,16 @@ const orderStore = useOrderStore();
 const scheduleItemStore = useScheduleItemStore();
 const { element: order } = storeToRefs(orderStore);
 
-const newStatus = computed(() => {
-  if (!status.value) return '';
-  return orderUtils.LABELS.find(label => label.value == status.value).title;
-});
-
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
 
-  if (status.value === 'Delivered' && signaturePad.value.isEmpty()) {
+  if (order.value.status === 'Delivered' && signaturePad.value.isEmpty()) {
     signatureError.value = 'La firma non può essere vuota';
     return;
   }
 
   loading.value = true;
   order.value.id = order.value.order_id;
-  if (status.value) order.value.status = status.value;
   orderStore.updateElementWithFormData(router, function (data) {
     loading.value = false;
     if (data.status == 'ok') {
@@ -233,9 +226,4 @@ const saveSignature = () => {
   order.value.signature = file;
   signatureSuccess.value = 'Firma salvata correttamente';
 };
-
-onMounted(() => {
-  if (order.value.preselectedStatus)
-    status.value = order.value.preselectedStatus;
-});
 </script>
