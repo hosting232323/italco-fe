@@ -24,42 +24,53 @@
         <div
           class="swipe-actions"
           :class="{ active: activeSwipeIndex === index }"
+          :style="{ color: theme.current.value.primaryColor }"
         >
-          <button
-            v-if="item.collection_point_id && !item.completed"
-            :style="{ color: theme.current.value.primaryColor }"
-            @click="completeCollectionPoint(item)"
-          >
-            Completa punto di ritiro
-          </button>
-          <button
-            v-else-if="item.collection_point_id && item.completed"
-            style="cursor: default;"
-            :style="{ color: theme.current.value.primaryColor }"
-          >
-            Punto di ritiro completato
-          </button>
-          <div
-            v-else-if="!item.collection_point_id && item.status != 'Scheduled'"
-            class="d-flex flex-column align-center justify-center"
-          >
+          <template v-if="item.operation_type == 'CollectionPoint'">
             <button
-              v-for="statusOption in getAvailableStatuses(item)"
-              :key="statusOption"
-              :style="{ color: theme.current.value.primaryColor }"
-              @click="completeOrder(item, statusOption)"
+              v-if="!item.completed"
+              @click="completeCollectionPoint(item)"
+              text="Completa punto di ritiro"
             >
-              {{ getStatusLabel(statusOption) }}
+              Completa punto di ritiro
             </button>
-          </div>
-          <button
-            v-else
-            style="cursor: default;"
-          >
-            Completa prima il punto di ritiro
-          </button>
+            <button
+              v-else
+              style="cursor: default;"
+              :style="{ color: theme.current.value.primaryColor }"
+            >
+              Punto di ritiro completato
+            </button>
+          </template>
+          <template v-else-if="item.operation_type == 'Order'">
+            <button
+              v-if="item.status == 'Scheduled'"
+              style="cursor: default;"
+            >
+              Completa prima il punto di ritiro
+            </button>
+            <button
+              v-if="['Booking', 'Not Delivered', 'At Warehouse', 'To Reschedule'].includes(item.status)"
+              style="cursor: default;"
+            >
+              Ordine completato
+            </button>
+            <div
+              v-else
+              class="d-flex flex-column align-center justify-center"
+            >
+              <button
+                v-for="statusOption in getAvailableStatuses(item)"
+                :key="statusOption"
+                :style="{ color: theme.current.value.primaryColor }"
+                @click="completeOrder(item, statusOption)"
+              >
+                {{ getStatusLabel(statusOption) }}
+              </button>
+            </div>
+          </template>
         </div>
-        <v-card :style="{ maxWidth: isMobile ? '200px' : '1000px' }">
+        <v-card :style="{ maxWidth: isMobile ? '300px' : '1000px' }">
           <v-card-text>
             <span v-if="item.collection_point_id">
               <b>Punto di ritiro</b><br><br>
@@ -86,7 +97,7 @@
                 :style="{ flexDirection: isMobile ? 'column' : ''}"
               >
                 <div :style="{ width: isMobile ? '100%' : '50%'}">
-                  <b>Prodotti e Servizi:</b>
+                  <b>Prodotti e Servizi</b>
                   <div
                     v-for="(product, productName) in item.products"
                     :key="productName"
@@ -100,9 +111,9 @@
                 <div :style="{ width: isMobile ? '100%' : '50%'}">
                   <b>Stato:</b> {{ orderUtils.LABELS.find(label => label.value == item.status)?.title }}<br>
                   <b>Tipo:</b> {{ orderUtils.TYPES.find(type => type.value == item.type)?.title }}<br><br>
-                  <b>Punti di Ritiro:</b>
+                  <b>Punti di Ritiro</b>
                   <div style="font-size: smaller;">
-                    {{ [...new Set(Object.values(item.products).map(
+                    {{ !item.products ? 'N/D' : [...new Set(Object.values(item.products).map(
                       product => scheduleItems.find(
                         scheduleItem => scheduleItem.collection_point_id == product.collection_point.id
                       ).name
@@ -199,7 +210,6 @@ const completeCollectionPoint = (item) => {
   }, () => {
     ready.value = false;
     scheduleItemStore.initList(router);
-
     activeSwipeIndex.value = null;
     swipeOffset[item.id] = 0;
   }, 'PUT', router);
