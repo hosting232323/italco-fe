@@ -1,9 +1,9 @@
 <template>
-  <v-card title="Storico Stati">
+  <v-card title="Storico Ordine">
     <v-data-table
       :items="statuses"
       :headers="[
-        { title: 'Tipo/Status', value: 'status', sortable: false },
+        { title: 'Stato', value: 'status', sortable: false },
         { title: 'Data', value: 'date', sortable: false },
         { title: 'Ora', value: 'time', sortable: false }
       ]"
@@ -14,7 +14,6 @@
             {{ orderUtils.LABELS.find(label => label.value == item.status).title }}
           </v-chip>
         </template>
-
         <template v-else>
           <div v-if="item.hasOwnProperty('anomaly')">
             <v-icon :color="item.anomaly ? 'red' : 'green'" class="me-1">
@@ -34,7 +33,6 @@
           </div>
         </template>
       </template>
-
       <template #[`item.date`]="{ item }">
         {{ item.created_at.split(' ')[0] }}
       </template>
