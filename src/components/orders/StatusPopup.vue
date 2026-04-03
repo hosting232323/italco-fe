@@ -14,8 +14,24 @@
             {{ orderUtils.LABELS.find(label => label.value == item.status).title }}
           </v-chip>
         </template>
+
         <template v-else>
-            {{ formatOtherStatus(item) }}
+          <div v-if="item.hasOwnProperty('anomaly')">
+            <v-icon :color="item.anomaly ? 'red' : 'green'" class="me-1">
+              {{ item.anomaly ? 'mdi-alert-outline' : 'mdi-alert-remove-outline' }}
+            </v-icon>
+            Anomalia
+          </div>
+          <div v-if="item.hasOwnProperty('delay')">
+            <v-icon :color="item.delay ? 'orange' : 'blue'" class="me-1">
+              {{ item.delay ? 'mdi-clock-alert-outline' : 'mdi-clock-outline' }}
+            </v-icon>
+            Ritardo
+          </div>
+          <div v-if="item.hasOwnProperty('confirmed')" class="d-flex align-center">
+            <div :style="{width: '15px', height: '15px', borderRadius: '50%', marginRight: '8px' ,backgroundColor: item.confirmed ? 'green' : 'red'}"></div>
+            Confermato
+          </div>
         </template>
       </template>
 
@@ -38,15 +54,4 @@ const { statuses } = defineProps({
     required: true
   }
 });
-
-const formatOtherStatus = (item) => {
-  const keys = Object.keys(item).filter(
-    k => !['id', 'order_id', 'created_at', 'updated_at', 'status'].includes(k)
-  );
-  
-  if (keys.length) {
-    return `${keys[0]}: ${item[keys[0]]}`;
-  }
-  return '';
-};
 </script>
