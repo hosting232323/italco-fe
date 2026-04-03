@@ -25,7 +25,7 @@
 </template>
 
 <script setup>
-import { useTheme } from "vuetify";
+import { useTheme } from 'vuetify';
 
 const { loading, submitText } = defineProps({
   loading: {
@@ -34,10 +34,10 @@ const { loading, submitText } = defineProps({
   },
   submitText: {
     type: String,
-    default: "Invia",
+    default: 'Invia',
   },
 });
 
 const theme = useTheme();
-const emits = defineEmits(["cancel"]);
+const emits = defineEmits(['cancel']);
 </script>

@@ -9,6 +9,7 @@
       <ScheduleItem
         :element="element"
         :not-found-addresses="notFoundAddresses"
+        @update:element="(updated) => Object.assign(element, updated)"
       />
     </template>
   </draggable>

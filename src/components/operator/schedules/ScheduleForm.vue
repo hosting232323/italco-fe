@@ -8,12 +8,12 @@
     :title="schedule.id ? 'Modifica Borderò' : 'Crea Borderò'"
     :subtitle="
       (schedule.id ? `ID: ${schedule.id} - ` : '') +
-      'Ordini: ' +
-      schedule.schedule_items
-        .flatMap((item) =>
-          item.operation_type === 'Order' ? [item.order_id] : [],
-        )
-        .join(', ')
+        'Ordini: ' +
+        schedule.schedule_items
+          .flatMap((item) =>
+            item.operation_type === 'Order' ? [item.order_id] : [],
+          )
+          .join(', ')
     "
   >
     <v-card-text>
@@ -29,8 +29,14 @@
         />
       </v-row>
       <v-row>
-        <v-col cols="12" md="7">
-          <v-form ref="form" @submit.prevent="submitForm">
+        <v-col
+          cols="12"
+          md="7"
+        >
+          <v-form
+            ref="form"
+            @submit.prevent="submitForm"
+          >
             <v-chip
               v-for="user in schedule.users"
               :key="user.id"
@@ -58,7 +64,10 @@
               @click:append="addUser"
             />
             <v-row no-gutters>
-              <v-col cols="12" md="6">
+              <v-col
+                cols="12"
+                md="6"
+              >
                 <v-select
                   v-model="schedule.transport_id"
                   :class="isMobile ? '' : 'mr-2'"
@@ -69,7 +78,10 @@
                   :rules="validation.requiredRules"
                 />
               </v-col>
-              <v-col cols="12" md="6">
+              <v-col
+                cols="12"
+                md="6"
+              >
                 <v-text-field
                   v-model="schedule.date"
                   type="date"
@@ -100,10 +112,16 @@
               @click="addOrder"
             />
             <ScheduleItemsDraggable :not-found-addresses="notFoundAddresses" />
-            <FormButtons :loading="loading" @cancel="emits('cancel')" />
+            <FormButtons
+              :loading="loading"
+              @cancel="emits('cancel')"
+            />
           </v-form>
         </v-col>
-        <v-col cols="12" md="5">
+        <v-col
+          cols="12"
+          md="5"
+        >
           <div style="height: 100%; border-radius: 12px; overflow: hidden">
             <OverStreetMap
               v-if="
@@ -119,23 +137,23 @@
 </template>
 
 <script setup>
-import FormButtons from "@/components/FormButtons";
-import OverStreetMap from "@/components/OverStreetMap.vue";
-import ScheduleItemsDraggable from "@/components/operator/schedules/ScheduleItemsDraggable.vue";
+import FormButtons from '@/components/FormButtons';
+import OverStreetMap from '@/components/OverStreetMap.vue';
+import ScheduleItemsDraggable from '@/components/operator/schedules/ScheduleItemsDraggable.vue';
 
-import { ref, watch } from "vue";
-import mobile from "@/utils/mobile";
-import { storeToRefs } from "pinia";
-import { useRouter } from "vue-router";
-import { useTheme } from "vuetify";
-import storesUtils from "@/utils/stores";
-import validation from "@/utils/validation";
-import { useOrderStore } from "@/stores/order";
-import { useScheduleStore } from "@/stores/schedule";
-import { useTransportStore } from "@/stores/transport";
-import { useAdministrationUserStore } from "@/stores/administrationUser";
+import { ref, watch } from 'vue';
+import mobile from '@/utils/mobile';
+import { storeToRefs } from 'pinia';
+import { useRouter } from 'vue-router';
+import { useTheme } from 'vuetify';
+import storesUtils from '@/utils/stores';
+import validation from '@/utils/validation';
+import { useOrderStore } from '@/stores/order';
+import { useScheduleStore } from '@/stores/schedule';
+import { useTransportStore } from '@/stores/transport';
+import { useAdministrationUserStore } from '@/stores/administrationUser';
 
-const props = defineProps({
+defineProps({
   showBack: {
     type: Boolean,
     default: false,
@@ -150,7 +168,7 @@ const loading = ref(false);
 const selectedUser = ref(null);
 const notFoundAddresses = ref([]);
 const selectedOrderId = ref(null);
-const emits = defineEmits(["cancel", "back"]);
+const emits = defineEmits(['cancel', 'back']);
 const isMobile = mobile.setupMobileUtils();
 
 const orderStore = useOrderStore();
@@ -192,14 +210,14 @@ const addOrder = () => {
     if (
       !schedule.value.schedule_items.some(
         (collectionPoint) =>
-          collectionPoint.operation_type === "CollectionPoint" &&
+          collectionPoint.operation_type === 'CollectionPoint' &&
           collectionPoint.collection_point_id === product.collection_point.id,
       )
     )
       schedule.value.schedule_items.push(
         createScheduleItem(
           product.collection_point,
-          "CollectionPoint",
+          'CollectionPoint',
           schedule.value.schedule_items.length,
         ),
       );
@@ -208,7 +226,7 @@ const addOrder = () => {
   schedule.value.schedule_items.push(
     createScheduleItem(
       orderToAdd,
-      "Order",
+      'Order',
       schedule.value.schedule_items.length,
     ),
   );
@@ -219,7 +237,7 @@ const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
 
   if (!schedule.value.users || schedule.value.users.length == 0) {
-    error.value = "Aggiungi prima l'utente";
+    error.value = 'Aggiungi prima l\'utente';
     return;
   }
 
@@ -230,24 +248,24 @@ const submitForm = async () => {
 
 const callback = (data) => {
   loading.value = false;
-  if (data.status == "ok") {
+  if (data.status == 'ok') {
     orderStore.initList(router);
     scheduleStore.initList(router);
     schedule.value = {};
-    emits("cancel");
+    emits('cancel');
   } else error.value = data.error;
 };
 
 const createScheduleItem = (element, type, index = undefined) => {
   const item = {
     ...element,
-    end_time_slot: "",
-    start_time_slot: "",
+    end_time_slot: '',
+    start_time_slot: '',
     operation_type: type,
   };
   if (index) item.index = index;
   delete item.id;
-  if (type == "Order") item.order_id = element.id;
+  if (type == 'Order') item.order_id = element.id;
   else item.collection_point_id = element.id;
   return item;
 };

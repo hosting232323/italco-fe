@@ -10,6 +10,7 @@
         :suggestion="suggestion"
         :index="index"
         :primary-color="primaryColor"
+        @update:suggestion="(updated) => Object.assign(suggestion, updated)"
         @open-schedule="emits('open-schedule', $event)"
         @orders-changed="emits('orders-changed')"
       />

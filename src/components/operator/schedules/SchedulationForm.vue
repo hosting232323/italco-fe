@@ -1,7 +1,10 @@
 <template>
   <v-card title="Pianificazione Automatica">
     <v-card-text>
-      <v-form ref="dpcForm" @submit.prevent="submitDpcForm">
+      <v-form
+        ref="dpcForm"
+        @submit.prevent="submitDpcForm"
+      >
         <DateField
           v-model="booking_date"
           label="Data Consegna"
@@ -9,7 +12,10 @@
           :allowed-dates="days.getDateRangeArray()"
         />
         <v-row no-gutters>
-          <v-col cols="12" md="4">
+          <v-col
+            cols="12"
+            md="4"
+          >
             <v-text-field
               v-model="minSizeGroup"
               type="number"
@@ -18,7 +24,10 @@
               :class="isMobile ? '' : 'mr-2'"
             />
           </v-col>
-          <v-col cols="12" md="4">
+          <v-col
+            cols="12"
+            md="4"
+          >
             <v-text-field
               v-model="maxSizeGroup"
               type="number"
@@ -27,7 +36,10 @@
               :class="isMobile ? '' : 'mr-2 ml-2'"
             />
           </v-col>
-          <v-col cols="12" md="4">
+          <v-col
+            cols="12"
+            md="4"
+          >
             <v-text-field
               v-model="maxDistanceKm"
               type="number"
@@ -43,7 +55,10 @@
           @cancel="emits('cancel')"
         />
       </v-form>
-      <v-alert v-if="message" class="mt-5 mb-5">
+      <v-alert
+        v-if="message"
+        class="mt-5 mb-5"
+      >
         {{ message }}
       </v-alert>
       <SchedulationProposals
@@ -62,21 +77,21 @@
 </template>
 
 <script setup>
-import DateField from "@/components/DateField";
-import FormButtons from "@/components/FormButtons";
-import SchedulationProposals from "@/components/operator/schedules/SchedulationProposals.vue";
+import DateField from '@/components/DateField';
+import FormButtons from '@/components/FormButtons';
+import SchedulationProposals from '@/components/operator/schedules/SchedulationProposals.vue';
 
-import http from "@/utils/http";
-import days from "@/utils/days";
-import { useTheme } from "vuetify";
-import mobile from "@/utils/mobile";
-import { ref, computed } from "vue";
-import { storeToRefs } from "pinia";
-import { useRouter } from "vue-router";
-import validation from "@/utils/validation";
-import { useScheduleStore } from "@/stores/schedule";
+import http from '@/utils/http';
+import days from '@/utils/days';
+import { useTheme } from 'vuetify';
+import mobile from '@/utils/mobile';
+import { ref, computed } from 'vue';
+import { storeToRefs } from 'pinia';
+import { useRouter } from 'vue-router';
+import validation from '@/utils/validation';
+import { useScheduleStore } from '@/stores/schedule';
 
-const message = ref("");
+const message = ref('');
 const theme = useTheme();
 const dpcForm = ref(null);
 const loading = ref(false);
@@ -90,13 +105,13 @@ const deliveryUsers = ref([]);
 const newSuggestionOrders = ref([]);
 const booking_date = ref(null);
 const isMobile = mobile.setupMobileUtils();
-const emits = defineEmits(["cancel", "goToSheduleForm"]);
+const emits = defineEmits(['cancel', 'goToSheduleForm']);
 
 const scheduleStore = useScheduleStore();
 const { element: schedule } = storeToRefs(scheduleStore);
 
-const DEFAULT_START_TIME_SLOT = "08:00";
-const DEFAULT_END_TIME_SLOT = "09:00";
+const DEFAULT_START_TIME_SLOT = '08:00';
+const DEFAULT_END_TIME_SLOT = '09:00';
 
 const normalizeScheduleItem = (item, operationType = item.operation_type) => {
   const normalizedItem = {
@@ -106,7 +121,7 @@ const normalizeScheduleItem = (item, operationType = item.operation_type) => {
     operation_type: operationType,
   };
 
-  if (operationType === "Order")
+  if (operationType === 'Order')
     normalizedItem.order_id = item.order_id ?? item.id;
   else normalizedItem.collection_point_id = item.collection_point_id ?? item.id;
 
@@ -116,7 +131,7 @@ const normalizeScheduleItem = (item, operationType = item.operation_type) => {
 };
 
 const createCollectionPointScheduleItem = (collectionPoint) => {
-  return normalizeScheduleItem(collectionPoint, "CollectionPoint");
+  return normalizeScheduleItem(collectionPoint, 'CollectionPoint');
 };
 
 const getScheduleItemsByType = (suggestion, operationType) => {
@@ -130,7 +145,7 @@ const getScheduleItemsByType = (suggestion, operationType) => {
 const syncSuggestionScheduleItems = (suggestion) => {
   const existingCollectionPoints = getScheduleItemsByType(
     suggestion,
-    "CollectionPoint",
+    'CollectionPoint',
   );
   const collectionPointItemsById = new Map(
     existingCollectionPoints.map((item) => [item.collection_point_id, item]),
@@ -166,8 +181,8 @@ const syncSuggestionScheduleItems = (suggestion) => {
 const normalizeSuggestion = (suggestion) => {
   const normalizedSuggestion = {
     ...suggestion,
-    orders: getScheduleItemsByType(suggestion, "Order").map((order) =>
-      normalizeScheduleItem(order, "Order"),
+    orders: getScheduleItemsByType(suggestion, 'Order').map((order) =>
+      normalizeScheduleItem(order, 'Order'),
     ),
   };
 
@@ -186,7 +201,7 @@ const createSuggestion = (orders = []) => {
     delivery_users: [],
     transports: [],
     schedule_items: [],
-    orders: orders.map((order) => normalizeScheduleItem(order, "Order")),
+    orders: orders.map((order) => normalizeScheduleItem(order, 'Order')),
   };
 
   syncSuggestionScheduleItems(suggestion);
@@ -205,10 +220,10 @@ const createSuggestionFromDroppedOrder = (event) => {
 const submitDpcForm = async () => {
   if (!(await dpcForm.value.validate()).valid) return;
 
-  message.value = "";
+  message.value = '';
   loading.value = true;
   http.getRequest(
-    "schedule/suggestions",
+    'schedule/suggestions',
     {
       booking_date: booking_date.value,
       min_size_group: minSizeGroup.value,
@@ -217,14 +232,14 @@ const submitDpcForm = async () => {
     },
     function (data) {
       loading.value = false;
-      if (data.status == "ok") {
+      if (data.status == 'ok') {
         suggestions.value = data.groups.map(normalizeSuggestion);
         newSuggestionOrders.value = [];
         transports.value = data.transports;
         deliveryUsers.value = data.delivery_users;
       } else message.value = data.error;
     },
-    "GET",
+    'GET',
     router,
   );
 };
@@ -237,7 +252,7 @@ const openSchedule = (suggestion) => {
   schedule.value.transport_id = suggestion.transports.length
     ? suggestion.transports[0].id
     : null;
-  emits("goToSheduleForm");
+  emits('goToSheduleForm');
 };
 
 const availableDeliveryUsers = computed(() => {

@@ -104,27 +104,21 @@ const props = defineProps({
   }
 });
 
-const emits = defineEmits(['open-schedule', 'orders-changed']);
+const emits = defineEmits(['open-schedule', 'orders-changed', 'update:suggestion']);
 
 const orders = computed({
   get: () => props.suggestion.orders,
-  set: (value) => {
-    props.suggestion.orders = value;
-  }
+  set: (value) => emits('update:suggestion', { ...props.suggestion, orders: value })
 });
 
 const deliveryUsers = computed({
   get: () => props.suggestion.delivery_users,
-  set: (value) => {
-    props.suggestion.delivery_users = value;
-  }
+  set: (value) => emits('update:suggestion', { ...props.suggestion, delivery_users: value })
 });
 
 const transports = computed({
   get: () => props.suggestion.transports,
-  set: (value) => {
-    props.suggestion.transports = value;
-  }
+  set: (value) => emits('update:suggestion', { ...props.suggestion, transports: value })
 });
 
 const getScheduleItemsByType = (operationType) => {
