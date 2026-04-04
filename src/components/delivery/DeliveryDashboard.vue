@@ -1,50 +1,18 @@
 <template>
-  <div v-if="!locationError">
-    <v-skeleton-loader
-      v-if="!ready"
-      type="table"
-      :color="theme.current.value.secondaryColor"
-      class="mt-5"
-    />
-    <div v-else>
-      <br><b>
-        Totale ordini: {{ totOrder }}
-      </b><br><br>
-      <v-item-group
-        v-model="selectedCard"
-        selected-class="selected"
-        :style="{ '--item-bg-color': theme.current.value.primaryColor }"
-      >
-        <v-row>
-          <v-col
-            v-for="card in cards"
-            :key="card.key"
-            :cols="isMobile ? 6 :
-              (['Delay', 'Anomaly', 'Not Delivered', 'To Reschedule'].includes(card.key) ? 2 : 4)"
-          >
-            <v-item
-              v-slot="{ selectedClass, toggle }"
-              :value="card.key"
-            >
-              <v-card
-                :class="['d-flex align-center', selectedClass]"
-                height="100"
-                @click="toggle"
-              >
-                <v-card-text style="font-size: larger;">
-                  {{ card.title }}: <b>{{ cardCounts[card.key] }}</b>
-                </v-card-text>
-              </v-card>
-            </v-item>
-          </v-col>
-        </v-row>
-      </v-item-group>
-    </div>
-    <Table :key-name="selectedCard" />
-  </div>
-
+  <v-dialog
+    v-if="goNext"
+    v-model="showForm"
+    max-width="1500"
+  >
+    <template #activator>
+      <DeliveryTimeline />
+    </template>
+    <template #default>
+      <DeliveryForm @cancel="showForm = false" />
+    </template>
+  </v-dialog>
   <div
-    v-else-if="locationError"
+    v-if="locationError"
     class="text-center mt-10"
   >
     <v-alert
@@ -60,89 +28,21 @@
 </template>
 
 <script setup>
-import Table from '@/components/delivery/DeliveryTable';
+import DeliveryForm from '@/components/delivery/DeliveryForm';
+import DeliveryTimeline from '@/components/delivery/DeliveryTimeline.vue';
 
 import http from '@/utils/http';
-import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
-import mobile from '@/utils/mobile';
 import { useRouter } from 'vue-router';
-import { useOrderStore } from '@/stores/order';
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
+import { useScheduleItemStore } from '@/stores/scheduleItem';
 
 let watcherId = null;
-const theme = useTheme();
 const router = useRouter();
-const locationError = ref(false); 
-const orderStore = useOrderStore();
-const selectedCard = ref('Scheduled');
-const { list: orders, ready } = storeToRefs(orderStore);
-
-const isMobile = mobile.setupMobileUtils();
-const totOrder = computed(() => {
-  if (!orders.value) return 0;
-  else
-    return Object.values(orders.value).reduce((sum, arr) => sum + arr.length, 0);
-});
-
-
-const cards = [
-  {
-    title: 'Da caricare',
-    key: 'Scheduled'
-  },
-  {
-    title: 'A bordo',
-    key: 'Booking'
-  },
-  {
-    title: 'In Magazzino',
-    key: 'At Warehouse'
-  },
-  {
-    title: 'Completato',
-    key: 'Delivered'
-  },
-  {
-    title: 'Non Consegnato',
-    key: 'Not Delivered'
-  },
-  {
-    title: 'Da Riprogrammare',
-    key: 'To Reschedule'
-  },
-  {
-    title: 'Anomalia',
-    key: 'Anomaly'
-  },
-  {
-    title: 'Ritardo',
-    key: 'Delay'
-  },
-];
-
-const cardCounts = computed(() => {
-  const anomalyOrders = [];
-  const delayOrders = [];
-
-  for (const key of ['Scheduled', 'Booking']) {
-    const list = orders.value?.[key] || [];
-    list.forEach(order => {
-      if (order.anomaly) anomalyOrders.push(order);
-      if (order.delay) delayOrders.push(order);
-    });
-  }
-  return {
-    'Scheduled': orders.value?.['Scheduled']?.length || 0,
-    'Booking': orders.value?.['Booking']?.length || 0,
-    'Delivered': orders.value?.['Delivered']?.length || 0,
-    'Not Delivered': orders.value?.['Not Delivered']?.length || 0,
-    'At Warehouse': orders.value?.['At Warehouse']?.length || 0,
-    'To Reschedule': orders.value?.['To Reschedule']?.length || 0,
-    'Anomaly': anomalyOrders.length,
-    'Delay': delayOrders.length
-  };
-});
+const goNext = ref(false);
+const locationError = ref(false);
+const scheduleItemStore = useScheduleItemStore();
+const { showForm } = storeToRefs(scheduleItemStore);
 
 onMounted(() => {
   if (!navigator.geolocation) {
@@ -150,18 +50,14 @@ onMounted(() => {
     return;
   }
 
-  let firstPositionHandled = false;
   watcherId = navigator.geolocation.watchPosition(
     position => {
-      if (!firstPositionHandled) {
-        firstPositionHandled = true;
-        if (!ready.value) orderStore.initListDelivery(router);
-      }
-
       http.postRequest('user/position', {
         lat: position.coords.latitude,
         lon: position.coords.longitude
-      }, () => {}, 'POST', router);
+      }, function () {
+        goNext.value = true;
+      }, 'POST', router);
     },
     () => locationError.value = true,
     {
@@ -176,11 +72,3 @@ onMounted(() => {
   });
 });
 </script>
-
-<style scoped>
-/* eslint-disable-next-line vue-scoped-css/no-unused-selector */
-.selected {
-  background-color: var(--item-bg-color);
-  color: white;
-}
-</style>

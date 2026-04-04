@@ -10,8 +10,7 @@
       <DatesForm />
     </v-card-text>
     <v-card-text v-else-if="order.user_id">
-      <OrderForm v-if="role != 'Delivery'" />
-      <DeliveryForm v-else />
+      <OrderForm />
     </v-card-text>
     <v-card-text v-else>
       <CustomerForm @set-subtitle="setSubtitle" />
@@ -21,18 +20,14 @@
 
 <script setup>
 import OrderForm from '@/components/orders/OrderForm';
-import DeliveryForm from '@/components/delivery/DeliveryForm';
-import CustomerForm from '@/components/orders/OrderCustomerForm';
 import DatesForm from '@/components/orders/OrderDatesForm';
+import CustomerForm from '@/components/orders/OrderCustomerForm';
 
 import { ref } from 'vue';
 import { storeToRefs } from 'pinia';
-import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
 
-const userStore = useUserStore();
 const orderStore = useOrderStore();
-const { role } = storeToRefs(userStore);
 const { activeForm, element: order } = storeToRefs(orderStore);
 const subtitle = ref(order.user ? `Punto Vendita: ${order.user.nickname}` : '');
 
