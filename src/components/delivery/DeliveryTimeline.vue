@@ -58,7 +58,7 @@
               Completa prima il punto di ritiro
             </button>
             <button
-              v-if="['Booked', 'Not Delivered', 'At Warehouse', 'To Reschedule'].includes(item.status)"
+              v-if="['Delivered', 'Not Delivered', 'At Warehouse', 'To Reschedule'].includes(item.status)"
               style="cursor: default;"
             >
               Ordine completato
