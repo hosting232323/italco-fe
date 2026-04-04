@@ -1,33 +1,24 @@
 <template>
-  <v-card :title="`ID Ordine: ${order.id}`">
+  <v-card :title="`ID Ordine: ${order.id} - Nuovo stato: ${orderUtils.LABELS.find(label => label.value == order.status)?.title}`">
     <v-card-text>
       <v-form
         ref="form"
         @submit.prevent="submitForm"
       >
-        <v-select
-          v-if="!['Delivered', 'Not Delivered', 'To Reschedule'].includes(actualStatus)"
-          v-model="status"
-          label="Stato"
-          :items="STATUS_MAP[actualStatus].map(status => ({
-            value: status,
-            title: orderUtils.LABELS.find(label => label.value == status).title
-          }))"
-        />
         <v-textarea
-          v-if="status === 'Not Delivered' || order.delay || order.anomaly"
+          v-if="order.status === 'Not Delivered' || order.delay || order.anomaly"
           v-model="order.motivation"
           label="Motivazione"
           rows="3"
           :rules="validation.requiredRules"
         />
         <v-file-input
-          v-if="['Delivered', 'Not Delivered'].includes(status) || order.delay || order.anomaly"
+          v-if="['Delivered', 'Not Delivered'].includes(order.status) || order.delay || order.anomaly"
           v-model="order.photos"
           multiple
           accept="image/*"
           label="Foto"
-          :rules="(status === 'Delivered' || order.anomaly) ? validation.arrayRules : []"
+          :rules="(order.status === 'Delivered' || order.anomaly) ? validation.arrayRules : []"
         />
         <v-row>
           <v-col
@@ -106,13 +97,12 @@
             />
           </div>
         </v-row>
-
-        <div v-if="status === 'Delivered'">
+        <div v-if="order.status === 'Delivered'">
           <label>Firma del cliente</label>
           <SignaturePad
             ref="signaturePad"
             width="auto"
-            height="200"
+            :height="200"
             pen-color="black"
             background-color="white"
             style="border: 1px solid #ccc;"
@@ -154,7 +144,6 @@
             </v-col>
           </v-row>
         </div>
-
         <FormButtons
           :loading="loading"
           @cancel="emits('cancel')"
@@ -176,42 +165,36 @@ import orderUtils from '@/utils/order';
 import { useRouter } from 'vue-router';
 import validation from '@/utils/validation';
 import { useOrderStore } from '@/stores/order';
+import { useScheduleItemStore } from '@/stores/scheduleItem';
 
 const form = ref(null);
 const theme = useTheme();
-const status = ref(null);
 const loading = ref(false);
 const router = useRouter();
+const signaturePad = ref(null);
 const signatureError = ref(null);
 const signatureSuccess = ref(null);
-const signaturePad = ref(null);
-const orderStore = useOrderStore();
 const emits = defineEmits(['cancel']);
 const isMobile = mobile.setupMobileUtils();
-const { element: order } = storeToRefs(orderStore);
 
-const STATUS_MAP = {
-  'Scheduled': ['Booking', 'Not Delivered', 'At Warehouse', 'To Reschedule'],
-  'Booking': ['Delivered', 'Not Delivered', 'At Warehouse', 'To Reschedule'],
-  'At Warehouse': ['Booking', 'To Reschedule']
-};
-const actualStatus = order.value.status;
+const orderStore = useOrderStore();
+const scheduleItemStore = useScheduleItemStore();
+const { element: order } = storeToRefs(orderStore);
 
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
 
-  if (status.value === 'Delivered' && signaturePad.value.isEmpty()) {
+  if (order.value.status === 'Delivered' && signaturePad.value.isEmpty()) {
     signatureError.value = 'La firma non può essere vuota';
     return;
   }
 
   loading.value = true;
-  order.value.user_id = order.value.user.id;
-  if (status.value) order.value.status = status.value;
+  order.value.id = order.value.order_id;
   orderStore.updateElementWithFormData(router, function (data) {
     loading.value = false;
     if (data.status == 'ok') {
-      orderStore.initListDelivery(router);
+      scheduleItemStore.initList(router);
       order.value = {};
       emits('cancel');
     }
@@ -237,9 +220,7 @@ const saveSignature = () => {
   const bstr = atob(arr[1]);
   let n = bstr.length;
   const u8arr = new Uint8Array(n);
-  while (n--) {
-    u8arr[n] = bstr.charCodeAt(n);
-  }
+  while (n--) u8arr[n] = bstr.charCodeAt(n);
   const file = new File([u8arr], `firma_${order.value.id}.png`, { type: mime });
 
   order.value.signature = file;
