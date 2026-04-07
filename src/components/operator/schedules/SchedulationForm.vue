@@ -5,7 +5,7 @@
         ref="dpcForm"
         @submit.prevent="submitDpcForm"
       >
-        <DateField 
+        <DateField
           v-model="booking_date"
           label="Data Consegna"
           :rules="validation.requiredRules"
@@ -50,6 +50,7 @@
         </v-row>
         <FormButtons
           :loading="loading"
+          :submit-text="suggestions.length > 0 ? 'Aggiorna' : 'Invia'"
           class="mb-5"
           @cancel="emits('cancel')"
         />
@@ -60,138 +61,17 @@
       >
         {{ message }}
       </v-alert>
-      <v-row>
-        <v-col
-          v-for="(suggestion, index) in suggestions"
-          :key="index"
-          cols="12"
-          md="4"
-        >
-          <v-card
-            :color="theme.current.value.primaryColor"
-            :title="`Proposta Borderò ${index + 1}`"
-          >
-            <template #append>
-              <v-btn
-                icon="mdi-open-in-new"
-                variant="text"
-                @click="openSchedule(suggestion)"
-              />
-            </template>
-            <v-card-text>
-              <v-list style="border-radius: 5px;">
-                <p class="ml-4">
-                  Punti di Ritiro:
-                </p>
-                <v-list-item
-                  v-for="item in suggestion.schedule_items.filter(element => element.operation_type == 'CollectionPoint')"
-                  :key="item.collection_point_id"
-                >
-                  <v-list-item-title class="no-truncate">
-                    ID {{ item.collection_point_id }}: {{ item.address }} ({{ item.cap }})
-                  </v-list-item-title>
-                </v-list-item>
-                <v-divider />
-                <p class="ml-4 mt-4">
-                  Ordini:
-                </p>
-                <v-list-item
-                  v-for="item in suggestion.schedule_items.filter(element => element.operation_type == 'Order')"
-                  :key="item.order_id"
-                >
-                  <v-list-item-title class="no-truncate">
-                    ID {{ item.order_id }}: {{ item.address }} ({{ item.cap }})
-                  </v-list-item-title>
-                </v-list-item>
-                <v-divider />
-                <p class="ml-4 mt-4">
-                  Utenti Delivery:
-                </p>
-                <draggable
-                  v-model="suggestion.delivery_users"
-                  :group="{ name: 'users', pull: false, put: 'users' }"
-                  item-key="id"
-                  class="draggable-area ml-3 mr-3"
-                >
-                  <template #item="{ element }">
-                    <v-chip
-                      :text="element.nickname"
-                      closable
-                      class="mr-2 mt-2"
-                      @click:close="suggestion.delivery_users = suggestion.delivery_users.filter(
-                        user => user.id !== element.id
-                      )"
-                    />
-                  </template>
-                </draggable>
-                <v-divider class="mt-4 mb-4" />
-                <p class="ml-4 mt-4">
-                  Veicolo:
-                </p>
-                <draggable
-                  v-model="suggestion.transports"
-                  :group="{ 
-                    name: 'transports', 
-                    pull: false, 
-                    put: (to, from) =>
-                      from.options.group.name === 'transports' &&
-                      suggestion.transports.length === 0 
-                  }"
-                  item-key="id"
-                  class="draggable-area ml-3 mr-3"
-                >
-                  <template #item="{ element }">
-                    <v-chip
-                      :text="element.name"
-                      closable
-                      class="mr-2 mt-2"
-                      @click:close="suggestion.transports = []"
-                    />
-                  </template>
-                </draggable>
-              </v-list>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-      <template v-if="availableDeliveryUsers.length > 0">
-        <h2 class="mt-5">
-          Utenti disponibili
-        </h2>
-        <draggable
-          :list="availableDeliveryUsers"
-          :group="{ name: 'users', pull: 'clone', put: false }"
-          :clone="cloneUser"
-          item-key="id"
-        >
-          <template #item="{ element }">
-            <v-chip
-              :text="element.nickname"
-              class="ma-1"
-              draggable
-            />
-          </template>
-        </draggable>
-      </template>
-      <template v-if="availableTransports.length > 0">
-        <h2 class="mt-5">
-          Veicoli disponibili
-        </h2>
-        <draggable
-          :list="availableTransports"
-          :group="{ name: 'transports', pull: 'clone', put: false }"
-          :clone="cloneTransport"
-          item-key="id"
-        >
-          <template #item="{ element }">
-            <v-chip
-              :text="element.name"
-              class="ma-1"
-              draggable
-            />
-          </template>
-        </draggable>
-      </template>
+      <SchedulationProposals
+        :suggestions="suggestions"
+        :new-suggestion-orders="newSuggestionOrders"
+        :available-delivery-users="availableDeliveryUsers"
+        :available-transports="availableTransports"
+        :primary-color="theme.current.value.primaryColor"
+        @update:new-suggestion-orders="newSuggestionOrders = $event"
+        @create-suggestion="createSuggestionFromDroppedOrder"
+        @orders-changed="syncSuggestionsAfterOrderMove"
+        @open-schedule="openSchedule"
+      />
     </v-card-text>
   </v-card>
 </template>
@@ -199,6 +79,7 @@
 <script setup>
 import DateField from '@/components/DateField';
 import FormButtons from '@/components/FormButtons';
+import SchedulationProposals from '@/components/operator/schedules/SchedulationProposals.vue';
 
 import http from '@/utils/http';
 import days from '@/utils/days';
@@ -206,7 +87,6 @@ import { useTheme } from 'vuetify';
 import mobile from '@/utils/mobile';
 import { ref, computed } from 'vue';
 import { storeToRefs } from 'pinia';
-import draggable from 'vuedraggable';
 import { useRouter } from 'vue-router';
 import validation from '@/utils/validation';
 import { useScheduleStore } from '@/stores/schedule';
@@ -222,6 +102,7 @@ const minSizeGroup = ref(10);
 const maxSizeGroup = ref(14);
 const maxDistanceKm = ref(50);
 const deliveryUsers = ref([]);
+const newSuggestionOrders = ref([]);
 const booking_date = ref(null);
 const isMobile = mobile.setupMobileUtils();
 const emits = defineEmits(['cancel', 'goToSheduleForm']);
@@ -229,32 +110,138 @@ const emits = defineEmits(['cancel', 'goToSheduleForm']);
 const scheduleStore = useScheduleStore();
 const { element: schedule } = storeToRefs(scheduleStore);
 
-const cloneUser = (user) => {
-  return { ...user };
+const DEFAULT_START_TIME_SLOT = '08:00';
+const DEFAULT_END_TIME_SLOT = '09:00';
+
+const normalizeScheduleItem = (item, operationType = item.operation_type) => {
+  const normalizedItem = {
+    ...item,
+    end_time_slot: item.end_time_slot || DEFAULT_END_TIME_SLOT,
+    start_time_slot: item.start_time_slot || DEFAULT_START_TIME_SLOT,
+    operation_type: operationType,
+  };
+
+  if (operationType === 'Order')
+    normalizedItem.order_id = item.order_id ?? item.id;
+  else normalizedItem.collection_point_id = item.collection_point_id ?? item.id;
+
+  delete normalizedItem.id;
+
+  return normalizedItem;
 };
-const cloneTransport = (transport) => {
-  return { ...transport };
-}; 
+
+const createCollectionPointScheduleItem = (collectionPoint) => {
+  return normalizeScheduleItem(collectionPoint, 'CollectionPoint');
+};
+
+const getScheduleItemsByType = (suggestion, operationType) => {
+  return (
+    suggestion.schedule_items?.filter(
+      (item) => item.operation_type === operationType,
+    ) ?? []
+  );
+};
+
+const syncSuggestionScheduleItems = (suggestion) => {
+  const existingCollectionPoints = getScheduleItemsByType(
+    suggestion,
+    'CollectionPoint',
+  );
+  const collectionPointItemsById = new Map(
+    existingCollectionPoints.map((item) => [item.collection_point_id, item]),
+  );
+  const collectionPoints = [];
+  const usedCollectionPointIds = new Set();
+
+  suggestion.orders.forEach((order) => {
+    Object.values(order.products ?? {}).forEach((product) => {
+      const collectionPoint = product.collection_point;
+      const collectionPointId =
+        collectionPoint?.id ?? collectionPoint?.collection_point_id;
+
+      if (!collectionPointId || usedCollectionPointIds.has(collectionPointId))
+        return;
+
+      usedCollectionPointIds.add(collectionPointId);
+      collectionPoints.push(
+        collectionPointItemsById.get(collectionPointId) ??
+          createCollectionPointScheduleItem(collectionPoint),
+      );
+    });
+  });
+
+  suggestion.schedule_items = [...collectionPoints, ...suggestion.orders].map(
+    (item, index) => ({
+      ...normalizeScheduleItem(item),
+      index,
+    }),
+  );
+};
+
+const normalizeSuggestion = (suggestion) => {
+  const normalizedSuggestion = {
+    ...suggestion,
+    orders: getScheduleItemsByType(suggestion, 'Order').map((order) =>
+      normalizeScheduleItem(order, 'Order'),
+    ),
+  };
+
+  syncSuggestionScheduleItems(normalizedSuggestion);
+
+  return normalizedSuggestion;
+};
+
+const syncSuggestionsAfterOrderMove = () => {
+  suggestions.value.forEach(syncSuggestionScheduleItems);
+  suggestions.value = suggestions.value.filter((s) => s.orders.length > 0);
+};
+
+const createSuggestion = (orders = []) => {
+  const suggestion = {
+    delivery_users: [],
+    transports: [],
+    schedule_items: [],
+    orders: orders.map((order) => normalizeScheduleItem(order, 'Order')),
+  };
+
+  syncSuggestionScheduleItems(suggestion);
+
+  return suggestion;
+};
+
+const createSuggestionFromDroppedOrder = (event) => {
+  if (!event.added?.element) return;
+
+  suggestions.value.push(createSuggestion([event.added.element]));
+  newSuggestionOrders.value = [];
+  syncSuggestionsAfterOrderMove();
+};
 
 const submitDpcForm = async () => {
   if (!(await dpcForm.value.validate()).valid) return;
 
   message.value = '';
   loading.value = true;
-  http.getRequest('schedule/suggestions', {
-    booking_date: booking_date.value,
-    min_size_group: minSizeGroup.value,
-    max_size_group: maxSizeGroup.value,
-    max_distance_km: maxDistanceKm.value
-  }, function (data) {
-    loading.value = false;
-    if (data.status == 'ok') {
-      suggestions.value = data.groups;
-      transports.value = data.transports;
-      deliveryUsers.value = data.delivery_users;
-    } else
-      message.value = data.error;
-  }, 'GET', router);
+  http.getRequest(
+    'schedule/suggestions',
+    {
+      booking_date: booking_date.value,
+      min_size_group: minSizeGroup.value,
+      max_size_group: maxSizeGroup.value,
+      max_distance_km: maxDistanceKm.value,
+    },
+    function (data) {
+      loading.value = false;
+      if (data.status == 'ok') {
+        suggestions.value = data.groups.map(normalizeSuggestion);
+        newSuggestionOrders.value = [];
+        transports.value = data.transports;
+        deliveryUsers.value = data.delivery_users;
+      } else message.value = data.error;
+    },
+    'GET',
+    router,
+  );
 };
 
 const openSchedule = (suggestion) => {
@@ -262,51 +249,30 @@ const openSchedule = (suggestion) => {
   schedule.value.schedulation = true;
   schedule.value.users = suggestion.delivery_users;
   schedule.value.schedule_items = suggestion.schedule_items;
-  schedule.value.transport_id = suggestion.transports.length ? suggestion.transports[0].id : null;
+  schedule.value.transport_id = suggestion.transports.length
+    ? suggestion.transports[0].id
+    : null;
   emits('goToSheduleForm');
 };
 
 const availableDeliveryUsers = computed(() => {
   const assignedIds = new Set(
     suggestions.value.flatMap(
-      suggestion => suggestion.delivery_users?.map(user => user.id) ?? []
-    )
+      (suggestion) => suggestion.delivery_users?.map((user) => user.id) ?? [],
+    ),
   );
 
-  return deliveryUsers.value.filter(user => !assignedIds.has(user.id));
+  return deliveryUsers.value.filter((user) => !assignedIds.has(user.id));
 });
 
 const availableTransports = computed(() => {
   const assignedIds = new Set(
     suggestions.value.flatMap(
-      suggestion => suggestion.transports?.map(transport => transport.id) ?? []
-    )
+      (suggestion) =>
+        suggestion.transports?.map((transport) => transport.id) ?? [],
+    ),
   );
 
-  return transports.value.filter(t => !assignedIds.has(t.id));
+  return transports.value.filter((t) => !assignedIds.has(t.id));
 });
 </script>
-
-<style scoped>
-.no-truncate {
-  white-space: normal !important;
-  overflow: visible !important;
-  text-overflow: unset !important;
-}
-
-.draggable-area {
-  min-height: 30px;
-  display: flex;
-  flex-wrap: wrap;
-}
-
-/* eslint-disable-next-line vue-scoped-css/no-unused-selector */
-.v-chip {
-  cursor: grab;
-}
-
-/* eslint-disable-next-line vue-scoped-css/no-unused-selector */
-.v-chip:active {
-  cursor: grabbing;
-}
-</style>

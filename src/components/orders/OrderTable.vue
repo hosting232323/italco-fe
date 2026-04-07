@@ -61,20 +61,23 @@
     <template #default>
       <ScheduleForm
         v-if="popUpType == 'form'"
-        @cancel="dialog = false"
+        :show-back="fromSchedulation"
+        @cancel="dialog = false; fromSchedulation = false"
+        @back="popUpType = 'schedulation'; fromSchedulation = false"
       />
       <SchedulationForm
-        v-else-if="popUpType == 'schedulation'"
+        v-if="popUpType == 'schedulation' || fromSchedulation"
+        v-show="popUpType == 'schedulation'"
         @cancel="dialog = false"
-        @go-to-shedule-form="popUpType = 'form'"
+        @go-to-shedule-form="popUpType = 'form'; fromSchedulation = true"
       />
       <StatusPopup
-        v-else-if="popUpType == 'statuses'"
+        v-if="popUpType == 'statuses'"
         :statuses="statuses"
         @cancel="dialog = false"
       />
       <v-card
-        v-else-if="popUpType == 'message' && scheduleFormMessage"
+        v-if="popUpType == 'message' && scheduleFormMessage"
         :title="scheduleFormMessage"
       />
     </template>
@@ -103,6 +106,7 @@ const theme = useTheme();
 const dialog = ref(false);
 const router = useRouter();
 const popUpType = ref(null);
+const fromSchedulation = ref(false);
 const userStore = useUserStore();
 const scheduleFormMessage = ref('');
 
