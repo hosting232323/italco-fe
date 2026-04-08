@@ -17,6 +17,15 @@
         :color="theme.current.value.primaryColor"
         @click="openFormPopUp()"
       />
+      <v-btn
+        v-if="['Admin', 'Operator'].includes(role) && schedule.orders?.length"
+        text="Scarica la Pianificazione"
+        color="success"
+        prepend-icon="mdi-microsoft-excel"
+        :loading="downloadingExcel"
+        class="ml-2"
+        @click="downloadExcel()"
+      />
       <v-skeleton-loader
         v-if="!ready"
         type="table"
@@ -105,10 +114,12 @@ const router = useRouter();
 const popUpType = ref(null);
 const userStore = useUserStore();
 const scheduleFormMessage = ref('');
+const downloadingExcel = ref(false);
 
 const orderStore = useOrderStore();
 const scheduleStore = useScheduleStore();
 const { role } = storeToRefs(userStore);
+const { token } = storeToRefs(userStore);
 const { ready } = storeToRefs(orderStore);
 const { element: schedule } = storeToRefs(scheduleStore);
 const orders = storesUtils.getStoreList(orderStore, router);
@@ -138,6 +149,36 @@ const createdAt = (input) => {
   const [datePart] = input.split(' ');
   const [day, month, year] = datePart.split('/');
   return `${year}-${month}-${day}`;
+};
+
+const downloadExcel = async () => {
+  if (!schedule.value.orders?.length) return;
+  downloadingExcel.value = true;
+  try {
+    const orderIds = schedule.value.orders.map(o => typeof o === 'object' ? o.id : o);
+    const response = await fetch(`${http.hostname}export/orders/excel`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': token.value
+      },
+      body: JSON.stringify({ order_ids: orderIds }),
+    });
+    if (!response.ok) throw new Error('Errore nel download');
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'ordini_selezionati.xlsx';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+  } catch (e) {
+    console.error('Errore download Excel:', e);
+  } finally {
+    downloadingExcel.value = false;
+  }
 };
 
 const openFormPopUp = () => {
