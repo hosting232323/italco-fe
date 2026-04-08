@@ -18,17 +18,6 @@
   >
     <v-card-text>
       <v-row>
-        <v-btn
-          v-if="showBack"
-          variant="text"
-          prepend-icon="mdi-arrow-left"
-          text="Torna alle proposte"
-          class="mb-2"
-          :color="theme.current.value.primaryColor"
-          @click="emits('back')"
-        />
-      </v-row>
-      <v-row>
         <v-col
           cols="12"
           md="7"
@@ -114,7 +103,7 @@
             <ScheduleItemsDraggable :not-found-addresses="notFoundAddresses" />
             <FormButtons
               :loading="loading"
-              @cancel="emits('cancel')"
+              @cancel="emits(showBack ? 'back' : 'cancel')"
             />
           </v-form>
         </v-col>
