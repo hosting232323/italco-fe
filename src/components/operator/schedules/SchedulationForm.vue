@@ -6,8 +6,8 @@
         @submit.prevent="submitDpcForm"
       >
         <DateField
-          v-model="booking_date"
-          label="Data Consegna"
+          v-model="work_date"
+          label="Data Work"
           :rules="validation.requiredRules"
           :allowed-dates="days.getDateRangeArray()"
         />
@@ -97,13 +97,13 @@ const dpcForm = ref(null);
 const loading = ref(false);
 const router = useRouter();
 const transports = ref([]);
+const work_date = ref(null);
 const suggestions = ref([]);
 const minSizeGroup = ref(10);
 const maxSizeGroup = ref(14);
 const maxDistanceKm = ref(50);
 const deliveryUsers = ref([]);
 const newSuggestionOrders = ref([]);
-const booking_date = ref(null);
 const isMobile = mobile.setupMobileUtils();
 const emits = defineEmits(['cancel', 'goToSheduleForm']);
 
@@ -225,7 +225,7 @@ const submitDpcForm = async () => {
   http.getRequest(
     'schedule/suggestions',
     {
-      booking_date: booking_date.value,
+      work_date: work_date.value,
       min_size_group: minSizeGroup.value,
       max_size_group: maxSizeGroup.value,
       max_distance_km: maxDistanceKm.value,
@@ -245,7 +245,7 @@ const submitDpcForm = async () => {
 };
 
 const openSchedule = (suggestion) => {
-  schedule.value.date = booking_date.value;
+  schedule.value.date = work_date.value;
   schedule.value.schedulation = true;
   schedule.value.users = suggestion.delivery_users;
   schedule.value.schedule_items = suggestion.schedule_items;
