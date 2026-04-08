@@ -34,10 +34,9 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['addressComponents']);
-
 const isValidAddress = ref(true);
 const localValue = ref(props.modelValue);
+const emit = defineEmits(['addressComponents']);
 const inputId = `google-autocomplete-${Math.random().toString(36).substr(2, 9)}`;
 
 const computedRules = computed(() => [
