@@ -47,7 +47,7 @@ export const useOrderStore = defineStore('order', {
       if (this.element.signature)
         content.signature = this.element.signature; 
 
-      http.formDataRequest(
+      http.uploadRequest(
         `order/${this.element.id}`,
         content,
         func,

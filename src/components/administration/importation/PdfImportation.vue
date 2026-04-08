@@ -122,7 +122,7 @@ const submitForm = async (isActive) => {
       content[file.selectedFile.name] = file.selectedFile;
   });
 
-  http.formDataRequest(
+  http.uploadRequest(
     'import/pdf',
     content, 
     function (data) {

@@ -111,19 +111,13 @@ const deleteItem = (item) => {
 const exportElement = async (item) => {
   exportLoading[item.id] = true;
 
-  http.getRequest(`export/schedule/${item.id}`, {}, function (data) {
-    if (data.status == 'ko')
-      alert(data.error);
-    else {
-      exportLoading[item.id] = false;
-      const blob = new Blob([data], { type: 'application/pdf' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `bordero_${item.id}.pdf`;
-      a.click();
-      window.URL.revokeObjectURL(url);
-    }
-  }, 'GET', router);
+  http.downloadRequest(
+    `export/schedule/${item.id}`, 
+    {},
+    'GET',
+    router,
+    `bordero_${item.id}.pdf`,
+    () => exportLoading[item.id] = false
+  );
 };
 </script>

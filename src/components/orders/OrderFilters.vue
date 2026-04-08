@@ -135,26 +135,19 @@ const filterOrder = async () => {
 const exportInvoice = async () => {
   loading.value = true;
 
-  http.postRequest('export/invoice', {
-    filters: storesUtils.formatFilters(
-      filters.value,
-      storesUtils.ORDER_DATE_FILTER_TYPES,
-      'Order'
-    )
-  }, function (data) {
-    loading.value = false;
-    panel.value = null;
-    if (data.status == 'ko')
-      alert(data.error);
-    else {
-      const blob = new Blob([data], { type: 'application/pdf' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `ordini_${filters.value['Order.dpc'][0]}_${filters.value['Order.dpc'][1]}.pdf`;
-      a.click();
-      window.URL.revokeObjectURL(url);
-    }
-  }, 'POST', router);
+  http.downloadRequest(
+    `export/invoice`,
+    {
+      filters: storesUtils.formatFilters(
+        filters.value,
+        storesUtils.ORDER_DATE_FILTER_TYPES,
+        'Order'
+      )
+    },
+    'POST', 
+    router,
+    `ordini_${filters.value['Order.dpc'][0]}_${filters.value['Order.dpc'][1]}.pdf`,
+    () => loading.value = false
+  );
 };
 </script>
