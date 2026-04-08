@@ -94,7 +94,7 @@
             </draggable>
             <FormButtons
               :loading="loading"
-              @cancel="emits('cancel')"
+              @cancel="emits(showBack ? 'back' : 'cancel')"
             />
           </v-form>
         </v-col>
@@ -116,8 +116,8 @@
 
 <script setup>
 import FormButtons from '@/components/FormButtons';
-import OverStreetMap from '@/components/OverStreetMap.vue';
-import ScheduleItem from '@/components/operator/schedules/ScheduleItem.vue';
+import OverStreetMap from '@/components/OverStreetMap';
+import ScheduleItem from '@/components/operator/schedules/ScheduleItem';
 
 import { ref, watch } from 'vue';
 import mobile from '@/utils/mobile';
@@ -131,6 +131,13 @@ import { useScheduleStore } from '@/stores/schedule';
 import { useTransportStore } from '@/stores/transport';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
+const { showBack } = defineProps({
+  showBack: {
+    type: Boolean,
+    default: false,
+  },
+});
+
 const form = ref(null);
 const error = ref(null);
 const router = useRouter();
@@ -138,7 +145,7 @@ const loading = ref(false);
 const selectedUser = ref(null);
 const notFoundAddresses = ref([]);
 const selectedOrderId = ref(null);
-const emits = defineEmits(['cancel']);
+const emits = defineEmits(['cancel', 'back']);
 const isMobile = mobile.setupMobileUtils();
 
 const orderStore = useOrderStore();
@@ -195,7 +202,7 @@ const addOrder = () => {
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
 
-  if (!schedule.value.users || schedule.value.users.length == 0){
+  if (!schedule.value.users || schedule.value.users.length == 0) {
     error.value = 'Aggiungi prima l\'utente';
     return;
   }

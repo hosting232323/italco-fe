@@ -61,20 +61,23 @@
     <template #default>
       <ScheduleForm
         v-if="popUpType == 'form'"
-        @cancel="dialog = false"
+        :show-back="fromSchedulation"
+        @cancel="dialog = false; fromSchedulation = false"
+        @back="popUpType = 'schedulation'; fromSchedulation = false"
       />
       <SchedulationForm
-        v-else-if="popUpType == 'schedulation'"
+        v-if="popUpType == 'schedulation' || fromSchedulation"
+        v-show="popUpType == 'schedulation'"
         @cancel="dialog = false"
-        @go-to-shedule-form="popUpType = 'form'"
+        @go-to-shedule-form="popUpType = 'form'; fromSchedulation = true"
       />
-      <StatusPopup
-        v-else-if="popUpType == 'statuses'"
+      <OrderHistoryPopup
+        v-if="popUpType == 'statuses'"
         :statuses="statuses"
         @cancel="dialog = false"
       />
       <v-card
-        v-else-if="popUpType == 'message' && scheduleFormMessage"
+        v-if="popUpType == 'message' && scheduleFormMessage"
         :title="scheduleFormMessage"
       />
     </template>
@@ -83,8 +86,8 @@
 
 <script setup>
 import Action from '@/components/orders/OrderActions';
-import StatusPopup from '@/components/orders/StatusPopup';
 import OrderInfoRow from '@/components/orders/OrderInfoRow';
+import OrderHistoryPopup from '@/components/orders/OrderHistoryPopup';
 import ScheduleForm from '@/components/operator/schedules/ScheduleForm';
 import SchedulationForm from '@/components/operator/schedules/SchedulationForm';
 
@@ -104,6 +107,7 @@ const dialog = ref(false);
 const router = useRouter();
 const popUpType = ref(null);
 const userStore = useUserStore();
+const fromSchedulation = ref(false);
 const scheduleFormMessage = ref('');
 
 const orderStore = useOrderStore();
