@@ -71,7 +71,7 @@
         @cancel="dialog = false"
         @go-to-shedule-form="popUpType = 'form'; fromSchedulation = true"
       />
-      <StatusPopup
+      <OrderHistoryPopup
         v-if="popUpType == 'statuses'"
         :statuses="statuses"
         @cancel="dialog = false"
@@ -86,8 +86,8 @@
 
 <script setup>
 import Action from '@/components/orders/OrderActions';
-import StatusPopup from '@/components/orders/StatusPopup';
 import OrderInfoRow from '@/components/orders/OrderInfoRow';
+import OrderHistoryPopup from '@/components/orders/OrderHistoryPopup';
 import ScheduleForm from '@/components/operator/schedules/ScheduleForm';
 import SchedulationForm from '@/components/operator/schedules/SchedulationForm';
 
