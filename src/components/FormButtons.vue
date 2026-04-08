@@ -4,7 +4,7 @@
       <v-btn
         class="mt-1"
         type="submit"
-        :text="submitText"
+        text="Invia"
         block
         :loading="loading"
         :color="theme.current.value.primaryColor"
@@ -27,14 +27,10 @@
 <script setup>
 import { useTheme } from 'vuetify';
 
-const { loading, submitText } = defineProps({
+const { loading } = defineProps({
   loading: {
     type: Boolean,
-    required: true,
-  },
-  submitText: {
-    type: String,
-    default: 'Invia',
+    required: true
   },
 });
 
