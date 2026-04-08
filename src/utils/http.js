@@ -24,6 +24,9 @@ const postRequest = async (endpoint, body, func, method = 'POST', router = undef
     else
       return response.json();
   }).then(data => {
+    if (data.status === 'ko') {
+      throw new Error(data.message);
+    }
     sessionHandler(data, func, router);
   }).catch(error => {
     console.error('Errore nella richiesta:', error);
@@ -44,6 +47,9 @@ const formDataRequest = async (endpoint, data, func, method = 'POST', router = u
       throw new Error(`Errore nella risposta del server: ${response.status} - ${response.statusText}`);
     return response.json();
   }).then(data => {
+    if (data.status === 'ko') {
+      throw new Error(data.message);
+    }
     sessionHandler(data, func, router);
   }).catch(error => {
     console.error('Errore nella richiesta:', error);
@@ -68,10 +74,63 @@ const getRequest = async (endpoint, params, func, method = 'GET', router = undef
     else
       return response.json();
   }).then(data => {
+    if (data.status === 'ko') {
+      throw new Error(data.message);
+    }
     sessionHandler(data, func, router);
   }).catch(error => {
     console.error('Errore nella richiesta:', error);
   });
+};
+
+
+const downloadRequest = async (endpoint, body, method = 'GET', router = undefined, fallbackName = 'download', loading = undefined) => {
+  let url, options;
+  if(method == 'GET') {
+    url = new URL(`${hostname}${endpoint}`);
+    Object.keys(body).forEach(key => url.searchParams.append(key, body[key]));
+    options = {
+      method: 'GET',
+      headers: await createHeader(router)
+    };
+  } else {
+    url = `${hostname}${endpoint}`;
+    options = {
+      method: 'POST',
+      headers: await createHeader(),
+      body: JSON.stringify(body)
+    };
+  }
+
+  fetch(url, 
+    options
+  )
+    .then(response => {
+      if (!response.ok)
+        throw new Error(`Server error: ${response.status}`);
+
+      const disposition = response.headers.get('Content-Disposition') || '';
+      const match = disposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+      const filename = match ? match[1].replace(/['"]/g, '') : fallbackName;
+
+      return response.blob().then(blob => ({ blob, filename }));
+    }).then(({ blob, filename }) => {
+      const url = URL.createObjectURL(blob);
+      const tab = window.open(url, '_blank');
+      if (!tab) {
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
+      if (loading) loading();
+    }).catch(error => {
+      if (loading) loading();
+      console.error('Errore nel download:', error);
+    });
 };
 
 
@@ -109,5 +168,6 @@ export default {
   postRequest,
   getRequest,
   formDataRequest,
-  hostname
+  hostname,
+  downloadRequest
 };
