@@ -106,8 +106,8 @@ const theme = useTheme();
 const dialog = ref(false);
 const router = useRouter();
 const popUpType = ref(null);
-const fromSchedulation = ref(false);
 const userStore = useUserStore();
+const fromSchedulation = ref(false);
 const scheduleFormMessage = ref('');
 
 const orderStore = useOrderStore();
