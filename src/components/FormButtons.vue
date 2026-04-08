@@ -30,12 +30,12 @@ import { useTheme } from 'vuetify';
 const { loading, submitText } = defineProps({
   loading: {
     type: Boolean,
-    required: true,
+    required: true
   },
   submitText: {
     type: String,
-    default: 'Invia',
-  },
+    default: 'Invia'
+  }
 });
 
 const theme = useTheme();
