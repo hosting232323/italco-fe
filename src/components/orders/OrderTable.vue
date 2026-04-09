@@ -9,23 +9,25 @@
         text="Pianificazione Automatica"
         class="mr-5"
         :color="theme.current.value.primaryColor"
+        prepend-icon="mdi-calendar-arrow-right"
         @click="openSchedulationPopUp()"
       />
-      <v-btn
-        v-if="['Admin', 'Operator'].includes(role) && schedule.orders?.length"
-        text="Assegna Gruppo Delivery"
-        :color="theme.current.value.primaryColor"
-        @click="openFormPopUp()"
-      />
-      <v-btn
-        v-if="['Admin', 'Operator'].includes(role) && schedule.orders?.length"
-        text="Scarica la Pianificazione"
-        color="success"
-        prepend-icon="mdi-microsoft-excel"
-        :loading="downloadingExcel"
-        class="ml-2"
-        @click="downloadExcel()"
-      />
+      <template v-if="['Admin', 'Operator'].includes(role) && schedule.orders?.length">
+        <v-btn
+          text="Crea Borderò"
+          :color="theme.current.value.primaryColor"
+          prepend-icon="mdi-text-box-plus-outline"
+          @click="openFormPopUp()"
+        />
+        <v-btn
+          text="Scarica la Pianificazione"
+          :color="theme.current.value.primaryColor"
+          prepend-icon="mdi-microsoft-excel"
+          :loading="downloadingExcel"
+          class="ml-2"
+          @click="downloadExcel()"
+        />
+      </template>
       <v-skeleton-loader
         v-if="!ready"
         type="table"
@@ -119,7 +121,6 @@ const downloadingExcel = ref(false);
 const orderStore = useOrderStore();
 const scheduleStore = useScheduleStore();
 const { role } = storeToRefs(userStore);
-const { token } = storeToRefs(userStore);
 const { ready } = storeToRefs(orderStore);
 const { element: schedule } = storeToRefs(scheduleStore);
 const orders = storesUtils.getStoreList(orderStore, router);
@@ -153,20 +154,13 @@ const createdAt = (input) => {
 
 const downloadExcel = async () => {
   if (!schedule.value.orders?.length) return;
+
   downloadingExcel.value = true;
-  try {
-    const orderIds = schedule.value.orders.map(o => typeof o === 'object' ? o.id : o);
-    const response = await fetch(`${http.hostname}export/orders/excel`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': token.value
-      },
-      body: JSON.stringify({ order_ids: orderIds }),
-    });
-    if (!response.ok) throw new Error('Errore nel download');
-    const blob = await response.blob();
-    const url = window.URL.createObjectURL(blob);
+  http.postRequest('export/orders/excel', {
+    order_ids: schedule.value.orders.map(order => typeof order === 'object' ? order.id : order)
+  }, (data) => {
+    downloadingExcel.value = false;
+    const url = window.URL.createObjectURL(new Blob([data]));
     const a = document.createElement('a');
     a.href = url;
     a.download = 'ordini_selezionati.xlsx';
@@ -174,11 +168,7 @@ const downloadExcel = async () => {
     a.click();
     a.remove();
     window.URL.revokeObjectURL(url);
-  } catch (e) {
-    console.error('Errore download Excel:', e);
-  } finally {
-    downloadingExcel.value = false;
-  }
+  }, 'POST', router, null, true);
 };
 
 const openFormPopUp = () => {

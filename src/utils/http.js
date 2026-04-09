@@ -6,6 +6,7 @@ import { useUserStore } from '@/stores/user';
 
 
 const hostname = import.meta.env.VITE_HOSTNAME;
+const fileContentTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
 
 
 const postRequest = async (endpoint, body, func, method = 'POST', router = undefined) => {
@@ -18,7 +19,7 @@ const postRequest = async (endpoint, body, func, method = 'POST', router = undef
       throw new Error(`Errore nella risposta del server: ${response.status} - ${response.statusText}`);
 
     const contentType = response.headers.get('content-type');
-    if (contentType && contentType.includes('application/pdf'))
+    if (contentType && fileContentTypes.some(type => contentType.includes(type)))
       return response.blob();
     else
       return response.json();
