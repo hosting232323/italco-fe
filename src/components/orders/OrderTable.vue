@@ -9,14 +9,25 @@
         text="Pianificazione Automatica"
         class="mr-5"
         :color="theme.current.value.primaryColor"
+        prepend-icon="mdi-calendar-arrow-right"
         @click="openSchedulationPopUp()"
       />
-      <v-btn
-        v-if="['Admin', 'Operator'].includes(role) && schedule.orders?.length"
-        text="Assegna Gruppo Delivery"
-        :color="theme.current.value.primaryColor"
-        @click="openFormPopUp()"
-      />
+      <template v-if="['Admin', 'Operator'].includes(role) && schedule.orders?.length">
+        <v-btn
+          text="Crea Borderò"
+          :color="theme.current.value.primaryColor"
+          prepend-icon="mdi-text-box-plus-outline"
+          @click="openFormPopUp()"
+        />
+        <v-btn
+          text="Esporta"
+          :color="theme.current.value.primaryColor"
+          prepend-icon="mdi-microsoft-excel"
+          :loading="downloadingExcel"
+          class="ml-2"
+          @click="downloadExcel()"
+        />
+      </template>
       <v-skeleton-loader
         v-if="!ready"
         type="table"
@@ -109,6 +120,7 @@ const popUpType = ref(null);
 const userStore = useUserStore();
 const fromSchedulation = ref(false);
 const scheduleFormMessage = ref('');
+const downloadingExcel = ref(false);
 
 const orderStore = useOrderStore();
 const scheduleStore = useScheduleStore();
@@ -142,6 +154,25 @@ const createdAt = (input) => {
   const [datePart] = input.split(' ');
   const [day, month, year] = datePart.split('/');
   return `${year}-${month}-${day}`;
+};
+
+const downloadExcel = async () => {
+  if (!schedule.value.orders?.length) return;
+
+  downloadingExcel.value = true;
+  http.postRequest('export/orders/excel', {
+    order_ids: schedule.value.orders.map(order => typeof order === 'object' ? order.id : order)
+  }, (data) => {
+    downloadingExcel.value = false;
+    const url = window.URL.createObjectURL(new Blob([data]));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'ordini_selezionati.xlsx';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+  }, 'POST', router);
 };
 
 const openFormPopUp = () => {
