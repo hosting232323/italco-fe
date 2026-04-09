@@ -11,6 +11,7 @@
       class="mt-2"
     >
       <b>Ares Logistics</b>
+      <br>{{ company.name }}
       <br>{{ role }}
     </v-list-item>
     <v-divider class="mb-4" />
@@ -86,5 +87,5 @@ import { useUserStore } from '@/stores/user';
 const theme = useTheme();
 const router = useRouter();
 const userStore = useUserStore();
-const { role } = storeToRefs(userStore);
+const { role, company } = storeToRefs(userStore);
 </script>

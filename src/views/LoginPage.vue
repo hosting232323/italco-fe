@@ -26,12 +26,13 @@ const secretKey = import.meta.env.VITE_SECRET_KEY;
 const theme = useTheme();
 const router = useRouter();
 const userStore = useUserStore();
-const { role, userId, token } = storeToRefs(userStore);
+const { role, userId, token, company } = storeToRefs(userStore);
 
 const goToDashboard = (data) => {
   role.value = data.role;
   userId.value = data.user_id;
   token.value = data.token;
+  company.value = data.company;
   router.push('dashboard');
 };
 </script>
