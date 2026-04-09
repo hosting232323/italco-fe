@@ -20,7 +20,7 @@
           @click="openFormPopUp()"
         />
         <v-btn
-          text="Scarica la Pianificazione"
+          text="Esporta"
           :color="theme.current.value.primaryColor"
           prepend-icon="mdi-microsoft-excel"
           :loading="downloadingExcel"
