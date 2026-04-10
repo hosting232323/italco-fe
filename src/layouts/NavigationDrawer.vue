@@ -68,6 +68,12 @@
       title="Punti di Ritiro"
       prepend-icon="mdi-store"
     />
+    <v-list-item
+      v-if="role === 'Super Admin'"
+      to="/collection-points"
+      title="Seleziona la company"
+      prepend-icon="mdi-factory"
+    />
     <v-divider class="mb-4 mt-4" />
     <v-list-item
       title="Logout"
@@ -83,9 +89,16 @@ import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import logoutModule from '@/utils/logout';
 import { useUserStore } from '@/stores/user';
+import { useCompanyStore } from '@/stores/company';
 
 const theme = useTheme();
 const router = useRouter();
 const userStore = useUserStore();
+const companyStore = useCompanyStore();
 const { role, company } = storeToRefs(userStore);
+
+const { list, element } = storeToRefs(companyStore);
+
+
+companyStore.initList(router);
 </script>
