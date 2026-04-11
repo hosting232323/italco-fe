@@ -1,12 +1,13 @@
 <template>
   <v-card
-    :color="primaryColor"
+    :color="theme.current.value.primaryColor"
     :title="`Proposta Borderò ${index + 1}`"
   >
     <template #append>
       <v-btn
         icon="mdi-open-in-new"
         variant="text"
+        :disabled="orders.some(order => order.status == 'Acquired')"
         @click="emits('open-schedule', suggestion)"
       />
     </template>
@@ -33,6 +34,7 @@
           class="ml-3 mr-3"
           empty-text="Trascina qui un ordine"
           @change="emits('orders-changed')"
+          @order-form="emits('order-form')"
         />
         <v-divider />
         <p class="ml-4 mt-4">
@@ -87,6 +89,7 @@
 import DraggableOrderList from '@/components/operator/schedules/DraggableOrderList.vue';
 
 import { computed } from 'vue';
+import { useTheme } from 'vuetify';
 import draggable from 'vuedraggable';
 
 const props = defineProps({
@@ -97,14 +100,11 @@ const props = defineProps({
   index: {
     type: Number,
     required: true
-  },
-  primaryColor: {
-    type: String,
-    required: true
   }
 });
 
-const emits = defineEmits(['open-schedule', 'orders-changed', 'update:suggestion']);
+const theme = useTheme();
+const emits = defineEmits(['open-schedule', 'orders-changed', 'update:suggestion', 'order-form']);
 
 const orders = computed({
   get: () => props.suggestion.orders,

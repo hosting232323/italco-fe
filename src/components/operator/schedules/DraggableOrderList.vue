@@ -15,6 +15,24 @@
       >
         <v-list-item-title class="no-truncate">
           ID {{ element.order_id }}: {{ element.address }} ({{ element.cap }})
+          <template v-if="element.status == 'Acquired'">
+            <v-icon
+              color="warning"
+              size="16"
+              class="ml-1"
+              title="Ordine senza data booking"
+            >
+              mdi-alert-circle
+            </v-icon>
+            <v-icon
+              size="16"
+              class="ml-1"
+              style="cursor:pointer"
+              @click="openOrderForm(element)"
+            >
+              mdi-pencil
+            </v-icon>
+          </template>
         </v-list-item-title>
       </v-list-item>
     </template>
@@ -31,7 +49,10 @@
 
 <script setup>
 import { computed } from 'vue';
+import { storeToRefs } from 'pinia';
 import draggable from 'vuedraggable';
+import storesUtils from '@/utils/stores';
+import { useOrderStore } from '@/stores/order';
 
 const props = defineProps({
   modelValue: {
@@ -52,7 +73,17 @@ const props = defineProps({
   }
 });
 
-const emits = defineEmits(['update:modelValue', 'change']);
+const orderStore = useOrderStore();
+const { element: order } = storeToRefs(orderStore);
+
+const emits = defineEmits(['update:modelValue', 'change', 'order-form']);
+
+const openOrderForm = (item) => {
+  order.value = storesUtils.exclude_keys(item, ['products']);
+  order.value.schedulation = true;
+  order.value.id = item.order_id;
+  emits('order-form');
+};
 
 const model = computed({
   get: () => props.modelValue,

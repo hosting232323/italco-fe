@@ -60,7 +60,7 @@
     </v-row>
     <FormButtons
       :loading="loading"
-      @cancel="order.dates_form = false"
+      @cancel="goBack"
     />
   </v-form>
 </template>
@@ -88,6 +88,7 @@ const userStore = useUserStore();
 const orderStore = useOrderStore();
 const isMobile = mobile.setupMobileUtils();
 const nextTwoMonths = days.getDateRangeArray();
+const emits = defineEmits(['go-to-schedulation']);
 
 const { role } = storeToRefs(userStore);
 const { element: order, activeForm } = storeToRefs(orderStore);
@@ -110,6 +111,13 @@ else {
   loadingDates.value = false;
 }
 
+const goBack = () => {
+  if (order.value.schedulation)
+    emits('go-to-schedulation');
+  else
+    order.value.dates_form = false;
+};
+
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
 
@@ -125,6 +133,8 @@ const submitForm = async () => {
 const callback = (data) => {
   loading.value = false;
   if (data.status === 'ok') {
+    if (order.value.schedulation)
+      emits('go-to-schedulation', data.order.id, data.order.status);
     order.value = {};
     orderStore.initList(router);
     activeForm.value = false;

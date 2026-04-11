@@ -20,23 +20,24 @@
       <div style="font-size: smaller; padding-right: 5px;">
         <template v-if="editingAddressId !== (element.order_id || element.collection_point_id)">
           {{ element.address }}, {{ element.cap }}
-          <v-icon
-            v-if="notFoundAddresses.includes(element.address)"
-            color="warning"
-            size="16"
-            class="ml-1"
-          >
-            mdi-alert-circle
-          </v-icon>
-          <v-icon
-            v-if="notFoundAddresses.includes(element.address)"
-            size="16"
-            class="ml-1"
-            style="cursor:pointer"
-            @click="startEditing(element)"
-          >
-            mdi-pencil
-          </v-icon>
+          <template v-if="notFoundAddresses.includes(element.address)">
+            <v-icon
+              color="warning"
+              size="16"
+              class="ml-1"
+              title="Indirizzo non identificato"
+            >
+              mdi-alert-circle
+            </v-icon>
+            <v-icon
+              size="16"
+              class="ml-1"
+              style="cursor:pointer"
+              @click="startEditing(element)"
+            >
+              mdi-pencil
+            </v-icon>
+          </template>
         </template>
         <template v-else>
           <div class="d-flex justify-center align-center">

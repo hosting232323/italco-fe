@@ -70,25 +70,34 @@
       </v-data-table>
     </template>
     <template #default>
-      <ScheduleForm
-        v-if="popUpType == 'form'"
-        :show-back="fromSchedulation"
-        @cancel="dialog = false; fromSchedulation = false"
-        @back="popUpType = 'schedulation'; fromSchedulation = false"
-      />
       <SchedulationForm
-        v-if="popUpType == 'schedulation' || fromSchedulation"
         v-show="popUpType == 'schedulation'"
+        :order-to-update="orderToUpdate"
         @cancel="dialog = false"
-        @go-to-shedule-form="popUpType = 'form'; fromSchedulation = true"
+        @go-to-shedule-form="popUpType = 'schedule-form'; fromSchedulation = true"
+        @order-form="popUpType = 'order-form'"
       />
+      <ScheduleForm
+        v-if="popUpType == 'schedule-form'"
+        :from-schedulation="fromSchedulation"
+        @cancel="dialog = false; fromSchedulation = false"
+        @go-back="popUpType = 'schedulation'; fromSchedulation = false"
+      />
+      <v-card
+        v-else-if="popUpType == 'order-form'" 
+        title="Modifica ordine"
+      >
+        <v-card-text>
+          <OrderDatesForm @go-to-schedulation="goToSchedulation" />
+        </v-card-text>
+      </v-card>
       <OrderHistoryPopup
-        v-if="popUpType == 'statuses'"
+        v-else-if="popUpType == 'statuses'"
         :statuses="statuses"
         @cancel="dialog = false"
       />
       <v-card
-        v-if="popUpType == 'message' && scheduleFormMessage"
+        v-else-if="popUpType == 'message' && scheduleFormMessage"
         :title="scheduleFormMessage"
       />
     </template>
@@ -98,6 +107,7 @@
 <script setup>
 import Action from '@/components/orders/OrderActions';
 import OrderInfoRow from '@/components/orders/OrderInfoRow';
+import OrderDatesForm from '@/components/orders/OrderDatesForm';
 import OrderHistoryPopup from '@/components/orders/OrderHistoryPopup';
 import ScheduleForm from '@/components/operator/schedules/ScheduleForm';
 import SchedulationForm from '@/components/operator/schedules/SchedulationForm';
@@ -117,6 +127,7 @@ const theme = useTheme();
 const dialog = ref(false);
 const router = useRouter();
 const popUpType = ref(null);
+const orderToUpdate = ref(null);
 const userStore = useUserStore();
 const fromSchedulation = ref(false);
 const scheduleFormMessage = ref('');
@@ -148,6 +159,11 @@ const getHeaders = () => {
     headers.push({ title: 'Prezzo', value: 'price', sortable: false });
   headers.push({ title: 'Azioni', key: 'actions', sortable: false });
   return headers;
+};
+
+const goToSchedulation = (id, status) => {
+  orderToUpdate.value = {id, status};
+  popUpType.value = 'schedulation';
 };
 
 const createdAt = (input) => {
@@ -184,7 +200,7 @@ const openFormPopUp = () => {
     orders_id: schedule.value.orders
   }, (data) => {
     if (data.status == 'ok') {
-      popUpType.value = 'form';
+      popUpType.value = 'schedule-form';
       schedule.value.schedule_items = data.schedule_items;
     } else
       scheduleFormMessage.value = data.error;

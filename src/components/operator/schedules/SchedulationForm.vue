@@ -3,7 +3,7 @@
     <v-card-text>
       <v-form
         ref="dpcForm"
-        @submit.prevent="submitDpcForm"
+        @submit.prevent="submitForm"
       >
         <DateField
           v-model="work_date"
@@ -66,11 +66,11 @@
         :new-suggestion-orders="newSuggestionOrders"
         :available-delivery-users="availableDeliveryUsers"
         :available-transports="availableTransports"
-        :primary-color="theme.current.value.primaryColor"
         @update:new-suggestion-orders="newSuggestionOrders = $event"
         @create-suggestion="createSuggestionFromDroppedOrder"
         @orders-changed="syncSuggestionsAfterOrderMove"
         @open-schedule="openSchedule"
+        @order-form="emits('order-form')"
       />
     </v-card-text>
   </v-card>
@@ -79,39 +79,53 @@
 <script setup>
 import DateField from '@/components/DateField';
 import FormButtons from '@/components/FormButtons';
-import SchedulationProposals from '@/components/operator/schedules/SchedulationProposals.vue';
+import SchedulationProposals from '@/components/operator/schedules/SchedulationProposals';
 
 import http from '@/utils/http';
 import days from '@/utils/days';
-import { useTheme } from 'vuetify';
 import mobile from '@/utils/mobile';
-import { ref, computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
+import { ref, computed, watch } from 'vue';
 import validation from '@/utils/validation';
 import { useScheduleStore } from '@/stores/schedule';
 
+const props = defineProps({
+  orderToUpdate: {
+    type: Object,
+    default: null
+  }
+});
+
 const message = ref('');
-const theme = useTheme();
 const dpcForm = ref(null);
 const loading = ref(false);
 const router = useRouter();
 const transports = ref([]);
 const work_date = ref(null);
 const suggestions = ref([]);
-const minSizeGroup = ref(10);
-const maxSizeGroup = ref(14);
+const minSizeGroup = ref(9);
+const maxSizeGroup = ref(12);
 const maxDistanceKm = ref(50);
 const deliveryUsers = ref([]);
 const newSuggestionOrders = ref([]);
 const isMobile = mobile.setupMobileUtils();
-const emits = defineEmits(['cancel', 'goToSheduleForm']);
+const emits = defineEmits(['cancel', 'goToSheduleForm', 'order-form']);
 
 const scheduleStore = useScheduleStore();
 const { element: schedule } = storeToRefs(scheduleStore);
 
 const DEFAULT_START_TIME_SLOT = '08:00';
 const DEFAULT_END_TIME_SLOT = '09:00';
+
+watch(() => props.orderToUpdate, (newVal) => {
+  for (const suggestion of suggestions.value)
+    for (const order of suggestion.orders)
+      if (order.order_id === newVal.id) {
+        order.status = newVal.status;
+        return;
+      }
+}, { deep: true });
 
 const normalizeScheduleItem = (item, operationType = item.operation_type) => {
   const normalizedItem = {
@@ -217,7 +231,7 @@ const createSuggestionFromDroppedOrder = (event) => {
   syncSuggestionsAfterOrderMove();
 };
 
-const submitDpcForm = async () => {
+const submitForm = async () => {
   if (!(await dpcForm.value.validate()).valid) return;
 
   message.value = '';

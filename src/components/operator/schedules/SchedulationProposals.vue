@@ -9,10 +9,10 @@
       <SchedulationProposalCard
         :suggestion="suggestion"
         :index="index"
-        :primary-color="primaryColor"
         @update:suggestion="(updated) => Object.assign(suggestion, updated)"
         @open-schedule="emits('open-schedule', $event)"
         @orders-changed="emits('orders-changed')"
+        @order-form="emits('order-form')"
       />
     </v-col>
     <v-col
@@ -101,10 +101,6 @@ const props = defineProps({
   availableTransports: {
     type: Array,
     required: true
-  },
-  primaryColor: {
-    type: String,
-    required: true
   }
 });
 
@@ -112,7 +108,8 @@ const emits = defineEmits([
   'update:newSuggestionOrders',
   'create-suggestion',
   'orders-changed',
-  'open-schedule'
+  'open-schedule',
+  'order-form'
 ]);
 
 const newSuggestionOrdersModel = computed({

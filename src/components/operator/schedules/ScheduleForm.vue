@@ -94,7 +94,7 @@
             </draggable>
             <FormButtons
               :loading="loading"
-              @cancel="emits(showBack ? 'back' : 'cancel')"
+              @cancel="emits(fromSchedulation ? 'go-back' : 'cancel')"
             />
           </v-form>
         </v-col>
@@ -131,11 +131,11 @@ import { useScheduleStore } from '@/stores/schedule';
 import { useTransportStore } from '@/stores/transport';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
-const { showBack } = defineProps({
-  showBack: {
+const fromSchedulation = defineProps({
+  fromSchedulation: {
     type: Boolean,
-    default: false,
-  },
+    default: false
+  }
 });
 
 const form = ref(null);
@@ -145,8 +145,8 @@ const loading = ref(false);
 const selectedUser = ref(null);
 const notFoundAddresses = ref([]);
 const selectedOrderId = ref(null);
-const emits = defineEmits(['cancel', 'back']);
 const isMobile = mobile.setupMobileUtils();
+const emits = defineEmits(['cancel', 'go-back']);
 
 const orderStore = useOrderStore();
 const scheduleStore = useScheduleStore();
