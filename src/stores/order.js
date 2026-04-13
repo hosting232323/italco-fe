@@ -64,6 +64,7 @@ export const useOrderStore = defineStore('order', {
     setList(data) {
       this.list = data.orders;
       this.ready = true;
+      this.filters = {};
     }
   }
 });

@@ -45,7 +45,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, watch } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import { useLogStore } from '@/stores/log';
@@ -65,25 +65,16 @@ const { element, filterTypes } = defineProps({
   }
 });
 
-const userStore = useUserStore();
-const { role } = storeToRefs(userStore);
-
 const logStore = useLogStore();
+const userStore = useUserStore();
 const orderStore = useOrderStore();
 const scheduleStore = useScheduleStore();
-
-const filters = computed(() => {
-  switch (element) {
-  case 'Order':
-    return storeToRefs(orderStore).filters;
-  case 'Schedule':
-    return storeToRefs(scheduleStore).filters;
-  case 'Log':
-    return storeToRefs(logStore).filters;
-  default:
-    return storeToRefs(orderStore).filters;
-  }
-});
+const { role } = storeToRefs(userStore);
+const { filters } = storeToRefs(
+  element == 'Order' ? orderStore :
+    element == 'Schedule' ? scheduleStore :
+      logStore
+);
 
 const DATE_FILTER_TYPES = role.value != 'Customer' || element != 'Order'
   ? filterTypes
@@ -96,8 +87,15 @@ const isMobile = mobile.setupMobileUtils();
 const dateType = ref(Object.keys(DATE_FILTER_TYPES)[0]);
 const previousDateType = ref(dateType.value);
 
-if (!filters.value[`${element}.${dateType.value}`])
-  filters.value[`${element}.${dateType.value}`] = [null, null];
+const formatFilters = () => {
+  if (!filters.value[`${element}.${dateType.value}`])
+    filters.value[`${element}.${dateType.value}`] = [null, null];
+};
+
+formatFilters();
+watch(filters, () => {
+  formatFilters();
+}, { deep: true });
 
 const handleDateTypeChange = (newValue) => {
   delete filters.value[`${element}.${previousDateType.value}`];

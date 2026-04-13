@@ -24,6 +24,7 @@ export const useLogStore = defineStore('log', {
     setList(data) {
       this.list = data.logs;
       this.ready = true;
+      this.filters = {};
     }
   }
 });

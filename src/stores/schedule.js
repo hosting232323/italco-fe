@@ -54,6 +54,7 @@ export const useScheduleStore = defineStore('schedule', {
     setList(data) {
       this.list = data.schedules;
       this.ready = true;
+      this.filters = {};
     }
   }
 });

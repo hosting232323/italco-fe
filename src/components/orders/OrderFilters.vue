@@ -75,31 +75,20 @@
             @cancel="panel = null"
           />
         </v-form>
+        <v-btn
+          v-if="role == 'Admin' && !panel && filters['CustomerUser.id'] && filters['Order.dpc']
+            && filters['Order.dpc'][0] && filters['Order.dpc'][1]"
+          class="mt-2"
+          block
+          text="Esporta Fatturazione"
+          prepend-icon="mdi-file-pdf-box"
+          :color="theme.current.value.primaryColor"
+          :loading="loading"
+          @click="exportInvoice"
+        />
       </v-expansion-panel-text>
     </v-expansion-panel>
   </v-expansion-panels>
-  <v-row
-    v-if="role == 'Admin' && !panel && filters['CustomerUser.id'] && filters['Order.dpc_0'] && filters['Order.dpc_1']"
-    no-gutters
-  >
-    <v-col
-      cols="8"
-      style="font-size: smaller;"
-    >
-      Punto Vendita: {{ filters['CustomerUser.id'] }}<br>
-      Data di Inizio Intervallo: {{ filters['Order.dpc_0'] }}<br>
-      Data di Fine Intervallo: {{ filters['Order.dpc_1'] }}
-    </v-col>
-    <v-col cols="4">
-      <v-btn
-        style="float: right;"
-        text="Esporta"
-        :color="theme.current.value.primaryColor"
-        :loading="loading"
-        @click="exportInvoice"
-      />
-    </v-col>
-  </v-row>
 </template>
 
 <script setup>
@@ -150,6 +139,9 @@ const exportInvoice = async () => {
     filters: storesUtils.formatFilters({ ...filters.value }, 'Order.dpc')
   }, function (data) {
     loading.value = false;
+    const oldFilters = { ...filters.value };
+    filters.value = {};
+    panel.value = null;
     if (data.status == 'ko')
       alert(data.error);
     else {
@@ -157,7 +149,7 @@ const exportInvoice = async () => {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `ordini_${filters.value['Order.dpc_0']}_${filters.value['Order.dpc_1']}.pdf`;
+      a.download = `ordini_${oldFilters['Order.dpc'][0]}_${oldFilters['Order.dpc'][1]}.pdf`;
       a.click();
       window.URL.revokeObjectURL(url);
     }
