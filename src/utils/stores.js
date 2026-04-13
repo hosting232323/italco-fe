@@ -15,21 +15,49 @@ const exclude_keys = (obj, keys) => {
 };
 
 
-const formatFilters = (filters, key) => {
-  if (filters[key + '_0'] && filters[key + '_1']) {
-    filters[key] = [filters[key + '_0'], filters[key + '_1']];
-    delete filters[key + '_0'];
-    delete filters[key + '_1'];
-  } else if (filters[key + '_0']) {
-    filters[key] = filters[key + '_0'];
-    delete filters[key + '_0'];
-  }
+const ORDER_DATE_FILTER_TYPES = {
+  work_date: 'Data Work',
+  booking_date: 'Data Booking',
+  dpc: 'Data Prevista dal Cliente',
+  drc: 'Data Richiesta dal Cliente',
+  confirmation_date: 'Data di Conferma',
+  completion_date: 'Data di Completamento',
+  created_at: 'Data di Creazione',
+  updated_at: 'Data di Ultima Modifica'
+};
+
+
+const SCHEDULE_DATE_FILTER_TYPES = {
+  date: 'Data del borderò',
+  created_at: 'Data di Creazione',
+  updated_at: 'Data di Ultima Modifica'
+};
+
+
+const LOG_DATE_FILTER_TYPES = {
+  created_at: 'Data di Creazione'
+};
+
+
+const formatFilters = (filters, keys, element) => {
+  const formattedKeys = Object.keys(keys).map(key => `${element}.${key}`);
 
   return Object.keys(filters)
-    .filter(key => filters[key] !== null)
+    .filter(key => {
+      if (formattedKeys.includes(key)) return filters[key][0];
+      else return filters[key];
+    })
     .map(key => {
+      let value = null;
+      if (!formattedKeys.includes(key))
+        value = filters[key];
+      else if (!filters[key][1])
+        value = filters[key][0];
+      else
+        value = [filters[key][0], filters[key][1]];
+
       return {
-        value: filters[key],
+        value,
         model: key.split('.')[0],
         field: key.split('.')[1]
       };
@@ -40,5 +68,8 @@ const formatFilters = (filters, key) => {
 export default {
   getStoreList,
   exclude_keys,
-  formatFilters
+  formatFilters,
+  ORDER_DATE_FILTER_TYPES,
+  SCHEDULE_DATE_FILTER_TYPES,
+  LOG_DATE_FILTER_TYPES
 };

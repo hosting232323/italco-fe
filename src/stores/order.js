@@ -52,13 +52,10 @@ export const useOrderStore = defineStore('order', {
       );
     },
     initList(router) {
-      Object.keys(this.filters).forEach(key => {
-        if (!this.filters[key]) delete this.filters[key];
-      });
-
       http.postRequest(
         'order/filter',
-        {filters: storesUtils.formatFilters({ ...this.filters }, 'Order.dpc')},
+        {filters: storesUtils.formatFilters({ ...this.filters },
+          storesUtils.ORDER_DATE_FILTER_TYPES, 'Order')},
         this.setList,
         'POST',
         router
@@ -67,6 +64,7 @@ export const useOrderStore = defineStore('order', {
     setList(data) {
       this.list = data.orders;
       this.ready = true;
+      this.filters = {};
     }
   }
 });
