@@ -12,10 +12,13 @@ export const useLogStore = defineStore('log', {
   }),
   actions: {
     initList(router) {
+      Object.keys(this.filters).forEach(key => {
+        if (!this.filters[key]) delete this.filters[key];
+      });
+
       http.postRequest(
         'log',
-        {filters: storesUtils.formatFilters({ ...this.filters },
-          storesUtils.LOG_DATE_FILTER_TYPES, 'Log')},
+        {filters: storesUtils.formatFilters({ ...this.filters }, 'Log.created_at')},
         this.setList,
         'POST',
         router
@@ -24,7 +27,6 @@ export const useLogStore = defineStore('log', {
     setList(data) {
       this.list = data.logs;
       this.ready = true;
-      this.filters = {};
     }
   }
 });

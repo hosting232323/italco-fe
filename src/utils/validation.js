@@ -42,20 +42,9 @@ const futureTime = (element) => [
 
     const [startH, startM] = element.split(':').map(Number);
     const [endH, endM] = value.split(':').map(Number);
-    return endH * 60 + endM > startH * 60 + startM
-      ? true
-      : 'L\'orario di fine deve essere maggiore di quello di inizio';
-  }
-];
-
-const futureDate = (element) => [
-  (value) => {
-    if (value && !element)
-      return 'Inserisci prima la data iniziale';
-
-    return new Date(value) > new Date(element)
-      ? true
-      : 'La data deve essere successiva a quella iniziale';
+    const startMinutes = startH * 60 + startM;
+    const endMinutes = endH * 60 + endM;
+    return endMinutes > startMinutes ? true : 'L\'orario di fine deve essere maggiore di quello di inizio';
   }
 ];
 
@@ -86,7 +75,6 @@ export default {
   capRules,
   phoneRules,
   futureTime,
-  futureDate,
   minGroupSizeRule,
   maxGroupSizeRule
 };
