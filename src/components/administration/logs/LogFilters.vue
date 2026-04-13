@@ -12,32 +12,18 @@
           ref="form"
           @submit.prevent="filterLogs"
         >
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="6"
-            >
-              <v-autocomplete
-                v-model="filters['User.id']"
-                :class="isMobile ? '' : 'mr-2'"
-                label="Utente"
-                :items="users"
-                item-title="nickname"
-                item-value="id"
-                clearable
-              />
-            </v-col>
-            <v-col
-              cols="12"
-              md="6"
-            >
-              <v-text-field
-                v-model="filters['Log.created_at']"
-                label="Data"
-                type="date"
-              />
-            </v-col>
-          </v-row>
+          <v-autocomplete
+            v-model="filters['User.id']"
+            label="Utente"
+            :items="users"
+            item-title="nickname"
+            item-value="id"
+            clearable
+          />
+          <DateFilters
+            element="Log"
+            :filter-types="storesUtils.LOG_DATE_FILTER_TYPES"
+          />
           <FormButtons
             :loading="false"
             @cancel="panel = null"
@@ -49,24 +35,25 @@
 </template>
 
 <script setup>
+import DateFilters from '@/components/DateFilters';
+import FormButtons from '@/components/FormButtons';
+
 import { ref } from 'vue';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
-import mobile from '@/utils/mobile';
 import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import { useLogStore } from '@/stores/log';
-import FormButtons from '@/components/FormButtons';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
 const form = ref(null);
 const panel = ref(null);
 const theme = useTheme();
 const router = useRouter();
+
 const logStore = useLogStore();
-const isMobile = mobile.setupMobileUtils();
-const { filters, ready } = storeToRefs(logStore);
 const administrationUserStore = useAdministrationUserStore();
+const { filters, ready } = storeToRefs(logStore);
 const users = storesUtils.getStoreList(administrationUserStore, router);
 
 const filterLogs = async () => {
