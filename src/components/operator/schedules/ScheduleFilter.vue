@@ -15,7 +15,7 @@
           <v-row no-gutters>
             <v-col
               cols="12"
-              md="6"
+              md="3"
             >
               <v-text-field
                 v-model="filters['Schedule.id']"
@@ -27,21 +27,41 @@
             </v-col>
             <v-col
               cols="12"
-              md="6"
+              md="3"
             >
               <v-text-field
                 v-model="filters['Order.id']"
-                :class="isMobile ? '' : 'ml-2'"
+                :class="isMobile ? '' : 'ml-2 mr-2'"
                 label="ID Ordine"
                 type="number"
                 clearable
               />
             </v-col>
+            <v-col
+              cols="12"
+              md="3"
+            >
+              <v-text-field
+                v-model="filters['Schedule.date_0']"
+                :class="isMobile ? '' : 'ml-2 mr-2'"
+                :rules="intervallRules('Schedule.date_1')"
+                label="Inizio Intervallo Data Consegna"
+                type="date"
+              />
+            </v-col>
+            <v-col
+              cols="12"
+              md="3"
+            >
+              <v-text-field
+                v-model="filters['Schedule.date_1']"
+                :class="isMobile ? '' : 'ml-2'"
+                :rules="intervallRules('Schedule.date_0')"
+                label="Fine Intervallo Data Consegna"
+                type="date"
+              />
+            </v-col>
           </v-row>
-          <DateFilters
-            element="Schedule"
-            :filter-types="storesUtils.SCHEDULE_DATE_FILTER_TYPES"
-          />
           <FormButtons
             :loading="false"
             @cancel="panel = null"
@@ -54,14 +74,12 @@
 
 <script setup>
 import FormButtons from '@/components/FormButtons';
-import DateFilters from '@/components/DateFilters';
 
 import { ref } from 'vue';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import mobile from '@/utils/mobile';
 import { useRouter } from 'vue-router';
-import storesUtils from '@/utils/stores';
 import { useScheduleStore } from '@/stores/schedule';
 
 const form = ref(null);
@@ -78,5 +96,14 @@ const filterOrder = async () => {
   ready.value = false;
   scheduleStore.initList(router);
   panel.value = null;
+};
+
+const intervallRules = (otherKey) => {
+  return [
+    (value) => {
+      if (value && !filters.value[otherKey]) return 'Usare entrambe le date per filtrare';
+      return true;
+    }
+  ];
 };
 </script>

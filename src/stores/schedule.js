@@ -33,10 +33,13 @@ export const useScheduleStore = defineStore('schedule', {
       );
     },
     initList(router) {
+      Object.keys(this.filters).forEach(key => {
+        if (!this.filters[key]) delete this.filters[key];
+      });
+
       http.postRequest(
         'schedule/filter',
-        {filters: storesUtils.formatFilters({ ...this.filters },
-          storesUtils.SCHEDULE_DATE_FILTER_TYPES, 'Schedule')},
+        {filters: storesUtils.formatFilters({ ...this.filters }, 'Schedule.date')},
         this.setList,
         'POST',
         router

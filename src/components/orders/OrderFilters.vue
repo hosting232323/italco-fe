@@ -66,9 +66,57 @@
               />
             </v-col>
           </v-row>
-          <DateFilters
-            element="Order"
-            :filter-types="storesUtils.ORDER_DATE_FILTER_TYPES"
+          <v-row no-gutters>
+            <v-col
+              cols="12"
+              md="3"
+            >
+              <v-text-field
+                v-model="filters['Order.booking_date']"
+                :class="isMobile ? '' : 'mr-2'"
+                label="Data Consegna"
+                type="date"
+              />
+            </v-col>
+            <v-col
+              cols="12"
+              md="3"
+            >
+              <v-text-field
+                v-model="filters['Order.drc']"
+                :class="isMobile ? '' : 'ml-2 mr-2'"
+                label="Data Richiesta dal Cliente"
+                type="date"
+              />
+            </v-col>
+            <v-col
+              cols="12"
+              md="3"
+            >
+              <v-text-field
+                v-model="filters['Order.dpc_0']"
+                :class="isMobile ? '' : 'mr-2 ml-2'"
+                label="Data Prevista dal Cliente (Inizio)"
+                type="date"
+              />
+            </v-col>
+            <v-col
+              cols="12"
+              md="3"
+            >
+              <v-text-field
+                v-model="filters['Order.dpc_1']"
+                :class="isMobile ? '' : 'ml-2'"
+                :rules="intervallRules()"
+                label="Data Prevista dal Cliente (Fine)"
+                type="date"
+              />
+            </v-col>
+          </v-row>
+          <v-text-field
+            v-model="filters['Order.work_date']"
+            label="Data Work"
+            type="date"
           />
           <FormButtons
             :loading="false"
@@ -104,7 +152,6 @@
 
 <script setup>
 import FormButtons from '@/components/FormButtons';
-import DateFilters from '@/components/DateFilters';
 import OperatorFilters from '@/components/operator/OperatorFilters';
 
 import { ref } from 'vue';
@@ -141,6 +188,16 @@ const filterOrder = async () => {
   ready.value = false;
   orderStore.initList(router);
   panel.value = null;
+};
+
+const intervallRules = () => {
+  return [
+    (value) => {
+      if (value && !filters.value['Order.dpc_0']) return 'Usare entrambe le date per filtrare';
+
+      return true;
+    }
+  ];
 };
 
 const exportInvoice = async () => {
