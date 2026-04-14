@@ -2,7 +2,7 @@ import http from '@/utils/http';
 import { defineStore } from 'pinia';
 import storesUtils from '@/utils/stores';
 
-export const useRaeProductStore = defineStore('raeProduct', {
+export const useRaeProductGroupStore = defineStore('raeProductGroup', {
   state: () => ({
     list: [],
     element: {},
@@ -12,7 +12,7 @@ export const useRaeProductStore = defineStore('raeProduct', {
   actions: {
     createElement(router, func) {
       http.postRequest(
-        'rae-product',
+        'rae/product-group',
         this.element,
         func,
         'POST',
@@ -21,7 +21,7 @@ export const useRaeProductStore = defineStore('raeProduct', {
     },
     updateElement(router, func) {
       http.postRequest(
-        `rae-product/${this.element.id}`,
+        `rae/product-group/${this.element.id}`,
         storesUtils.exclude_keys(this.element, ['created_at', 'updated_at']),
         func,
         'PUT',
@@ -30,7 +30,7 @@ export const useRaeProductStore = defineStore('raeProduct', {
     },
     initList(router) {
       http.getRequest(
-        'rae-product',
+        'rae/product-group',
         {},
         this.setList,
         'GET',
@@ -39,7 +39,7 @@ export const useRaeProductStore = defineStore('raeProduct', {
     },
     deleteElement(element, router, func) {
       http.getRequest(
-        `rae-product/${element.id}`,
+        `rae/product-group/${element.id}`,
         {},
         func,
         'DELETE',
@@ -47,7 +47,7 @@ export const useRaeProductStore = defineStore('raeProduct', {
       );
     },
     setList(data) {
-      this.list = data.rae_products;
+      this.list = data.rae_product_groups;
       this.ready = true;
     }
   }

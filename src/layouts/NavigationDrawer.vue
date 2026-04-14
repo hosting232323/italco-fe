@@ -51,12 +51,6 @@
     />
     <v-list-item
       v-if="role === 'Admin'"
-      to="/rae-products"
-      title="Prodotti Raee"
-      prepend-icon="mdi-file-code"
-    />
-    <v-list-item
-      v-if="role === 'Admin'"
       to="/log"
       title="Log"
       prepend-icon="mdi-math-log"
@@ -67,6 +61,23 @@
       title="Punti di Ritiro"
       prepend-icon="mdi-store"
     />
+    <template v-if="['Admin', 'Operator'].includes(role)">
+      <v-divider class="mb-4 mt-4" />
+      <v-list-item
+        to="/rae-dashboard"
+        title="Dashboard Raee"
+        prepend-icon="mdi-human-dolly"
+      />
+      <v-list-item
+        v-if="role === 'Admin'"
+        to="/rae-product-groups"
+        prepend-icon="mdi-file-code"
+      >
+        <v-list-item-title>
+          Configurazione<br>Raggruppamenti
+        </v-list-item-title>
+      </v-list-item>
+    </template>
     <v-divider class="mb-4 mt-4" />
     <v-list-item
       title="Logout"
