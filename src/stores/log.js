@@ -8,17 +8,21 @@ export const useLogStore = defineStore('log', {
     filters: {},
     ready: false,
     activePopUp: false,
-    selectedLog: false
+    selectedLog: false,
+    filtersSetting: {
+      doubleDates: false,
+      dateType: Object.keys(storesUtils.LOG_DATE_FILTER_TYPES)[0]
+    }
   }),
   actions: {
     initList(router) {
-      Object.keys(this.filters).forEach(key => {
-        if (!this.filters[key]) delete this.filters[key];
-      });
-
       http.postRequest(
         'log',
-        {filters: storesUtils.formatFilters({ ...this.filters }, 'Log.created_at')},
+        {filters: storesUtils.formatFilters(
+          this.filters,
+          storesUtils.LOG_DATE_FILTER_TYPES,
+          'Log'
+        )},
         this.setList,
         'POST',
         router
