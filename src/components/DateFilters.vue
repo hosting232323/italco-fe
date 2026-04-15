@@ -2,43 +2,43 @@
   <v-row no-gutters>
     <v-col
       cols="12"
-      :md="doubleDates ? 4: 6"
+      :md="filtersSetting.doubleDates ? 4: 6"
     >
       <v-text-field
-        v-model="filters[`${element}.${dateType}`][0]"
+        v-model="filters[`${element}.${filtersSetting.dateType}`][0]"
         :class="isMobile ? '' : 'mr-2'"
-        :label="DATE_FILTER_TYPES[dateType]"
+        :label="DATE_FILTER_TYPES[filtersSetting.dateType]"
         type="date"
         clearable
-        :prepend-icon="doubleDates ? 'mdi-minus' : 'mdi-plus'"
+        :prepend-icon="filtersSetting.doubleDates ? 'mdi-minus' : 'mdi-plus'"
         @click:prepend="updateDoubleDates"
       />
     </v-col>
     <v-col
-      v-if="doubleDates"
+      v-if="filtersSetting.doubleDates"
       cols="12"
       md="4"
     >
       <v-text-field
-        v-model="filters[`${element}.${dateType}`][1]"
+        v-model="filters[`${element}.${filtersSetting.dateType}`][1]"
         :class="isMobile ? '' : 'ml-2 mr-2'"
         label="Data di fine intervallo"
         type="date"
-        :rules="validation.futureDate(filters[`${element}.${dateType}`][0])"
+        :rules="validation.futureDate(filters[`${element}.${filtersSetting.dateType}`][0])"
         clearable
       />
     </v-col>
     <v-col
       cols="12"
-      :md="doubleDates ? 4: 6"
+      :md="filtersSetting.doubleDates ? 4: 6"
     >
       <v-select
-        v-model="dateType"
+        v-model="filtersSetting.dateType"
         label="Tipo di Data"
         :class="isMobile ? '' : 'ml-2'"
         :disabled="Object.keys(DATE_FILTER_TYPES).length == 1"
         :items="Object.entries(DATE_FILTER_TYPES).map(([value, title]) => ({value, title}))"
-        @update:model-value="handleDateTypeChange"
+        @update:model-value="updateDateType"
       />
     </v-col>
   </v-row>
@@ -70,11 +70,14 @@ const userStore = useUserStore();
 const orderStore = useOrderStore();
 const scheduleStore = useScheduleStore();
 const { role } = storeToRefs(userStore);
-const { filters } = storeToRefs(
+const { filters, filtersSetting } = storeToRefs(
   element == 'Order' ? orderStore :
     element == 'Schedule' ? scheduleStore :
       logStore
 );
+
+const isMobile = mobile.setupMobileUtils();
+const previousDateType = ref(filtersSetting.value.dateType);
 
 const DATE_FILTER_TYPES = role.value != 'Customer' || element != 'Order'
   ? filterTypes
@@ -82,14 +85,9 @@ const DATE_FILTER_TYPES = role.value != 'Customer' || element != 'Order'
     ([key]) => ['drc', 'dpc', 'created_at'].includes(key)
   ));
 
-const doubleDates = ref(false);
-const isMobile = mobile.setupMobileUtils();
-const dateType = ref(Object.keys(DATE_FILTER_TYPES)[0]);
-const previousDateType = ref(dateType.value);
-
 const formatFilters = () => {
-  if (!filters.value[`${element}.${dateType.value}`])
-    filters.value[`${element}.${dateType.value}`] = [null, null];
+  if (!filters.value[`${element}.${filtersSetting.value.dateType}`])
+    filters.value[`${element}.${filtersSetting.value.dateType}`] = [null, null];
 };
 
 formatFilters();
@@ -97,14 +95,14 @@ watch(filters, () => {
   formatFilters();
 }, { deep: true });
 
-const handleDateTypeChange = (newValue) => {
+const updateDateType = (newValue) => {
   delete filters.value[`${element}.${previousDateType.value}`];
   filters.value[`${element}.${newValue}`] = [null, null];
   previousDateType.value = newValue;
 };
 
 const updateDoubleDates = () => {
-  doubleDates.value = !doubleDates.value;
-  filters.value[`${element}.${dateType.value}`][1] = null;
+  filtersSetting.value.doubleDates = !filtersSetting.value.doubleDates;
+  filters.value[`${element}.${filtersSetting.value.dateType}`][1] = null;
 };
 </script>

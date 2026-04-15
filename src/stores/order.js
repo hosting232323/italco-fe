@@ -12,7 +12,11 @@ export const useOrderStore = defineStore('order', {
     element: {},
     filters: {},
     ready: false,
-    activeForm: false
+    activeForm: false,
+    filtersSetting: {
+      doubleDates: false,
+      dateType: Object.keys(storesUtils.ORDER_DATE_FILTER_TYPES)[0]
+    }
   }),
   actions: {
     createElement(router, func) {
@@ -54,8 +58,11 @@ export const useOrderStore = defineStore('order', {
     initList(router) {
       http.postRequest(
         'order/filter',
-        {filters: storesUtils.formatFilters({ ...this.filters },
-          storesUtils.ORDER_DATE_FILTER_TYPES, 'Order')},
+        {filters: storesUtils.formatFilters(
+          this.filters,
+          storesUtils.ORDER_DATE_FILTER_TYPES,
+          'Order'
+        )},
         this.setList,
         'POST',
         router
@@ -64,7 +71,6 @@ export const useOrderStore = defineStore('order', {
     setList(data) {
       this.list = data.orders;
       this.ready = true;
-      this.filters = {};
     }
   }
 });

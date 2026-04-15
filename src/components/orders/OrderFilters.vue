@@ -136,11 +136,13 @@ const exportInvoice = async () => {
   loading.value = true;
 
   http.postRequest('export/invoice', {
-    filters: storesUtils.formatFilters({ ...filters.value }, 'Order.dpc')
+    filters: storesUtils.formatFilters(
+      filters.value,
+      storesUtils.ORDER_DATE_FILTER_TYPES,
+      'Order'
+    )
   }, function (data) {
     loading.value = false;
-    const oldFilters = { ...filters.value };
-    filters.value = {};
     panel.value = null;
     if (data.status == 'ko')
       alert(data.error);
@@ -149,7 +151,7 @@ const exportInvoice = async () => {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `ordini_${oldFilters['Order.dpc'][0]}_${oldFilters['Order.dpc'][1]}.pdf`;
+      a.download = `ordini_${filters.value['Order.dpc'][0]}_${filters.value['Order.dpc'][1]}.pdf`;
       a.click();
       window.URL.revokeObjectURL(url);
     }
