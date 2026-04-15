@@ -66,92 +66,34 @@
               />
             </v-col>
           </v-row>
-          <v-row no-gutters>
-            <v-col
-              cols="12"
-              md="3"
-            >
-              <v-text-field
-                v-model="filters['Order.booking_date']"
-                :class="isMobile ? '' : 'mr-2'"
-                label="Data Consegna"
-                type="date"
-              />
-            </v-col>
-            <v-col
-              cols="12"
-              md="3"
-            >
-              <v-text-field
-                v-model="filters['Order.drc']"
-                :class="isMobile ? '' : 'ml-2 mr-2'"
-                label="Data Richiesta dal Cliente"
-                type="date"
-              />
-            </v-col>
-            <v-col
-              cols="12"
-              md="3"
-            >
-              <v-text-field
-                v-model="filters['Order.dpc_0']"
-                :class="isMobile ? '' : 'mr-2 ml-2'"
-                label="Data Prevista dal Cliente (Inizio)"
-                type="date"
-              />
-            </v-col>
-            <v-col
-              cols="12"
-              md="3"
-            >
-              <v-text-field
-                v-model="filters['Order.dpc_1']"
-                :class="isMobile ? '' : 'ml-2'"
-                :rules="intervallRules()"
-                label="Data Prevista dal Cliente (Fine)"
-                type="date"
-              />
-            </v-col>
-          </v-row>
-          <v-text-field
-            v-model="filters['Order.work_date']"
-            label="Data Work"
-            type="date"
+          <DateFilters
+            element="Order"
+            :filter-types="storesUtils.ORDER_DATE_FILTER_TYPES"
           />
           <FormButtons
             :loading="false"
             @cancel="panel = null"
           />
         </v-form>
+        <v-btn
+          v-if="role == 'Admin' && !panel && filters['CustomerUser.id'] && filters['Order.dpc']
+            && filters['Order.dpc'][0] && filters['Order.dpc'][1]"
+          class="mt-2"
+          block
+          text="Esporta Fatturazione"
+          prepend-icon="mdi-file-pdf-box"
+          :color="theme.current.value.primaryColor"
+          :loading="loading"
+          @click="exportInvoice"
+        />
       </v-expansion-panel-text>
     </v-expansion-panel>
   </v-expansion-panels>
-  <v-row
-    v-if="role == 'Admin' && !panel && filters['CustomerUser.id'] && filters['Order.dpc_0'] && filters['Order.dpc_1']"
-    no-gutters
-  >
-    <v-col
-      cols="8"
-      style="font-size: smaller;"
-    >
-      Punto Vendita: {{ filters['CustomerUser.id'] }}<br>
-      Data di Inizio Intervallo: {{ filters['Order.dpc_0'] }}<br>
-      Data di Fine Intervallo: {{ filters['Order.dpc_1'] }}
-    </v-col>
-    <v-col cols="4">
-      <v-btn
-        style="float: right;"
-        text="Esporta"
-        :color="theme.current.value.primaryColor"
-        :loading="loading"
-        @click="exportInvoice"
-      />
-    </v-col>
-  </v-row>
 </template>
 
 <script setup>
 import FormButtons from '@/components/FormButtons';
+import DateFilters from '@/components/DateFilters';
 import OperatorFilters from '@/components/operator/OperatorFilters';
 
 import { ref } from 'vue';
@@ -190,23 +132,18 @@ const filterOrder = async () => {
   panel.value = null;
 };
 
-const intervallRules = () => {
-  return [
-    (value) => {
-      if (value && !filters.value['Order.dpc_0']) return 'Usare entrambe le date per filtrare';
-
-      return true;
-    }
-  ];
-};
-
 const exportInvoice = async () => {
   loading.value = true;
 
   http.postRequest('export/invoice', {
-    filters: storesUtils.formatFilters({ ...filters.value }, 'Order.dpc')
+    filters: storesUtils.formatFilters(
+      filters.value,
+      storesUtils.ORDER_DATE_FILTER_TYPES,
+      'Order'
+    )
   }, function (data) {
     loading.value = false;
+    panel.value = null;
     if (data.status == 'ko')
       alert(data.error);
     else {
@@ -214,7 +151,7 @@ const exportInvoice = async () => {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `ordini_${filters.value['Order.dpc_0']}_${filters.value['Order.dpc_1']}.pdf`;
+      a.download = `ordini_${filters.value['Order.dpc'][0]}_${filters.value['Order.dpc'][1]}.pdf`;
       a.click();
       window.URL.revokeObjectURL(url);
     }

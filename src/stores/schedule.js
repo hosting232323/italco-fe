@@ -11,7 +11,11 @@ export const useScheduleStore = defineStore('schedule', {
     list: [],
     element: {},
     filters: {},
-    ready: false
+    ready: false,
+    filtersSetting: {
+      doubleDates: false,
+      dateType: Object.keys(storesUtils.SCHEDULE_DATE_FILTER_TYPES)[0]
+    }
   }),
   actions: {
     createElement(router, func) {
@@ -33,13 +37,13 @@ export const useScheduleStore = defineStore('schedule', {
       );
     },
     initList(router) {
-      Object.keys(this.filters).forEach(key => {
-        if (!this.filters[key]) delete this.filters[key];
-      });
-
       http.postRequest(
         'schedule/filter',
-        {filters: storesUtils.formatFilters({ ...this.filters }, 'Schedule.date')},
+        {filters: storesUtils.formatFilters(
+          this.filters,
+          storesUtils.SCHEDULE_DATE_FILTER_TYPES,
+          'Schedule'
+        )},
         this.setList,
         'POST',
         router
