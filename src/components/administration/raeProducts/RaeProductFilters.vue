@@ -12,6 +12,10 @@
           ref="form"
           @submit.prevent="filterRaeProduct"
         >
+          <DateFilters
+            element="RaeProduct"
+            :filter-types="storesUtils.RAE_PRODUCT_FILTER_TYPES"
+          />
           <FormButtons
             :loading="false"
             @cancel="panel = null"
@@ -24,9 +28,11 @@
 
 <script setup>
 import FormButtons from '@/components/FormButtons';
+import DateFilters from '@/components/DateFilters';
 
 import { ref } from 'vue';
 import { useTheme } from 'vuetify';
+import storesUtils from '@/utils/stores';
 
 const panel = ref(null);
 const theme = useTheme();

@@ -28,7 +28,7 @@ const ORDER_DATE_FILTER_TYPES = {
 
 
 const SCHEDULE_DATE_FILTER_TYPES = {
-  date: 'Data del borderò',
+  date: 'Data del Borderò',
   created_at: 'Data di Creazione',
   updated_at: 'Data di Ultima Modifica'
 };
@@ -37,6 +37,12 @@ const SCHEDULE_DATE_FILTER_TYPES = {
 const LOG_DATE_FILTER_TYPES = {
   created_at: 'Data di Creazione'
 };
+
+
+const RAE_PRODUCT_FILTER_TYPES = {
+  created_at: 'Data di Creazione',
+  schedule_date: 'Data del Borderò'
+}
 
 
 const formatFilters = (filters, keys, element) => {
@@ -71,5 +77,6 @@ export default {
   formatFilters,
   ORDER_DATE_FILTER_TYPES,
   SCHEDULE_DATE_FILTER_TYPES,
-  LOG_DATE_FILTER_TYPES
+  LOG_DATE_FILTER_TYPES,
+  RAE_PRODUCT_FILTER_TYPES
 };

@@ -1,5 +1,6 @@
 <template>
   <v-navigation-drawer
+    v-if="role != 'Delivery'"
     permanent
     expand-on-hover
     rail
@@ -19,49 +20,39 @@
       title="Dashboard"
       prepend-icon="mdi-view-dashboard"
     />
-    <v-list-item
-      v-if="['Admin', 'Operator'].includes(role)"
-      to="/schedules"
-      title="Borderò"
-      prepend-icon="mdi-text-box-multiple-outline"
-    />
-    <v-list-item
-      v-if="role === 'Admin'"
-      to="/services"
-      title="Servizi"
-      prepend-icon="mdi-clipboard-list"
-    />
-    <v-list-item
-      v-if="role === 'Admin'"
-      to="/delivery"
-      title="Delivery"
-      prepend-icon="mdi-truck-delivery"
-    />
-    <v-list-item
-      v-if="role === 'Admin'"
-      to="/users"
-      title="Utenti"
-      prepend-icon="mdi-account-group"
-    />
-    <v-list-item
-      v-if="role === 'Admin'"
-      to="/customer-points"
-      title="Punti Vendita"
-      prepend-icon="mdi-store-marker"
-    />
-    <v-list-item
-      v-if="role === 'Admin'"
-      to="/log"
-      title="Log"
-      prepend-icon="mdi-math-log"
-    />
-    <v-list-item
-      v-if="role === 'Customer'"
-      to="/collection-points"
-      title="Punti di Ritiro"
-      prepend-icon="mdi-store"
-    />
     <template v-if="['Admin', 'Operator'].includes(role)">
+      <v-list-item
+        to="/schedules"
+        title="Borderò"
+        prepend-icon="mdi-text-box-multiple-outline"
+      />
+      <template v-if="role == 'Admin'">
+        <v-list-item
+          to="/services"
+          title="Servizi"
+          prepend-icon="mdi-clipboard-list"
+        />
+        <v-list-item
+          to="/delivery"
+          title="Delivery"
+          prepend-icon="mdi-truck-delivery"
+        />
+        <v-list-item
+          to="/customer-points"
+          title="Punti Vendita"
+          prepend-icon="mdi-store-marker"
+        />
+        <v-list-item
+          to="/users"
+          title="Utenti"
+          prepend-icon="mdi-account-group"
+        />
+        <v-list-item
+          to="/log"
+          title="Log"
+          prepend-icon="mdi-math-log"
+        />
+      </template>
       <v-divider class="mb-4 mt-4" />
       <v-list-item
         to="/rae-dashboard"
@@ -78,6 +69,12 @@
         </v-list-item-title>
       </v-list-item>
     </template>
+    <v-list-item
+      v-else
+      to="/collection-points"
+      title="Punti di Ritiro"
+      prepend-icon="mdi-store"
+    />
     <v-divider class="mb-4 mt-4" />
     <v-list-item
       title="Logout"

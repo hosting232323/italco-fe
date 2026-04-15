@@ -154,6 +154,33 @@ const EXTERNAL_LABELS = [
   }
 ];
 
+const RAE_STATUS = [
+  {
+    value: 'Generated',
+    title: 'Generato'
+  },
+  {
+    value: 'Emitted',
+    title: 'Emesso',
+    color: 'blue'
+  },
+  {
+    value: 'LDR',
+    title: 'LDR',
+    color: 'blue'
+  },
+  {
+    value: 'Disposed Off',
+    title: 'Smaltito',
+    color: 'green'
+  },
+  {
+    value: 'Annulled',
+    title: 'Annullato',
+    color: 'red'
+  }
+];
+
 const TYPES = [
   {
     title: 'Consegna',
@@ -176,5 +203,6 @@ const TYPES = [
 export default {
   LABELS,
   EXTERNAL_LABELS,
-  TYPES
+  TYPES,
+  RAE_STATUS
 };

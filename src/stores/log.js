@@ -17,7 +17,7 @@ export const useLogStore = defineStore('log', {
   actions: {
     initList(router) {
       http.postRequest(
-        'log',
+        'log/filter',
         {filters: storesUtils.formatFilters(
           this.filters,
           storesUtils.LOG_DATE_FILTER_TYPES,

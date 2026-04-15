@@ -53,6 +53,7 @@ import validation from '@/utils/validation';
 import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
 import { useScheduleStore } from '@/stores/schedule';
+import { useRaeProductStore } from '@/stores/raeProduct';
 
 const { element, filterTypes } = defineProps({
   element: {
@@ -69,11 +70,12 @@ const logStore = useLogStore();
 const userStore = useUserStore();
 const orderStore = useOrderStore();
 const scheduleStore = useScheduleStore();
+const raeProductStore = useRaeProductStore();
 const { role } = storeToRefs(userStore);
 const { filters, filtersSetting } = storeToRefs(
   element == 'Order' ? orderStore :
     element == 'Schedule' ? scheduleStore :
-      logStore
+      element == 'Log' ? logStore : raeProductStore
 );
 
 const isMobile = mobile.setupMobileUtils();
