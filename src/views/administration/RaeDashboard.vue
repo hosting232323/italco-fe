@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <h1>Dashboard Raee</h1><hr>
+    <h1>Ritiri Raee</h1><hr>
   </v-container>
 </template>
 

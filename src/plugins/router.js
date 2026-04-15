@@ -74,7 +74,7 @@ const routes = [
       },
       {
         path: 'rae-dashboard',
-        name: 'Dashboard Raee',
+        name: 'Ritiri Raee',
         component: () => import('@/views/administration/RaeDashboard.vue')
       },
       {

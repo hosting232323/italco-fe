@@ -65,7 +65,7 @@
       <v-divider class="mb-4 mt-4" />
       <v-list-item
         to="/rae-dashboard"
-        title="Dashboard Raee"
+        title="Ritiri Raee"
         prepend-icon="mdi-human-dolly"
       />
       <v-list-item
