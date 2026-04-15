@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <h1>Borderò</h1><hr>
-    <ScheduleFilter />
+    <ScheduleFilters />
     <ScheduleTable @open-dialog="dialog = true" />
   </v-container>
   <v-dialog
@@ -15,7 +15,7 @@
 <script setup>
 import ScheduleForm from '@/components/operator/schedules/ScheduleForm';
 import ScheduleTable from '@/components/operator/schedules/ScheduleTable';
-import ScheduleFilter from '@/components/operator/schedules/ScheduleFilter';
+import ScheduleFilters from '@/components/operator/schedules/ScheduleFilters';
 
 import { ref } from 'vue';
 

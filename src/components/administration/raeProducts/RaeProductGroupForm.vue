@@ -1,7 +1,7 @@
 <template>
   <v-card
     v-if="activeForm"
-    :title="raeProductGroup.id ? `Modifica Prodotto Raee ${raeProductGroup.id}` : 'Crea Prodotto Raee'"
+    :title="raeProductGroup.id ? `Modifica Raggruppamento Raee ${raeProductGroup.id}` : 'Crea Raggruppamento Raee'"
     class="mt-10 mb-5"
   >
     <v-card-text>

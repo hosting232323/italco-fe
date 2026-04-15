@@ -9,7 +9,7 @@ export const useRaeProductStore = defineStore('raeProduct', {
     ready: false,
     filtersSetting: {
       doubleDates: false,
-      dateType: Object.keys(storesUtils.RAE_PRODUCT_FILTER_TYPES)[0]
+      dateType: Object.keys(storesUtils.RAE_PRODUCT_DATE_FILTER_TYPES)[0]
     }
   }),
   actions: {
@@ -18,7 +18,7 @@ export const useRaeProductStore = defineStore('raeProduct', {
         'rae/product/filter',
         {filters: storesUtils.formatFilters(
           this.filters,
-          storesUtils.ORDER_DATE_FILTER_TYPES,
+          storesUtils.RAE_PRODUCT_DATE_FILTER_TYPES,
           'Order'
         )},
         this.setList,
