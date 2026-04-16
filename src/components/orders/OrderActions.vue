@@ -73,7 +73,7 @@
           </v-col>
           <v-col cols="3">
             <v-btn
-              v-if="Object.values(item.products).some(product => product.rae_product_id)"
+              v-if="Object.values(item.products).some(product => product.rae_product)"
               icon="mdi-human-dolly"
               variant="text"
               :loading="raeLoading"

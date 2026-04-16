@@ -7,7 +7,7 @@
   />
   <v-data-table
     v-else
-    :items="raeProducts"
+    :items="raeProductGroups"
     :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
     :headers="[
       { title: 'ID', value: 'id', sortable: false },
@@ -47,18 +47,18 @@ import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
-import { useRaeProductStore } from '@/stores/raeProduct';
+import { useRaeProductGroupStore } from '@/stores/raeProductGroup';
 
 const theme = useTheme();
 const router = useRouter();
 const deleteLoading = reactive({});
 
-const raeProductStore = useRaeProductStore();
-const { element: raeProduct, activeForm, ready } = storeToRefs(raeProductStore);
-const raeProducts = storesUtils.getStoreList(raeProductStore, router);
+const raeProductGroupStore = useRaeProductGroupStore();
+const { element: raeProductGroup, activeForm, ready } = storeToRefs(raeProductGroupStore);
+const raeProductGroups = storesUtils.getStoreList(raeProductGroupStore, router);
 
 const openForm = (item) => {
-  raeProduct.value = item;
+  raeProductGroup.value = item;
   activeForm.value = true;
 
   window.scrollTo({
@@ -69,8 +69,8 @@ const openForm = (item) => {
 
 const deleteItem = (item) => {
   deleteLoading[item.id] = true;
-  raeProductStore.deleteElement(item, router, function() {
-    raeProductStore.initList(router);
+  raeProductGroupStore.deleteElement(item, router, function() {
+    raeProductGroupStore.initList(router);
     deleteLoading[item.id] = false;
   });
 };
