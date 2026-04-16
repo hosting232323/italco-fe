@@ -169,8 +169,10 @@ const collectionPointStore = useCollectionPointStore();
 const { role } = storeToRefs(userStore);
 const { element: order } = storeToRefs(orderStore);
 const services = storesUtils.getStoreList(serviceStore, router);
-const raeProductGroups = storesUtils.getStoreList(raeProductGroupStore, router);
 const collectionPoints = storesUtils.getStoreList(collectionPointStore, router);
+const raeProductGroups = (role.value != 'Customer')
+  ? storesUtils.getStoreList(raeProductGroupStore, router)
+  : ref([]);
 
 const filteredCollectionPoints = computed(() => {
   return role.value === 'Customer'
