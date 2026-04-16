@@ -73,9 +73,14 @@ const routes = [
         component: () => import('@/views/customer/CollectionPoints.vue')
       },
       {
-        path: 'rae-products',
-        name: 'Prodotti Rae',
-        component: () => import('@/views/administration/AdministrationRaeProducts.vue')
+        path: 'rae-dashboard',
+        name: 'Ritiri Raee',
+        component: () => import('@/views/administration/RaeDashboard.vue')
+      },
+      {
+        path: 'rae-product-groups',
+        name: 'Raggruppamenti Raee',
+        component: () => import('@/views/administration/RaeProductGroups.vue')
       }
     ]
   }

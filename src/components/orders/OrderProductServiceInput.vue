@@ -8,11 +8,11 @@
     >
       <v-list-item-title>
         {{ product }}
-        <i v-if="order.products[product].rae_product_id">
+        <i v-if="order.products[product].rae_product">
           RAEE
         </i>
-        <i v-if="order.products[product].rae_product_quantity > 1">
-          x{{ order.products[product].rae_product_quantity }}
+        <i v-if="order.products[product].rae_product?.quantity > 1">
+          x{{ order.products[product].rae_product.quantity }}
         </i>
         [{{ order.products[product].collection_point.name }}]
       </v-list-item-title>
@@ -47,10 +47,10 @@
         />
         <v-autocomplete
           v-else
-          v-model="selectedRaeProduct"
+          v-model="selectedRaeProductGroup"
           :class="isMobile ? '' : 'mr-2'"
           label="Prodotto Rae"
-          :items="raeProducts"
+          :items="raeProductGroups"
           item-title="name"
           item-value="id"
           prepend-icon="mdi-plus"
@@ -146,7 +146,7 @@ import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
 import { useServiceStore } from '@/stores/service';
 import { ref, computed, watch, nextTick } from 'vue';
-import { useRaeProductStore } from '@/stores/raeProduct';
+import { useRaeProductGroupStore } from '@/stores/raeProductGroup';
 import { useCollectionPointStore } from '@/stores/collectionPoint';
 
 const form = ref(null);
@@ -156,20 +156,20 @@ const raeQuantity = ref(1);
 const selectedServices = ref([]);
 const selectedProduct = ref(null);
 const selectedService = ref(null);
-const selectedRaeProduct = ref(null);
+const selectedRaeProductGroup = ref(null);
 const selectedCollectionPoint = ref(null);
 const isMobile = mobile.setupMobileUtils();
 
 const userStore = useUserStore();
 const orderStore = useOrderStore();
 const serviceStore = useServiceStore();
-const raeProductStore = useRaeProductStore();
+const raeProductGroupStore = useRaeProductGroupStore();
 const collectionPointStore = useCollectionPointStore();
 
 const { role } = storeToRefs(userStore);
 const { element: order } = storeToRefs(orderStore);
 const services = storesUtils.getStoreList(serviceStore, router);
-const raeProducts = storesUtils.getStoreList(raeProductStore, router);
+const raeProductGroups = storesUtils.getStoreList(raeProductGroupStore, router);
 const collectionPoints = storesUtils.getStoreList(collectionPointStore, router);
 
 const filteredCollectionPoints = computed(() => {
@@ -190,7 +190,7 @@ const resetFormRow = () => {
   selectedServices.value = [];
   selectedService.value = null;
   selectedProduct.value = null;
-  selectedRaeProduct.value = null;
+  selectedRaeProductGroup.value = null;
   selectedCollectionPoint.value = null;
 };
 
@@ -198,16 +198,17 @@ const addProduct = async () => {
   if (!(await form.value.validate()).valid) return;
 
   if (!order.value.products) order.value.products = {};
-  if (isRae.value) selectedProduct.value = raeProducts.value.find(product => product.id == selectedRaeProduct.value).name;
+  if (isRae.value) selectedProduct.value = raeProductGroups.value.find(product => product.id == selectedRaeProductGroup.value).name;
 
   order.value.products[selectedProduct.value] = {
     services: selectedServices.value,
     collection_point: selectedCollectionPoint.value
   };
-  if (isRae.value) {
-    order.value.products[selectedProduct.value].rae_product_id = selectedRaeProduct.value;
-    order.value.products[selectedProduct.value].rae_product_quantity = raeQuantity.value;
-  }
+  if (isRae.value)
+    order.value.products[selectedProduct.value].rae_product= {
+      group_id: selectedRaeProductGroup.value,
+      quantity: raeQuantity.value
+    };
   resetFormRow();
 };
 
