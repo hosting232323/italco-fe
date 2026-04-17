@@ -192,11 +192,12 @@ const copyOrder = (selectedOrder) => {
   updatedOrder.value = {
     user,
     user_id: user.id,
+    booking_date: null,
     cloned_order_id: id,
     ...Object.fromEntries(
       Object.entries(rest).filter(([key]) =>
         ![
-          'schedule_id', 'status', 'anomaly', 'delay', 'schedule_index', 'start_time_slot', 'end_time_slot', 'id', 'price'
+          'booking_date', 'schedule_id', 'status', 'anomaly', 'delay', 'schedule_index', 'start_time_slot', 'end_time_slot', 'id', 'price'
         ].includes(key)
       )
     )

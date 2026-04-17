@@ -3,7 +3,7 @@
     v-model="order.status"
     :disabled="['Acquired', 'Booked'].includes(order.status)"
     label="Stato"
-    :items="orderUtils.LABELS.filter(label => !['Acquired', 'Booked'].includes(label.value))"
+    :items="orderUtils.LABELS.filter(label => !['Acquired', 'Booked', 'Rescheduled'].includes(label.value))"
   />
   <v-textarea
     v-model="order.motivation"
