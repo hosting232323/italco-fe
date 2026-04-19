@@ -58,7 +58,7 @@
               Completa prima il punto di ritiro
             </button>
             <button
-              v-if="['Delivered', 'Not Delivered', 'At Warehouse', 'To Reschedule'].includes(item.status)"
+              v-if="['Delivered', 'To Reschedule'].includes(item.status)"
               style="cursor: default;"
             >
               Ordine completato
@@ -170,8 +170,8 @@ const { ready, showForm } = storeToRefs(scheduleItemStore);
 const scheduleItems = storesUtils.getStoreList(scheduleItemStore, router);
 
 const STATUS_MAP = {
-  'Booking': ['Delivered', 'Not Delivered', 'At Warehouse', 'To Reschedule'],
-  'At Warehouse': ['Booking', 'To Reschedule']
+  'Booking': ['Delivered', 'Not Delivered', 'To Reschedule'],
+  'Not Delivered': ['To Reschedule']
 };
 
 const getAvailableStatuses = (item) => {
@@ -237,7 +237,6 @@ const timelineColor = (order) => {
   switch (order.status) {
   case 'In Progress': return 'blue';
   case 'On Board': return 'indigo';
-  case 'At Warehouse': return 'cyan';
   case 'Completed': return 'green';
   case 'Cancelled': return 'grey';
   default: return 'primary';
