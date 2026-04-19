@@ -20,6 +20,20 @@
           label="Foto"
           :rules="(order.status === 'Delivered' || order.anomaly) ? validation.arrayRules : []"
         />
+        <template
+          v-if="order.status == 'To Reschedule'"
+          v-for="product in Object.keys(order.products)"
+        >
+          {{ product }}
+          <v-select
+            label="Luogo di Rilascio"
+            :items="collectionPoints.filter(
+              collectionPoint => collectionPoint.user_id == order.products[product].services[0] !!!!!!!!!!!!
+            )"
+            item-title="name"
+            item-value="id"
+          />
+        </template>
         <v-row>
           <v-col
             cols="6"
@@ -163,9 +177,11 @@ import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import orderUtils from '@/utils/order';
 import { useRouter } from 'vue-router';
+import storesUtils from '@/utils/stores';
 import validation from '@/utils/validation';
 import { useOrderStore } from '@/stores/order';
 import { useScheduleItemStore } from '@/stores/scheduleItem';
+import { useCollectionPointStore } from '@/stores/collectionPoint';
 
 const form = ref(null);
 const theme = useTheme();
@@ -179,7 +195,10 @@ const isMobile = mobile.setupMobileUtils();
 
 const orderStore = useOrderStore();
 const scheduleItemStore = useScheduleItemStore();
+const collectionPointStore = useCollectionPointStore();
 const { element: order } = storeToRefs(orderStore);
+const collectionPoints = storesUtils.getStoreList(collectionPointStore, router);
+console.log(collectionPoints.value)
 
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
