@@ -136,7 +136,7 @@ const exportInvoice = async () => {
   loading.value = true;
 
   http.downloadRequest(
-    `export/invoice`,
+    'export/invoice',
     {
       filters: storesUtils.formatFilters(
         filters.value,
