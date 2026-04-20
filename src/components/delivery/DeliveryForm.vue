@@ -24,12 +24,16 @@
           v-if="order.status == 'To Reschedule'"
           v-for="product in Object.keys(order.products)"
         >
-          {{ product }}
+          <b>{{ product }}</b>:<br>
+          <i style="font-size: small;">
+            {{ order.products[product].services.join(', ') }}
+          </i>
           <v-select
+            v-model="order.products[product].new_collection_point_id"
+            :loading="collectionPoints.length == 0"
             label="Luogo di Rilascio"
-            :items="collectionPoints.filter(
-              collectionPoint => collectionPoint.user_id == order.products[product].services[0] !!!!!!!!!!!!
-            )"
+            class="mt-2"
+            :items="collectionPoints.concat([{name: 'Veicolo', id: 0}])"
             item-title="name"
             item-value="id"
           />
@@ -172,6 +176,7 @@ import SignaturePad from 'vue3-signature-pad';
 import FormButtons from '@/components/FormButtons';
 
 import { ref } from 'vue';
+import http from '@/utils/http';
 import { useTheme } from 'vuetify';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
@@ -181,13 +186,13 @@ import storesUtils from '@/utils/stores';
 import validation from '@/utils/validation';
 import { useOrderStore } from '@/stores/order';
 import { useScheduleItemStore } from '@/stores/scheduleItem';
-import { useCollectionPointStore } from '@/stores/collectionPoint';
 
 const form = ref(null);
 const theme = useTheme();
 const loading = ref(false);
 const router = useRouter();
 const signaturePad = ref(null);
+const collectionPoints = ref([]);
 const signatureError = ref(null);
 const signatureSuccess = ref(null);
 const emits = defineEmits(['cancel']);
@@ -195,10 +200,14 @@ const isMobile = mobile.setupMobileUtils();
 
 const orderStore = useOrderStore();
 const scheduleItemStore = useScheduleItemStore();
-const collectionPointStore = useCollectionPointStore();
 const { element: order } = storeToRefs(orderStore);
-const collectionPoints = storesUtils.getStoreList(collectionPointStore, router);
-console.log(collectionPoints.value)
+
+order.value.id = order.value.order_id;
+if (order.value.status == 'To Reschedule')
+  http.getRequest(`order/collection-points/${order.value.id}`, {}, (data) => {
+    if (data.status == 'ok')
+      collectionPoints.value = data.collection_points;
+  }, 'GET', router);
 
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
@@ -209,7 +218,6 @@ const submitForm = async () => {
   }
 
   loading.value = true;
-  order.value.id = order.value.order_id;
   orderStore.updateElementWithFormData(router, function (data) {
     loading.value = false;
     if (data.status == 'ok') {

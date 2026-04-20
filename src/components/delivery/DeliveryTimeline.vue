@@ -123,9 +123,7 @@
                   <div style="font-size: smaller;">
                     {{
                       !item.products ? 'N/D' : [...new Set(Object.values(item.products).map(
-                        product => scheduleItems.find(
-                          scheduleItem => scheduleItem.collection_point_id == product.collection_point.id
-                        ).name
+                        product => product.collection_point.name
                       ))].join(', ')
                     }}
                   </div>
@@ -235,8 +233,8 @@ const timelineColor = (order) => {
   if (order.delay) return 'orange';
 
   switch (order.status) {
-  case 'In Progress': return 'blue';
-  case 'On Board': return 'indigo';
+  case 'Scheduled': return 'blue';
+  case 'Booking': return 'indigo';
   case 'Completed': return 'green';
   case 'Cancelled': return 'grey';
   default: return 'primary';
@@ -248,8 +246,8 @@ const timelineIcon = (order) => {
   if (order.delay) return 'mdi-clock-alert';
 
   switch (order.status) {
-  case 'In Progress': return 'mdi-truck-outline';
-  case 'On Board': return 'mdi-truck-fast';
+  case 'Scheduled': return 'mdi-truck-outline';
+  case 'Booking': return 'mdi-truck-fast';
   case 'Completed': return 'mdi-check-circle';
   case 'Cancelled': return 'mdi-close-circle';
   default: return 'mdi-package-variant';
