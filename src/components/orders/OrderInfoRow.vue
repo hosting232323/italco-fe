@@ -68,11 +68,10 @@
 </template>
 
 <script setup>
-import orderUtils from '@/utils/order';
-
 import { ref } from 'vue';
 import http from '@/utils/http';
 import { useTheme } from 'vuetify';
+import orderUtils from '@/utils/order';
 import { useRouter } from 'vue-router';
 import { useOrderStore } from '@/stores/order';
 
