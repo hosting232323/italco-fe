@@ -20,23 +20,25 @@
           label="Foto"
           :rules="(order.status === 'Delivered' || order.anomaly) ? validation.arrayRules : []"
         />
-        <template
-          v-if="order.status == 'To Reschedule'"
-          v-for="product in Object.keys(order.products)"
-        >
-          <b>{{ product }}</b>:<br>
-          <i style="font-size: small;">
-            {{ order.products[product].services.join(', ') }}
-          </i>
-          <v-select
-            v-model="order.products[product].new_collection_point_id"
-            :loading="collectionPoints.length == 0"
-            label="Luogo di Rilascio"
-            class="mt-2"
-            :items="collectionPoints.concat([{name: 'Veicolo', id: 0}])"
-            item-title="name"
-            item-value="id"
-          />
+        <template v-if="order.status == 'To Reschedule'">
+          <div
+            v-for="product in Object.keys(order.products)"
+            :key="product"
+          >
+            <b>{{ product }}</b>:<br>
+            <i style="font-size: small;">
+              {{ order.products[product].services.join(', ') }}
+            </i>
+            <v-select
+              v-model="order.products[product].new_collection_point_id"
+              :loading="collectionPoints.length == 0"
+              label="Luogo di Rilascio"
+              class="mt-2"
+              :items="collectionPoints.concat([{name: 'Veicolo', id: 0}])"
+              item-title="name"
+              item-value="id"
+            />
+          </div>
         </template>
         <v-row>
           <v-col
@@ -182,7 +184,6 @@ import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import orderUtils from '@/utils/order';
 import { useRouter } from 'vue-router';
-import storesUtils from '@/utils/stores';
 import validation from '@/utils/validation';
 import { useOrderStore } from '@/stores/order';
 import { useScheduleItemStore } from '@/stores/scheduleItem';
