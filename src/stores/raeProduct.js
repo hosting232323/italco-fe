@@ -2,34 +2,41 @@ import http from '@/utils/http';
 import { defineStore } from 'pinia';
 import storesUtils from '@/utils/stores';
 
-export const useLogStore = defineStore('log', {
+export const useRaeProductStore = defineStore('raeProduct', {
   state: () => ({
     list: [],
     filters: {},
     ready: false,
-    activePopUp: false,
-    selectedLog: false,
     filtersSetting: {
       doubleDates: false,
-      dateType: Object.keys(storesUtils.LOG_DATE_FILTER_TYPES)[0]
+      dateType: Object.keys(storesUtils.RAE_PRODUCT_DATE_FILTER_TYPES)[0]
     }
   }),
   actions: {
     initList(router) {
       http.postRequest(
-        'log/filter',
+        'rae/product/filter',
         {filters: storesUtils.formatFilters(
           this.filters,
-          storesUtils.LOG_DATE_FILTER_TYPES,
-          'Log'
+          storesUtils.RAE_PRODUCT_DATE_FILTER_TYPES,
+          'Order'
         )},
         this.setList,
         'POST',
         router
       );
     },
+    deleteElement(element, router, func) {
+      http.getRequest(
+        `rae/product/${element.id}`,
+        {},
+        func,
+        'DELETE',
+        router
+      );
+    },
     setList(data) {
-      this.list = data.logs;
+      this.list = data.rae_products;
       this.ready = true;
     }
   }

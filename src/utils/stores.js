@@ -16,31 +16,80 @@ const exclude_keys = (obj, keys) => {
 
 
 const ORDER_DATE_FILTER_TYPES = {
-  work_date: 'Data Work',
-  booking_date: 'Data Booking',
-  dpc: 'Data Prevista dal Cliente',
-  drc: 'Data Richiesta dal Cliente',
-  confirmation_date: 'Data di Conferma',
-  completion_date: 'Data di Completamento',
-  created_at: 'Data di Creazione',
-  updated_at: 'Data di Ultima Modifica'
+  work_date: {
+    label: 'Data Work',
+    entity: 'Order'
+  },
+  booking_date: {
+    label: 'Data Booking',
+    entity: 'Order'
+  },
+  dpc: {
+    label: 'Data Prevista dal Cliente',
+    entity: 'Order'
+  },
+  drc: {
+    label: 'Data Richiesta dal Cliente',
+    entity: 'Order'
+  },
+  confirmation_date: {
+    label: 'Data di Conferma',
+    entity: 'Order'
+  },
+  completion_date: {
+    label: 'Data di Completamento',
+    entity: 'Order'
+  },
+  created_at: {
+    label: 'Data di Creazione',
+    entity: 'Order'
+  },
+  updated_at: {
+    label: 'Data di Ultima Modifica',
+    entity: 'Order'
+  }
 };
 
 
 const SCHEDULE_DATE_FILTER_TYPES = {
-  date: 'Data del borderò',
-  created_at: 'Data di Creazione',
-  updated_at: 'Data di Ultima Modifica'
+  date: {
+    label: 'Data del Borderò',
+    entity: 'Schedule'
+  },
+  created_at: {
+    label: 'Data di Creazione',
+    entity: 'Schedule'
+  },
+  updated_at: {
+    label: 'Data di Ultima Modifica',
+    entity: 'Schedule'
+  }
 };
 
 
 const LOG_DATE_FILTER_TYPES = {
-  created_at: 'Data di Creazione'
+  created_at: {
+    label: 'Data di Creazione',
+    entity: 'Log'
+  }
 };
 
 
-const formatFilters = (filters, keys, element) => {
-  const formattedKeys = Object.keys(keys).map(key => `${element}.${key}`);
+const RAE_PRODUCT_DATE_FILTER_TYPES = {
+  created_at: {
+    label: 'Data di Creazione',
+    entity: 'RaeProduct'
+  },
+  date: {
+    label: 'Data del Borderò',
+    entity: 'Schedule'
+  }
+};
+
+
+const formatFilters = (filters, dateFilterType) => {
+  const formattedKeys = Object.keys(dateFilterType)
+    .map(key => `${dateFilterType[key].entity}.${key}`);
 
   return Object.keys(filters)
     .filter(key => {
@@ -71,5 +120,6 @@ export default {
   formatFilters,
   ORDER_DATE_FILTER_TYPES,
   SCHEDULE_DATE_FILTER_TYPES,
-  LOG_DATE_FILTER_TYPES
+  LOG_DATE_FILTER_TYPES,
+  RAE_PRODUCT_DATE_FILTER_TYPES
 };
