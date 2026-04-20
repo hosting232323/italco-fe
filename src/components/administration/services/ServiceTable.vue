@@ -73,7 +73,7 @@ import { useServiceStore } from '@/stores/service';
 
 const { activatorProps } = defineProps({
   activatorProps: {
-    type: Boolean,
+    type: Object,
     required: true
   }
 });
