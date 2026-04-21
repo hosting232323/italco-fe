@@ -95,7 +95,7 @@
               </div>
             </span>
             <span v-else>
-              <b>Ordine #{{ item.id }}</b><br><br>
+              <b>Ordine #{{ item.order_id }}</b><br><br>
               <b>Destinatario:</b> {{ item.addressee || item.name }}<br>
               <span>
                 {{ item.address || 'N/A' }}, {{ item.cap || 'N/A' }}

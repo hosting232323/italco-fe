@@ -1,7 +1,7 @@
 import http from '@/utils/http';
 import { defineStore } from 'pinia';
 
-export const useScheduleItemStore = defineStore('schedule', {
+export const useScheduleItemStore = defineStore('scheduleItem', {
   state: () => ({
     list: [],
     element: {},

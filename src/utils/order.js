@@ -24,11 +24,6 @@ const LABELS = [
     icon: 'mdi-truck-delivery'
   },
   {
-    value: 'At Warehouse',
-    title: 'In Magazzino',
-    color: 'orange'
-  },
-  {
     value: 'Delivered',
     title: 'Completato',
     color: 'green',
@@ -45,39 +40,9 @@ const LABELS = [
     color: 'orange'
   },
   {
-    value: 'Redelivery',
+    value: 'Rescheduled',
     title: 'Riprogrammato',
     color: 'green'
-  },
-  { 
-    value: 'Replacement',
-    title: 'Sostituzione',
-    color: 'purple'
-  },
-  { 
-    value: 'Cancelled', 
-    title: 'Annullato', 
-    color: 'red' 
-  },
-  { 
-    value: 'Urgent', 
-    title: 'Urgente', 
-    color: 'red' 
-  },
-  { 
-    value: 'Verification', 
-    title: 'In Verifica', 
-    color: 'yellow' 
-  },
-  { 
-    value: 'Cancelled to be Refunded', 
-    title: 'Annullato da rimborsare', 
-    color: 'red' 
-  },
-  { 
-    value: 'Deleted', 
-    title: 'Eliminato', 
-    color: 'grey' 
   }
 ];
 

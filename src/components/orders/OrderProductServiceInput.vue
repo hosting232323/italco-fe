@@ -208,8 +208,8 @@ const addProduct = async () => {
   };
   if (isRae.value)
     order.value.products[selectedProduct.value].rae_product= {
-      group_id: selectedRaeProductGroup.value,
-      quantity: raeQuantity.value
+      quantity: raeQuantity.value,
+      rae_product_group_id: selectedRaeProductGroup.value,
     };
   resetFormRow();
 };
