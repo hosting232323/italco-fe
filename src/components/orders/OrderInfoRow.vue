@@ -88,10 +88,10 @@ const { item } = defineProps({
 const theme = useTheme();
 const router = useRouter();
 const confirmLoading = ref({});
-const userStore = useUserStore();
-const orderStore = useOrderStore();
 const emits = defineEmits(['open-statuses-popup']);
 
+const userStore = useUserStore();
+const orderStore = useOrderStore();
 const { role } = storeToRefs(userStore);
 
 const confirmOrder = (order) => {
