@@ -94,7 +94,6 @@ const emits = defineEmits(['open-statuses-popup']);
 
 const { role } = storeToRefs(userStore);
 
-
 const confirmOrder = (order) => {
   confirmLoading.value[order.id] = true;
   http.postRequest(`order/${order.id}`, {
