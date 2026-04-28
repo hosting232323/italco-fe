@@ -37,8 +37,8 @@
       <v-chip
         :color="orderUtils.LABELS.find(label => label.value == item.status).color"
         style="font-size: 12px; height: 30px;"
-        :style="{ cursor: role === 'admin' ? 'pointer' : 'default' }"
-        @click="role === 'admin' && emits('open-statuses-popup', item)"
+        :style="{ cursor: role == 'Customer' ? 'default' : 'pointer' }"
+        @click="role != 'Customer' && emits('open-statuses-popup', item)"
       >
         {{ orderUtils.LABELS.find(label => label.value == item.status).title }}
       </v-chip>
