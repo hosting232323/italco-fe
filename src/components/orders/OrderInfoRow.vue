@@ -37,7 +37,8 @@
       <v-chip
         :color="orderUtils.LABELS.find(label => label.value == item.status).color"
         style="font-size: 12px; height: 30px;"
-        @click="emits('open-statuses-popup', item)"
+        :style="{ cursor: role == 'Customer' ? 'default' : 'pointer' }"
+        @click="role != 'Customer' && emits('open-statuses-popup', item)"
       >
         {{ orderUtils.LABELS.find(label => label.value == item.status).title }}
       </v-chip>
@@ -71,8 +72,10 @@
 import { ref } from 'vue';
 import http from '@/utils/http';
 import { useTheme } from 'vuetify';
+import { storeToRefs } from 'pinia';
 import orderUtils from '@/utils/order';
 import { useRouter } from 'vue-router';
+import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
 
 const { item } = defineProps({
@@ -85,8 +88,11 @@ const { item } = defineProps({
 const theme = useTheme();
 const router = useRouter();
 const confirmLoading = ref({});
-const orderStore = useOrderStore();
 const emits = defineEmits(['open-statuses-popup']);
+
+const userStore = useUserStore();
+const orderStore = useOrderStore();
+const { role } = storeToRefs(userStore);
 
 const confirmOrder = (order) => {
   confirmLoading.value[order.id] = true;
