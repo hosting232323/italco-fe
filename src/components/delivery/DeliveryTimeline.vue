@@ -80,7 +80,7 @@
         </div>
         <v-card style="max-width: 1200px;">
           <v-card-text>
-            <span v-if="item.collection_point_id">
+            <span v-if="item.operation_type == 'CollectionPoint'">
               <b>Punto di ritiro</b><br><br>
               <div
                 class="products-container"
@@ -94,7 +94,7 @@
                 </div>
               </div>
             </span>
-            <span v-else>
+            <span v-else-if="item.operation_type == 'Order'">
               <b>Ordine #{{ item.order_id }}</b><br><br>
               <b>Destinatario:</b> {{ item.addressee || item.name }}<br>
               <span>
@@ -118,6 +118,8 @@
                 </div>
                 <div :style="{ width: isMobile ? '100%' : '50%'}">
                   <b>Stato:</b> {{ orderUtils.LABELS.find(label => label.value == item.status)?.title }}<br>
+                  <template v-if="item.anomaly"><b>Anomalia</b><br></template>
+                  <template v-if="item.delay"><b>Ritardo</b><br></template>
                   <b>Tipo:</b> {{ orderUtils.TYPES.find(type => type.value == item.type)?.title }}<br><br>
                   <b>Punti di Ritiro</b>
                   <div style="font-size: smaller;">
@@ -228,15 +230,16 @@ const completeOrder = (item, status) => {
 };
 
 const timelineColor = (order) => {
-  if (order.completed) return 'green';
-  if (order.anomaly) return 'red';
+  if (order.completed && !order.status == 'Not Delivered') return 'green';
+  if (order.anomaly) return 'orange';
   if (order.delay) return 'orange';
 
   switch (order.status) {
   case 'Scheduled': return 'blue';
   case 'Booking': return 'indigo';
-  case 'Completed': return 'green';
-  case 'Cancelled': return 'grey';
+  case 'Delivered': return 'green';
+  case 'To Reschedule': return 'orange';
+  case 'Not Delivered': return 'red';
   default: return 'primary';
   }
 };
@@ -248,8 +251,9 @@ const timelineIcon = (order) => {
   switch (order.status) {
   case 'Scheduled': return 'mdi-truck-outline';
   case 'Booking': return 'mdi-truck-fast';
-  case 'Completed': return 'mdi-check-circle';
-  case 'Cancelled': return 'mdi-close-circle';
+  case 'Delivered': return 'mdi-check-circle';
+  case 'To Reschedule': return 'mdi-close-circle';
+  case 'Not Delivered': return 'mdi-close-circle';
   default: return 'mdi-package-variant';
   }
 };
