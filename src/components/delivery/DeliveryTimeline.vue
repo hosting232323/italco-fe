@@ -222,7 +222,7 @@ const completeCollectionPoint = (item) => {
 };
 
 const completeOrder = (item, status) => {
-  order.value = item;
+  order.value = { ...item };
   order.value.status = status;
   showForm.value = true;
   activeSwipeIndex.value = null;

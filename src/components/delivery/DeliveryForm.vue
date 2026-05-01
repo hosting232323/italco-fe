@@ -30,7 +30,7 @@
               {{ order.products[product].services.join(', ') }}
             </i>
             <v-select
-              v-model="order.products[product].new_collection_point_id"
+              v-model="order.products[product].release_collection_point_id"
               :loading="collectionPoints.length == 0"
               label="Luogo di Rilascio"
               class="mt-2"
