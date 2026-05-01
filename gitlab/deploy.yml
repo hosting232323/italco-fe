@@ -32,7 +32,7 @@
 deploy_test:
   extends: .deploy
   tags:
-    - deploy-local
+    - deploy-local-ralts
   when: manual
   variables:
     PJ_NAME: "${PROJECT_NAME}-test"
@@ -47,7 +47,7 @@ deploy_test:
 deploy_prod:
   extends: .deploy
   tags:
-    - deploy-local
+    - deploy-local-ralts
   when: manual
   only:
     - main
