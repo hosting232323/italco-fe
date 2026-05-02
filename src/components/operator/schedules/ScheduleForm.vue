@@ -185,6 +185,7 @@ const addOrder = () => {
 
   Object.values(orderToAdd.products).forEach((product) => {
     if (
+      product.collection_point &&
       !schedule.value.schedule_items.some(collectionPoint =>
         collectionPoint.operation_type === 'CollectionPoint' && collectionPoint.collection_point_id === product.collection_point.id)
     )
