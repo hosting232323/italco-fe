@@ -121,14 +121,16 @@
                   <template v-if="item.anomaly"><b>Anomalia</b><br></template>
                   <template v-if="item.delay"><b>Ritardo</b><br></template>
                   <b>Tipo:</b> {{ orderUtils.TYPES.find(type => type.value == item.type)?.title }}<br><br>
-                  <b>Punti di Ritiro</b>
-                  <div style="font-size: smaller;">
-                    {{
-                      !item.products ? 'N/D' : [...new Set(Object.values(item.products).map(
-                        product => product.collection_point.name
-                      ))].join(', ')
-                    }}
-                  </div>
+                  <template v-if="item.products && !Object.values(item.products).every(product => product.transport)">
+                    <b>Punti di Ritiro</b>
+                    <div style="font-size: smaller;">
+                      {{ [...new Set(
+                          Object.values(item.products)
+                          .filter(product => product.collection_point)
+                          .map(product => scheduleItems.find(collectionPoint => collectionPoint.collection_point_id === product.collection_point.id)?.name)
+                      )].join(', ') }}
+                    </div>
+                  </template>
                 </div>
               </div>
               <br>
