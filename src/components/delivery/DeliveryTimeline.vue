@@ -125,7 +125,7 @@
                     <b>Punti di Ritiro</b>
                     <div style="font-size: smaller;">
                       {{ [...new Set(
-                          Object.values(item.products)
+                        Object.values(item.products)
                           .filter(product => product.collection_point)
                           .map(product => scheduleItems.find(collectionPoint => collectionPoint.collection_point_id === product.collection_point.id)?.name)
                       )].join(', ') }}

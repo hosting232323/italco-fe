@@ -152,7 +152,7 @@ const removeOrder = (order) => {
   const removedOrderCollectionPointIds = new Set(
     Object.values(order.products).filter(product => product.collection_point)
       .map(product => product.collection_point.id)
-    );
+  );
 
   schedule.value.schedule_items = remainingItems.filter(item =>
     item.operation_type !== 'CollectionPoint' ||
