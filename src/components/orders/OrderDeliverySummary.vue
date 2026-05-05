@@ -61,12 +61,21 @@
             />
             <v-btn
               v-if="photoId(photo) != null"
-              class="mt-2"
+              class="mt-2 mr-2"
               size="small"
               variant="tonal"
               @click="downloadPhotoPdf(photo)"
             >
               Scarica PDF
+            </v-btn>
+            <v-btn
+              v-if="photoId(photo) != null"
+              class="mt-2"
+              size="small"
+              variant="tonal"
+              @click="downloadPhotoPdfScanned(photo)"
+            >
+              Scarica PDF scannerizzato
             </v-btn>
           </div>
         </div>
@@ -152,6 +161,25 @@ const downloadPhotoPdf = (photo) => {
       const a = document.createElement('a');
       a.href = url;
       a.download = `bolla_ordine_${order.id}_foto_${id}.pdf`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    }
+  }, 'GET', router);
+};
+
+const downloadPhotoPdfScanned = (photo) => {
+  const id = photoId(photo);
+  if (id == null)
+    return;
+  http.getRequest(`export/order-photo-scanned/${id}`, {}, function (data) {
+    if (data.status == 'ko')
+      alert(data.error);
+    else {
+      const blob = new Blob([data], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `bolla_ordine_${order.id}_foto_${id}_scannerizzato.pdf`;
       a.click();
       window.URL.revokeObjectURL(url);
     }
