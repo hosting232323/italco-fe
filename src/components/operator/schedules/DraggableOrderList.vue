@@ -33,6 +33,26 @@
               mdi-pencil
             </v-icon>
           </template>
+          <v-icon
+            v-if="element.products && Object.values(element.products).some(product => product.transport)"
+            size="16"
+            class="ml-1"
+            style="cursor:pointer"
+            title="Ordine con prodotti sul veicolo"
+          >
+            mdi-truck-delivery
+          </v-icon>
+          <v-icon
+            v-if="element.products && Object.values(element.products).some(product =>
+              product.services.some(service => service.professional)
+            )"
+            size="16"
+            class="ml-1"
+            style="cursor:pointer"
+            title="Ordine con servizi professionali"
+          >
+            mdi-star
+          </v-icon>
         </v-list-item-title>
       </v-list-item>
     </template>

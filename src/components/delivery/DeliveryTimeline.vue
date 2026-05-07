@@ -58,7 +58,7 @@
               Completa prima il punto di ritiro
             </button>
             <button
-              v-if="['Delivered', 'Not Delivered', 'At Warehouse', 'To Reschedule'].includes(item.status)"
+              v-if="['Delivered', 'To Reschedule'].includes(item.status)"
               style="cursor: default;"
             >
               Ordine completato
@@ -80,7 +80,7 @@
         </div>
         <v-card style="max-width: 1200px;">
           <v-card-text>
-            <span v-if="item.collection_point_id">
+            <span v-if="item.operation_type == 'CollectionPoint'">
               <b>Punto di ritiro</b><br><br>
               <div
                 class="products-container"
@@ -94,7 +94,7 @@
                 </div>
               </div>
             </span>
-            <span v-else>
+            <span v-else-if="item.operation_type == 'Order'">
               <b>Ordine #{{ item.order_id }}</b><br><br>
               <b>Destinatario:</b> {{ item.addressee || item.name }}<br>
               <span>
@@ -118,17 +118,19 @@
                 </div>
                 <div :style="{ width: isMobile ? '100%' : '50%'}">
                   <b>Stato:</b> {{ orderUtils.LABELS.find(label => label.value == item.status)?.title }}<br>
+                  <template v-if="item.anomaly"><b>Anomalia</b><br></template>
+                  <template v-if="item.delay"><b>Ritardo</b><br></template>
                   <b>Tipo:</b> {{ orderUtils.TYPES.find(type => type.value == item.type)?.title }}<br><br>
-                  <b>Punti di Ritiro</b>
-                  <div style="font-size: smaller;">
-                    {{
-                      !item.products ? 'N/D' : [...new Set(Object.values(item.products).map(
-                        product => scheduleItems.find(
-                          scheduleItem => scheduleItem.collection_point_id == product.collection_point.id
-                        ).name
-                      ))].join(', ')
-                    }}
-                  </div>
+                  <template v-if="item.products && !Object.values(item.products).every(product => product.transport)">
+                    <b>Punti di Ritiro</b>
+                    <div style="font-size: smaller;">
+                      {{ [...new Set(
+                        Object.values(item.products)
+                          .filter(product => product.collection_point)
+                          .map(product => scheduleItems.find(collectionPoint => collectionPoint.collection_point_id === product.collection_point.id)?.name)
+                      )].join(', ') }}
+                    </div>
+                  </template>
                 </div>
               </div>
               <br>
@@ -170,8 +172,8 @@ const { ready, showForm } = storeToRefs(scheduleItemStore);
 const scheduleItems = storesUtils.getStoreList(scheduleItemStore, router);
 
 const STATUS_MAP = {
-  'Booking': ['Delivered', 'Not Delivered', 'At Warehouse', 'To Reschedule'],
-  'At Warehouse': ['Booking', 'To Reschedule']
+  'Booking': ['Delivered', 'Not Delivered', 'To Reschedule'],
+  'Not Delivered': ['To Reschedule']
 };
 
 const getAvailableStatuses = (item) => {
@@ -222,7 +224,7 @@ const completeCollectionPoint = (item) => {
 };
 
 const completeOrder = (item, status) => {
-  order.value = item;
+  order.value = { ...item };
   order.value.status = status;
   showForm.value = true;
   activeSwipeIndex.value = null;
@@ -230,17 +232,15 @@ const completeOrder = (item, status) => {
 };
 
 const timelineColor = (order) => {
-  if (order.completed) return 'green';
-  if (order.anomaly) return 'red';
+  if (order.anomaly) return 'orange';
   if (order.delay) return 'orange';
 
   switch (order.status) {
-  case 'In Progress': return 'blue';
-  case 'On Board': return 'indigo';
-  case 'At Warehouse': return 'cyan';
-  case 'Completed': return 'green';
-  case 'Cancelled': return 'grey';
-  default: return 'primary';
+  case 'Scheduled': return 'blue';
+  case 'Booking': return 'indigo';
+  case 'Delivered', 'To Reschedule': return 'green';
+  case 'Not Delivered': return 'red';
+  default: return order.completed ? 'green' : 'primary';
   }
 };
 
@@ -249,10 +249,10 @@ const timelineIcon = (order) => {
   if (order.delay) return 'mdi-clock-alert';
 
   switch (order.status) {
-  case 'In Progress': return 'mdi-truck-outline';
-  case 'On Board': return 'mdi-truck-fast';
-  case 'Completed': return 'mdi-check-circle';
-  case 'Cancelled': return 'mdi-close-circle';
+  case 'Scheduled': return 'mdi-truck-outline';
+  case 'Booking': return 'mdi-truck-fast';
+  case 'Delivered', 'To Reschedule': return 'mdi-check-circle';
+  case 'Not Delivered': return 'mdi-close-circle';
   default: return 'mdi-package-variant';
   }
 };
