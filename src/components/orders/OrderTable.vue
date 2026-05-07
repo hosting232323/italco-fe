@@ -217,9 +217,7 @@ const openStatusesPopup = (item) => {
   popUpType.value = 'message';
   scheduleFormMessage.value = 'Loading...';
 
-  http.getRequest(`order/get-statuses/${item.id}`, {
-    order_id: item.id
-  }, (data) => {
+  http.getRequest(`order/statuses/${item.id}`, {}, (data) => {
     popUpType.value = 'statuses';
     statuses.value = data.statuses;
   }, 'GET', router);

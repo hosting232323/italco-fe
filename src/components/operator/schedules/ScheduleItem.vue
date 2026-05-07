@@ -144,18 +144,27 @@ if (!element.id) {
 
 const removeOrder = (order) => {
   const remainingItems = schedule.value.schedule_items.filter(
-    item => !(item.operation_type === 'Order' && item.order_id === order.order_id));
-
-  const usedCollectionPointIds = new Set(remainingItems.filter(item => item.operation_type === 'Order')
-    .flatMap(item => Object.values(item.products).map(product => product.collection_point.id)));
-
-  const removedOrderCollectionPointIds = new Set(Object.values(order.products).map(product => product.collection_point.id));
-
-  schedule.value.schedule_items = remainingItems.filter(item =>
-    item.operation_type !== 'CollectionPoint' ||
-    usedCollectionPointIds.has(item.collection_point_id) ||
-    !removedOrderCollectionPointIds.has(item.collection_point_id)
+    item => !(item.operation_type === 'Order' && item.order_id === order.order_id)
   );
+
+  const usedCollectionPointIds = new Set(
+    remainingItems
+      .filter(item => item.operation_type === 'Order')
+      .flatMap(item =>
+        Object.values(item.products || {})
+          .filter(product => product.collection_point)
+          .map(product => product.collection_point.id)
+      )
+  );
+
+  schedule.value.schedule_items = remainingItems.filter(item => {
+    if (item.operation_type === 'Order')
+      return true;
+    else if (item.operation_type === 'CollectionPoint')
+      return usedCollectionPointIds.has(item.id);
+    else
+      return false;
+  });
 };
 
 const updateAddress = (value, element) => {
