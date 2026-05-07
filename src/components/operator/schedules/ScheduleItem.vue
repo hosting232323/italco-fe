@@ -105,9 +105,9 @@
 <script setup>
 import GooglePlacesAutocomplete from '@/components/GooglePlacesAutocomplete';
 
-import { ref, computed } from 'vue';
 import http from '@/utils/http';
 import { useTheme } from 'vuetify';
+import { ref, computed } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
@@ -135,9 +135,8 @@ const isMobile = mobile.setupMobileUtils();
 const orderStore = useOrderStore();
 const scheduleStore = useScheduleStore();
 const { element: schedule } = storeToRefs(scheduleStore);
-const element = computed(() =>
-  schedule.value.schedule_items.find(item => item.index === index)
-);
+const element = computed(() => schedule.value.schedule_items.find(item => item.index === index));
+
 if (!element.value?.id) {
   element.value.start_time_slot = '08:00';
   element.value.end_time_slot = '09:00';

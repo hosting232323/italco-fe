@@ -1,5 +1,5 @@
 lint_frontend:
-  stage: lint
+  stage: rattata-lint
   image: node:22
   interruptible: true
   allow_failure: true
