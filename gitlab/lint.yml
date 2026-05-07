@@ -1,10 +1,10 @@
 lint_frontend:
-  stage: rattata-lint
+  stage: lint
   image: node:22
   interruptible: true
   allow_failure: true
   tags:
-    - linux
+    - rattata-lint
   rules:
     - if: '$CI_COMMIT_BRANCH != "main"'
   script:
