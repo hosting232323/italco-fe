@@ -105,9 +105,9 @@
 <script setup>
 import GooglePlacesAutocomplete from '@/components/GooglePlacesAutocomplete';
 
-import { ref } from 'vue';
 import http from '@/utils/http';
 import { useTheme } from 'vuetify';
+import { ref, computed } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
@@ -135,11 +135,11 @@ const isMobile = mobile.setupMobileUtils();
 const orderStore = useOrderStore();
 const scheduleStore = useScheduleStore();
 const { element: schedule } = storeToRefs(scheduleStore);
-const element = schedule.value.schedule_items.find(item => item.index === index);
+const element = computed(() => schedule.value.schedule_items.find(item => item.index === index));
 
-if (!element.id) {
-  element.start_time_slot = '08:00';
-  element.end_time_slot = '09:00';
+if (!element.value?.id) {
+  element.value.start_time_slot = '08:00';
+  element.value.end_time_slot = '09:00';
 }
 
 const removeOrder = (order) => {
@@ -161,7 +161,7 @@ const removeOrder = (order) => {
     if (item.operation_type === 'Order')
       return true;
     else if (item.operation_type === 'CollectionPoint')
-      return usedCollectionPointIds.has(item.id);
+      return usedCollectionPointIds.has(item.collection_point_id);
     else
       return false;
   });
