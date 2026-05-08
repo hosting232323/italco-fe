@@ -8,7 +8,6 @@
   <v-data-table
     v-else
     :items="geographicZones"
-    :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
     :headers="[
       { title: 'Nome', value: 'name', sortable: false },
       { title: 'CAP aggiunti e rimossi', value: 'codes', sortable: false },

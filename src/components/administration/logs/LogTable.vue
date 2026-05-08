@@ -2,7 +2,6 @@
   <v-data-table
     v-if="ready"
     :items="logs"
-    :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
     :headers="[
       { title: 'ID', value: 'logs.id', sortable: false },
       { title: 'Data', value: 'logs.created_at', sortable: false },
