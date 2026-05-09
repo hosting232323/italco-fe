@@ -13,7 +13,6 @@
       <v-data-table
         v-else
         :items="users"
-        :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
         :headers="[
           { title: 'ID', value: 'id', sortable: false },
           { title: 'Nickname', value: 'nickname', sortable: false },

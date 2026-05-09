@@ -38,7 +38,6 @@
         v-else
         v-model="schedule.orders"
         :items="orders"
-        :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
         :headers="getHeaders()"
         :show-select="['Admin', 'Operator'].includes(role)"
         :items-per-page="25"

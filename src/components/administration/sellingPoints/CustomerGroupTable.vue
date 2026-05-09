@@ -8,7 +8,6 @@
   <v-data-table
     v-else
     :items="customerGroups"
-    :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
     :headers="[
       { title: 'Nome', value: 'name', sortable: false },
       { title: 'Utenti', value: 'users', sortable: false },

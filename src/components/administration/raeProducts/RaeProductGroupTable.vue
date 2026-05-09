@@ -8,7 +8,6 @@
   <v-data-table
     v-else
     :items="raeProductGroups"
-    :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
     :headers="[
       { title: 'ID', value: 'id', sortable: false },
       { title: 'Nome', value: 'name', sortable: false },

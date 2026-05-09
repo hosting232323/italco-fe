@@ -8,7 +8,6 @@
   <v-data-table
     v-else
     :items="customerRules"
-    :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
     :headers="[
       { title: 'Utente', value: 'nickname', sortable: false },
       { title: 'Regole', value: 'rules', sortable: false },

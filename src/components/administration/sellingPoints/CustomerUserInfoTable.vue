@@ -8,7 +8,6 @@
   <v-data-table
     v-else
     :items="users.filter(user => user.role == 'Customer')"
-    :style="{ '--item-bg-color': theme.current.value.secondaryColor }"
     :headers="[
       { title: 'ID', value: 'id', sortable: false },
       { title: 'Nickname', value: 'nickname', sortable: false },
