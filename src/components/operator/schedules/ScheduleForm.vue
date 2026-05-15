@@ -94,7 +94,7 @@
             </draggable>
             <FormButtons
               :loading="loading"
-              @cancel="emits(fromSchedulation ? 'go-back' : 'cancel')"
+              @cancel="handleCancel"
             />
           </v-form>
         </v-col>
@@ -238,6 +238,10 @@ const createScheduleItem = (element, type, index = undefined) => {
   if (type == 'Order') item.order_id = element.id;
   else item.collection_point_id = element.id;
   return item;
+};
+
+const handleCancel = () => {
+ emits(fromSchedulation.fromSchedulation ? 'go-back' : 'cancel');
 };
 
 watch(
