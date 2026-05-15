@@ -241,7 +241,7 @@ const createScheduleItem = (element, type, index = undefined) => {
 };
 
 const handleCancel = () => {
- emits(fromSchedulation.fromSchedulation ? 'go-back' : 'cancel');
+  emits(fromSchedulation.fromSchedulation ? 'go-back' : 'cancel');
 };
 
 watch(
