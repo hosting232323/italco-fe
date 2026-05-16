@@ -94,7 +94,7 @@
             </draggable>
             <FormButtons
               :loading="loading"
-              @cancel="handleCancel"
+              @cancel="emits(fromSchedulation ? 'go-back' : 'cancel')"
             />
           </v-form>
         </v-col>
@@ -131,7 +131,7 @@ import { useScheduleStore } from '@/stores/schedule';
 import { useTransportStore } from '@/stores/transport';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
-const fromSchedulation = defineProps({
+const { fromSchedulation } = defineProps({
   fromSchedulation: {
     type: Boolean,
     default: false
@@ -238,10 +238,6 @@ const createScheduleItem = (element, type, index = undefined) => {
   if (type == 'Order') item.order_id = element.id;
   else item.collection_point_id = element.id;
   return item;
-};
-
-const handleCancel = () => {
-  emits(fromSchedulation.fromSchedulation ? 'go-back' : 'cancel');
 };
 
 watch(
