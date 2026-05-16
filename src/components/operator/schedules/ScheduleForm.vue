@@ -131,7 +131,7 @@ import { useScheduleStore } from '@/stores/schedule';
 import { useTransportStore } from '@/stores/transport';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
-const fromSchedulation = defineProps({
+const { fromSchedulation } = defineProps({
   fromSchedulation: {
     type: Boolean,
     default: false
