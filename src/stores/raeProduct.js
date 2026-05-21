@@ -5,8 +5,10 @@ import storesUtils from '@/utils/stores';
 export const useRaeProductStore = defineStore('raeProduct', {
   state: () => ({
     list: [],
+    element: {},
     filters: {},
     ready: false,
+    activePopUpForm: false,
     filtersSetting: {
       doubleDates: false,
       dateType: Object.keys(storesUtils.RAE_PRODUCT_DATE_FILTER_TYPES)[0]

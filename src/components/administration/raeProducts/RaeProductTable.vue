@@ -51,6 +51,13 @@
         :color="theme.current.value.primaryColor"
         @click="deleteItem(item)"
       />
+      <v-btn
+        v-if="item.status == 'Emitted'"
+        icon="mdi-pencil"
+        variant="text"
+        v-bind="activatorProps"
+        @click="rae = item"
+      />
     </template>
   </v-data-table>
 </template>
@@ -65,13 +72,20 @@ import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import { useRaeProductStore } from '@/stores/raeProduct';
 
+const { activatorProps } = defineProps({
+  activatorProps: {
+    type: Object,
+    required: true
+  }
+});
+
 const theme = useTheme();
 const router = useRouter();
 const deleteLoading = reactive({});
 const exportLoading = reactive({});
 
 const raeProductStore = useRaeProductStore();
-const { ready } = storeToRefs(raeProductStore);
+const { element: rae, ready } = storeToRefs(raeProductStore);
 const raeProducts = storesUtils.getStoreList(raeProductStore, router);
 
 const raeExport = (item) => {
