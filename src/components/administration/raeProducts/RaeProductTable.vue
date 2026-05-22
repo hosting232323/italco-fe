@@ -52,9 +52,10 @@
         @click="deleteItem(item)"
       />
       <v-btn
-        v-if="item.status == 'Emitted'"
+        v-if="item.status == 'Emitted' && orderUtils.isTerminatedOrder(item.order)"
         icon="mdi-pencil"
         variant="text"
+        :color="theme.current.value.primaryColor"
         v-bind="activatorProps"
         @click="rae = item"
       />
