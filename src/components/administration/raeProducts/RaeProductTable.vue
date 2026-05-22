@@ -36,7 +36,7 @@
     </template>
     <template #[`item.actions`]="{ item }">
       <v-btn
-        v-if="item.order"
+        v-if="item.order && item.status != 'Generated'"
         icon="mdi-file-export"
         variant="text"
         :loading="!!exportLoading[item.id]"
@@ -44,7 +44,7 @@
         @click="raeExport(item)"
       />
       <v-btn
-        v-else
+        v-else-if="!item.order"
         icon="mdi-delete"
         variant="text"
         :loading="!!deleteLoading[item.id]"

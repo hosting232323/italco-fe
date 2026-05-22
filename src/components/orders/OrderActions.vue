@@ -73,7 +73,7 @@
           </v-col>
           <v-col cols="3">
             <v-btn
-              v-if="Object.values(item.products).some(product => product.rae_product)"
+              v-if="Object.values(item.products).some(product => product.rae_product) && !['Acquired', 'Booked'].includes(item.status)"
               icon="mdi-human-dolly"
               variant="text"
               :loading="raeLoading"
