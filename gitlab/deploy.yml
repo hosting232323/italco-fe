@@ -1,5 +1,8 @@
 .deploy:
   stage: deploy
+  when: manual
+  tags:
+    - "${SERVER_NAME}-deploy"
   script:
     - |
       docker build \
@@ -31,9 +34,6 @@
 
 deploy_test:
   extends: .deploy
-  tags:
-    - deploy-local-ralts
-  when: manual
   variables:
     PJ_NAME: "${PROJECT_NAME}-test"
     CONTAINER_ACTIVE: "${PROJECT_NAME}-test"
@@ -46,9 +46,6 @@ deploy_test:
 
 deploy_prod:
   extends: .deploy
-  tags:
-    - deploy-local-ralts
-  when: manual
   only:
     - main
   variables:
