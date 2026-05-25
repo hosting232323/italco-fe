@@ -53,7 +53,7 @@ const ORDER_DATE_FILTER_TYPES = {
 
 const SCHEDULE_DATE_FILTER_TYPES = {
   date: {
-    label: 'Data del Borderò',
+    label: 'Data DTR',
     entity: 'Schedule'
   },
   created_at: {
@@ -81,7 +81,7 @@ const RAE_PRODUCT_DATE_FILTER_TYPES = {
     entity: 'RaeProduct'
   },
   date: {
-    label: 'Data del Borderò',
+    label: 'Data DTR',
     entity: 'Schedule'
   }
 };

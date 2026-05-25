@@ -172,7 +172,7 @@ const isTerminatedOrder = (order) => {
     'To Reschedule',
     'Rescheduled'
   ]).has(order.status);
-}
+};
 
 export default {
   LABELS,
