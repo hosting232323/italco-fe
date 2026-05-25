@@ -191,12 +191,21 @@ const copyOrderLink = (id) => {
 };
 
 const copyOrder = (selectedOrder) => {
-  const { user, id, ...rest } = selectedOrder;
+  const { user, id, products, ...rest } = selectedOrder;
+  const filteredProducts = Object.fromEntries(
+    Object.entries(products).filter(([_, product]) => {
+      const rae = product.rae_product;
+      if (!rae) return true;
+      if (rae.status === 'Annulled') return true;
+    })
+  );
+
   updatedOrder.value = {
     user,
     user_id: user.id,
     booking_date: null,
     cloned_order_id: id,
+    products: filteredProducts,
     ...Object.fromEntries(
       Object.entries(rest).filter(([key]) =>
         ![
