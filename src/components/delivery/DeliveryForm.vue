@@ -34,6 +34,7 @@
               :loading="collectionPoints.length == 0"
               label="Luogo di Rilascio"
               class="mt-2"
+              :rules="validation.requiredRulesWithZero"
               :items="collectionPoints.concat([{name: 'Veicolo', id: 0}])"
               item-title="name"
               item-value="id"

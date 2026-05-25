@@ -64,8 +64,8 @@
           <v-col cols="3">
             <v-btn
               v-if="item.status == 'To Reschedule' &&
-                !Object.values(item.products).some(
-                  product => product.rae_product?.status === 'Emitted'
+                Object.values(item.products).every(
+                  product => !product.rae_product || product.rae_product.status == 'Annulled'
                 )"
               icon="mdi-content-copy"
               variant="text"

@@ -8,7 +8,6 @@ export const useRaeProductStore = defineStore('raeProduct', {
     element: {},
     filters: {},
     ready: false,
-    activePopUpForm: false,
     filtersSetting: {
       doubleDates: false,
       dateType: Object.keys(storesUtils.RAE_PRODUCT_DATE_FILTER_TYPES)[0]
@@ -25,6 +24,15 @@ export const useRaeProductStore = defineStore('raeProduct', {
         )},
         this.setList,
         'POST',
+        router
+      );
+    },
+    updateElement(router, func) {
+      http.postRequest(
+        `rae/product/${this.element.id}`,
+        {status: this.element.status},
+        func,
+        'PUT',
         router
       );
     },

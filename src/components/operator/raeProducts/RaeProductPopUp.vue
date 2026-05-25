@@ -14,15 +14,22 @@
           :items="orderUtils.RAE_STATUS.filter(
             status => ['LDR', 'Annulled'].includes(status.value)
           )"
-          :rules="validation.requiredRules"
+          :rules="validation.requiredRules.concat([
+            (value) => {
+              if (value != 'Emitted') return true;
+              return 'Aggiorna stato';
+            }
+          ])"
         />
         <v-file-input
           label="File PDF"
           accept="application/pdf"
-          :rules="validation.requiredRules"
           :error-messages="fileError"
-          @change="onFilesSelected"
         />
+        <!--
+          @change="onFilesSelected"
+          :rules="validation.requiredRules"
+        -->
         <div
           v-if="file"
           class="mb-4"
@@ -63,7 +70,7 @@
         </div>
         <FormButtons
           :loading="loading"
-          @cancel="activePopUpForm = false"
+          @cancel="emits('cancel')"
         />
       </v-form>
     </v-card-text>
@@ -73,27 +80,35 @@
 <script setup>
 import FormButtons from '@/components/FormButtons';
 
+import { ref } from 'vue';
 import http from '@/utils/http';
-import { ref, computed } from 'vue';
 import { storeToRefs } from 'pinia';
-import mobile from '@/utils/mobile';
 import orderUtils from '@/utils/order';
 import { useRouter } from 'vue-router';
-import storesUtils from '@/utils/stores';
 import validation from '@/utils/validation';
 import { useRaeProductStore } from '@/stores/raeProduct';
 
 const file = ref(null);
 const form = ref(null);
 const fileError = ref('');
+const loading = ref(false);
+const router = useRouter();
+const emits = defineEmits(['cancel']);
 
 const raeProductStore = useRaeProductStore();
-const { element: rae, activePopUpForm } = storeToRefs(raeProductStore);
+const { element: rae } = storeToRefs(raeProductStore);
 
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
 
   loading.value = true;
+  raeProductStore.updateElement(router, function (data) {
+    loading.value = false;
+    if (data.status == 'ok') {
+      raeProductStore.initList(router);
+      emits('cancel');
+    }
+  });
 };
 
 const onFilesSelected = (event) => {

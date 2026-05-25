@@ -15,8 +15,8 @@
 </template>
 
 <script setup>
-import RaeProductGroupForm from '@/components/administration/raeProducts/RaeProductGroupForm';
-import RaeProductGroupTable from '@/components/administration/raeProducts/RaeProductGroupTable';
+import RaeProductGroupForm from '@/components/administration/raeProductGroups/RaeProductGroupForm';
+import RaeProductGroupTable from '@/components/administration/raeProductGroups/RaeProductGroupTable';
 
 import { storeToRefs } from 'pinia';
 import { useRaeProductGroupStore } from '@/stores/raeProductGroup';
