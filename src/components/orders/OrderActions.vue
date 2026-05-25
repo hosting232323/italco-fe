@@ -194,9 +194,8 @@ const copyOrder = (selectedOrder) => {
   const { user, id, products, ...rest } = selectedOrder;
   const filteredProducts = Object.fromEntries(
     Object.entries(products).filter(([_, product]) => {
-      const rae = product.rae_product;
-      if (!rae) return true;
-      if (rae.status === 'Annulled') return true;
+      if (!product.rae_product) return true;
+      if (product.rae_product.status === 'Annulled') return true;
     })
   );
 

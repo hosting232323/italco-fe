@@ -53,7 +53,7 @@ const ORDER_DATE_FILTER_TYPES = {
 
 const SCHEDULE_DATE_FILTER_TYPES = {
   date: {
-    label: 'Data DTR',
+    label: 'Data del Borderò',
     entity: 'Schedule'
   },
   created_at: {
