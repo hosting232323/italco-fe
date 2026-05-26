@@ -20,27 +20,7 @@
           label="Foto"
           :rules="(order.status === 'Delivered' || order.anomaly) ? validation.arrayRules : []"
         />
-        <template v-if="order.status == 'To Reschedule'">
-          <div
-            v-for="product in Object.keys(order.products)"
-            :key="product"
-          >
-            <b>{{ product }}</b>:<br>
-            <i style="font-size: small;">
-              {{ order.products[product].services.join(', ') }}
-            </i>
-            <v-select
-              v-model="order.products[product].release_collection_point_id"
-              :loading="collectionPoints.length == 0"
-              label="Luogo di Rilascio"
-              class="mt-2"
-              :rules="validation.requiredRulesWithZero"
-              :items="collectionPoints.concat([{name: 'Veicolo', id: 0}])"
-              item-title="name"
-              item-value="id"
-            />
-          </div>
-        </template>
+        <ReleasePlaceForm v-if="order.status == 'To Reschedule'" />
         <v-row>
           <v-col
             cols="6"
@@ -177,6 +157,7 @@
 <script setup>
 import SignaturePad from 'vue3-signature-pad';
 import FormButtons from '@/components/FormButtons';
+import ReleasePlaceForm from '@/components/orders/ReleasePlaceForm';
 
 import { ref } from 'vue';
 import http from '@/utils/http';
@@ -194,7 +175,6 @@ const theme = useTheme();
 const loading = ref(false);
 const router = useRouter();
 const signaturePad = ref(null);
-const collectionPoints = ref([]);
 const signatureError = ref(null);
 const signatureSuccess = ref(null);
 const emits = defineEmits(['cancel']);
@@ -203,13 +183,7 @@ const isMobile = mobile.setupMobileUtils();
 const orderStore = useOrderStore();
 const scheduleItemStore = useScheduleItemStore();
 const { element: order } = storeToRefs(orderStore);
-
 order.value.id = order.value.order_id;
-if (order.value.status == 'To Reschedule')
-  http.getRequest(`order/collection-points/${order.value.id}`, {}, (data) => {
-    if (data.status == 'ok')
-      collectionPoints.value = data.collection_points;
-  }, 'GET', router);
 
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;

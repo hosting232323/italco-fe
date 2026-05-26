@@ -5,6 +5,7 @@
     label="Stato"
     :items="orderUtils.LABELS.filter(label => !['Acquired', 'Booked', 'Rescheduled'].includes(label.value))"
   />
+  <ReleasePlaceForm v-if="order.status == 'To Reschedule'" />
   <v-textarea
     v-model="order.motivation"
     label="Motivazione"
@@ -74,6 +75,8 @@
 </template>
 
 <script setup>
+import ReleasePlaceForm from '@/components/orders/ReleasePlaceForm';
+
 import { storeToRefs } from 'pinia';
 import mobile from '@/utils/mobile';
 import orderUtils from '@/utils/order';
