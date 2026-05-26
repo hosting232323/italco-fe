@@ -36,6 +36,22 @@ export const useRaeProductStore = defineStore('raeProduct', {
         router
       );
     },
+    updateElementWithFormData(router, func) {
+      const content = {
+        data: JSON.stringify(storesUtils.exclude_keys(this.element, ['document']))
+      };
+
+      if (this.element.document)
+        content.document = this.element.document.selectedFile;
+
+      http.formDataRequest(
+        `rae/product/${this.element.id}`,
+        content,
+        func,
+        'PUT',
+        router
+      );
+    },
     deleteElement(element, router, func) {
       http.getRequest(
         `rae/product/${element.id}`,
