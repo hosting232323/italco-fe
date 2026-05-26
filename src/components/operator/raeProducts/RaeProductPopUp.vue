@@ -25,13 +25,11 @@
           label="File PDF"
           accept="application/pdf"
           :error-messages="fileError"
-        />
-        <!--
-          @change="onFilesSelected"
           :rules="validation.requiredRules"
-        -->
+          @change="onFilesSelected"
+        />
         <div
-          v-if="file"
+          v-if="rae.document"
           class="mb-4"
         >
           <strong>PDF selezionato</strong>
@@ -46,7 +44,7 @@
               </v-icon>
 
               <div class="pdf-name mt-2">
-                {{ file.selectedFile.name }}
+                {{ rae.document.selectedFile.name }}
               </div>
             </v-card-text>
 
@@ -56,14 +54,14 @@
               <v-btn
                 icon="mdi-eye"
                 variant="text"
-                @click="openPdf(file)"
+                @click="openPdf(rae.document)"
               />
 
               <v-btn
                 icon="mdi-delete"
                 variant="text"
                 color="red"
-                @click="file = null"
+                @click="rae.document = null"
               />
             </v-card-actions>
           </v-card>
@@ -87,7 +85,6 @@ import { useRouter } from 'vue-router';
 import validation from '@/utils/validation';
 import { useRaeProductStore } from '@/stores/raeProduct';
 
-const file = ref(null);
 const form = ref(null);
 const fileError = ref('');
 const loading = ref(false);
@@ -99,15 +96,19 @@ const { element: rae } = storeToRefs(raeProductStore);
 
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
-
   loading.value = true;
-  raeProductStore.updateElement(router, function (data) {
-    loading.value = false;
-    if (data.status == 'ok') {
-      raeProductStore.initList(router);
-      emits('cancel');
-    }
-  });
+  if (rae.value.document)
+    raeProductStore.updateElementWithFormData(router, callback);
+  else
+    raeProductStore.updateElement(router, callback);
+};
+
+const callback = (data) => {
+  loading.value = false;
+  if (data.status == 'ok') {
+    raeProductStore.initList(router);
+    emits('cancel');
+  }
 };
 
 /**
@@ -122,7 +123,7 @@ const onFilesSelected = (event) => {
     return;
   }
 
-  file.value = {
+  rae.value.document = {
     selectedFile,
     preview: URL.createObjectURL(selectedFile),
   };
