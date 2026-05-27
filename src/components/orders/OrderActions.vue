@@ -193,7 +193,7 @@ const copyOrderLink = (id) => {
 const copyOrder = (selectedOrder) => {
   const { user, id, products, ...rest } = selectedOrder;
   const filteredProducts = Object.fromEntries(
-    Object.entries(products).filter(([_, product]) => {
+    Object.entries(products).filter(([, product]) => {
       if (!product.rae_product) return true;
       if (product.rae_product.status === 'Annulled') return true;
     })
