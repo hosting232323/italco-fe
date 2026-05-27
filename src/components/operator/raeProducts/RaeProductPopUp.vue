@@ -25,8 +25,8 @@
           label="File PDF"
           accept="application/pdf"
           :error-messages="fileError"
-          @change="onFilesSelected"
           :rules="validation.requiredRules"
+          @change="onFilesSelected"
         />
         <div
           v-if="rae.document"
@@ -85,7 +85,6 @@ import { useRouter } from 'vue-router';
 import validation from '@/utils/validation';
 import { useRaeProductStore } from '@/stores/raeProduct';
 
-const file = ref(null);
 const form = ref(null);
 const fileError = ref('');
 const loading = ref(false);
@@ -99,7 +98,7 @@ const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
   loading.value = true;
   if (rae.value.document)
-    raeProductStore.updateElementWithFormData(router, callback)
+    raeProductStore.updateElementWithFormData(router, callback);
   else
     raeProductStore.updateElement(router, callback);
 };
