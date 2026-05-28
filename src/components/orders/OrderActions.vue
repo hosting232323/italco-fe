@@ -65,7 +65,7 @@
             <v-btn
               v-if="item.status == 'To Reschedule' &&
                 Object.values(item.products).every(
-                  product => !product.rae_product || product.rae_product.status == 'Annulled'
+                  product => !product.rae_product || !product.rae_product.status.includes(['Emitted', 'Generated'])
                 )"
               icon="mdi-content-copy"
               variant="text"
@@ -193,10 +193,9 @@ const copyOrderLink = (id) => {
 const copyOrder = (selectedOrder) => {
   const { user, id, products, ...rest } = selectedOrder;
   const filteredProducts = Object.fromEntries(
-    Object.entries(products).filter(([_, product]) => {
-      if (!product.rae_product) return true;
-      if (product.rae_product.status === 'Annulled') return true;
-    })
+    Object.entries(products).filter(
+      ([, product]) => !product.rae_product || product.rae_product.status === 'Annulled'
+    )
   );
 
   updatedOrder.value = {

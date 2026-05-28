@@ -12,7 +12,7 @@
           v-model="rae.status"
           label="Tipo"
           :items="orderUtils.RAE_STATUS.filter(
-            status => ['LDR', 'Annulled'].includes(status.value)
+            status => ['Emitted', 'LDR', 'Annulled'].includes(status.value)
           )"
           :rules="validation.requiredRules.concat([
             (value) => {
@@ -110,6 +110,7 @@ const submitForm = async () => {
   });
 };
 
+/**
 const onFilesSelected = (event) => {
   const selectedFile = event.target.files?.[0];
   if (!selectedFile) return;
@@ -126,4 +127,5 @@ const onFilesSelected = (event) => {
     preview: URL.createObjectURL(selectedFile),
   };
 };
+*/
 </script>

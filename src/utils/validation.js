@@ -9,7 +9,10 @@ const positiveNumberRules = [
 const requiredRulesWithZero = [
   (value) => {
     if (value) return true;
-    if (!isNaN(value) && Number(value) >= 0) return true;
+    if (
+      value !== null && value !== undefined && value !== '' &&
+      !isNaN(value) && Number(value) >= 0
+    ) return true;
     return 'Campo obbligatorio';
   }
 ];

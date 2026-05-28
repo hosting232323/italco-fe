@@ -49,14 +49,6 @@
         @click="raeExport(item)"
       />
       <v-btn
-        v-else-if="!item.order"
-        icon="mdi-delete"
-        variant="text"
-        :loading="!!deleteLoading[item.id]"
-        :color="theme.current.value.primaryColor"
-        @click="deleteItem(item)"
-      />
-      <v-btn
         v-if="item.status == 'Emitted' && orderUtils.isTerminatedOrder(item.order)"
         icon="mdi-pencil"
         variant="text"
@@ -79,7 +71,6 @@ import { useRaeProductStore } from '@/stores/raeProduct';
 
 const theme = useTheme();
 const router = useRouter();
-const deleteLoading = reactive({});
 const exportLoading = reactive({});
 const emits = defineEmits(['open-dialog']);
 
@@ -109,14 +100,5 @@ const raeExport = (item) => {
 const editElement = (item) => {
   rae.value = { ...item };
   emits('open-dialog');
-};
-
-const deleteItem = (item) => {
-  deleteLoading[item.id] = true;
-
-  raeProductStore.deleteElement(item, router, function() {
-    raeProductStore.initList(router);
-    deleteLoading[item.id] = false;
-  });
 };
 </script>

@@ -5,7 +5,7 @@
     label="Stato"
     :items="orderUtils.LABELS.filter(label => !['Acquired', 'Booked', 'Rescheduled'].includes(label.value))"
   />
-  <ReleasePlaceForm v-if="order.status == 'To Reschedule'" />
+  <ReleasePlaceForm v-if="showReleasePlaceForm" />
   <v-textarea
     v-model="order.motivation"
     label="Motivazione"
@@ -77,13 +77,20 @@
 <script setup>
 import ReleasePlaceForm from '@/components/orders/ReleasePlaceForm';
 
+import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import mobile from '@/utils/mobile';
 import orderUtils from '@/utils/order';
 import validation from '@/utils/validation';
 import { useOrderStore } from '@/stores/order';
 
-const orderStore = useOrderStore();
 const isMobile = mobile.setupMobileUtils();
+
+const orderStore = useOrderStore();
 const { element: order } = storeToRefs(orderStore);
+const initialStatus = order.value.status;
+
+const showReleasePlaceForm = computed(() =>
+  initialStatus !== 'To Reschedule' && order.value.status === 'To Reschedule'
+);
 </script>
