@@ -36,15 +36,6 @@ export const useRaeProductStore = defineStore('raeProduct', {
         router
       );
     },
-    deleteElement(element, router, func) {
-      http.getRequest(
-        `rae/product/${element.id}`,
-        {},
-        func,
-        'DELETE',
-        router
-      );
-    },
     setList(data) {
       this.list = data.rae_products;
       this.ready = true;

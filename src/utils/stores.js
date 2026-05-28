@@ -83,6 +83,10 @@ const RAE_PRODUCT_DATE_FILTER_TYPES = {
   date: {
     label: 'Data DTR',
     entity: 'Schedule'
+  },
+  emission_date: {
+    label: 'Data di Emissione',
+    entity: 'RaeProduct'
   }
 };
 
