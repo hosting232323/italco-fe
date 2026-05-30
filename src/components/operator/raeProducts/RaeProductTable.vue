@@ -21,6 +21,9 @@
       { title: 'Azioni', key: 'actions', sortable: false }
     ]"
   >
+    <template #[`item.number`]="{ item }">
+      {{ item.number || '' }}
+    </template>
     <template #[`item.order_id`]="{ item }">
       {{ item.order?.id }}
       <span
