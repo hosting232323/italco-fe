@@ -18,6 +18,7 @@
       { title: 'Destinatario', value: 'order.addressee', sortable: false },
       { title: 'Punto Vendita', value: 'user.nickname', sortable: false },
       { title: 'Data DTR', value: 'schedule.date', sortable: false },
+      { title: 'Data di emissione', value: 'emission_date', sortable: false },
       { title: 'Azioni', key: 'actions', sortable: false }
     ]"
   >
