@@ -105,7 +105,7 @@ const submitForm = async () => {
       emits('cancel');
     }
   });
-}
+};
 
 const onFilesSelected = (event) => {
   const selectedFile = event.target.files?.[0];
