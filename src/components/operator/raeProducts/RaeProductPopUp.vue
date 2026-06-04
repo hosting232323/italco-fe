@@ -111,7 +111,6 @@ const callback = (data) => {
   }
 };
 
-/**
 const onFilesSelected = (event) => {
   const selectedFile = event.target.files?.[0];
   if (!selectedFile) return;
@@ -128,5 +127,4 @@ const onFilesSelected = (event) => {
     preview: URL.createObjectURL(selectedFile),
   };
 };
-*/
 </script>
