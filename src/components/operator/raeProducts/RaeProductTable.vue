@@ -19,7 +19,6 @@
       { title: 'Punto Vendita', value: 'user.nickname', sortable: false },
       { title: 'Data DTR', value: 'schedule.date', sortable: false },
       { title: 'Data di emissione', value: 'emission_date', sortable: false },
-      { title: 'Documento', value: 'link', sortable: false },
       { title: 'Azioni', key: 'actions', sortable: false }
     ]"
   >
@@ -45,19 +44,6 @@
         {{ orderUtils.RAE_STATUS.find(label => label.value == item.status).title }}
       </v-chip>
     </template>
-    <template #[`item.link`]="{ item }">
-      <v-btn
-        v-if="item.link"
-        icon="mdi-file-pdf-box"
-        variant="text"
-        :color="theme.current.value.primaryColor"
-        :href="item.link"
-        target="_blank"
-      />
-      <span v-else>
-        -
-      </span>
-    </template>
     <template #[`item.actions`]="{ item }">
       <v-btn
         v-if="item.order && item.status != 'Generated'"
@@ -73,6 +59,14 @@
         variant="text"
         :color="theme.current.value.primaryColor"
         @click="editElement(item)"
+      />
+      <v-btn
+        v-if="item.link"
+        icon="mdi-file-pdf-box"
+        variant="text"
+        :color="theme.current.value.primaryColor"
+        :href="item.link"
+        target="_blank"
       />
     </template>
   </v-data-table>
