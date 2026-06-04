@@ -75,10 +75,9 @@ const { element: schedule } = storeToRefs(scheduleStore);
 const emits = defineEmits(['not-found-addresses']);
 
 const geocode = async (address) => {
-  const res = await fetch(
-    `https://wooffy.it/nominatim/search?format=json&q=${encodeURIComponent(address)}`
-  );
+  const res = await fetch(`/nominatim/search?format=json&q=${encodeURIComponent(address)}`);
   const data = await res.json();
+
   return data[0]
     ? { lat: +data[0].lat, lng: +data[0].lon }
     : null;
