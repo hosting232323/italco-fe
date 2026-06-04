@@ -27,15 +27,6 @@ export const useRaeProductStore = defineStore('raeProduct', {
         router
       );
     },
-    updateElement(router, func) {
-      http.postRequest(
-        `rae/product/${this.element.id}`,
-        {status: this.element.status},
-        func,
-        'PUT',
-        router
-      );
-    },
     updateElementWithFormData(router, func) {
       const content = {
         data: JSON.stringify(storesUtils.exclude_keys(this.element, ['document']))
