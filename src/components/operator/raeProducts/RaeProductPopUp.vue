@@ -29,7 +29,7 @@
           @change="onFilesSelected"
         />
         <div
-          v-if="rae.document"
+          v-if="rae.document?.selectedFile"
           class="mb-4"
         >
           <strong>PDF selezionato</strong>
@@ -97,18 +97,14 @@ const { element: rae } = storeToRefs(raeProductStore);
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
   loading.value = true;
-  if (rae.value.document)
-    raeProductStore.updateElementWithFormData(router, callback);
-  else
-    raeProductStore.updateElement(router, callback);
-};
 
-const callback = (data) => {
-  loading.value = false;
-  if (data.status == 'ok') {
-    raeProductStore.initList(router);
-    emits('cancel');
-  }
+  raeProductStore.updateElementWithFormData(router, (data) => {
+    loading.value = false;
+    if (data.status == 'ok') {
+      raeProductStore.initList(router);
+      emits('cancel');
+    }
+  });
 };
 
 const onFilesSelected = (event) => {
