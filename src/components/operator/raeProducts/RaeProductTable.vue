@@ -10,8 +10,7 @@
     :items="raeProducts"
     :headers="[
       { title: 'Id', value: 'id', sortable: false },
-      { title: 'Progressivo', value: 'rae_number', sortable: false },
-      { title: 'Progressivo Vecchio', value: 'number', sortable: false },
+      { title: 'Progressivo', value: 'number', sortable: false },
       { title: 'Stato', value: 'status', sortable: false },
       { title: 'Ordine', value: 'order_id', sortable: false },
       { title: 'Prodotto', value: 'product', sortable: false },
