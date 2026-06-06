@@ -3,12 +3,19 @@
     v-if="ready"
     :items="logs"
     :headers="[
-      { title: 'ID', value: 'logs.id', sortable: false },
       { title: 'Data', value: 'logs.created_at', sortable: false },
+      { title: 'Ora', value: 'logs.created_at', key: 'time', sortable: false },
       { title: 'User', value: 'user.nickname', sortable: false },
       { title: 'Azioni', key: 'actions', sortable: false }
     ]"
   >
+    <template #[`item.logs.created_at`]="{ item }">
+      {{ item.logs.created_at?.split('T')[0] }}
+    </template>
+
+    <template #[`item.time`]="{ item }">
+      {{ item.logs.created_at?.split('T')[1]?.split('.')[0] }}
+    </template>
     <template #[`item.actions`]="{ item }">
       <v-btn
         icon="mdi-magnify-plus-outline"
