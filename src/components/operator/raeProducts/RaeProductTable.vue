@@ -14,6 +14,7 @@
       { title: 'Stato', value: 'status', sortable: false },
       { title: 'Ordine', value: 'order_id', sortable: false },
       { title: 'Prodotto', value: 'product', sortable: false },
+      { title: 'Raggruppamento', value: 'product_group.group_code', sortable: false },
       { title: 'Destinatario', value: 'order.addressee', sortable: false },
       { title: 'Punto Vendita', value: 'user.nickname', sortable: false },
       { title: 'Data DTR', value: 'schedule.date', sortable: false },
