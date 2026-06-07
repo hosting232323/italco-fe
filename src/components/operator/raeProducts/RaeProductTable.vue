@@ -46,19 +46,19 @@
     </template>
     <template #[`item.actions`]="{ item }">
       <v-btn
+        v-if="['Emitted', 'LDR'].includes(item.status) && orderUtils.isTerminatedOrder(item.order)"
+        icon="mdi-pencil"
+        variant="text"
+        :color="theme.current.value.primaryColor"
+        @click="editElement(item)"
+      />
+      <v-btn
         v-if="item.order && item.status != 'Generated'"
         icon="mdi-file-export"
         variant="text"
         :loading="!!exportLoading[item.id]"
         :color="theme.current.value.primaryColor"
         @click="raeExport(item)"
-      />
-      <v-btn
-        v-if="item.status == 'Emitted' && orderUtils.isTerminatedOrder(item.order)"
-        icon="mdi-pencil"
-        variant="text"
-        :color="theme.current.value.primaryColor"
-        @click="editElement(item)"
       />
       <v-btn
         v-if="item.link"
