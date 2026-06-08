@@ -9,14 +9,30 @@
     v-else
     :items="raeProducts"
     :headers="[
-      { title: 'Progressivo', value: 'rae_number', sortable: false },
+      { title: 'Id', value: 'id', sortable: false },
+      { title: 'Progressivo', value: 'number', sortable: false },
       { title: 'Stato', value: 'status', sortable: false },
+      { title: 'Ordine', value: 'order_id', sortable: false },
       { title: 'Prodotto', value: 'product', sortable: false },
-      { title: 'Ordine', value: 'order', sortable: false },
+      { title: 'Raggruppamento', value: 'product_group.group_code', sortable: false },
+      { title: 'Destinatario', value: 'order.addressee', sortable: false },
       { title: 'Punto Vendita', value: 'user.nickname', sortable: false },
+      { title: 'Data DTR', value: 'schedule.date', sortable: false },
+      { title: 'Data di emissione', value: 'emission_date', sortable: false },
       { title: 'Azioni', key: 'actions', sortable: false }
     ]"
   >
+    <template #[`item.number`]="{ item }">
+      {{ item.number || '' }}
+    </template>
+    <template #[`item.order_id`]="{ item }">
+      {{ item.order?.id }}
+      <span
+        v-if="item.order?.external_id"
+      >
+        [{{ item.order.external_id }}]
+      </span>
+    </template>
     <template #[`item.product`]="{ item }">
       {{ item.product_group.name }}
       <template v-if="item.quantity > 1">
@@ -28,15 +44,16 @@
         {{ orderUtils.RAE_STATUS.find(label => label.value == item.status).title }}
       </v-chip>
     </template>
-    <template #[`item.order`]="{ item }">
-      <template v-if="item.order">
-        [ {{ item.order.id }} ]
-        {{ item.order.addressee }}
-      </template>
-    </template>
     <template #[`item.actions`]="{ item }">
       <v-btn
-        v-if="item.order"
+        v-if="item.status == 'Emitted' && orderUtils.isTerminatedOrder(item.order)"
+        icon="mdi-pencil"
+        variant="text"
+        :color="theme.current.value.primaryColor"
+        @click="editElement(item)"
+      />
+      <v-btn
+        v-if="item.order && item.status != 'Generated'"
         icon="mdi-file-export"
         variant="text"
         :loading="!!exportLoading[item.id]"
@@ -44,12 +61,12 @@
         @click="raeExport(item)"
       />
       <v-btn
-        v-else
-        icon="mdi-delete"
+        v-if="item.link"
+        icon="mdi-file-pdf-box"
         variant="text"
-        :loading="!!deleteLoading[item.id]"
         :color="theme.current.value.primaryColor"
-        @click="deleteItem(item)"
+        :href="item.link"
+        target="_blank"
       />
     </template>
   </v-data-table>
@@ -67,11 +84,11 @@ import { useRaeProductStore } from '@/stores/raeProduct';
 
 const theme = useTheme();
 const router = useRouter();
-const deleteLoading = reactive({});
 const exportLoading = reactive({});
+const emits = defineEmits(['open-dialog']);
 
 const raeProductStore = useRaeProductStore();
-const { ready } = storeToRefs(raeProductStore);
+const { element: rae, ready } = storeToRefs(raeProductStore);
 const raeProducts = storesUtils.getStoreList(raeProductStore, router);
 
 const raeExport = (item) => {
@@ -93,12 +110,8 @@ const raeExport = (item) => {
   }, 'GET', router);
 };
 
-const deleteItem = (item) => {
-  deleteLoading[item.id] = true;
-
-  raeProductStore.deleteElement(item, router, function() {
-    raeProductStore.initList(router);
-    deleteLoading[item.id] = false;
-  });
+const editElement = (item) => {
+  rae.value = { ...item };
+  emits('open-dialog');
 };
 </script>

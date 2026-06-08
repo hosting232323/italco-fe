@@ -9,7 +9,9 @@
       @click="confirmOrder(item)"
     />
     <div>
-      <b>ID:</b> {{ item.id }}<br>
+      <b>ID:</b> {{ item.id }}
+      <i v-if="Object.values(item.products).some(product => product.rae_product)">RAEE</i>
+      <br>
       <v-tooltip
         v-if="item.external_id"
         location="top"
@@ -82,7 +84,7 @@ const { item } = defineProps({
   item: {
     type: Object,
     required: true
-  },
+  }
 });
 
 const theme = useTheme();

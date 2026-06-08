@@ -56,12 +56,10 @@
               md="3"
             >
               <v-autocomplete
-                v-model="filters['RaeProductGroup.id']"
+                v-model="filters['RaeProductGroup.group_code']"
                 :class="isMobile ? '' : 'ml-2'"
                 label="Raggruppamento Raee"
-                :items="raeProductGroups"
-                item-title="name"
-                item-value="id"
+                :items="[...new Set(raeProductGroups.map(group => group.group_code))]"
                 clearable
               />
             </v-col>

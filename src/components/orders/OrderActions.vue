@@ -63,7 +63,10 @@
           </v-col>
           <v-col cols="3">
             <v-btn
-              v-if="item.status == 'To Reschedule'"
+              v-if="item.status == 'To Reschedule' &&
+                Object.values(item.products).every(
+                  product => !product.rae_product || !product.rae_product.status.includes(['Emitted', 'Generated'])
+                )"
               icon="mdi-content-copy"
               variant="text"
               :color="theme.current.value.primaryColor"
@@ -73,7 +76,7 @@
           </v-col>
           <v-col cols="3">
             <v-btn
-              v-if="Object.values(item.products).some(product => product.rae_product)"
+              v-if="Object.values(item.products).some(product => product.rae_product) && !['Acquired', 'Booked'].includes(item.status)"
               icon="mdi-human-dolly"
               variant="text"
               :loading="raeLoading"
@@ -188,12 +191,19 @@ const copyOrderLink = (id) => {
 };
 
 const copyOrder = (selectedOrder) => {
-  const { user, id, ...rest } = selectedOrder;
+  const { user, id, products, ...rest } = selectedOrder;
+  const filteredProducts = Object.fromEntries(
+    Object.entries(products).filter(
+      ([, product]) => !product.rae_product || product.rae_product.status === 'Annulled'
+    )
+  );
+
   updatedOrder.value = {
     user,
     user_id: user.id,
     booking_date: null,
     cloned_order_id: id,
+    products: filteredProducts,
     ...Object.fromEntries(
       Object.entries(rest).filter(([key]) =>
         ![

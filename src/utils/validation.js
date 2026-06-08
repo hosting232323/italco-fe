@@ -4,8 +4,19 @@ const positiveNumberRules = [
     if (!isNaN(value) && Number(value) >= 0) return true;
     return 'Deve essere un numero positivo';
   }
-]
-;
+];
+
+const requiredRulesWithZero = [
+  (value) => {
+    if (value) return true;
+    if (
+      value !== null && value !== undefined && value !== '' &&
+      !isNaN(value) && Number(value) >= 0
+    ) return true;
+    return 'Campo obbligatorio';
+  }
+];
+
 const requiredRules = [
   (value) => {
     if (value) return true;
@@ -81,6 +92,7 @@ const maxGroupSizeRule = (minElement) => [
 
 export default {
   positiveNumberRules,
+  requiredRulesWithZero,
   requiredRules,
   arrayRules,
   capRules,

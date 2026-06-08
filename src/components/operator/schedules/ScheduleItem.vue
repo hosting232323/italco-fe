@@ -92,6 +92,7 @@
     <v-col cols="1">
       <v-btn
         v-if="element.operation_type === 'Order' &&
+          !orderUtils.isTerminatedOrder(element) &&
           schedule.schedule_items.filter(item => item.operation_type == 'Order').length > 1"
         variant="text"
         icon="mdi-delete"
@@ -111,6 +112,7 @@ import { ref, computed } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
+import orderUtils from '@/utils/order';
 import validation from '@/utils/validation';
 import { useOrderStore } from '@/stores/order';
 import { useScheduleStore } from '@/stores/schedule';
