@@ -5,6 +5,7 @@ import storesUtils from '@/utils/stores';
 export const useRaeProductStore = defineStore('raeProduct', {
   state: () => ({
     list: [],
+    element: {},
     filters: {},
     ready: false,
     filtersSetting: {
@@ -23,6 +24,22 @@ export const useRaeProductStore = defineStore('raeProduct', {
         )},
         this.setList,
         'POST',
+        router
+      );
+    },
+    updateElementWithFormData(router, func) {
+      const content = {
+        data: JSON.stringify(storesUtils.exclude_keys(this.element, ['document']))
+      };
+
+      if (this.element.document)
+        content.document = this.element.document.selectedFile;
+
+      http.formDataRequest(
+        `rae/product/${this.element.id}`,
+        content,
+        func,
+        'PUT',
         router
       );
     },
