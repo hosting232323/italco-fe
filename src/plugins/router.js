@@ -81,6 +81,21 @@ const routes = [
         path: 'rae-product-groups',
         name: 'Raggruppamenti Raee',
         component: () => import('@/views/administration/RaeProductGroups.vue')
+      },
+      {
+        path: 'rae-carrier',
+        name: 'Trasportatori Raee',
+        component: () => import('@/views/administration/RaeCarrier.vue')
+      },
+      {
+        path: 'rae-collection-center',
+        name: 'Centro di raccolta Raee',
+        component: () => import('@/views/administration/RaeCollectionCenter.vue')
+      },
+      {
+        path: 'rae-disposal',
+        name: 'Smaltimento Raee',
+        component: () => import('@/views/administration/RaeDisposal.vue')
       }
     ]
   }

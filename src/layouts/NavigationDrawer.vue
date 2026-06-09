@@ -65,7 +65,33 @@
         prepend-icon="mdi-file-code"
       >
         <v-list-item-title>
-          Configurazione<br>Raggruppamenti
+          Raggruppamenti
+        </v-list-item-title>
+      </v-list-item>
+      <v-list-item
+        v-if="role === 'Admin'"
+        to="/rae-carrier"
+        prepend-icon="mdi-car-pickup"
+      >
+        <v-list-item-title>
+          Trasportatori
+        </v-list-item-title>
+      </v-list-item>
+      <v-list-item
+        v-if="role === 'Admin'"
+        to="/rae-collection-center"
+        prepend-icon="mdi-map-marker-radius"
+      >
+        <v-list-item-title>
+          Centro di Raccolta
+        </v-list-item-title>
+      </v-list-item>
+      <v-list-item
+        to="/rae-disposal"
+        prepend-icon="mdi-delete-empty"
+      >
+        <v-list-item-title>
+          Smaltimento
         </v-list-item-title>
       </v-list-item>
     </template>

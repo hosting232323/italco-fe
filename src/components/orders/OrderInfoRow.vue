@@ -79,6 +79,7 @@ import orderUtils from '@/utils/order';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
+import { useRaeProductStore } from '@/stores/raeProduct';
 
 const { item } = defineProps({
   item: {
@@ -95,6 +96,7 @@ const emits = defineEmits(['open-statuses-popup']);
 const userStore = useUserStore();
 const orderStore = useOrderStore();
 const { role } = storeToRefs(userStore);
+const raeProductStore = useRaeProductStore();
 
 const confirmOrder = (order) => {
   confirmLoading.value[order.id] = true;
@@ -105,6 +107,7 @@ const confirmOrder = (order) => {
     confirmLoading.value[order.id] = false;
     if (data.status == 'ok')
       orderStore.initList(router);
+    raeProductStore.initList(router);
   }, 'PUT', router);
 };
 </script>

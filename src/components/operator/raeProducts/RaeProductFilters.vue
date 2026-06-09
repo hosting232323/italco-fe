@@ -59,8 +59,9 @@
                 v-model="filters['RaeProductGroup.group_code']"
                 :class="isMobile ? '' : 'ml-2'"
                 label="Raggruppamento Raee"
-                :items="[...new Set(raeProductGroups.map(group => group.group_code))]"
+                :items="orderUtils.raeGrouping"
                 clearable
+                multiple
               />
             </v-col>
           </v-row>
@@ -90,7 +91,6 @@ import orderUtils from '@/utils/order';
 import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import { useRaeProductStore } from '@/stores/raeProduct';
-import { useRaeProductGroupStore } from '@/stores/raeProductGroup';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
 const form = ref(null);
@@ -100,11 +100,9 @@ const router = useRouter();
 const isMobile = mobile.setupMobileUtils();
 
 const raeProductStore = useRaeProductStore();
-const raeProductGroupStore = useRaeProductGroupStore();
 const administrationUserStore = useAdministrationUserStore();
 const { ready, filters } = storeToRefs(raeProductStore);
 const users = storesUtils.getStoreList(administrationUserStore, router);
-const raeProductGroups = storesUtils.getStoreList(raeProductGroupStore, router);
 
 const filterRaeProduct = async () => {
   if (!(await form.value.validate()).valid) return;

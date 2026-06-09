@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <h1>
-      Configurazione Raggruppamenti Raee
+      Raggruppamenti
       <v-btn
         icon="mdi-plus"
         style="float: right;"
