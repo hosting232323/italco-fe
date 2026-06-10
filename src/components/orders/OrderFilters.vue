@@ -76,9 +76,9 @@
           />
         </v-form>
         <v-btn
-          v-if="role == 'Admin' && !panel && filters['CustomerUser.id'] && filters['Order.dpc']
-            && filters['Order.dpc'][0] && filters['Order.dpc'][1]"
-          class="mt-2"
+          v-if="role == 'Admin' && !panel && filters['CustomerUser.id'] && filters['Order.booking_date']
+            && filters['Order.booking_date'][0] && filters['Order.booking_date'][1]"
+          class="mt-2 mb-2"
           block
           text="Esporta Fatturazione"
           prepend-icon="mdi-file-pdf-box"
@@ -151,7 +151,7 @@ const exportInvoice = async () => {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `ordini_${filters.value['Order.dpc'][0]}_${filters.value['Order.dpc'][1]}.pdf`;
+      a.download = `ordini_${filters.value['Order.booking_date'][0]}_${filters.value['Order.booking_date'][1]}.pdf`;
       a.click();
       window.URL.revokeObjectURL(url);
     }
