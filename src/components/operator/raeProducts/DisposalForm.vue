@@ -131,7 +131,6 @@ import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import validation from '@/utils/validation';
-import { useRaeProductStore } from '@/stores/raeProduct';
 import { useRaeCarrierStore } from '@/stores/raeCarrier';
 import { useRaeDisposalStore } from '@/stores/raeDisposal';
 import { useRaeCollectionCenterStore } from '@/stores/raeCollectionCenter';
@@ -172,10 +171,10 @@ const submitForm = async () => {
   raeDisposalStore.createElementWithFormData(router, (data) => {
     loading.value = false;
     if (data.status == 'ok') {
-      raeDisposalStore.initList(router)
+      raeDisposalStore.initList(router);
       emits('cancel');
     }
-  })
+  });
 };
 
 const onFilesSelected = (event) => {

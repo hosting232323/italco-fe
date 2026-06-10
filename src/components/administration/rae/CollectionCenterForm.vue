@@ -71,12 +71,12 @@
             cols="12"
             md="4"
           >
-          <v-text-field
-            v-model="raeCollectionCenter.authorization_date"
-            label="Data di autorizzazione"
-            type="date"
-            :rules="validation.requiredRules"
-          />
+            <v-text-field
+              v-model="raeCollectionCenter.authorization_date"
+              label="Data di autorizzazione"
+              type="date"
+              :rules="validation.requiredRules"
+            />
           </v-col>
         </v-row>
         <FormButtons
@@ -90,9 +90,8 @@
 
 <script setup>
 import FormButtons from '@/components/FormButtons';
-import GooglePlacesAutocomplete from '@/components/GooglePlacesAutocomplete';
 
-import { ref, watch } from 'vue';
+import { ref } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import orderUtils from '@/utils/order';

@@ -47,12 +47,11 @@
 import { reactive } from 'vue';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
-import orderUtils from '@/utils/order';
 import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import { useRaeCarrierStore } from '@/stores/raeCarrier';
 
-const { activatorProps } = defineProps({
+defineProps({
   activatorProps: {
     type: Object,
     required: true
@@ -84,10 +83,5 @@ const deleteItem = (item) => {
     raeCarrierStore.initList(router);
     deleteLoading[item.id] = false;
   });
-};
-
-const formatTime = (value) => {
-  if (!value) return '';
-  return `${value} min`;
 };
 </script>

@@ -19,7 +19,7 @@ export const useRaeDisposalStore = defineStore('raeDisposal', {
         content.document = this.element.document.selectedFile;
 
       http.formDataRequest(
-        `rae/disposal`,
+        'rae/disposal',
         content,
         func,
         'POST',
