@@ -35,7 +35,6 @@
 </template>
 
 <script setup>
-import { reactive } from 'vue';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
@@ -44,7 +43,6 @@ import { useRaeDisposalStore } from '@/stores/raeDisposal';
 
 const theme = useTheme();
 const router = useRouter();
-const deleteLoading = reactive({});
 
 const raeDisposalStore = useRaeDisposalStore();
 const { ready } = storeToRefs(raeDisposalStore);

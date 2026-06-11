@@ -147,7 +147,7 @@ const raeCollectionCenters = storesUtils.getStoreList(raeCollectionCenterStore, 
 const form = ref(null);
 const loading = ref(null);
 const fileError = ref('');
-const emits = defineEmits(['cancel']);
+const emits = defineEmits(['cancel', 'success']);
 const raeDisposalStore = useRaeDisposalStore();
 const { element: disposal } = storeToRefs(raeDisposalStore);
 
@@ -173,6 +173,7 @@ const submitForm = async () => {
     if (data.status == 'ok') {
       raeDisposalStore.initList(router);
       emits('cancel');
+      emits('success');
     }
   });
 };

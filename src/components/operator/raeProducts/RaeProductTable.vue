@@ -90,7 +90,7 @@
         v-show="dialog"
         :selected-products="selectedProducts"
         @cancel="dialog = false"
-        @success="dialog = false; selectedProducts = []"
+        @success="selectedProducts = []"
       />
     </template>
   </v-dialog>
