@@ -1,5 +1,6 @@
 import http from '@/utils/http';
 import { defineStore } from 'pinia';
+import storesUtils from '@/utils/stores';
 
 export const useCustomerGroupStore = defineStore('customerGroup', {
   state: () => ({
@@ -19,13 +20,13 @@ export const useCustomerGroupStore = defineStore('customerGroup', {
       );
     },
     initList(router) {
-      http.getRequest(
+      storesUtils.refreshList(this, (callback) => http.getRequest(
         'customer-group',
         {},
-        this.setList,
+        callback,
         'GET',
         router
-      );
+      ));
     },
     deleteElement(element, router, func) {
       http.getRequest(

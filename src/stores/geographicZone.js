@@ -1,5 +1,6 @@
 import http from '@/utils/http';
 import { defineStore } from 'pinia';
+import storesUtils from '@/utils/stores';
 
 export const useGeographicZoneStore = defineStore('geographicZone', {
   state: () => ({
@@ -19,13 +20,13 @@ export const useGeographicZoneStore = defineStore('geographicZone', {
       );
     },
     initList(router) {
-      http.getRequest(
+      storesUtils.refreshList(this, (callback) => http.getRequest(
         'geographic-zone',
         {},
-        this.setList,
+        callback,
         'GET',
         router
-      );
+      ));
     },
     deleteElement(element, router, func) {
       http.getRequest(

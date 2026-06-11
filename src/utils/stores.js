@@ -8,6 +8,28 @@ const getStoreList = (store, router) => {
 };
 
 
+const _listGuards = new Map();
+
+
+const refreshList = (store, doSend, debounce = 50) => {
+  let guard = _listGuards.get(store.$id);
+  if (!guard) {
+    guard = { seq: 0, timer: null };
+    _listGuards.set(store.$id, guard);
+  }
+
+  clearTimeout(guard.timer);
+  guard.timer = setTimeout(() => {
+    const token = ++guard.seq;
+    doSend((data) => {
+      if (token !== guard.seq) return;
+
+      store.setList(data);
+    });
+  }, debounce);
+};
+
+
 const exclude_keys = (obj, keys) => {
   return Object.fromEntries(
     Object.entries(obj).filter(([key]) => !keys.includes(key))
@@ -120,6 +142,7 @@ const formatFilters = (filters, dateFilterType) => {
 
 export default {
   getStoreList,
+  refreshList,
   exclude_keys,
   formatFilters,
   ORDER_DATE_FILTER_TYPES,

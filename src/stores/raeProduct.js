@@ -15,17 +15,17 @@ export const useRaeProductStore = defineStore('raeProduct', {
   }),
   actions: {
     initList(router) {
-      http.postRequest(
+      storesUtils.refreshList(this, (callback) => http.postRequest(
         'rae/product/filter',
         {filters: storesUtils.formatFilters(
           this.filters,
           storesUtils.RAE_PRODUCT_DATE_FILTER_TYPES,
           'Order'
         )},
-        this.setList,
+        callback,
         'POST',
         router
-      );
+      ));
     },
     updateElementWithFormData(router, func) {
       const content = {

@@ -31,13 +31,13 @@ export const useServiceStore = defineStore('service', {
       );
     },
     initList(router) {
-      http.getRequest(
+      storesUtils.refreshList(this, (callback) => http.getRequest(
         'service',
         {},
-        this.setList,
+        callback,
         'GET',
         router
-      );
+      ));
     },
     deleteElement(element, router, func) {
       http.getRequest(

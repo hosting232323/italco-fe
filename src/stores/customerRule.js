@@ -1,5 +1,6 @@
 import http from '@/utils/http';
 import { defineStore } from 'pinia';
+import storesUtils from '@/utils/stores';
 
 export const useCustomerRuleStore = defineStore('customerRule', {
   state: () => ({
@@ -19,13 +20,13 @@ export const useCustomerRuleStore = defineStore('customerRule', {
       );
     },
     initList(router) {
-      http.getRequest(
+      storesUtils.refreshList(this, (callback) => http.getRequest(
         'customer-rule',
         {},
-        this.setList,
+        callback,
         'GET',
         router
-      );
+      ));
     },
     deleteElements(ids, router, func) {
       http.postRequest(

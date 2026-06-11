@@ -29,13 +29,13 @@ export const useRaeProductGroupStore = defineStore('raeProductGroup', {
       );
     },
     initList(router) {
-      http.getRequest(
+      storesUtils.refreshList(this, (callback) => http.getRequest(
         'rae/product-group',
         {},
-        this.setList,
+        callback,
         'GET',
         router
-      );
+      ));
     },
     deleteElement(element, router, func) {
       http.getRequest(

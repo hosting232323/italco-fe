@@ -1,5 +1,6 @@
 import http from '@/utils/http';
 import { defineStore } from 'pinia';
+import storesUtils from '@/utils/stores';
 import { encryptPassword } from 'generic-module';
 
 const iv = import.meta.env.VITE_IV;
@@ -26,13 +27,13 @@ export const useAdministrationUserStore = defineStore('administrationUser', {
       );
     },
     initList(router) {
-      http.getRequest(
+      storesUtils.refreshList(this, (callback) => http.getRequest(
         'user',
         {},
-        this.setList,
+        callback,
         'GET',
         router
-      );
+      ));
     },
     deleteElement(force, element, router, func) {
       const args = {};

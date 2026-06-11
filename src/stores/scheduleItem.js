@@ -1,5 +1,6 @@
 import http from '@/utils/http';
 import { defineStore } from 'pinia';
+import storesUtils from '@/utils/stores';
 
 export const useScheduleItemStore = defineStore('scheduleItem', {
   state: () => ({
@@ -19,13 +20,13 @@ export const useScheduleItemStore = defineStore('scheduleItem', {
       );
     },
     initList(router) {
-      http.getRequest(
+      storesUtils.refreshList(this, (callback) => http.getRequest(
         'schedule/delivery',
         {},
-        this.setList,
+        callback,
         'GET',
         router
-      );
+      ));
     },
     setList(data) {
       this.list = data.schedule_items;

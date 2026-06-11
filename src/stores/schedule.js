@@ -37,17 +37,17 @@ export const useScheduleStore = defineStore('schedule', {
       );
     },
     initList(router) {
-      http.postRequest(
+      storesUtils.refreshList(this, (callback) => http.postRequest(
         'schedule/filter',
         {filters: storesUtils.formatFilters(
           this.filters,
           storesUtils.SCHEDULE_DATE_FILTER_TYPES,
           'Schedule'
         )},
-        this.setList,
+        callback,
         'POST',
         router
-      );
+      ));
     },
     deleteElement(element, router, func) {
       http.getRequest(

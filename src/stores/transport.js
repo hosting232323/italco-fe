@@ -29,13 +29,13 @@ export const useTransportStore = defineStore('transport', {
       );
     },
     initList(router) {
-      http.getRequest(
+      storesUtils.refreshList(this, (callback) => http.getRequest(
         'transport',
         {},
-        this.setList,
+        callback,
         'GET',
         router
-      );
+      ));
     },
     deleteElement(element, router, func) {
       http.getRequest(

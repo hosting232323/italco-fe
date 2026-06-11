@@ -56,17 +56,17 @@ export const useOrderStore = defineStore('order', {
       );
     },
     initList(router) {
-      http.postRequest(
+      storesUtils.refreshList(this, (callback) => http.postRequest(
         'order/filter',
         {filters: storesUtils.formatFilters(
           this.filters,
           storesUtils.ORDER_DATE_FILTER_TYPES,
           'Order'
         )},
-        this.setList,
+        callback,
         'POST',
         router
-      );
+      ));
     },
     setList(data) {
       this.list = data.orders;
