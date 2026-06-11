@@ -89,13 +89,13 @@ const routes = [
       },
       {
         path: 'rae-collection-center',
-        name: 'Centro di raccolta Raee',
+        name: 'Centri di raccolta Raee',
         component: () => import('@/views/administration/RaeCollectionCenter.vue')
       },
       {
         path: 'rae-disposal',
-        name: 'Smaltimento Raee',
-        component: () => import('@/views/administration/RaeDisposal.vue')
+        name: 'Smaltimenti Raee',
+        component: () => import('@/views/operator/RaeDisposal.vue')
       }
     ]
   }

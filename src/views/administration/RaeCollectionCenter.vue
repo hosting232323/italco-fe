@@ -19,8 +19,8 @@
 </template>
 
 <script setup>
-import CollectionCenterForm from '@/components/administration/rae/CollectionCenterForm';
-import CollectionCenterTable from '@/components/administration/rae/CollectionCenterTable';
+import CollectionCenterForm from '@/components/administration/raeCollectionCenter/CollectionCenterForm';
+import CollectionCenterTable from '@/components/administration/raeCollectionCenter/CollectionCenterTable';
 
 import { storeToRefs } from 'pinia';
 import { useRaeCollectionCenterStore } from '@/stores/raeCollectionCenter';

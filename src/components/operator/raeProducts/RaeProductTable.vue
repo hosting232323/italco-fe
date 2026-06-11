@@ -96,14 +96,15 @@
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue';
+import DisposalForm from '@/components/operator/raeDisposal/DisposalForm';
+
 import http from '@/utils/http';
 import { useTheme } from 'vuetify';
+import { reactive, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import orderUtils from '@/utils/order';
 import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
-import DisposalForm from './DisposalForm.vue';
 import { useRaeProductStore } from '@/stores/raeProduct';
 
 const showDisposal = ref(false);

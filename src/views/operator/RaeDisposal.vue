@@ -6,5 +6,5 @@
 </template>
 
 <script setup>
-import DisposalTable from '@/components/administration/rae/DisposalTable';
+import DisposalTable from '@/components/operator/raeDisposal/DisposalTable';
 </script>

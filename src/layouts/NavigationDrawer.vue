@@ -60,40 +60,27 @@
         prepend-icon="mdi-human-dolly"
       />
       <v-list-item
-        v-if="role === 'Admin'"
-        to="/rae-product-groups"
-        prepend-icon="mdi-file-code"
-      >
-        <v-list-item-title>
-          Raggruppamenti
-        </v-list-item-title>
-      </v-list-item>
-      <v-list-item
-        v-if="role === 'Admin'"
-        to="/rae-carrier"
-        prepend-icon="mdi-car-pickup"
-      >
-        <v-list-item-title>
-          Trasportatori
-        </v-list-item-title>
-      </v-list-item>
-      <v-list-item
-        v-if="role === 'Admin'"
-        to="/rae-collection-center"
-        prepend-icon="mdi-map-marker-radius"
-      >
-        <v-list-item-title>
-          Centro di Raccolta
-        </v-list-item-title>
-      </v-list-item>
-      <v-list-item
         to="/rae-disposal"
+        title="Smaltimenti"
         prepend-icon="mdi-delete-empty"
-      >
-        <v-list-item-title>
-          Smaltimento
-        </v-list-item-title>
-      </v-list-item>
+      />
+      <template v-if="role == 'Admin'">
+        <v-list-item
+          to="/rae-product-groups"
+          title="Raggruppamenti"
+          prepend-icon="mdi-file-code"
+        />
+        <v-list-item
+          to="/rae-carrier"
+          title="Trasportatori"
+          prepend-icon="mdi-car-pickup"
+        />
+        <v-list-item
+          to="/rae-collection-center"
+          title="Centri di Raccolta"
+          prepend-icon="mdi-map-marker-radius"
+        />
+      </template>
     </template>
     <v-list-item
       v-else

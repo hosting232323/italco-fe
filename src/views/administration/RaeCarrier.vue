@@ -19,8 +19,8 @@
 </template>
 
 <script setup>
-import CarrierForm from '@/components/administration/rae/CarrierForm';
-import CarrierTable from '@/components/administration/rae/CarrierTable';
+import CarrierForm from '@/components/administration/raeCarrier/CarrierForm';
+import CarrierTable from '@/components/administration/raeCarrier/CarrierTable';
 
 import { storeToRefs } from 'pinia';
 import { useRaeCarrierStore } from '@/stores/raeCarrier';
