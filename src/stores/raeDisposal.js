@@ -42,15 +42,6 @@ export const useRaeDisposalStore = defineStore('raeDisposal', {
         router
       );
     },
-    deleteElement(element, router, func) {
-      http.getRequest(
-        `rae/disposal/${element.id}`,
-        {},
-        func,
-        'DELETE',
-        router
-      );
-    },
     initList(router) {
       http.getRequest(
         'rae/disposal',
