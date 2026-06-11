@@ -29,15 +29,6 @@
             target="_blank"
           />
         </v-col>
-        <v-col cols="6">
-          <v-btn
-            icon="mdi-delete"
-            variant="text"
-            :loading="deleteLoading[item.id]"
-            :color="theme.current.value.primaryColor"
-            @click="deleteItem(item)"
-          />
-        </v-col>
       </v-row>
     </template>
   </v-data-table>
@@ -58,13 +49,4 @@ const deleteLoading = reactive({});
 const raeDisposalStore = useRaeDisposalStore();
 const { ready } = storeToRefs(raeDisposalStore);
 const raeDisposals = storesUtils.getStoreList(raeDisposalStore, router);
-
-const deleteItem = (item) => {
-  if (!confirm('Sei sicuro di voler eliminare questo smaltimento?')) return;
-  deleteLoading[item.id] = true;
-  raeDisposalStore.deleteElement(item, router, function() {
-    raeDisposalStore.initList(router);
-    deleteLoading[item.id] = false;
-  });
-};
 </script>
