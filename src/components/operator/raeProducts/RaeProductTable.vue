@@ -8,7 +8,7 @@
         v-if="selectedProducts.length"
         text="Smaltimento"
         :color="theme.current.value.primaryColor"
-        @click="openForm()"
+        @click="dialog = true"
       />
       <v-skeleton-loader
         v-if="!ready"
@@ -87,9 +87,10 @@
     </template>
     <template #default>
       <DisposalForm
-        v-show="showDisposal"
+        v-show="dialog"
         :selected-products="selectedProducts"
         @cancel="dialog = false"
+        @success="dialog = false; selectedProducts = []"
       />
     </template>
   </v-dialog>
@@ -107,7 +108,6 @@ import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import { useRaeProductStore } from '@/stores/raeProduct';
 
-const showDisposal = ref(false);
 const theme = useTheme();
 const dialog = ref(false);
 const router = useRouter();
@@ -142,10 +142,5 @@ const raeExport = (item) => {
 const editElement = (item) => {
   rae.value = { ...item };
   emits('open-dialog');
-};
-
-const openForm = () => {
-  dialog.value = true;
-  showDisposal.value = true;
 };
 </script>
