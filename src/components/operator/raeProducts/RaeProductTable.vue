@@ -67,6 +67,13 @@
             @click="editElement(item)"
           />
           <v-btn
+            v-if="item.status == 'Annulled' && !item.link"
+            icon="mdi-pencil"
+            variant="text"
+            :color="theme.current.value.primaryColor"
+            @click="editElement(item)"
+          />
+          <v-btn
             v-if="item.order && item.status != 'Generated'"
             icon="mdi-file-export"
             variant="text"
@@ -107,6 +114,7 @@ import orderUtils from '@/utils/order';
 import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import { useRaeProductStore } from '@/stores/raeProduct';
+import { outerHeight } from 'ol/dom';
 
 const theme = useTheme();
 const dialog = ref(false);

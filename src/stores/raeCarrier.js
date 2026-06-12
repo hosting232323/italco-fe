@@ -38,13 +38,13 @@ export const useRaeCarrierStore = defineStore('raeCarrier', {
       );
     },
     initList(router) {
-      http.getRequest(
+      storesUtils.refreshList(this, (callback) => http.getRequest(
         'rae/carrier',
         {},
-        this.setList,
+        callback,
         'GET',
         router
-      );
+      ));
     },
     setList(data) {
       this.list = data.rae_carriers;

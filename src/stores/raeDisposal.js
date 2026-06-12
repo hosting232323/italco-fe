@@ -43,13 +43,13 @@ export const useRaeDisposalStore = defineStore('raeDisposal', {
       );
     },
     initList(router) {
-      http.getRequest(
+      storesUtils.refreshList(this, (callback) => http.getRequest(
         'rae/disposal',
         {},
-        this.setList,
+        callback,
         'GET',
         router
-      );
+      ));
     },
     setList(data) {
       this.list = data.rae_disposals;

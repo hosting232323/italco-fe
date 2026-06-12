@@ -9,6 +9,7 @@
         @submit.prevent="submitForm"
       >
         <v-select
+          v-if="initialStatus !== 'Annulled'"
           v-model="rae.status"
           label="Tipo"
           :items="orderUtils.RAE_STATUS.filter(
@@ -93,6 +94,7 @@ const emits = defineEmits(['cancel']);
 
 const raeProductStore = useRaeProductStore();
 const { element: rae } = storeToRefs(raeProductStore);
+const initialStatus = ref(rae.value.status);
 
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;

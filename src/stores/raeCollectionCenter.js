@@ -38,13 +38,13 @@ export const useRaeCollectionCenterStore = defineStore('raeCollectionCenter', {
       );
     },
     initList(router) {
-      http.getRequest(
+      storesUtils.refreshList(this, (callback) => http.getRequest(
         'rae/collection-center',
         {},
-        this.setList,
+        callback,
         'GET',
         router
-      );
+      ));
     },
     setList(data) {
       this.list = data.rae_collection_centers;

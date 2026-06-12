@@ -1,7 +1,7 @@
 <template>
   <v-card
-    v-if="selectedProducts.some(p => p.status === 'LDR')"
-    title="Ci sono ordini in stato LDR selezionati"
+    v-if="selectedProducts.some(p => p.status != 'LDR')"
+    title="Puoi smaltire solo prodotti in stato LDR"
   />
   <v-card
     v-else
