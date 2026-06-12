@@ -6,6 +6,7 @@
           <v-btn
             icon="mdi-pencil"
             variant="text"
+            :loading="loadingEdit"
             :color="theme.current.value.primaryColor"
             @click="openForm(item)"
           />
@@ -139,6 +140,7 @@ const theme = useTheme();
 const popUpType = ref('');
 const router = useRouter();
 const raeLoading = ref(false);
+const loadingEdit = ref(false);
 const loadingExport = ref(false);
 const loadingDelete = ref(false);
 
@@ -151,10 +153,20 @@ const openExternalLink = (link) => {
   window.open(link, '_blank');
 };
 
+// ricarica l'ordine completo dal server: la riga della lista può essere stantia
+// e salvarla sovrascriverebbe stato e prodotti con dati vecchi
 const openForm = (item) => {
-  updatedOrder.value = item;
-  updatedOrder.value.user_id = updatedOrder.value.user.id;
-  activeForm.value = true;
+  loadingEdit.value = true;
+
+  http.getRequest(`order/${item.id}`, {}, function (data) {
+    loadingEdit.value = false;
+    if (data.status == 'ok') {
+      updatedOrder.value = data.order;
+      updatedOrder.value.user_id = data.order.user.id;
+      activeForm.value = true;
+    } else
+      alert(data.error || 'Ordine non trovato, ricarica la pagina');
+  }, 'GET', router);
 };
 
 const openPopUp = (item, type) => {

@@ -49,6 +49,7 @@
         v-if="item.status == 'Emitted' && orderUtils.isTerminatedOrder(item.order)"
         icon="mdi-pencil"
         variant="text"
+        :loading="!!editLoading[item.id]"
         :color="theme.current.value.primaryColor"
         @click="editElement(item)"
       />
@@ -84,6 +85,7 @@ import { useRaeProductStore } from '@/stores/raeProduct';
 
 const theme = useTheme();
 const router = useRouter();
+const editLoading = reactive({});
 const exportLoading = reactive({});
 const emits = defineEmits(['open-dialog']);
 
@@ -110,8 +112,20 @@ const raeExport = (item) => {
   }, 'GET', router);
 };
 
+// ricarica il ritiro completo dal server: la riga della lista può essere stantia
+// e l'update rispedisce l'intero elemento
 const editElement = (item) => {
-  rae.value = { ...item };
-  emits('open-dialog');
+  editLoading[item.id] = true;
+
+  http.postRequest('rae/product/filter', {
+    filters: [{ model: 'RaeProduct', field: 'id', value: item.id }]
+  }, function (data) {
+    editLoading[item.id] = false;
+    if (data.status == 'ok' && data.rae_products && data.rae_products.length > 0) {
+      rae.value = data.rae_products[0];
+      emits('open-dialog');
+    } else
+      alert(data.error || 'Ritiro non trovato, ricarica la pagina');
+  }, 'POST', router);
 };
 </script>
