@@ -44,6 +44,7 @@
           <v-btn
             icon="mdi-pencil"
             variant="text"
+            :loading="!!editLoading[item.id]"
             :color="theme.current.value.primaryColor"
             @click="editElement(item)"
           />
@@ -83,6 +84,7 @@ import { useScheduleStore } from '@/stores/schedule';
 
 const theme = useTheme();
 const router = useRouter();
+const editLoading = reactive({});
 const deleteLoading = reactive({});
 const exportLoading = reactive({});
 const emits = defineEmits(['open-dialog']);
@@ -92,9 +94,21 @@ const scheduleStore = useScheduleStore();
 const { ready, element: schedule } = storeToRefs(scheduleStore);
 const schedules = storesUtils.getStoreList(scheduleStore, router);
 
+// ricarica il borderò completo dal server: la riga della lista può essere
+// stantia o con schedule_items incompleti, e salvarla cancellerebbe gli item mancanti
 const editElement = (item) => {
-  schedule.value = item;
-  emits('open-dialog');
+  editLoading[item.id] = true;
+
+  http.postRequest('schedule/filter', {
+    filters: [{ model: 'Schedule', field: 'id', value: item.id }]
+  }, function (data) {
+    editLoading[item.id] = false;
+    if (data.status == 'ok' && data.schedules && data.schedules.length > 0) {
+      schedule.value = data.schedules[0];
+      emits('open-dialog');
+    } else
+      alert(data.error || 'Borderò non trovato, ricarica la pagina');
+  }, 'POST', router);
 };
 
 const deleteItem = (item) => {
