@@ -8,7 +8,7 @@
         v-model="filters[`${dateFilterTypes[filtersSetting.dateType].entity}.${filtersSetting.dateType}`][0]"
         :class="isMobile ? '' : 'mr-2'"
         :label="dateFilterTypes[filtersSetting.dateType].label"
-        type="date"
+        :type="dateInputType"
         clearable
         :prepend-icon="filtersSetting.doubleDates ? 'mdi-minus' : 'mdi-plus'"
         @click:prepend="updateDoubleDates"
@@ -23,7 +23,7 @@
         v-model="filters[`${dateFilterTypes[filtersSetting.dateType].entity}.${filtersSetting.dateType}`][1]"
         :class="isMobile ? '' : 'ml-2 mr-2'"
         label="Data di fine intervallo"
-        type="date"
+        :type="dateInputType"
         :rules="validation.futureDate(filters[`${dateFilterTypes[filtersSetting.dateType].entity}.${filtersSetting.dateType}`][0])"
         clearable
       />
@@ -55,7 +55,7 @@ import { useOrderStore } from '@/stores/order';
 import { useScheduleStore } from '@/stores/schedule';
 import { useRaeProductStore } from '@/stores/raeProduct';
 
-const { filterTypes, element } = defineProps({
+const { filterTypes, element, dateInputType } = defineProps({
   element: {
     type: String,
     required: true
@@ -63,6 +63,10 @@ const { filterTypes, element } = defineProps({
   filterTypes: {
     type: Object,
     required: true
+  },
+  dateInputType: {
+    type: String,
+    default: 'date'
   }
 });
 

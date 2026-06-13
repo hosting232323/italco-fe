@@ -1,14 +1,24 @@
 <template>
+  <v-skeleton-loader
+    v-if="!ready"
+    type="table"
+    :color="theme.current.value.secondaryColor"
+    class="mt-5"
+  />
   <v-data-table
-    v-if="ready"
+    v-else
     :items="logs"
     :headers="[
-      { title: 'ID', value: 'logs.id', sortable: false },
       { title: 'Data', value: 'logs.created_at', sortable: false },
+      { title: 'Metodo', value: 'logs.method', sortable: false },
+      { title: 'Endpoint', value: 'logs.endpoint', sortable: false },
       { title: 'User', value: 'user.nickname', sortable: false },
       { title: 'Azioni', key: 'actions', sortable: false }
     ]"
   >
+    <template #[`item.logs.created_at`]="{ item }">
+      {{ formatDateTime(item.logs.created_at) }}
+    </template>
     <template #[`item.actions`]="{ item }">
       <v-btn
         icon="mdi-magnify-plus-outline"
@@ -36,5 +46,20 @@ const logs = storesUtils.getStoreList(logStore, router);
 const openForm = (item) => {
   selectedLog.value = item.id;
   activePopUp.value = true;
+};
+
+const formatDateTime = (value) => {
+  if (!value) return '';
+  const d = new Date(value);
+  if (isNaN(d)) return '';
+  return d.toLocaleString('it-IT', {
+    timeZone: 'Europe/Rome',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  });
 };
 </script>

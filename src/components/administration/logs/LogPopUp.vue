@@ -1,7 +1,7 @@
 <template>
   <v-card
     v-if="!loading"
-    :title="`Log id: ${log.id}`"
+    :title="title"
   >
     <v-card-text>
       <h3 class="section-title">
@@ -34,14 +34,28 @@ const router = useRouter();
 const logStore = useLogStore();
 const { selectedLog } = storeToRefs(logStore);
 
-http.getRequest('log', {
-  log_id: selectedLog.value
-}, (data) => {
+http.getRequest(`log/${encodeURIComponent(selectedLog.value)}`, {}, (data) => {
   if(data.status == 'ok') {
     log.value = data.log;
     loading.value = false;
   }
 }, 'GET', router);
+
+const title = computed(() => {
+  if (!log.value?.created_at) return 'Log';
+
+  const d = new Date(log.value.created_at);
+  const formatted = isNaN(d) ? '' : d.toLocaleString('it-IT', {
+    timeZone: 'Europe/Rome',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  });
+  return `Log del ${formatted}`;
+});
 
 const formattedRequest = computed(() => {
   if (!log.value?.content) return '';
