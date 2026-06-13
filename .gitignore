@@ -29,3 +29,4 @@ coverage
 *.sw?
 bun.lock
 .claude/
+docs/

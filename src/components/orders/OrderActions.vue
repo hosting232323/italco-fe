@@ -153,8 +153,6 @@ const openExternalLink = (link) => {
   window.open(link, '_blank');
 };
 
-// ricarica l'ordine completo dal server: la riga della lista può essere stantia
-// e salvarla sovrascriverebbe stato e prodotti con dati vecchi
 const openForm = (item) => {
   loadingEdit.value = true;
 

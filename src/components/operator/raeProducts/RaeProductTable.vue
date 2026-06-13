@@ -112,8 +112,6 @@ const raeExport = (item) => {
   }, 'GET', router);
 };
 
-// ricarica il ritiro completo dal server: la riga della lista può essere stantia
-// e l'update rispedisce l'intero elemento
 const editElement = (item) => {
   editLoading[item.id] = true;
 

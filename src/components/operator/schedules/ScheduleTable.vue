@@ -94,8 +94,6 @@ const scheduleStore = useScheduleStore();
 const { ready, element: schedule } = storeToRefs(scheduleStore);
 const schedules = storesUtils.getStoreList(scheduleStore, router);
 
-// ricarica il borderò completo dal server: la riga della lista può essere
-// stantia o con schedule_items incompleti, e salvarla cancellerebbe gli item mancanti
 const editElement = (item) => {
   editLoading[item.id] = true;
 
