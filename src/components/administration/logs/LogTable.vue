@@ -17,7 +17,7 @@
     ]"
   >
     <template #[`item.logs.created_at`]="{ item }">
-      {{ formatDateTime(item.logs.created_at) }}
+      {{ days.formatDateTime(item.logs.created_at) }}
     </template>
     <template #[`item.actions`]="{ item }">
       <v-btn
@@ -31,6 +31,7 @@
 </template>
 
 <script setup>
+import days from '@/utils/days';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
@@ -46,20 +47,5 @@ const logs = storesUtils.getStoreList(logStore, router);
 const openForm = (item) => {
   selectedLog.value = item.id;
   activePopUp.value = true;
-};
-
-const formatDateTime = (value) => {
-  if (!value) return '';
-  const d = new Date(value);
-  if (isNaN(d)) return '';
-  return d.toLocaleString('it-IT', {
-    timeZone: 'Europe/Rome',
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit'
-  });
 };
 </script>

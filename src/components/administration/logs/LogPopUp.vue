@@ -22,6 +22,7 @@
 
 <script setup>
 import http from '@/utils/http';
+import days from '@/utils/days';
 import { ref, computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
@@ -44,17 +45,7 @@ http.getRequest(`log/${encodeURIComponent(selectedLog.value)}`, {}, (data) => {
 const title = computed(() => {
   if (!log.value?.created_at) return 'Log';
 
-  const d = new Date(log.value.created_at);
-  const formatted = isNaN(d) ? '' : d.toLocaleString('it-IT', {
-    timeZone: 'Europe/Rome',
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit'
-  });
-  return `Log del ${formatted}`;
+  return `Log del ${days.formatDateTime(log.value.created_at)}`;
 });
 
 const formattedRequest = computed(() => {
