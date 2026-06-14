@@ -22,6 +22,7 @@
           />
           <DateFilters
             element="Log"
+            date-input-type="datetime-local"
             :filter-types="storesUtils.LOG_DATE_FILTER_TYPES"
           />
           <FormButtons
