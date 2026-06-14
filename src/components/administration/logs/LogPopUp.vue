@@ -1,7 +1,7 @@
 <template>
   <v-card
     v-if="!loading"
-    :title="`Log id: ${log.id}`"
+    :title="title"
   >
     <v-card-text>
       <h3 class="section-title">
@@ -22,6 +22,7 @@
 
 <script setup>
 import http from '@/utils/http';
+import days from '@/utils/days';
 import { ref, computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
@@ -34,14 +35,18 @@ const router = useRouter();
 const logStore = useLogStore();
 const { selectedLog } = storeToRefs(logStore);
 
-http.getRequest('log', {
-  log_id: selectedLog.value
-}, (data) => {
+http.getRequest(`log/${encodeURIComponent(selectedLog.value)}`, {}, (data) => {
   if(data.status == 'ok') {
     log.value = data.log;
     loading.value = false;
   }
 }, 'GET', router);
+
+const title = computed(() => {
+  if (!log.value?.created_at) return 'Log';
+
+  return `Log del ${days.formatDateTime(log.value.created_at)}`;
+});
 
 const formattedRequest = computed(() => {
   if (!log.value?.content) return '';

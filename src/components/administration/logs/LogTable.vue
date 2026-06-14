@@ -1,14 +1,24 @@
 <template>
+  <v-skeleton-loader
+    v-if="!ready"
+    type="table"
+    :color="theme.current.value.secondaryColor"
+    class="mt-5"
+  />
   <v-data-table
-    v-if="ready"
+    v-else
     :items="logs"
     :headers="[
-      { title: 'ID', value: 'logs.id', sortable: false },
       { title: 'Data', value: 'logs.created_at', sortable: false },
+      { title: 'Metodo', value: 'logs.method', sortable: false },
+      { title: 'Endpoint', value: 'logs.endpoint', sortable: false },
       { title: 'User', value: 'user.nickname', sortable: false },
       { title: 'Azioni', key: 'actions', sortable: false }
     ]"
   >
+    <template #[`item.logs.created_at`]="{ item }">
+      {{ days.formatDateTime(item.logs.created_at) }}
+    </template>
     <template #[`item.actions`]="{ item }">
       <v-btn
         icon="mdi-magnify-plus-outline"
@@ -21,6 +31,7 @@
 </template>
 
 <script setup>
+import days from '@/utils/days';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
