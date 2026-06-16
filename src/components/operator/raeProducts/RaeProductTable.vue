@@ -131,7 +131,7 @@ rae.value = {};
 const raeExport = (item) => {
   exportLoading[item.id] = true;
 
-  http.getRequest(`export/rae/${item.order.id}`, {}, function (data) {
+  http.getRequest(`export/rae/product/${item.id}`, {}, function (data) {
     exportLoading[item.id] = false;
     if (data.status == 'ko')
       alert(data.error);
