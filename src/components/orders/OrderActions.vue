@@ -126,6 +126,7 @@ import { useRouter } from 'vue-router';
 import { encodeId } from '@/utils/hashids';
 import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
+import { useRaeProductStore } from '@/stores/raeProduct';
 
 const { item } = defineProps({
   item: {
@@ -145,6 +146,7 @@ const loadingDelete = ref(false);
 const userStore = useUserStore();
 const orderStore = useOrderStore();
 const { role } = storeToRefs(userStore);
+const raeProductStore = useRaeProductStore();
 const { element: updatedOrder, activeForm, ready } = storeToRefs(orderStore);
 
 const openExternalLink = (link) => {
@@ -222,6 +224,7 @@ const deleteOrder = (item) => {
     if (data.status == 'ok') {
       ready.value = false;
       orderStore.initList(router);
+      raeProductStore.initList(router);
     } else
       alert(data.error);
   }, 'DELETE', router);

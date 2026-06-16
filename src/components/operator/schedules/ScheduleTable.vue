@@ -80,6 +80,7 @@ import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import { useOrderStore } from '@/stores/order';
 import { useScheduleStore } from '@/stores/schedule';
+import { useRaeProductStore } from '@/stores/raeProduct';
 
 const theme = useTheme();
 const router = useRouter();
@@ -89,6 +90,7 @@ const emits = defineEmits(['open-dialog']);
 
 const orderStore = useOrderStore();
 const scheduleStore = useScheduleStore();
+const raeProductStore = useRaeProductStore();
 const { ready, element: schedule } = storeToRefs(scheduleStore);
 const schedules = storesUtils.getStoreList(scheduleStore, router);
 
@@ -103,6 +105,7 @@ const deleteItem = (item) => {
   scheduleStore.deleteElement(item, router, function() {
     orderStore.initList(router);
     scheduleStore.initList(router);
+    raeProductStore.initList(router);
     deleteLoading[item.id] = false;
   });
 };
