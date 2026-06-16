@@ -40,6 +40,7 @@ import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
+import { useRaeProductStore } from '@/stores/raeProduct';
 
 const form = ref(null);
 const activeTab = ref(0);
@@ -50,6 +51,7 @@ const loading = ref(false);
 const userStore = useUserStore();
 const orderStore = useOrderStore();
 const { role } = storeToRefs(userStore);
+const raeProductStore = useRaeProductStore();
 const { element: order, activeForm } = storeToRefs(orderStore);
 
 const exitFunction = () => {
@@ -85,6 +87,7 @@ const callback = (data) => {
   if (data.status === 'ok') {
     order.value = {};
     orderStore.initList(router);
+    raeProductStore.initList(router);
     activeForm.value = false;
   }
 };

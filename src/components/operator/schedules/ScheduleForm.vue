@@ -129,6 +129,7 @@ import validation from '@/utils/validation';
 import { useOrderStore } from '@/stores/order';
 import { useScheduleStore } from '@/stores/schedule';
 import { useTransportStore } from '@/stores/transport';
+import { useRaeProductStore } from '@/stores/raeProduct';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
 const { fromSchedulation } = defineProps({
@@ -151,6 +152,7 @@ const emits = defineEmits(['cancel', 'go-back']);
 const orderStore = useOrderStore();
 const scheduleStore = useScheduleStore();
 const transportStore = useTransportStore();
+const raeProductStore = useRaeProductStore();
 const administrationUserStore = useAdministrationUserStore();
 const { element: schedule } = storeToRefs(scheduleStore);
 const orders = storesUtils.getStoreList(orderStore, router);
@@ -220,6 +222,7 @@ const callback = (data) => {
   if (data.status == 'ok') {
     orderStore.initList(router);
     scheduleStore.initList(router);
+    raeProductStore.initList(router);
     schedule.value = {};
     emits('cancel');
   } else 
