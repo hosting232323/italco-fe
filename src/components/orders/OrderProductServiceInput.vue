@@ -17,7 +17,7 @@
         [{{
           order.products[product].collection_point ?
             order.products[product].collection_point.name :
-            order.products[product].transport.name
+            order.products[product].transport?.name
         }}]
       </v-list-item-title>
       <v-list-item-subtitle>
