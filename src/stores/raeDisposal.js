@@ -21,11 +21,11 @@ export const useRaeDisposalStore = defineStore('raeDisposal', {
     },
     updateElementWithFormData(router, func) {
       const content = {
-        data: JSON.stringify(storesUtils.exclude_keys(this.element, ['document_ldr']))
+        data: JSON.stringify(storesUtils.exclude_keys(this.element, ['document_fir']))
       };
 
-      if (this.element.document_ldr)
-        content.document_ldr = this.element.document_ldr.selectedFile;
+      if (this.element.document_fir)
+        content.document_fir = this.element.document_fir.selectedFile;
 
       http.formDataRequest(
         `rae/disposal/${this.element.id}`,

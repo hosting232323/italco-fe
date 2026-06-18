@@ -21,11 +21,11 @@
       <v-row no-gutters>
         <v-col cols="6">
           <v-btn
-            v-if="item.document_ldr"
+            v-if="item.document_fir"
             icon="mdi-file-pdf-box"
             variant="text"
             :color="theme.current.value.primaryColor"
-            :href="item.document_ldr"
+            :href="item.document_fir"
             target="_blank"
           />
           <v-btn
