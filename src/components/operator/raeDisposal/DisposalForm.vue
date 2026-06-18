@@ -69,6 +69,7 @@
         </v-row>
         <FormButtons
           class="mb-5"
+          :loading="loading"
           @cancel="emits('cancel')"
         />
       </v-form>
@@ -99,12 +100,12 @@ const raeCollectionCenterStore = useRaeCollectionCenterStore();
 const raeCollectionCenters = storesUtils.getStoreList(raeCollectionCenterStore, router);
 
 const form = ref(null);
-const loading = ref(null);
+const loading = ref(false);
 const emits = defineEmits(['cancel', 'success']);
 const raeDisposalStore = useRaeDisposalStore();
 const { element: disposal } = storeToRefs(raeDisposalStore);
 
-defineProps({
+const { selectedProducts } = defineProps({
   selectedProducts: {
     type: Array,
     required: true
@@ -115,6 +116,7 @@ const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
   loading.value = true;
 
+  disposal.value.rae_product_ids = selectedProducts.map(p => p.id);
   raeDisposalStore.createElement(router, (data) => {
     loading.value = false;
     if (data.status == 'ok') {
