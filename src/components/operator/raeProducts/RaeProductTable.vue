@@ -131,7 +131,7 @@ rae.value = {};
 const raeExport = (item) => {
   exportLoading[item.id] = true;
 
-  http.getRequest(`export/rae/${item.order.id}`, {}, function (data) {
+  http.getRequest(`export/rae/product/${item.id}`, {}, function (data) {
     exportLoading[item.id] = false;
     if (data.status == 'ko')
       alert(data.error);
@@ -140,7 +140,7 @@ const raeExport = (item) => {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `raee_${item.order.id}.pdf`;
+      a.download = `raee_${item.id}.pdf`;
       a.click();
       window.URL.revokeObjectURL(url);
     }
