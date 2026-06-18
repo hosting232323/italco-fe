@@ -28,6 +28,13 @@
             :href="item.document_ldr"
             target="_blank"
           />
+          <v-btn
+            v-else
+            icon="mdi-pencil"
+            variant="text"
+            :color="theme.current.value.primaryColor"
+            @click="editElement(item)"
+          />
         </v-col>
       </v-row>
     </template>
@@ -43,8 +50,14 @@ import { useRaeDisposalStore } from '@/stores/raeDisposal';
 
 const theme = useTheme();
 const router = useRouter();
+const emits = defineEmits(['open-dialog']);
 
 const raeDisposalStore = useRaeDisposalStore();
-const { ready } = storeToRefs(raeDisposalStore);
+const { ready, element: disposal } = storeToRefs(raeDisposalStore);
 const raeDisposals = storesUtils.getStoreList(raeDisposalStore, router);
+
+const editElement = (item) => {
+  disposal.value = { ...item };
+  emits('open-dialog');
+};
 </script>
