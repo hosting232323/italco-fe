@@ -111,7 +111,7 @@ const onFilesSelected = (event) => {
     return;
   }
 
-  disposal.value.document = {
+  disposal.value.document_ldr = {
     selectedFile,
     preview: URL.createObjectURL(selectedFile),
   };

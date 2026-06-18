@@ -118,6 +118,7 @@ const submitForm = async () => {
   raeDisposalStore.createElement(router, (data) => {
     loading.value = false;
     if (data.status == 'ok') {
+      disposal.value = {};
       raeDisposalStore.initList(router);
       emits('cancel');
       emits('success');
