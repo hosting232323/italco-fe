@@ -3,7 +3,7 @@
     <template #activator="{ props: activatorProps }">
       <v-container>
         <h1>
-          Gestione Punto di Raccolta
+          Gestione Centro di Raccolta
           <v-btn
             icon="mdi-plus"
             style="float: right;"

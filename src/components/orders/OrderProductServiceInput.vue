@@ -25,7 +25,7 @@
       </v-list-item-subtitle>
       <template #append>
         <v-icon
-          v-if="!orderUtils.isTerminatedOrder(order)"
+          v-if="canDeleteProduct(order.products[product])"
           icon="mdi-delete"
           @click.stop="delete order.products[product]"
         />
@@ -145,7 +145,6 @@
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
-import orderUtils from '@/utils/order';
 import storesUtils from '@/utils/stores';
 import validation from '@/utils/validation';
 import { useUserStore } from '@/stores/user';
@@ -192,6 +191,10 @@ watch([filteredCollectionPoints, () => selectedCollectionPoint.value], async ([l
     selectedCollectionPoint.value = list[0];
   }
 }, { immediate: true });
+
+const canDeleteProduct = (product) => {
+  return !product.rae_product || product.rae_product.status === 'Generated';
+};
 
 const resetFormRow = () => {
   isRae.value = false;
