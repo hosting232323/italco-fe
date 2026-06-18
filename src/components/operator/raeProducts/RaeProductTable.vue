@@ -140,7 +140,7 @@ const raeExport = (item) => {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `raee_${item.order.id}.pdf`;
+      a.download = `raee_${item.id}.pdf`;
       a.click();
       window.URL.revokeObjectURL(url);
     }
