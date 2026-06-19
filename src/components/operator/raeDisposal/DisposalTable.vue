@@ -21,12 +21,19 @@
       <v-row no-gutters>
         <v-col cols="6">
           <v-btn
-            v-if="item.document_ldr"
+            v-if="item.document_fir"
             icon="mdi-file-pdf-box"
             variant="text"
             :color="theme.current.value.primaryColor"
-            :href="item.document_ldr"
+            :href="item.document_fir"
             target="_blank"
+          />
+          <v-btn
+            v-else
+            icon="mdi-pencil"
+            variant="text"
+            :color="theme.current.value.primaryColor"
+            @click="editElement(item)"
           />
         </v-col>
       </v-row>
@@ -43,8 +50,14 @@ import { useRaeDisposalStore } from '@/stores/raeDisposal';
 
 const theme = useTheme();
 const router = useRouter();
+const emits = defineEmits(['open-dialog']);
 
 const raeDisposalStore = useRaeDisposalStore();
-const { ready } = storeToRefs(raeDisposalStore);
+const { ready, element: disposal } = storeToRefs(raeDisposalStore);
 const raeDisposals = storesUtils.getStoreList(raeDisposalStore, router);
+
+const editElement = (item) => {
+  disposal.value = { ...item };
+  emits('open-dialog');
+};
 </script>

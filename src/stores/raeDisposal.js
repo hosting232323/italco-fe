@@ -10,17 +10,10 @@ export const useRaeDisposalStore = defineStore('raeDisposal', {
     ready: false
   }),
   actions: {
-    createElementWithFormData(router, func) {
-      const content = {
-        data: JSON.stringify(storesUtils.exclude_keys(this.element, ['document']))
-      };
-      
-      if (this.element.document)
-        content.document = this.element.document.selectedFile;
-
-      http.formDataRequest(
+    createElement(router, func) {
+      http.postRequest(
         'rae/disposal',
-        content,
+        this.element,
         func,
         'POST',
         router
@@ -28,11 +21,11 @@ export const useRaeDisposalStore = defineStore('raeDisposal', {
     },
     updateElementWithFormData(router, func) {
       const content = {
-        data: JSON.stringify(storesUtils.exclude_keys(this.element, ['document']))
+        data: JSON.stringify(storesUtils.exclude_keys(this.element, ['document_fir']))
       };
 
-      if (this.element.document)
-        content.document = this.element.document.selectedFile;
+      if (this.element.document_fir)
+        content.document_fir = this.element.document_fir.selectedFile;
 
       http.formDataRequest(
         `rae/disposal/${this.element.id}`,
