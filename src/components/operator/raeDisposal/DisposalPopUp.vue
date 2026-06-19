@@ -16,7 +16,7 @@
           @change="onFilesSelected"
         />
         <div
-          v-if="disposal.document?.selectedFile"
+          v-if="disposal.document_fir?.selectedFile"
           class="mb-4"
         >
           <strong>PDF selezionato</strong>
@@ -31,7 +31,7 @@
               </v-icon>
 
               <div class="pdf-name mt-2">
-                {{ disposal.document.selectedFile.name }}
+                {{ disposal.document_fir.selectedFile.name }}
               </div>
             </v-card-text>
 
@@ -41,14 +41,14 @@
               <v-btn
                 icon="mdi-eye"
                 variant="text"
-                @click="openPdf(disposal.document)"
+                @click="openPdf(disposal.document_fir)"
               />
 
               <v-btn
                 icon="mdi-delete"
                 variant="text"
                 color="red"
-                @click="disposal.document = null"
+                @click="disposal.document_fir = null"
               />
             </v-card-actions>
           </v-card>
