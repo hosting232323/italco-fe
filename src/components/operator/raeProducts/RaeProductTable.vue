@@ -114,7 +114,6 @@ import orderUtils from '@/utils/order';
 import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import { useRaeProductStore } from '@/stores/raeProduct';
-import { outerHeight } from 'ol/dom';
 
 const theme = useTheme();
 const dialog = ref(false);
