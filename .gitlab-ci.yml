@@ -1,7 +1,7 @@
 stages:
   - deploy
-  - lint
+  - housekeeping
 
 include:
   - local: 'gitlab/deploy.yml'
-  - local: 'gitlab/lint.yml'
+  - local: 'gitlab/housekeeping.yml'
