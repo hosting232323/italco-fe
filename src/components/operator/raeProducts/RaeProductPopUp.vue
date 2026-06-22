@@ -85,6 +85,7 @@ import orderUtils from '@/utils/order';
 import { useRouter } from 'vue-router';
 import validation from '@/utils/validation';
 import { useRaeProductStore } from '@/stores/raeProduct';
+import { useRaeDisposalStore } from '@/stores/raeDisposal';
 
 const form = ref(null);
 const fileError = ref('');
@@ -93,6 +94,7 @@ const router = useRouter();
 const emits = defineEmits(['cancel']);
 
 const raeProductStore = useRaeProductStore();
+const raeDisposalStore = useRaeDisposalStore();
 const { element: rae } = storeToRefs(raeProductStore);
 const initialStatus = ref(rae.value.status);
 
@@ -104,6 +106,7 @@ const submitForm = async () => {
     loading.value = false;
     if (data.status == 'ok') {
       raeProductStore.initList(router);
+      raeDisposalStore.initList(router);
       emits('cancel');
     }
   });
