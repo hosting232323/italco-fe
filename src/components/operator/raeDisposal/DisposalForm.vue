@@ -69,6 +69,7 @@
         </v-row>
         <FormButtons
           class="mb-5"
+          :loading="loading"
           @cancel="emits('cancel')"
         />
       </v-form>
@@ -85,6 +86,7 @@ import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import validation from '@/utils/validation';
+import { useRaeProductStore } from '@/stores/raeProduct';
 import { useRaeCarrierStore } from '@/stores/raeCarrier';
 import { useRaeDisposalStore } from '@/stores/raeDisposal';
 import { useRaeCollectionCenterStore } from '@/stores/raeCollectionCenter';
@@ -99,12 +101,13 @@ const raeCollectionCenterStore = useRaeCollectionCenterStore();
 const raeCollectionCenters = storesUtils.getStoreList(raeCollectionCenterStore, router);
 
 const form = ref(null);
-const loading = ref(null);
+const loading = ref(false);
 const emits = defineEmits(['cancel', 'success']);
+const raeProductStore = useRaeProductStore();
 const raeDisposalStore = useRaeDisposalStore();
 const { element: disposal } = storeToRefs(raeDisposalStore);
 
-defineProps({
+const { selectedProducts } = defineProps({
   selectedProducts: {
     type: Array,
     required: true
@@ -115,11 +118,12 @@ const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
   loading.value = true;
 
+  disposal.value.rae_product_ids = selectedProducts.map(p => p.id);
   raeDisposalStore.createElement(router, (data) => {
     loading.value = false;
     if (data.status == 'ok') {
       disposal.value = {};
-      raeDisposalStore.initList(router);
+      raeProductStore.initList(router);
       emits('cancel');
       emits('success');
     }
