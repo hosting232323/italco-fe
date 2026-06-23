@@ -118,7 +118,6 @@ const exportElement = async (item) => {
     {},
     'GET',
     router,
-    `bordero_${item.id}.pdf`,
     () => exportLoading[item.id] = false
   );
 };

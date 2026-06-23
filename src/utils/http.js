@@ -109,18 +109,13 @@ const downloadRequest = async (endpoint, body, method = 'GET', router = undefine
       if (!response.ok)
         throw new Error(`Server error: ${response.status}`);
 
-      const disposition = response.headers.get('Content-Disposition') || '';
-      const match = disposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
-      const filename = match ? match[1].replace(/['"]/g, '') : fallbackName;
-
-      return response.blob().then(blob => ({ blob, filename }));
-    }).then(({ blob, filename }) => {
+      return response.blob().then(blob => ({ blob }));
+    }).then(({ blob }) => {
       const url = URL.createObjectURL(blob);
       const tab = window.open(url, '_blank');
       if (!tab) {
         const a = document.createElement('a');
         a.href = url;
-        a.download = filename;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);

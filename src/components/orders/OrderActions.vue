@@ -172,7 +172,6 @@ const exportPdf = (item) => {
     {},
     'GET',
     router,
-    `ordine_${item.id}.pdf`,
     () => loadingExport.value = false
   );
 };
@@ -232,7 +231,6 @@ const raeExport = (item) => {
     {},
     'GET',
     router,
-    `raee_${item.id}.pdf`,
     () => raeLoading.value = false
   );
 };

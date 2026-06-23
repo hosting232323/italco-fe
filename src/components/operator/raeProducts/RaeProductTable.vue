@@ -129,7 +129,13 @@ rae.value = {};
 
 const raeExport = (item) => {
   exportLoading[item.id] = true;
-  http.downloadRequest(`export/rae/product/${item.id}`, {}, 'GET', router, `raee_${item.id}.pdf`, () => { exportLoading[item.id] = false; });
+  http.downloadRequest(
+    `export/rae/product/${item.id}`,
+    {},
+    'GET',
+    router,
+    () => exportLoading[item.id] = false
+  );
 };
 
 const editElement = (item) => {

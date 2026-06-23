@@ -146,7 +146,6 @@ const exportInvoice = async () => {
     },
     'POST', 
     router,
-    `ordini_${filters.value['Order.booking_date'][0]}_${filters.value['Order.booking_date'][1]}.pdf`,
     () => loading.value = false
   );
 };
