@@ -84,7 +84,7 @@ const getRequest = async (endpoint, params, func, method = 'GET', router = undef
 };
 
 
-const downloadRequest = async (endpoint, body, method = 'GET', router = undefined, fallbackName = 'download', loading = undefined) => {
+const downloadRequest = async (endpoint, body, method = 'GET', router = undefined, loading = undefined) => {
   let url, options;
   if(method == 'GET') {
     url = new URL(`${hostname}${endpoint}`);
