@@ -15,18 +15,20 @@ const postRequest = async (endpoint, body, func, method = 'POST', router = undef
     headers: await createHeader(router),
     body: JSON.stringify(body)
   }).then(response => {
-    if (!response.ok)
-      throw new Error(`Errore nella risposta del server: ${response.status} - ${response.statusText}`);
-
     const contentType = response.headers.get('content-type');
-    if (contentType && fileContentTypes.some(type => contentType.includes(type)))
+    if (contentType && fileContentTypes.some(type => contentType.includes(type))) {
+      if (!response.ok) throw new Error(`Errore nella risposta del server: ${response.status} - ${response.statusText}`);
       return response.blob();
-    else
-      return response.json();
+    }
+    return response.json().then(data => {
+      if (!response.ok && !data.error) data.error = `Errore ${response.status}`;
+      return data;
+    });
   }).then(data => {
     sessionHandler(data, func, router);
   }).catch(error => {
     console.error('Errore nella richiesta:', error);
+    func({ status: 'ko', error: 'Errore di rete' });
   });
 };
 
@@ -40,13 +42,15 @@ const formDataRequest = async (endpoint, data, func, method = 'POST', router = u
     headers: await createHeader(router, true),
     body: formData
   }).then(response => {
-    if (!response.ok)
-      throw new Error(`Errore nella risposta del server: ${response.status} - ${response.statusText}`);
-    return response.json();
+    return response.json().then(data => {
+      if (!response.ok && !data.error) data.error = `Errore ${response.status}`;
+      return data;
+    });
   }).then(data => {
     sessionHandler(data, func, router);
   }).catch(error => {
     console.error('Errore nella richiesta:', error);
+    func({ status: 'ko', error: 'Errore di rete' });
   });
 };
 
@@ -59,18 +63,20 @@ const getRequest = async (endpoint, params, func, method = 'GET', router = undef
     method: method,
     headers: await createHeader(router)
   }).then(response => {
-    if (!response.ok)
-      throw new Error(`Errore nella risposta del server: ${response.status} - ${response.statusText}`);
-
     const contentType = response.headers.get('content-type');
-    if (contentType && contentType.includes('application/pdf'))
+    if (contentType && contentType.includes('application/pdf')) {
+      if (!response.ok) throw new Error(`Errore nella risposta del server: ${response.status} - ${response.statusText}`);
       return response.blob();
-    else
-      return response.json();
+    }
+    return response.json().then(data => {
+      if (!response.ok && !data.error) data.error = `Errore ${response.status}`;
+      return data;
+    });
   }).then(data => {
     sessionHandler(data, func, router);
   }).catch(error => {
     console.error('Errore nella richiesta:', error);
+    func({ status: 'ko', error: 'Errore di rete' });
   });
 };
 
