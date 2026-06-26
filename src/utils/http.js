@@ -103,7 +103,7 @@ const downloadRequest = async (endpoint, body, method = 'GET', router = undefine
         const data = await response.json();
         sessionHandler(data, (d) => {
           if (d.status === 'ko') {
-            alert(d.error || d.message || 'Errore durante il download');
+            alert(d.error || 'Errore durante il download');
           }
         }, router);
         throw new Error('Server returned JSON instead of a file');
