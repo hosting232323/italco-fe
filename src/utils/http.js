@@ -75,6 +75,62 @@ const getRequest = async (endpoint, params, func, method = 'GET', router = undef
 };
 
 
+const downloadRequest = async (endpoint, body, method = 'GET', router = undefined, loading = undefined) => {
+  let url, options;
+  if(method == 'GET') {
+    url = new URL(`${hostname}${endpoint}`);
+    Object.keys(body).forEach(key => url.searchParams.append(key, body[key]));
+    options = {
+      method: 'GET',
+      headers: await createHeader(router)
+    };
+  } else {
+    url = `${hostname}${endpoint}`;
+    options = {
+      method: 'POST',
+      headers: await createHeader(router),
+      body: JSON.stringify(body)
+    };
+  }
+
+  fetch(url, options)
+    .then(async response => {
+      if (!response.ok)
+        throw new Error(`Server error: ${response.status}`);
+
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        const data = await response.json();
+        sessionHandler(data, (d) => {
+          if (d.status === 'ko') {
+            alert(d.error || 'Errore durante il download');
+          }
+        }, router);
+        throw new Error('Server returned JSON instead of a file');
+      }
+
+      return response.blob();
+    }).then(blob => {
+      const url = URL.createObjectURL(blob);
+      const tab = window.open(url, '_blank');
+      
+      if (!tab) {
+        const a = document.createElement('a');
+        a.href = url;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
+      
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
+    }).catch(error => {
+      console.error('Errore nel download:', error);
+    }).finally(() => {
+      if (loading) loading();
+    });
+};
+
+
 const createHeader = async (router, file = false) => {
   let headers = {};
   if (file)
@@ -109,5 +165,6 @@ export default {
   postRequest,
   getRequest,
   formDataRequest,
-  hostname
+  hostname,
+  downloadRequest
 };
