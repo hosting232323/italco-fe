@@ -102,9 +102,9 @@ const RAE_PRODUCT_DATE_FILTER_TYPES = {
     label: 'Data di Creazione',
     entity: 'RaeProduct'
   },
-  date: {
+  dtr_date: {
     label: 'Data DTR',
-    entity: 'Schedule'
+    entity: 'RaeProduct'
   },
   emission_date: {
     label: 'Data di Emissione',
