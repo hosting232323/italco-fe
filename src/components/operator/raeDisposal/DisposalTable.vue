@@ -121,14 +121,12 @@ const exportRoutes = {
 const exportAllegato = (item, allegato) => {
   const { path, loading } = exportRoutes[allegato];
   loading[item.id] = true;
-  http.getRequest(`export/disposal/${item.id}/${path}`, {}, (data) => {
-    loading[item.id] = false;
-    const url = window.URL.createObjectURL(new Blob([data], { type: 'application/pdf' }));
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `smaltimento_${item.id}_${path}.pdf`;
-    a.click();
-    window.URL.revokeObjectURL(url);
-  }, 'GET', router);
+  http.downloadRequest(
+    `export/disposal/${item.id}/${path}`,
+    {},
+    'GET',
+    router,
+    () => loading[item.id] = false
+  );
 };
 </script>
