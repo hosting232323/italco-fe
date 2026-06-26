@@ -116,7 +116,6 @@ const exportElement = async (item) => {
   http.downloadRequest(
     `export/schedule/${item.id}`, 
     {},
-    `bordero_${item.id}.pdf`,
     'GET',
     router,
     () => exportLoading[item.id] = false

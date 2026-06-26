@@ -180,7 +180,6 @@ const downloadExcel = async () => {
     {
       order_ids: schedule.value.orders.map(order => typeof order === 'object' ? order.id : order)
     }, 
-    'ordini_selezionati.xlsx',
     'POST', 
     router,
     () => downloadingExcel.value = false

@@ -124,7 +124,6 @@ const exportAllegato = (item, allegato) => {
   http.downloadRequest(
     `export/disposal/${item.id}/${path}`,
     {},
-    `smaltimento_${item.id}_${path}.pdf`,
     'GET',
     router,
     () => loading[item.id] = false

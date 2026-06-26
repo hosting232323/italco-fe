@@ -75,7 +75,7 @@ const getRequest = async (endpoint, params, func, method = 'GET', router = undef
 };
 
 
-const downloadRequest = async (endpoint, body, filename, method = 'GET', router = undefined, loading = undefined) => {
+const downloadRequest = async (endpoint, body, method = 'GET', router = undefined, loading = undefined) => {
   let url, options;
   if(method == 'GET') {
     url = new URL(`${hostname}${endpoint}`);
@@ -112,12 +112,16 @@ const downloadRequest = async (endpoint, body, filename, method = 'GET', router 
       return response.blob();
     }).then(blob => {
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+      const tab = window.open(url, '_blank');
+      
+      if (!tab) {
+        const a = document.createElement('a');
+        a.href = url;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
+      
       setTimeout(() => URL.revokeObjectURL(url), 10000);
     }).catch(error => {
       console.error('Errore nel download:', error);
