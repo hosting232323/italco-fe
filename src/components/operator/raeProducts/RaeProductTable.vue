@@ -132,6 +132,7 @@ const raeExport = (item) => {
   http.downloadRequest(
     `export/rae/product/${item.id}`,
     {},
+    `raee_${item.id}.pdf`,
     'GET',
     router,
     () => exportLoading[item.id] = false

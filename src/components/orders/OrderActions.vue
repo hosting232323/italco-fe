@@ -170,6 +170,7 @@ const exportPdf = (item) => {
   http.downloadRequest(
     `export/order/${item.id}`, 
     {},
+    `ordine_${item.id}.pdf`,
     'GET',
     router,
     () => loadingExport.value = false
@@ -229,6 +230,7 @@ const raeExport = (item) => {
   http.downloadRequest(
     `export/rae/${item.id}`, 
     {},
+    `raee_${item.id}.pdf`,
     'GET',
     router,
     () => raeLoading.value = false

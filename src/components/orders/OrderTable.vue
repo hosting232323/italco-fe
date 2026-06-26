@@ -175,19 +175,16 @@ const downloadExcel = async () => {
   if (!schedule.value.orders?.length) return;
 
   downloadingExcel.value = true;
-  http.postRequest('export/orders/excel', {
-    order_ids: schedule.value.orders.map(order => typeof order === 'object' ? order.id : order)
-  }, (data) => {
-    downloadingExcel.value = false;
-    const url = window.URL.createObjectURL(new Blob([data]));
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'ordini_selezionati.xlsx';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    window.URL.revokeObjectURL(url);
-  }, 'POST', router);
+  http.downloadRequest(
+    'export/orders/excel', 
+    {
+      order_ids: schedule.value.orders.map(order => typeof order === 'object' ? order.id : order)
+    }, 
+    'ordini_selezionati.xlsx',
+    'POST', 
+    router,
+    () => downloadingExcel.value = false
+  );
 };
 
 const openFormPopUp = () => {
