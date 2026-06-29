@@ -14,11 +14,7 @@
         <i v-if="order.products[product].rae_product?.quantity > 1">
           x{{ order.products[product].rae_product.quantity }}
         </i>
-        [{{
-          order.products[product].collection_point ?
-            order.products[product].collection_point.name :
-            order.products[product].transport?.name
-        }}]
+        [{{ productLocation(order.products[product]) }}]
       </v-list-item-title>
       <v-list-item-subtitle>
         {{ order.products[product].services.map(service => service.name).join(', ') }}
@@ -194,6 +190,13 @@ watch([filteredCollectionPoints, () => selectedCollectionPoint.value], async ([l
 
 const canDeleteProduct = (product) => {
   return !product.rae_product || product.rae_product.status === 'Generated';
+};
+
+const productLocation = (product) => {
+  if (product.release_transport) return product.release_transport.plate;
+  if (product.release_collection_point) return product.release_collection_point.name;
+  if (product.collection_point) return product.collection_point.name;
+  return product.transport?.plate ?? product.transport?.name;
 };
 
 const resetFormRow = () => {
