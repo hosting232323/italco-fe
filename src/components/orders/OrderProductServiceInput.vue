@@ -147,6 +147,7 @@ import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
 import { useServiceStore } from '@/stores/service';
 import { ref, computed, watch, nextTick } from 'vue';
+import { useTransportStore } from '@/stores/transport';
 import { useRaeProductGroupStore } from '@/stores/raeProductGroup';
 import { useCollectionPointStore } from '@/stores/collectionPoint';
 
@@ -164,6 +165,7 @@ const isMobile = mobile.setupMobileUtils();
 const userStore = useUserStore();
 const orderStore = useOrderStore();
 const serviceStore = useServiceStore();
+const transportStore = useTransportStore();
 const raeProductGroupStore = useRaeProductGroupStore();
 const collectionPointStore = useCollectionPointStore();
 
@@ -171,6 +173,9 @@ const { role } = storeToRefs(userStore);
 const { element: order } = storeToRefs(orderStore);
 const services = storesUtils.getStoreList(serviceStore, router);
 const collectionPoints = storesUtils.getStoreList(collectionPointStore, router);
+const transports = (role.value != 'Customer')
+  ? storesUtils.getStoreList(transportStore, router)
+  : ref([]);
 const raeProductGroups = (role.value != 'Customer')
   ? storesUtils.getStoreList(raeProductGroupStore, router)
   : ref([]);
@@ -193,8 +198,10 @@ const canDeleteProduct = (product) => {
 };
 
 const productLocation = (product) => {
-  if (product.release_transport) return product.release_transport.plate;
-  if (product.release_collection_point) return product.release_collection_point.name;
+  if (product.release_transport_id)
+    return transports.value.find(transport => transport.id === product.release_transport_id)?.plate;
+  if (product.release_collection_point_id)
+    return collectionPoints.value.find(collectionPoint => collectionPoint.id === product.release_collection_point_id)?.name;
   if (product.collection_point) return product.collection_point.name;
   return product.transport?.plate ?? product.transport?.name;
 };
