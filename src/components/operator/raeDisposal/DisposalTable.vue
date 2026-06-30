@@ -19,24 +19,55 @@
   >
     <template #[`item.actions`]="{ item }">
       <v-row no-gutters>
-        <v-col cols="6">
-          <v-btn
-            v-if="item.document_fir"
-            icon="mdi-file-pdf-box"
-            variant="text"
-            :color="theme.current.value.primaryColor"
-            :href="item.document_fir"
-            target="_blank"
-          />
-          <v-btn
-            v-else
-            icon="mdi-pencil"
-            variant="text"
-            :color="theme.current.value.primaryColor"
-            @click="editElement(item)"
-          />
+        <v-col cols="4">
+          <v-tooltip
+            v-if="!isBothDocumentsLoaded(item)"
+            text="Modifica FIR"
+          >
+            <template #activator="{ props }">
+              <v-btn
+                v-bind="props"
+                icon="mdi-pencil"
+                variant="text"
+                :color="theme.current.value.primaryColor"
+                @click="editElement(item)"
+              />
+            </template>
+          </v-tooltip>
         </v-col>
-        <v-col cols="6">
+        <v-col cols="4">
+          <v-tooltip text="First Copy FIR">
+            <template #activator="{ props }">
+              <v-btn
+                v-bind="props"
+                icon="mdi-file-pdf-box"
+                variant="text"
+                :color="theme.current.value.primaryColor"
+                :href="item.first_copy_document_fir"
+                :disabled="!item.first_copy_document_fir"
+                target="_blank"
+              />
+            </template>
+          </v-tooltip>
+        </v-col>
+        <v-col cols="4">
+          <v-tooltip text="Fourth Copy FIR">
+            <template #activator="{ props }">
+              <v-btn
+                v-bind="props"
+                icon="mdi-file-pdf-box"
+                variant="text"
+                :color="theme.current.value.primaryColor"
+                :href="item.fourth_copy_document_fir"
+                :disabled="!item.fourth_copy_document_fir"
+                target="_blank"
+              />
+            </template>
+          </v-tooltip>
+        </v-col>
+      </v-row>
+      <v-row no-gutters>
+        <v-col cols="4">
           <v-tooltip text="Allegato A">
             <template #activator="{ props }">
               <v-btn
@@ -50,9 +81,7 @@
             </template>
           </v-tooltip>
         </v-col>
-      </v-row>
-      <v-row no-gutters>
-        <v-col cols="6">
+        <v-col cols="4">
           <v-tooltip text="Allegato B">
             <template #activator="{ props }">
               <v-btn
@@ -66,7 +95,7 @@
             </template>
           </v-tooltip>
         </v-col>
-        <v-col cols="6">
+        <v-col cols="4">
           <v-tooltip text="Schedari">
             <template #activator="{ props }">
               <v-btn
@@ -102,6 +131,10 @@ const emits = defineEmits(['open-dialog']);
 const raeDisposalStore = useRaeDisposalStore();
 const { ready, element: disposal } = storeToRefs(raeDisposalStore);
 const raeDisposals = storesUtils.getStoreList(raeDisposalStore, router);
+
+const isBothDocumentsLoaded = (item) => {
+  return !!item.first_copy_document_fir && !!item.fourth_copy_document_fir;
+};
 
 const editElement = (item) => {
   disposal.value = { ...item };
