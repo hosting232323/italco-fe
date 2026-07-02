@@ -11,6 +11,7 @@
     :headers="[
       { title: 'ID', value: 'id', sortable: false },
       { title: 'Data', value: 'date', sortable: false },
+      { title: 'Peso', value: 'weight', sortable: false },
       { title: 'Codice', value: 'code', sortable: false },
       { title: 'Trasportatore', value: 'carrier.company_name', sortable: false },
       { title: 'Centro di raccolta', value: 'collection_center.company_name', sortable: false },
@@ -21,8 +22,8 @@
       <v-row no-gutters>
         <v-col cols="4">
           <v-tooltip
-            v-if="!isBothDocumentsLoaded(item)"
-            text="Modifica FIR"
+            v-if="!isComplete(item)"
+            text="Modifica smaltimento"
           >
             <template #activator="{ props }">
               <v-btn
@@ -36,7 +37,7 @@
           </v-tooltip>
         </v-col>
         <v-col cols="4">
-          <v-tooltip text="First Copy FIR">
+          <v-tooltip text="FIR Prima Copia">
             <template #activator="{ props }">
               <v-btn
                 v-bind="props"
@@ -51,7 +52,7 @@
           </v-tooltip>
         </v-col>
         <v-col cols="4">
-          <v-tooltip text="Fourth Copy FIR">
+          <v-tooltip text="FIR Quarta Copia">
             <template #activator="{ props }">
               <v-btn
                 v-bind="props"
@@ -132,8 +133,8 @@ const raeDisposalStore = useRaeDisposalStore();
 const { ready, element: disposal } = storeToRefs(raeDisposalStore);
 const raeDisposals = storesUtils.getStoreList(raeDisposalStore, router);
 
-const isBothDocumentsLoaded = (item) => {
-  return !!item.first_copy_document_fir && !!item.fourth_copy_document_fir;
+const isComplete = (item) => {
+  return !!item.first_copy_document_fir && !!item.fourth_copy_document_fir && !!item.weight;
 };
 
 const editElement = (item) => {
