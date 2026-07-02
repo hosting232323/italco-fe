@@ -151,6 +151,7 @@ const submitForm = async () => {
     loading.value = false;
     if (data.status == 'ok') {
       raeDisposalStore.initList(router);
+      disposal.value = {};
       emits('cancel');
     }
   });
