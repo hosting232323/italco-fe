@@ -14,11 +14,7 @@
         <i v-if="order.products[product].rae_product?.quantity > 1">
           x{{ order.products[product].rae_product.quantity }}
         </i>
-        [{{
-          order.products[product].collection_point ?
-            order.products[product].collection_point.name :
-            order.products[product].transport?.name
-        }}]
+        [{{ productLocation(order.products[product]) }}]
       </v-list-item-title>
       <v-list-item-subtitle>
         {{ order.products[product].services.map(service => service.name).join(', ') }}
@@ -151,6 +147,7 @@ import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
 import { useServiceStore } from '@/stores/service';
 import { ref, computed, watch, nextTick } from 'vue';
+import { useTransportStore } from '@/stores/transport';
 import { useRaeProductGroupStore } from '@/stores/raeProductGroup';
 import { useCollectionPointStore } from '@/stores/collectionPoint';
 
@@ -168,6 +165,7 @@ const isMobile = mobile.setupMobileUtils();
 const userStore = useUserStore();
 const orderStore = useOrderStore();
 const serviceStore = useServiceStore();
+const transportStore = useTransportStore();
 const raeProductGroupStore = useRaeProductGroupStore();
 const collectionPointStore = useCollectionPointStore();
 
@@ -194,6 +192,19 @@ watch([filteredCollectionPoints, () => selectedCollectionPoint.value], async ([l
 
 const canDeleteProduct = (product) => {
   return !product.rae_product || product.rae_product.status === 'Generated';
+};
+
+const productLocation = (product) => {
+  if (order.value.cloned_order_id) {
+    if (product.release_transport_id)
+      return storesUtils.getStoreList(transportStore, router).value
+        .find(transport => transport.id === product.release_transport_id)?.plate;
+    if (product.release_collection_point_id)
+      return collectionPoints.value.find(collectionPoint => collectionPoint.id === product.release_collection_point_id)?.name;
+  }
+
+  if (product.collection_point) return product.collection_point.name;
+  return product.transport?.plate ?? product.transport?.name;
 };
 
 const resetFormRow = () => {
