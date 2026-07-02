@@ -14,8 +14,7 @@
             md="6"
           >
             <v-file-input
-              v-if="!disposal.first_copy_document_fir"
-              label="First Copy FIR Document (PDF)"
+              label="Documento FIR Prima Copia (PDF)"
               accept="application/pdf"
               :error-messages="fileErrors.firstCopy"
               :class="!isMobile ? 'mr-2' : ''"
@@ -64,8 +63,7 @@
             md="6"
           >
             <v-file-input
-              v-if="!disposal.fourth_copy_document_fir"
-              label="Fourth Copy FIR Document (PDF)"
+              label="Documento FIR Quarta Copia (PDF)"
               accept="application/pdf"
               :error-messages="fileErrors.fourthCopy"
               :class="!isMobile ? 'ml-2' : ''"
@@ -73,7 +71,7 @@
               @change="onFilesSelected('fourthCopy', $event)"
             />
             <div
-              v-if="disposal.fourth_copy_document_fir?.selectedFile || (typeof disposal.fourth_copy_document_fir === 'string')"
+              v-if="disposal.fourth_copy_document_fir?.selectedFile"
               class="mb-4"
             >
               <v-card class="pdf-card">
@@ -110,9 +108,14 @@
             </div>
           </v-col>
         </v-row>
+        <v-text-field
+          v-model.number="disposal.weight"
+          label="Peso"
+          type="number"
+          min="0"
+        />
         <FormButtons
           :loading="loading"
-          :disabled="bothDocumentsLoaded"
           @cancel="emits('cancel')"
         />
       </v-form>
@@ -123,7 +126,7 @@
 <script setup>
 import FormButtons from '@/components/FormButtons';
 
-import { ref, reactive, computed } from 'vue';
+import { ref, reactive } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import mobile from '@/utils/mobile';
@@ -138,12 +141,6 @@ const emits = defineEmits(['cancel']);
 
 const raeDisposalStore = useRaeDisposalStore();
 const { element: disposal } = storeToRefs(raeDisposalStore);
-
-const bothDocumentsLoaded = computed(() => {
-  const firstLoaded = disposal.value.first_copy_document_fir;
-  const fourthLoaded = disposal.value.fourth_copy_document_fir;
-  return firstLoaded && fourthLoaded;
-});
 
 
 const submitForm = async () => {
