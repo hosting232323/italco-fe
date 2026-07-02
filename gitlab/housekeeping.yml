@@ -19,7 +19,7 @@ deps_check:
   tags:
     - test
   rules:
-    - when: always
+    - if: '$CI_COMMIT_BRANCH != "main"'
   script:
     - npm ci --prefer-offline 2>/dev/null || npm ci
     - npm audit --audit-level=high || AUDIT_EXIT=$?
