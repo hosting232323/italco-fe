@@ -198,10 +198,12 @@ const canDeleteProduct = (product) => {
 };
 
 const productLocation = (product) => {
-  if (product.release_transport_id)
-    return transports.value.find(transport => transport.id === product.release_transport_id)?.plate;
-  if (product.release_collection_point_id)
-    return collectionPoints.value.find(collectionPoint => collectionPoint.id === product.release_collection_point_id)?.name;
+  if (order.value.cloned_order_id) {
+    if (product.release_transport_id)
+      return transports.value.find(transport => transport.id === product.release_transport_id)?.plate;
+    if (product.release_collection_point_id)
+      return collectionPoints.value.find(collectionPoint => collectionPoint.id === product.release_collection_point_id)?.name;
+  }
   if (product.collection_point) return product.collection_point.name;
   return product.transport?.plate ?? product.transport?.name;
 };
