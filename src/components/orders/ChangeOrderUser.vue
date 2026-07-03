@@ -34,7 +34,6 @@ import FormButtons from '@/components/FormButtons';
 import { ref } from 'vue';
 import http from '@/utils/http';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import validation from '@/utils/validation';
 import { useOrderStore } from '@/stores/order';
@@ -50,31 +49,32 @@ const { order } = defineProps({
 const form = ref(null);
 const message = ref('');
 const userId = ref(null);
-const router = useRouter();
 const loading = ref(false);
 const orderStore = useOrderStore();
 const emits = defineEmits(['cancel']);
 const administrationUserStore = useAdministrationUserStore();
 
 const { ready } = storeToRefs(orderStore);
-const users = storesUtils.getStoreList(administrationUserStore, router);
+const users = storesUtils.getStoreList(administrationUserStore);
 
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
 
   message.value = '';
   loading.value = true;
-  http.postRequest('order/customer', {
-    order_id: order.id,
-    user_id: userId.value
+  http.makeRequest('order/customer', 'POST', {
+    body: {
+      order_id: order.id,
+      user_id: userId.value
+    }
   }, function (data) {
     loading.value = false;
     if (data.status == 'ok') {
       ready.value = false;
-      orderStore.initList(router);
+      orderStore.initList();
       emits('cancel');
     } else
       message.value = data.message;
-  }, 'POST', router);
+  });
 };
 </script>

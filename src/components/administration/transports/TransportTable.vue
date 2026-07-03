@@ -47,18 +47,16 @@
 import { reactive } from 'vue';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import addressUtils from '@/utils/address';
 import { useTransportStore } from '@/stores/transport';
 
 const theme = useTheme();
-const router = useRouter();
 const deleteLoading = reactive({});
 
 const transportStore = useTransportStore();
 const { element: transport, activeForm, ready } = storeToRefs(transportStore);
-const transports = storesUtils.getStoreList(transportStore, router);
+const transports = storesUtils.getStoreList(transportStore);
 
 const openForm = (item) => {
   transport.value = item;
@@ -72,8 +70,8 @@ const openForm = (item) => {
 
 const deleteItem = (item) => {
   deleteLoading[item.id] = true;
-  transportStore.deleteElement(item, router, function() {
-    transportStore.initList(router);
+  transportStore.deleteElement(item, function() {
+    transportStore.initList();
     deleteLoading[item.id] = false;
   });
 };

@@ -101,7 +101,6 @@ import http from '@/utils/http';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import mobile from '@/utils/mobile';
-import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
@@ -111,7 +110,6 @@ import { useCollectionPointStore } from '@/stores/collectionPoint';
 const form = ref(null);
 const panel = ref(null);
 const theme = useTheme();
-const router = useRouter();
 const loading = ref(false);
 const isMobile = mobile.setupMobileUtils();
 
@@ -121,14 +119,14 @@ const serviceStore = useServiceStore();
 const collectionPointStore = useCollectionPointStore();
 const { role } = storeToRefs(userStore);
 const { filters, ready } = storeToRefs(orderStore);
-const services = storesUtils.getStoreList(serviceStore, router);
-const collectionPoints = storesUtils.getStoreList(collectionPointStore, router);
+const services = storesUtils.getStoreList(serviceStore);
+const collectionPoints = storesUtils.getStoreList(collectionPointStore);
 
 const filterOrder = async () => {
   if (!(await form.value.validate()).valid) return;
 
   ready.value = false;
-  orderStore.initList(router);
+  orderStore.initList();
   panel.value = null;
 };
 
@@ -137,15 +135,16 @@ const exportInvoice = async () => {
 
   http.downloadRequest(
     'export/invoice',
+    'POST',
     {
-      filters: storesUtils.formatFilters(
-        filters.value,
-        storesUtils.ORDER_DATE_FILTER_TYPES,
-        'Order'
-      )
+      body: {
+        filters: storesUtils.formatFilters(
+          filters.value,
+          storesUtils.ORDER_DATE_FILTER_TYPES,
+          'Order'
+        )
+      }
     },
-    'POST', 
-    router,
     () => loading.value = false
   );
 };

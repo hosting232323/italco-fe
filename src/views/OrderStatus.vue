@@ -163,12 +163,12 @@ onMounted(() => {
   const decoded = decodeId(props.orderId);
   if (decoded != null) {
     orderIdNumeric.value = decoded;
-    http.getRequest(`order/${orderIdNumeric.value}`, {}, (data) => {
+    http.makeRequest(`order/${orderIdNumeric.value}`, 'GET', { session: false }, (data) => {
       if (data.status === 'ok') {
         order.value = data.order;
         show.value = true;
       }
-    }, 'GET');
+    });
   }
 });
 </script>

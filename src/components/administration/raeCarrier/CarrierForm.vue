@@ -95,13 +95,11 @@ import { ref } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import orderUtils from '@/utils/order';
-import { useRouter } from 'vue-router';
 import validation from '@/utils/validation';
 import { useRaeCarrierStore } from '@/stores/raeCarrier';
 
 const form = ref(null);
 const loading = ref(false);
-const router = useRouter();
 const isMobile = mobile.setupMobileUtils();
 
 const raeCarrierStore = useRaeCarrierStore();
@@ -112,16 +110,16 @@ const submitForm = async () => {
 
   loading.value = true;
   if (raeCarrier.value.id)
-    raeCarrierStore.updateElement(router, callback);
+    raeCarrierStore.updateElement(callback);
   else
-    raeCarrierStore.createElement(router, callback);
+    raeCarrierStore.createElement(callback);
 };
 
 const callback = (data) => {
   loading.value = false;
   if (data.status == 'ok') {
     raeCarrier.value = {};
-    raeCarrierStore.initList(router);
+    raeCarrierStore.initList();
     activeForm.value = false;
   }
 };

@@ -88,7 +88,6 @@ import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import mobile from '@/utils/mobile';
 import orderUtils from '@/utils/order';
-import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import { useRaeProductStore } from '@/stores/raeProduct';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
@@ -96,19 +95,18 @@ import { useAdministrationUserStore } from '@/stores/administrationUser';
 const form = ref(null);
 const panel = ref(null);
 const theme = useTheme();
-const router = useRouter();
 const isMobile = mobile.setupMobileUtils();
 
 const raeProductStore = useRaeProductStore();
 const administrationUserStore = useAdministrationUserStore();
 const { ready, filters } = storeToRefs(raeProductStore);
-const users = storesUtils.getStoreList(administrationUserStore, router);
+const users = storesUtils.getStoreList(administrationUserStore);
 
 const filterRaeProduct = async () => {
   if (!(await form.value.validate()).valid) return;
 
   ready.value = false;
-  raeProductStore.initList(router);
+  raeProductStore.initList();
   panel.value = null;
 };
 </script>

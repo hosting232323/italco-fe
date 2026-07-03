@@ -34,15 +34,13 @@
 import days from '@/utils/days';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import { useLogStore } from '@/stores/log';
 
 const theme = useTheme();
-const router = useRouter();
 const logStore = useLogStore();
 const { ready, activePopUp, selectedLog } = storeToRefs(logStore);
-const logs = storesUtils.getStoreList(logStore, router);
+const logs = storesUtils.getStoreList(logStore);
 
 const openForm = (item) => {
   selectedLog.value = item.id;

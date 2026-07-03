@@ -40,22 +40,20 @@ import { reactive } from 'vue';
 import days from '@/utils/days';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import { useCustomerRuleStore } from '@/stores/customerRule';
 
 const theme = useTheme();
-const router = useRouter();
 const deleteLoading = reactive({});
 
 const customerRuleStore = useCustomerRuleStore();
 const { ready } = storeToRefs(customerRuleStore);
-const customerRules = storesUtils.getStoreList(customerRuleStore, router);
+const customerRules = storesUtils.getStoreList(customerRuleStore);
 
 const deleteItem = (item) => {
   deleteLoading[item.id] = true;
-  customerRuleStore.deleteElements(item.rules.map(rule => rule.id), router, function() {
-    customerRuleStore.initList(router);
+  customerRuleStore.deleteElements(item.rules.map(rule => rule.id), function() {
+    customerRuleStore.initList();
     deleteLoading[item.id] = false;
   });
 };

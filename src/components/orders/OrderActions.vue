@@ -122,7 +122,6 @@ import { ref } from 'vue';
 import http from '@/utils/http';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import { encodeId } from '@/utils/hashids';
 import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
@@ -138,7 +137,6 @@ const { item } = defineProps({
 const order = ref({});
 const theme = useTheme();
 const popUpType = ref('');
-const router = useRouter();
 const raeLoading = ref(false);
 const loadingExport = ref(false);
 const loadingDelete = ref(false);
@@ -168,10 +166,9 @@ const exportPdf = (item) => {
   loadingExport.value = true;
 
   http.downloadRequest(
-    `export/order/${item.id}`, 
-    {},
+    `export/order/${item.id}`,
     'GET',
-    router,
+    {},
     () => loadingExport.value = false
   );
 };
@@ -212,25 +209,24 @@ const copyOrder = (selectedOrder) => {
 
 const deleteOrder = (item) => {
   loadingDelete.value = true;
-  http.getRequest(`order/${item.id}`, {}, function (data) {
+  http.makeRequest(`order/${item.id}`, 'DELETE', {}, function (data) {
     loadingDelete.value = false;
     if (data.status == 'ok') {
       ready.value = false;
-      orderStore.initList(router);
-      raeProductStore.initList(router);
+      orderStore.initList();
+      raeProductStore.initList();
     } else
       alert(data.message);
-  }, 'DELETE', router);
+  });
 };
 
 const raeExport = (item) => {
   raeLoading.value = true;
 
   http.downloadRequest(
-    `export/rae/${item.id}`, 
-    {},
+    `export/rae/${item.id}`,
     'GET',
-    router,
+    {},
     () => raeLoading.value = false
   );
 };

@@ -10,16 +10,15 @@ export const useRaeDisposalStore = defineStore('raeDisposal', {
     ready: false
   }),
   actions: {
-    createElement(router, func) {
-      http.postRequest(
+    createElement(func) {
+      http.makeRequest(
         'rae/disposal',
-        this.element,
-        func,
         'POST',
-        router
+        { body: this.element },
+        func
       );
     },
-    updateElementWithFormData(router, func) {
+    updateElementWithFormData(func) {
       const content = {
         data: JSON.stringify(storesUtils.exclude_keys(this.element, ['first_copy_document_fir', 'fourth_copy_document_fir']))
       };
@@ -30,21 +29,19 @@ export const useRaeDisposalStore = defineStore('raeDisposal', {
       if (this.element.fourth_copy_document_fir)
         content.fourth_copy_document_fir = this.element.fourth_copy_document_fir.selectedFile;
 
-      http.formDataRequest(
+      http.uploadRequest(
         `rae/disposal/${this.element.id}`,
-        content,
-        func,
         'PUT',
-        router
+        { body: content },
+        func
       );
     },
-    initList(router) {
-      storesUtils.refreshList(this, (callback) => http.getRequest(
+    initList() {
+      storesUtils.refreshList(this, (callback) => http.makeRequest(
         'rae/disposal',
-        {},
-        callback,
         'GET',
-        router
+        {},
+        callback
       ));
     },
     setList(data) {

@@ -1,9 +1,9 @@
 import { storeToRefs } from 'pinia';
 
 
-const getStoreList = (store, router) => {
+const getStoreList = (store) => {
   const { list, ready } = storeToRefs(store);
-  if (!ready.value) store.initList(router);
+  if (!ready.value) store.initList();
   return list;
 };
 

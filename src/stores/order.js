@@ -19,25 +19,23 @@ export const useOrderStore = defineStore('order', {
     }
   }),
   actions: {
-    createElement(router, func) {
-      http.postRequest(
+    createElement(func) {
+      http.makeRequest(
         'order',
-        storesUtils.exclude_keys(this.element, EXCLUDED_KEYS),
-        func,
         'POST',
-        router
+        { body: storesUtils.exclude_keys(this.element, EXCLUDED_KEYS) },
+        func
       );
     },
-    updateElement(router, func) {
-      http.postRequest(
+    updateElement(func) {
+      http.makeRequest(
         `order/${this.element.id}`,
-        storesUtils.exclude_keys(this.element, EXCLUDED_KEYS),
-        func,
         'PUT',
-        router
+        { body: storesUtils.exclude_keys(this.element, EXCLUDED_KEYS) },
+        func
       );
     },
-    updateElementWithFormData(router, func) {
+    updateElementWithFormData(func) {
       const content = {
         data: JSON.stringify(storesUtils.exclude_keys(this.element, EXCLUDED_KEYS.concat(['photo'])))
       };
@@ -47,25 +45,23 @@ export const useOrderStore = defineStore('order', {
       if (this.element.signature)
         content.signature = this.element.signature; 
 
-      http.formDataRequest(
+      http.uploadRequest(
         `order/${this.element.id}`,
-        content,
-        func,
         'PUT',
-        router
+        { body: content },
+        func
       );
     },
-    initList(router) {
-      storesUtils.refreshList(this, (callback) => http.postRequest(
+    initList() {
+      storesUtils.refreshList(this, (callback) => http.makeRequest(
         'order/filter',
-        {filters: storesUtils.formatFilters(
+        'POST',
+        { body: { filters: storesUtils.formatFilters(
           this.filters,
           storesUtils.ORDER_DATE_FILTER_TYPES,
           'Order'
-        )},
-        callback,
-        'POST',
-        router
+        ) } },
+        callback
       ));
     },
     setList(data) {

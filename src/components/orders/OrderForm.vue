@@ -37,7 +37,6 @@ import OrderOperatorForm from '@/components/orders/OrderOperatorForm';
 
 import { ref } from 'vue';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
 import { useRaeProductStore } from '@/stores/raeProduct';
@@ -45,7 +44,6 @@ import { useRaeProductStore } from '@/stores/raeProduct';
 const form = ref(null);
 const activeTab = ref(0);
 const errorMsg = ref('');
-const router = useRouter();
 const loading = ref(false);
 
 const userStore = useUserStore();
@@ -76,9 +74,9 @@ const submitForm = async () => {
   else {
     loading.value = true;
     if (order.value.photos && order.value.photos.length > 0)
-      orderStore.updateElementWithFormData(router, callback);
+      orderStore.updateElementWithFormData(callback);
     else
-      orderStore.updateElement(router, callback);
+      orderStore.updateElement(callback);
   }
 };
 
@@ -86,8 +84,8 @@ const callback = (data) => {
   loading.value = false;
   if (data.status === 'ok') {
     order.value = {};
-    orderStore.initList(router);
-    raeProductStore.initList(router);
+    orderStore.initList();
+    raeProductStore.initList();
     activeForm.value = false;
   }
 };

@@ -62,9 +62,8 @@ const exportCardIndex = async () => {
   loading.value = true;
   http.downloadRequest(
     `export/rae/card-index/${userId.value}/${year.value}`,
-    {},
     'GET',
-    router,
+    { session: !!router },
     () => loading.value = false
   );
 };

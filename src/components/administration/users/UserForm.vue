@@ -55,7 +55,6 @@ import FormButtons from '@/components/FormButtons';
 import { ref } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import validation from '@/utils/validation';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
@@ -64,21 +63,20 @@ const MAX_USERS = 75;
 
 const form = ref(null);
 const loading = ref(false);
-const router = useRouter();
 const isMobile = mobile.setupMobileUtils();
 const administrationUserStore = useAdministrationUserStore();
 const { element: user, activeForm } = storeToRefs(administrationUserStore);
-const users = storesUtils.getStoreList(administrationUserStore, router);
+const users = storesUtils.getStoreList(administrationUserStore);
 
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
 
   loading.value = true;
-  administrationUserStore.createElement(router, function (data) {
+  administrationUserStore.createElement(function (data) {
     loading.value = false;
     if (data.status == 'ok') {
       user.value = {};
-      administrationUserStore.initList(router);
+      administrationUserStore.initList();
       activeForm.value = false;
     }
   });

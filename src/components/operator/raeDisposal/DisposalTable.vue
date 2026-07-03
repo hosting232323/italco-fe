@@ -88,17 +88,15 @@ import http from '@/utils/http';
 import { reactive } from 'vue';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import { useRaeDisposalStore } from '@/stores/raeDisposal';
 
 const theme = useTheme();
-const router = useRouter();
 const emits = defineEmits(['open-dialog']);
 
 const raeDisposalStore = useRaeDisposalStore();
 const { ready, element: disposal } = storeToRefs(raeDisposalStore);
-const raeDisposals = storesUtils.getStoreList(raeDisposalStore, router);
+const raeDisposals = storesUtils.getStoreList(raeDisposalStore);
 
 const formatGroupQuantities = (groupQuantities = {}) => {
   const values = Object.entries(groupQuantities)
@@ -126,9 +124,8 @@ const exportAllegato = (item, allegato) => {
   loading[item.id] = true;
   http.downloadRequest(
     `export/disposal/${item.id}/${path}`,
-    {},
     'GET',
-    router,
+    {},
     () => loading[item.id] = false
   );
 };

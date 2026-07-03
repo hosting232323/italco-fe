@@ -74,13 +74,11 @@ import days from '@/utils/days';
 import http from '@/utils/http';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import validation from '@/utils/validation';
 import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
 
 const form = ref(null);
-const router = useRouter();
 const loading = ref(false);
 const loadingDates = ref(true);
 const allowedDpcDates = ref([]);
@@ -94,18 +92,20 @@ const { role } = storeToRefs(userStore);
 const { element: order, activeForm } = storeToRefs(orderStore);
 
 if (role.value == 'Customer')
-  http.postRequest('check-constraints', {
-    cap: order.value.cap,
-    services_id: [
-      ...new Set(Object.values(order.value.products).flat().map(s => s.id))
-    ]
+  http.makeRequest('check-constraints', 'POST', {
+    body: {
+      cap: order.value.cap,
+      services_id: [
+        ...new Set(Object.values(order.value.products).flat().map(s => s.id))
+      ]
+    }
   }, (data) => {
     if (data.status === 'ok')
-      allowedDpcDates.value = data.dates; 
-    else 
-      allowedDpcDates.value = []; 
+      allowedDpcDates.value = data.dates;
+    else
+      allowedDpcDates.value = [];
     loadingDates.value = false;
-  }, 'POST', router);
+  });
 else {
   allowedDpcDates.value = nextTwoMonths;
   loadingDates.value = false;
@@ -123,11 +123,11 @@ const submitForm = async () => {
 
   loading.value = true;
   if (order.value.id && order.value.photos && order.value.photos.length > 0)
-    orderStore.updateElementWithFormData(router, callback);
+    orderStore.updateElementWithFormData(callback);
   else if (order.value.id)
-    orderStore.updateElement(router, callback);
+    orderStore.updateElement(callback);
   else
-    orderStore.createElement(router, callback);
+    orderStore.createElement(callback);
 };
 
 const callback = (data) => {
@@ -136,7 +136,7 @@ const callback = (data) => {
     if (order.value.schedulation)
       emits('go-to-schedulation', data.order.id, data.order.status);
     order.value = {};
-    orderStore.initList(router);
+    orderStore.initList();
     activeForm.value = false;
   }
 };

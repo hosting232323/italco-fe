@@ -25,22 +25,20 @@ import http from '@/utils/http';
 import days from '@/utils/days';
 import { ref, computed } from 'vue';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import { useLogStore } from '@/stores/log';
 
 const log = ref({});
 const loading = ref(true);
-const router = useRouter();
 
 const logStore = useLogStore();
 const { selectedLog } = storeToRefs(logStore);
 
-http.getRequest(`log/${encodeURIComponent(selectedLog.value)}`, {}, (data) => {
+http.makeRequest(`log/${encodeURIComponent(selectedLog.value)}`, 'GET', {}, (data) => {
   if(data.status == 'ok') {
     log.value = data.log;
     loading.value = false;
   }
-}, 'GET', router);
+});
 
 const title = computed(() => {
   if (!log.value?.created_at) return 'Log';

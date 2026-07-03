@@ -76,14 +76,12 @@ import { reactive } from 'vue';
 import http from '@/utils/http';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import { useOrderStore } from '@/stores/order';
 import { useScheduleStore } from '@/stores/schedule';
 import { useRaeProductStore } from '@/stores/raeProduct';
 
 const theme = useTheme();
-const router = useRouter();
 const deleteLoading = reactive({});
 const exportLoading = reactive({});
 const emits = defineEmits(['open-dialog']);
@@ -92,7 +90,7 @@ const orderStore = useOrderStore();
 const scheduleStore = useScheduleStore();
 const raeProductStore = useRaeProductStore();
 const { ready, element: schedule } = storeToRefs(scheduleStore);
-const schedules = storesUtils.getStoreList(scheduleStore, router);
+const schedules = storesUtils.getStoreList(scheduleStore);
 
 const editElement = (item) => {
   schedule.value = item;
@@ -102,10 +100,10 @@ const editElement = (item) => {
 const deleteItem = (item) => {
   deleteLoading[item.id] = true;
 
-  scheduleStore.deleteElement(item, router, function() {
-    orderStore.initList(router);
-    scheduleStore.initList(router);
-    raeProductStore.initList(router);
+  scheduleStore.deleteElement(item, function() {
+    orderStore.initList();
+    scheduleStore.initList();
+    raeProductStore.initList();
     deleteLoading[item.id] = false;
   });
 };
@@ -114,10 +112,9 @@ const exportElement = async (item) => {
   exportLoading[item.id] = true;
 
   http.downloadRequest(
-    `export/schedule/${item.id}`, 
-    {},
+    `export/schedule/${item.id}`,
     'GET',
-    router,
+    {},
     () => exportLoading[item.id] = false
   );
 };

@@ -95,13 +95,11 @@ import { ref } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import orderUtils from '@/utils/order';
-import { useRouter } from 'vue-router';
 import validation from '@/utils/validation';
 import { useRaeCollectionCenterStore } from '@/stores/raeCollectionCenter';
 
 const form = ref(null);
 const loading = ref(false);
-const router = useRouter();
 const isMobile = mobile.setupMobileUtils();
 
 const raeCollectionCenterStore = useRaeCollectionCenterStore();
@@ -112,16 +110,16 @@ const submitForm = async () => {
 
   loading.value = true;
   if (raeCollectionCenter.value.id)
-    raeCollectionCenterStore.updateElement(router, callback);
+    raeCollectionCenterStore.updateElement(callback);
   else
-    raeCollectionCenterStore.createElement(router, callback);
+    raeCollectionCenterStore.createElement(callback);
 };
 
 const callback = (data) => {
   loading.value = false;
   if (data.status == 'ok') {
     raeCollectionCenter.value = {};
-    raeCollectionCenterStore.initList(router);
+    raeCollectionCenterStore.initList();
     activeForm.value = false;
   }
 };

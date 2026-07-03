@@ -95,7 +95,6 @@ import ExcelImportationConflicts from '@/components/administration/importation/E
 import { ref } from 'vue';
 import http from '@/utils/http';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import validation from '@/utils/validation';
 import { useOrderStore } from '@/stores/order';
@@ -106,21 +105,22 @@ const form = ref(null);
 const user = ref(null);
 const fileError = ref('');
 const loading = ref(false);
-const router = useRouter();
 const conflictsOrders = ref([]);
 const orderStore = useOrderStore();
 const administrationUserStore = useAdministrationUserStore();
 
 const { ready } = storeToRefs(orderStore);
-const users = storesUtils.getStoreList(administrationUserStore, router);
+const users = storesUtils.getStoreList(administrationUserStore);
 
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
 
   loading.value = true;
-  http.formDataRequest('import/excel', {
-    file: file.value,
-    customer_id: user.value
+  http.uploadRequest('import/excel', 'POST', {
+    body: {
+      file: file.value,
+      customer_id: user.value
+    }
   }, function (data) {
     loading.value = false;
     if (data.status == 'ko')
@@ -133,11 +133,11 @@ const submitForm = async () => {
         conflictsOrders.value = data.conflicted_orders;
       else {
         ready.value = false;
-        orderStore.initList(router);
+        orderStore.initList();
         resetForm();
       }
     }
-  }, 'POST', router);
+  });
 };
 
 const onFilesSelected = (event) => {

@@ -128,14 +128,12 @@ import FormButtons from '@/components/FormButtons';
 
 import { ref, reactive } from 'vue';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import mobile from '@/utils/mobile';
 import { useRaeDisposalStore } from '@/stores/raeDisposal';
 
 const form = ref(null);
 const fileErrors = reactive({ firstCopy: '', fourthCopy: '' });
 const loading = ref(false);
-const router = useRouter();
 const isMobile = mobile.setupMobileUtils();
 const emits = defineEmits(['cancel']);
 
@@ -147,10 +145,10 @@ const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
   loading.value = true;
 
-  raeDisposalStore.updateElementWithFormData(router, (data) => {
+  raeDisposalStore.updateElementWithFormData((data) => {
     loading.value = false;
     if (data.status == 'ok') {
-      raeDisposalStore.initList(router);
+      raeDisposalStore.initList();
       disposal.value = {};
       emits('cancel');
     }

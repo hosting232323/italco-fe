@@ -47,7 +47,6 @@
 import { reactive } from 'vue';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import { useRaeCarrierStore } from '@/stores/raeCarrier';
 
@@ -59,13 +58,12 @@ defineProps({
 });
 
 const theme = useTheme();
-const router = useRouter();
 const deleteLoading = reactive({});
 
 const raeCarrierStore = useRaeCarrierStore();
 const { element: raeCarrier, activeForm, ready } = storeToRefs(raeCarrierStore);
 
-const raeCarriers = storesUtils.getStoreList(raeCarrierStore, router);
+const raeCarriers = storesUtils.getStoreList(raeCarrierStore);
 
 const openForm = (item) => {
   raeCarrier.value = item;
@@ -79,8 +77,8 @@ const openForm = (item) => {
 
 const deleteItem = (item) => {
   deleteLoading[item.id] = true;
-  raeCarrierStore.deleteElement(item, router, function() {
-    raeCarrierStore.initList(router);
+  raeCarrierStore.deleteElement(item, function() {
+    raeCarrierStore.initList();
     deleteLoading[item.id] = false;
   });
 };

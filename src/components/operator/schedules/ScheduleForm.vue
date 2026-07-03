@@ -117,7 +117,6 @@ import { ref, watch } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import draggable from 'vuedraggable';
-import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import validation from '@/utils/validation';
 import { useOrderStore } from '@/stores/order';
@@ -135,7 +134,6 @@ const { fromSchedulation } = defineProps({
 
 const form = ref(null);
 const error = ref(null);
-const router = useRouter();
 const loading = ref(false);
 const selectedUser = ref(null);
 const selectedOrderId = ref(null);
@@ -148,9 +146,9 @@ const transportStore = useTransportStore();
 const raeProductStore = useRaeProductStore();
 const administrationUserStore = useAdministrationUserStore();
 const { element: schedule } = storeToRefs(scheduleStore);
-const orders = storesUtils.getStoreList(orderStore, router);
-const transports = storesUtils.getStoreList(transportStore, router);
-const users = storesUtils.getStoreList(administrationUserStore, router);
+const orders = storesUtils.getStoreList(orderStore);
+const transports = storesUtils.getStoreList(transportStore);
+const users = storesUtils.getStoreList(administrationUserStore);
 
 const addUser = () => {
   if (!selectedUser.value) return;
@@ -201,17 +199,17 @@ const submitForm = async () => {
 
   loading.value = true;
   if (schedule.value.id)
-    scheduleStore.updateElement(router, callback);
+    scheduleStore.updateElement(callback);
   else
-    scheduleStore.createElement(router, callback);
+    scheduleStore.createElement(callback);
 };
 
 const callback = (data) => {
   loading.value = false;
   if (data.status == 'ok') {
-    orderStore.initList(router);
-    scheduleStore.initList(router);
-    raeProductStore.initList(router);
+    orderStore.initList();
+    scheduleStore.initList();
+    raeProductStore.initList();
     schedule.value = {};
     emits('cancel');
   } else 

@@ -68,7 +68,6 @@ import http from '@/utils/http';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import orderUtils from '@/utils/order';
-import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
 import { useRaeProductStore } from '@/stores/raeProduct';
@@ -81,7 +80,6 @@ const { item } = defineProps({
 });
 
 const theme = useTheme();
-const router = useRouter();
 const confirmLoading = ref({});
 const emits = defineEmits(['open-statuses-popup']);
 
@@ -92,15 +90,17 @@ const raeProductStore = useRaeProductStore();
 
 const confirmOrder = (order) => {
   confirmLoading.value[order.id] = true;
-  http.postRequest(`order/${order.id}`, {
-    order_id: order.id,
-    confirmed: !order.confirmed
+  http.makeRequest(`order/${order.id}`, 'PUT', {
+    body: {
+      order_id: order.id,
+      confirmed: !order.confirmed
+    }
   }, (data) => {
     confirmLoading.value[order.id] = false;
     if (data.status == 'ok')
-      orderStore.initList(router);
-    raeProductStore.initList(router);
-  }, 'PUT', router);
+      orderStore.initList();
+    raeProductStore.initList();
+  });
 };
 </script>
 

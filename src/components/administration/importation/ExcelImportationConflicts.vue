@@ -135,7 +135,6 @@ import { ref } from 'vue';
 import http from '@/utils/http';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import { useOrderStore } from '@/stores/order';
 import { useServiceStore } from '@/stores/service';
@@ -159,7 +158,6 @@ const form = ref(null);
 const message = ref('');
 const theme = useTheme();
 const loading = ref(false);
-const router = useRouter();
 const serviceNames = ref({});
 const orderStore = useOrderStore();
 const activeNewProductForm = ref({});
@@ -169,7 +167,7 @@ const serviceStore = useServiceStore();
 const emits = defineEmits(['cancel', 'deleteOrder']);
 
 const { ready } = storeToRefs(orderStore);
-const services = storesUtils.getStoreList(serviceStore, router);
+const services = storesUtils.getStoreList(serviceStore);
 
 const submitConflictsForm = async () => {
   if (!(await form.value.validate()).valid) return;
@@ -185,9 +183,11 @@ const submitConflictsForm = async () => {
   }
 
   loading.value = true;
-  http.postRequest('import/excel/conflict', {
-    orders: conflictsOrders,
-    customer_id: customerId
+  http.makeRequest('import/excel/conflict', 'POST', {
+    body: {
+      orders: conflictsOrders,
+      customer_id: customerId
+    }
   }, function (data) {
     loading.value = false;
     if (data.status == 'ok') {
@@ -195,10 +195,10 @@ const submitConflictsForm = async () => {
         alert(`Importati ${data.imported_orders_count} ordini con successo.`);
 
       ready.value = false;
-      orderStore.initList(router);
+      orderStore.initList();
       emits('cancel', isActive);
     }
-  }, 'POST', router);
+  });
 };
 
 const selectService = (order, productName, type) => {

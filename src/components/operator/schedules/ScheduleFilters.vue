@@ -60,14 +60,12 @@ import { ref } from 'vue';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import mobile from '@/utils/mobile';
-import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import { useScheduleStore } from '@/stores/schedule';
 
 const form = ref(null);
 const panel = ref(null);
 const theme = useTheme();
-const router = useRouter();
 const scheduleStore = useScheduleStore();
 const isMobile = mobile.setupMobileUtils();
 const { filters, ready } = storeToRefs(scheduleStore);
@@ -76,7 +74,7 @@ const filterOrder = async () => {
   if (!(await form.value.validate()).valid) return;
 
   ready.value = false;
-  scheduleStore.initList(router);
+  scheduleStore.initList();
   panel.value = null;
 };
 </script>

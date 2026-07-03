@@ -79,23 +79,21 @@ import { reactive } from 'vue';
 import days from '@/utils/days';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import { useGeographicZoneStore } from '@/stores/geographicZone';
 
 const theme = useTheme();
-const router = useRouter();
 const deleteLoading = reactive({});
 const emits = defineEmits(['openPopUp']);
 
 const geographicZoneStore = useGeographicZoneStore();
 const { ready } = storeToRefs(geographicZoneStore);
-const geographicZones = storesUtils.getStoreList(geographicZoneStore, router);
+const geographicZones = storesUtils.getStoreList(geographicZoneStore);
 
 const deleteItem = (item) => {
   deleteLoading[item.id] = true;
-  geographicZoneStore.deleteElement(item, router, function() {
-    geographicZoneStore.initList(router);
+  geographicZoneStore.deleteElement(item, function() {
+    geographicZoneStore.initList();
     deleteLoading[item.id] = false;
   });
 };

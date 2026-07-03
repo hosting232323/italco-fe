@@ -28,18 +28,16 @@
 import { ref } from 'vue';
 import http from '@/utils/http';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import validation from '@/utils/validation';
 import { useOrderStore } from '@/stores/order';
 
-const router = useRouter();
 const collectionPoints = ref([]);
 
 const orderStore = useOrderStore();
 const { element: order } = storeToRefs(orderStore);
 
-http.getRequest(`order/collection-points/${order.value.id}`, {}, (data) => {
+http.makeRequest(`order/collection-points/${order.value.id}`, 'GET', {}, (data) => {
   if (data.status == 'ok')
     collectionPoints.value = data.collection_points;
-}, 'GET', router);
+});
 </script>

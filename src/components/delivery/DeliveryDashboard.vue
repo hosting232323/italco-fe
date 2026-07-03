@@ -33,12 +33,10 @@ import DeliveryTimeline from '@/components/delivery/DeliveryTimeline.vue';
 
 import http from '@/utils/http';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import { ref, onMounted, onUnmounted } from 'vue';
 import { useScheduleItemStore } from '@/stores/scheduleItem';
 
 let watcherId = null;
-const router = useRouter();
 const goNext = ref(false);
 const locationError = ref(false);
 const scheduleItemStore = useScheduleItemStore();
@@ -52,12 +50,14 @@ onMounted(() => {
 
   watcherId = navigator.geolocation.watchPosition(
     position => {
-      http.postRequest('user/position', {
-        lat: position.coords.latitude,
-        lon: position.coords.longitude
+      http.makeRequest('user/position', 'POST', {
+        body: {
+          lat: position.coords.latitude,
+          lon: position.coords.longitude
+        }
       }, function () {
         goNext.value = true;
-      }, 'POST', router);
+      });
     },
     () => locationError.value = true,
     {

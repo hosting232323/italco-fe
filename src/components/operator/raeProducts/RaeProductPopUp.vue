@@ -82,7 +82,6 @@ import FormButtons from '@/components/FormButtons';
 import { ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import orderUtils from '@/utils/order';
-import { useRouter } from 'vue-router';
 import validation from '@/utils/validation';
 import { useRaeProductStore } from '@/stores/raeProduct';
 import { useRaeDisposalStore } from '@/stores/raeDisposal';
@@ -90,7 +89,6 @@ import { useRaeDisposalStore } from '@/stores/raeDisposal';
 const form = ref(null);
 const fileError = ref('');
 const loading = ref(false);
-const router = useRouter();
 const emits = defineEmits(['cancel']);
 
 const raeProductStore = useRaeProductStore();
@@ -102,11 +100,11 @@ const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
   loading.value = true;
 
-  raeProductStore.updateElementWithFormData(router, (data) => {
+  raeProductStore.updateElementWithFormData((data) => {
     loading.value = false;
     if (data.status == 'ok') {
-      raeProductStore.initList(router);
-      raeDisposalStore.initList(router);
+      raeProductStore.initList();
+      raeDisposalStore.initList();
       emits('cancel');
     }
   });

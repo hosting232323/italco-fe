@@ -85,7 +85,6 @@ import http from '@/utils/http';
 import days from '@/utils/days';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import { ref, computed, watch } from 'vue';
 import validation from '@/utils/validation';
 import { useScheduleStore } from '@/stores/schedule';
@@ -100,7 +99,6 @@ const props = defineProps({
 const message = ref('');
 const dpcForm = ref(null);
 const loading = ref(false);
-const router = useRouter();
 const transports = ref([]);
 const work_date = ref(null);
 const suggestions = ref([]);
@@ -236,13 +234,16 @@ const submitForm = async () => {
 
   message.value = '';
   loading.value = true;
-  http.getRequest(
+  http.makeRequest(
     'schedule/suggestions',
+    'GET',
     {
-      work_date: work_date.value,
-      min_size_group: minSizeGroup.value,
-      max_size_group: maxSizeGroup.value,
-      max_distance_km: maxDistanceKm.value,
+      params: {
+        work_date: work_date.value,
+        min_size_group: minSizeGroup.value,
+        max_size_group: maxSizeGroup.value,
+        max_distance_km: maxDistanceKm.value,
+      }
     },
     function (data) {
       loading.value = false;
@@ -252,9 +253,7 @@ const submitForm = async () => {
         transports.value = data.transports;
         deliveryUsers.value = data.delivery_users;
       } else message.value = data.message;
-    },
-    'GET',
-    router,
+    }
   );
 };
 

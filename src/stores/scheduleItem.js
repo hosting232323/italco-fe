@@ -10,22 +10,20 @@ export const useScheduleItemStore = defineStore('scheduleItem', {
     showForm: false
   }),
   actions: {
-    updateElement(router, func) {
-      http.postRequest(
+    updateElement(func) {
+      http.makeRequest(
         `schedule/${this.element.id}`,
-        {},
-        func,
         'PUT',
-        router
+        { body: {} },
+        func
       );
     },
-    initList(router) {
-      storesUtils.refreshList(this, (callback) => http.getRequest(
+    initList() {
+      storesUtils.refreshList(this, (callback) => http.makeRequest(
         'schedule/delivery',
-        {},
-        callback,
         'GET',
-        router
+        {},
+        callback
       ));
     },
     setList(data) {

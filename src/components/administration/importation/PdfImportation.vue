@@ -94,7 +94,6 @@ import FormButtons from '@/components/FormButtons';
 import { ref } from 'vue';
 import http from '@/utils/http';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import validation from '@/utils/validation';
 import { useOrderStore } from '@/stores/order';
@@ -105,12 +104,11 @@ const form = ref(null);
 const user = ref(null);
 const fileError = ref('');
 const loading = ref(false);
-const router = useRouter();
 const orderStore = useOrderStore();
 const administrationUserStore = useAdministrationUserStore();
 
 const { ready } = storeToRefs(orderStore);
-const users = storesUtils.getStoreList(administrationUserStore, router);
+const users = storesUtils.getStoreList(administrationUserStore);
 
 const submitForm = async (isActive) => {
   if (!(await form.value.validate()).valid) return;
@@ -122,9 +120,10 @@ const submitForm = async (isActive) => {
       content[file.selectedFile.name] = file.selectedFile;
   });
 
-  http.formDataRequest(
+  http.uploadRequest(
     'import/pdf',
-    content, 
+    'POST',
+    { body: content },
     function (data) {
       loading.value = false;
       if (data.status == 'ok' && data.imported_orders_count > 0) {
@@ -134,10 +133,10 @@ const submitForm = async (isActive) => {
         user.value = null;
 
         ready.value = false;
-        orderStore.initList(router);
+        orderStore.initList();
         isActive.value = false;
       }
-    }, 'POST', router);
+    });
 };
 
 const onFilesSelected = (event) => {

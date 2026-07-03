@@ -30,14 +30,12 @@ import FormButtons from '@/components/FormButtons';
 
 import { ref } from 'vue';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import addressUtils from '@/utils/address';
 import validation from '@/utils/validation';
 import { useGeographicZoneStore } from '@/stores/geographicZone';
 
 const form = ref(null);
 const loading = ref(false);
-const router = useRouter();
 const geographicZoneStore = useGeographicZoneStore();
 const { element: geographicZone, activeForm } = storeToRefs(geographicZoneStore);
 
@@ -45,10 +43,10 @@ const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
 
   loading.value = true;
-  geographicZoneStore.createElement(router, function (data) {
+  geographicZoneStore.createElement(function (data) {
     loading.value = false;
     if (data.status == 'ok') {
-      geographicZoneStore.initList(router);
+      geographicZoneStore.initList();
       geographicZone.value = {};
       activeForm.value = false;
     }

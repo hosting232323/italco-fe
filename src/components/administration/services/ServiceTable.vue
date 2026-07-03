@@ -66,7 +66,6 @@ import { reactive } from 'vue';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import orderUtils from '@/utils/order';
-import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import { useServiceStore } from '@/stores/service';
 
@@ -78,12 +77,11 @@ const { activatorProps } = defineProps({
 });
 
 const theme = useTheme();
-const router = useRouter();
 const deleteLoading = reactive({});
 
 const serviceStore = useServiceStore();
 const { element: service, activeForm, ready } = storeToRefs(serviceStore);
-const services = storesUtils.getStoreList(serviceStore, router);
+const services = storesUtils.getStoreList(serviceStore);
 
 const openForm = (item) => {
   service.value = item;
@@ -97,8 +95,8 @@ const openForm = (item) => {
 
 const deleteItem = (item) => {
   deleteLoading[item.id] = true;
-  serviceStore.deleteElement(item, router, function() {
-    serviceStore.initList(router);
+  serviceStore.deleteElement(item, function() {
+    serviceStore.initList();
     deleteLoading[item.id] = false;
   });
 };

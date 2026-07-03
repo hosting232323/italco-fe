@@ -10,40 +10,36 @@ export const useRaeCarrierStore = defineStore('raeCarrier', {
     activeForm: false,
   }),
   actions: {
-    createElement(router, func) {
-      http.postRequest(
+    createElement(func) {
+      http.makeRequest(
         'rae/carrier',
-        this.element,
-        func,
         'POST',
-        router
+        { body: this.element },
+        func
       );
     },
-    updateElement(router, func) {
-      http.postRequest(
+    updateElement(func) {
+      http.makeRequest(
         `rae/carrier/${this.element.id}`,
-        storesUtils.exclude_keys(this.element, ['created_at', 'updated_at', 'users']),
-        func,
         'PUT',
-        router
+        { body: storesUtils.exclude_keys(this.element, ['created_at', 'updated_at', 'users']) },
+        func
       );
     },
-    deleteElement(element, router, func) {
-      http.getRequest(
+    deleteElement(element, func) {
+      http.makeRequest(
         `rae/carrier/${element.id}`,
-        {},
-        func,
         'DELETE',
-        router
+        {},
+        func
       );
     },
-    initList(router) {
-      storesUtils.refreshList(this, (callback) => http.getRequest(
+    initList() {
+      storesUtils.refreshList(this, (callback) => http.makeRequest(
         'rae/carrier',
-        {},
-        callback,
         'GET',
-        router
+        {},
+        callback
       ));
     },
     setList(data) {

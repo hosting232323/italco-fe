@@ -60,7 +60,6 @@ import { ref } from 'vue';
 import days from '@/utils/days';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import validation from '@/utils/validation';
 import { useCustomerRuleStore } from '@/stores/customerRule';
@@ -68,21 +67,20 @@ import { useAdministrationUserStore } from '@/stores/administrationUser';
 
 const form = ref(null);
 const loading = ref(false);
-const router = useRouter();
 const isMobile = mobile.setupMobileUtils();
 const customerRuleStore = useCustomerRuleStore();
 const administrationUserStore = useAdministrationUserStore();
-const users = storesUtils.getStoreList(administrationUserStore, router);
+const users = storesUtils.getStoreList(administrationUserStore);
 const { element: customerRule, activeForm } = storeToRefs(customerRuleStore);
 
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
 
   loading.value = true;
-  customerRuleStore.createElement(router, function (data) {
+  customerRuleStore.createElement(function (data) {
     loading.value = false;
     if (data.status == 'ok') {
-      customerRuleStore.initList(router);
+      customerRuleStore.initList();
       customerRule.value = {};
       activeForm.value = false;
     }
