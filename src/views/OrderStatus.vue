@@ -168,7 +168,7 @@ onMounted(() => {
         order.value = data.order;
         show.value = true;
       }
-    }, 'GET');
+    }, 'GET', false);
   }
 });
 </script>
