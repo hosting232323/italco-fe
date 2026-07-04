@@ -251,7 +251,7 @@ const submitForm = async () => {
         newSuggestionOrders.value = [];
         transports.value = data.transports;
         deliveryUsers.value = data.delivery_users;
-      } else message.value = data.error;
+      } else message.value = data.message;
     },
     'GET',
     router,

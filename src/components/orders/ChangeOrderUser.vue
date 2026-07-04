@@ -74,7 +74,7 @@ const submitForm = async () => {
       orderStore.initList(router);
       emits('cancel');
     } else
-      message.value = data.error;
+      message.value = data.message;
   }, 'POST', router);
 };
 </script>
