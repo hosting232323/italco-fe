@@ -151,7 +151,7 @@ const getToken = () => {
 
 const sessionHandler = (data, func, router) => {
   if (data.status == 'session') {
-    alert(data.error);
+    alert(data.message);
     logoutModule.logout(router);
   } else {
     if (data.new_token)

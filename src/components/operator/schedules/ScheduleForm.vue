@@ -226,7 +226,7 @@ const callback = (data) => {
     schedule.value = {};
     emits('cancel');
   } else 
-    error.value = data.error;
+    error.value = data.message;
 };
 
 const createScheduleItem = (element, type, index = undefined) => {

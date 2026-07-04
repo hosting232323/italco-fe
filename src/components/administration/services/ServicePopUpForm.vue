@@ -90,6 +90,6 @@ const callback = (data) => {
   if (data.status == 'ok')
     serviceStore.initList(router);
   else
-    message.value = data.error;
+    message.value = data.message;
 };
 </script>

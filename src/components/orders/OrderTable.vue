@@ -198,7 +198,7 @@ const openFormPopUp = () => {
       popUpType.value = 'schedule-form';
       schedule.value.schedule_items = data.schedule_items;
     } else
-      scheduleFormMessage.value = data.error;
+      scheduleFormMessage.value = data.message;
   }, 'POST', router);
 };
 

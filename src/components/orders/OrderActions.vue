@@ -219,7 +219,7 @@ const deleteOrder = (item) => {
       orderStore.initList(router);
       raeProductStore.initList(router);
     } else
-      alert(data.error);
+      alert(data.message);
   }, 'DELETE', router);
 };
 
