@@ -30,9 +30,6 @@ const botItalco = {
   name: 'Italco.mi Bot',
   image: '/logo.png',
   message: 'Ciao! Sono qui per rispondere alle tue domande sugli ordini.<br>Chiedimi quello che ti serve sapere specificando la data di creazione degli ordini interessati.',
-  endpoint: 'chatty/message',
-  sessionKey: 'thread_id',
-  responseKey: 'message',
   color: {
     theme_color: '#354c7c',
     theme_color_hover: '#46639e',
