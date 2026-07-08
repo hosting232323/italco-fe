@@ -11,6 +11,7 @@
     :headers="[
       { title: 'ID', value: 'id', sortable: false },
       { title: 'Data', value: 'date', sortable: false },
+      { title: 'Peso', value: 'weight', sortable: false },
       { title: 'Codice', value: 'code', sortable: false },
       { title: 'Trasportatore', value: 'carrier.company_name', sortable: false },
       { title: 'Centro di raccolta', value: 'collection_center.company_name', sortable: false },
@@ -19,24 +20,55 @@
   >
     <template #[`item.actions`]="{ item }">
       <v-row no-gutters>
-        <v-col cols="6">
-          <v-btn
-            v-if="item.document_fir"
-            icon="mdi-file-pdf-box"
-            variant="text"
-            :color="theme.current.value.primaryColor"
-            :href="item.document_fir"
-            target="_blank"
-          />
-          <v-btn
-            v-else
-            icon="mdi-pencil"
-            variant="text"
-            :color="theme.current.value.primaryColor"
-            @click="editElement(item)"
-          />
+        <v-col cols="4">
+          <v-tooltip
+            v-if="!isComplete(item)"
+            text="Modifica smaltimento"
+          >
+            <template #activator="{ props }">
+              <v-btn
+                v-bind="props"
+                icon="mdi-pencil"
+                variant="text"
+                :color="theme.current.value.primaryColor"
+                @click="editElement(item)"
+              />
+            </template>
+          </v-tooltip>
         </v-col>
-        <v-col cols="6">
+        <v-col cols="4">
+          <v-tooltip text="FIR Prima Copia">
+            <template #activator="{ props }">
+              <v-btn
+                v-bind="props"
+                icon="mdi-file-pdf-box"
+                variant="text"
+                :color="theme.current.value.primaryColor"
+                :href="item.first_copy_document_fir"
+                :disabled="!item.first_copy_document_fir"
+                target="_blank"
+              />
+            </template>
+          </v-tooltip>
+        </v-col>
+        <v-col cols="4">
+          <v-tooltip text="FIR Quarta Copia">
+            <template #activator="{ props }">
+              <v-btn
+                v-bind="props"
+                icon="mdi-file-pdf-box"
+                variant="text"
+                :color="theme.current.value.primaryColor"
+                :href="item.fourth_copy_document_fir"
+                :disabled="!item.fourth_copy_document_fir"
+                target="_blank"
+              />
+            </template>
+          </v-tooltip>
+        </v-col>
+      </v-row>
+      <v-row no-gutters>
+        <v-col cols="4">
           <v-tooltip text="Allegato A">
             <template #activator="{ props }">
               <v-btn
@@ -50,9 +82,7 @@
             </template>
           </v-tooltip>
         </v-col>
-      </v-row>
-      <v-row no-gutters>
-        <v-col cols="6">
+        <v-col cols="4">
           <v-tooltip text="Allegato B">
             <template #activator="{ props }">
               <v-btn
@@ -66,7 +96,7 @@
             </template>
           </v-tooltip>
         </v-col>
-        <v-col cols="6">
+        <v-col cols="4">
           <v-tooltip text="Schedari">
             <template #activator="{ props }">
               <v-btn
@@ -102,6 +132,10 @@ const emits = defineEmits(['open-dialog']);
 const raeDisposalStore = useRaeDisposalStore();
 const { ready, element: disposal } = storeToRefs(raeDisposalStore);
 const raeDisposals = storesUtils.getStoreList(raeDisposalStore, router);
+
+const isComplete = (item) => {
+  return !!item.first_copy_document_fir && !!item.fourth_copy_document_fir && !!item.weight;
+};
 
 const editElement = (item) => {
   disposal.value = { ...item };
