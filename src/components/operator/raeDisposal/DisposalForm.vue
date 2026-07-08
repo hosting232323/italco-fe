@@ -124,6 +124,7 @@ const submitForm = async () => {
     if (data.status == 'ok') {
       disposal.value = {};
       raeProductStore.initList(router);
+      raeDisposalStore.initList(router);
       emits('cancel');
       emits('success');
     }

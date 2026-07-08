@@ -21,11 +21,14 @@ export const useRaeDisposalStore = defineStore('raeDisposal', {
     },
     updateElementWithFormData(router, func) {
       const content = {
-        data: JSON.stringify(storesUtils.exclude_keys(this.element, ['document_fir']))
+        data: JSON.stringify(storesUtils.exclude_keys(this.element, ['first_copy_document_fir', 'fourth_copy_document_fir']))
       };
 
-      if (this.element.document_fir)
-        content.document_fir = this.element.document_fir.selectedFile;
+      if (this.element.first_copy_document_fir)
+        content.first_copy_document_fir = this.element.first_copy_document_fir.selectedFile;
+
+      if (this.element.fourth_copy_document_fir)
+        content.fourth_copy_document_fir = this.element.fourth_copy_document_fir.selectedFile;
 
       http.formDataRequest(
         `rae/disposal/${this.element.id}`,
