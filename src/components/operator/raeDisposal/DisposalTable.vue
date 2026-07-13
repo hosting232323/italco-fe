@@ -8,23 +8,19 @@
   <v-data-table
     v-else
     :items="raeDisposals"
-    :headers="[
-      { title: 'ID', value: 'id', sortable: false },
-      { title: 'Data', value: 'date', sortable: false },
-      { title: 'Peso', value: 'weight', sortable: false },
-      { title: 'Codice', value: 'code', sortable: false },
-      { title: 'Trasportatore', value: 'carrier.company_name', sortable: false },
-      { title: 'Centro di raccolta', value: 'collection_center.company_name', sortable: false },
-      { title: 'Azioni', key: 'actions', sortable: false }
-    ]"
+    :headers="headers"
   >
+    <template
+      v-for="groupCode in RAE_GROUP_CODES"
+      :key="groupCode"
+      #[`item.group-${groupCode}`]="{ item }"
+    >
+      {{ item.group_quantities?.[groupCode] ?? 0 }}
+    </template>
     <template #[`item.actions`]="{ item }">
       <v-row no-gutters>
         <v-col cols="4">
-          <v-tooltip
-            v-if="!isComplete(item)"
-            text="Modifica smaltimento"
-          >
+          <v-tooltip text="Modifica smaltimento">
             <template #activator="{ props }">
               <v-btn
                 v-bind="props"
@@ -133,9 +129,22 @@ const raeDisposalStore = useRaeDisposalStore();
 const { ready, element: disposal } = storeToRefs(raeDisposalStore);
 const raeDisposals = storesUtils.getStoreList(raeDisposalStore, router);
 
-const isComplete = (item) => {
-  return !!item.first_copy_document_fir && !!item.fourth_copy_document_fir && !!item.weight;
-};
+const RAE_GROUP_CODES = ['R1', 'R2', 'R3', 'R4', 'R5'];
+const headers = [
+  { title: 'ID', value: 'id', sortable: false },
+  { title: 'Data', value: 'date', sortable: false },
+  { title: 'Peso', value: 'weight', sortable: false },
+  { title: 'Codice', value: 'code', sortable: false },
+  ...RAE_GROUP_CODES.map(groupCode => ({
+    title: groupCode,
+    key: `group-${groupCode}`,
+    sortable: false
+  })),
+  { title: 'Trasportatore', value: 'carrier.company_name', sortable: false },
+  { title: 'Centro di raccolta', value: 'collection_center.company_name', sortable: false },
+  { title: 'Azioni', key: 'actions', sortable: false }
+];
+
 
 const editElement = (item) => {
   disposal.value = { ...item };
