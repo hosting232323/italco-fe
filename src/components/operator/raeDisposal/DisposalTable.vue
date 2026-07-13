@@ -8,14 +8,19 @@
   <v-data-table
     v-else
     :items="raeDisposals"
-    :headers="headers"
+    :headers="[
+      { title: 'ID', value: 'id', sortable: false },
+      { title: 'Data', value: 'date', sortable: false },
+      { title: 'Peso', value: 'weight', sortable: false },
+      { title: 'Codice', value: 'code', sortable: false },
+      { title: 'Raggruppamenti', key: 'group_quantities', sortable: false },
+      { title: 'Trasportatore', value: 'carrier.company_name', sortable: false },
+      { title: 'Centro di raccolta', value: 'collection_center.company_name', sortable: false },
+      { title: 'Azioni', key: 'actions', sortable: false }
+    ]"
   >
-    <template
-      v-for="groupCode in RAE_GROUP_CODES"
-      :key="groupCode"
-      #[`item.group-${groupCode}`]="{ item }"
-    >
-      {{ item.group_quantities?.[groupCode] ?? 0 }}
+    <template #[`item.group_quantities`]="{ item }">
+      {{ formatGroupQuantities(item.group_quantities) }}
     </template>
     <template #[`item.actions`]="{ item }">
       <v-row no-gutters>
@@ -129,21 +134,13 @@ const raeDisposalStore = useRaeDisposalStore();
 const { ready, element: disposal } = storeToRefs(raeDisposalStore);
 const raeDisposals = storesUtils.getStoreList(raeDisposalStore, router);
 
-const RAE_GROUP_CODES = ['R1', 'R2', 'R3', 'R4', 'R5'];
-const headers = [
-  { title: 'ID', value: 'id', sortable: false },
-  { title: 'Data', value: 'date', sortable: false },
-  { title: 'Peso', value: 'weight', sortable: false },
-  { title: 'Codice', value: 'code', sortable: false },
-  ...RAE_GROUP_CODES.map(groupCode => ({
-    title: groupCode,
-    key: `group-${groupCode}`,
-    sortable: false
-  })),
-  { title: 'Trasportatore', value: 'carrier.company_name', sortable: false },
-  { title: 'Centro di raccolta', value: 'collection_center.company_name', sortable: false },
-  { title: 'Azioni', key: 'actions', sortable: false }
-];
+const formatGroupQuantities = (groupQuantities = {}) => {
+  const values = Object.entries(groupQuantities)
+    .filter(([, quantity]) => quantity > 0)
+    .map(([groupCode, quantity]) => `${groupCode}: ${quantity}`);
+
+  return values.join(', ') || '-';
+};
 
 
 const editElement = (item) => {
