@@ -69,28 +69,28 @@
       </v-row>
       <v-row no-gutters>
         <v-col cols="4">
-          <v-tooltip text="Allegato A">
+          <v-tooltip text="Allegato 1">
             <template #activator="{ props }">
               <v-btn
                 v-bind="props"
                 icon="mdi-clipboard-list-outline"
                 variant="text"
                 :color="theme.current.value.primaryColor"
-                :loading="exportingAttachedA[item.id]"
+                :loading="exportingAttachment1[item.id]"
                 @click="exportAllegato(item, 1)"
               />
             </template>
           </v-tooltip>
         </v-col>
         <v-col cols="4">
-          <v-tooltip text="Allegato B">
+          <v-tooltip text="Allegato 2">
             <template #activator="{ props }">
               <v-btn
                 v-bind="props"
                 icon="mdi-chart-bar"
                 variant="text"
                 :color="theme.current.value.primaryColor"
-                :loading="exportingAttachedB[item.id]"
+                :loading="exportingAttachment2[item.id]"
                 @click="exportAllegato(item, 2)"
               />
             </template>
@@ -142,13 +142,13 @@ const editElement = (item) => {
   emits('open-dialog');
 };
 
-const exportingAttachedA = reactive({});
-const exportingAttachedB = reactive({});
+const exportingAttachment1 = reactive({});
+const exportingAttachment2 = reactive({});
 const exportingCardIndex = reactive({});
 
 const exportRoutes = {
-  1: { path: 'attached-a', loading: exportingAttachedA },
-  2: { path: 'attached-a', loading: exportingAttachedB },
+  1: { path: 'attached-1', loading: exportingAttachment1 },
+  2: { path: 'attached-2', loading: exportingAttachment2 },
   3: { path: 'card-index', loading: exportingCardIndex },
 };
 
