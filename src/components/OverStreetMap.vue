@@ -72,17 +72,56 @@ const osmUrl = ref('');
 const scheduleStore = useScheduleStore();
 const { element: schedule } = storeToRefs(scheduleStore);
 
-const emits = defineEmits(['not-found-addresses']);
+const geocodeCache = new Map();
 
-const geocode = async (address) => {
-  const res = await fetch(
-    `https://nominatim.ares-logistics.it/search?format=json&q=${encodeURIComponent(address)}`
-  );
-  const data = await res.json();
+const searchNominatim = async (query) => {
+  try {
+    const res = await fetch(
+      `https://nominatim.ares-logistics.it/search?format=json&q=${encodeURIComponent(query)}`
+    );
+    const data = await res.json();
 
-  return data[0]
-    ? { lat: +data[0].lat, lng: +data[0].lon }
-    : null;
+    return data[0]
+      ? { lat: +data[0].lat, lng: +data[0].lon }
+      : null;
+  } catch {
+    return null;
+  }
+};
+
+// Rimuove civici e "SNC" dalle parti dell'indirizzo, mantenendo via e località
+const simplifyAddress = (address) => address
+  .split(',')
+  .map(part => part
+    .replace(/\b(snc|s\.n\.c\.?)\b/gi, '')
+    .replace(/\b\d+\s*\/?\s*[a-z]?(?=\s|,|$)/gi, '')
+    .replace(/\s{2,}/g, ' ')
+    .trim())
+  .filter(Boolean)
+  .join(', ');
+
+// Catena di fallback: indirizzo completo → senza civico → centroide del CAP,
+// così ogni tappa ottiene sempre almeno una posizione approssimata
+const geocode = async (item) => {
+  const cacheKey = `${item.address}|${item.cap}`;
+  if (geocodeCache.has(cacheKey)) return geocodeCache.get(cacheKey);
+
+  const queries = [];
+  if (item.address) {
+    queries.push(item.address);
+    const simplified = simplifyAddress(item.address);
+    if (simplified && simplified !== item.address) queries.push(simplified);
+  }
+  if (item.cap) queries.push(`${item.cap} Italia`);
+
+  let coords = null;
+  for (const query of queries) {
+    coords = await searchNominatim(query);
+    if (coords) break;
+  }
+
+  geocodeCache.set(cacheKey, coords);
+  return coords;
 };
 
 const drawRoute = async (coords) => {
@@ -94,10 +133,15 @@ const drawRoute = async (coords) => {
     'https://www.openstreetmap.org/directions?engine=fossgis_osrm_car&route=' +
     coords.map(c => `${c.lat},${c.lng}`).join(';');
 
-  const res = await fetch(
-    `https://router.project-osrm.org/route/v1/driving/${coordStr}?overview=full&geometries=geojson`
-  );
-  const data = await res.json();
+  let data;
+  try {
+    const res = await fetch(
+      `https://router.project-osrm.org/route/v1/driving/${coordStr}?overview=full&geometries=geojson`
+    );
+    data = await res.json();
+  } catch {
+    return;
+  }
 
   if (!data.routes?.length) return;
 
@@ -111,51 +155,49 @@ const drawRoute = async (coords) => {
   routeLine.value = L.geoJSON(route.geometry).addTo(map.value);
 };
 
+let updateToken = 0;
+
 const updateMap = async () => {
   if (!map.value) return;
+  const token = ++updateToken;
   loading.value = true;
 
-  markers.value.forEach(m => map.value.removeLayer(m));
-  markers.value = [];
+  try {
+    const results = await Promise.all(
+      schedule.value.schedule_items.map(async (item) => {
+        if (!item.address && !item.cap) return null;
 
-  const results = await Promise.all(
-    schedule.value.schedule_items.map(async (item) => {
-      if (!item.address) return null;
+        return await geocode(item);
+      })
+    );
 
-      const coords = await geocode(item.address);
+    if (token !== updateToken) return;
 
-      return {
-        address: item.address,
-        coords
-      };
-    })
-  );
+    markers.value.forEach(m => map.value.removeLayer(m));
+    markers.value = [];
 
-  emits(
-    'not-found-addresses',
-    results.filter(r => r && !r.coords).map(r => r.address)
-  );
+    locations.value = results.filter(coords => coords);
 
-  locations.value = results.filter(r => r && r.coords).map(r => r.coords);
+    locations.value.forEach((pos, i) => {
+      const marker = L.marker([pos.lat, pos.lng], { icon: redIcon }).addTo(map.value);
 
-  locations.value.forEach((pos, i) => {
-    const marker = L.marker([pos.lat, pos.lng], { icon: redIcon }).addTo(map.value);
+      marker.bindTooltip(`${i + 1}`, {
+        permanent: true,
+        direction: 'top',
+        className: 'number-tooltip'
+      });
 
-    marker.bindTooltip(`${i + 1}`, {
-      permanent: true,
-      direction: 'top',
-      className: 'number-tooltip'
+      markers.value.push(marker);
     });
 
-    markers.value.push(marker);
-  });
-
-  if (locations.value.length) {
-    const bounds = L.latLngBounds(locations.value.map(p => [p.lat, p.lng]));
-    map.value.fitBounds(bounds);
-    await drawRoute(locations.value);
+    if (locations.value.length) {
+      const bounds = L.latLngBounds(locations.value.map(p => [p.lat, p.lng]));
+      map.value.fitBounds(bounds);
+      await drawRoute(locations.value);
+    }
+  } finally {
+    if (token === updateToken) loading.value = false;
   }
-  loading.value = false;
 };
 
 const redIcon = L.icon({
@@ -197,10 +239,11 @@ onMounted(() => {
   updateMap();
 });
 
+// Ri-geocodifica solo quando cambiano indirizzi, CAP o l'ordine delle tappe,
+// non a ogni modifica dei time slot
 watch(
-  () => schedule.value.schedule_items,
-  updateMap,
-  { deep: true }
+  () => (schedule.value.schedule_items || []).map(item => `${item.address}|${item.cap}`).join(';'),
+  updateMap
 );
 </script>
 
