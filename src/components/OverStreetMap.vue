@@ -180,13 +180,10 @@ const updateMap = async () => {
     locations.value = results.filter(coords => coords);
 
     locations.value.forEach((pos, i) => {
-      const marker = L.marker([pos.lat, pos.lng], { icon: precisionIcons[pos.precision] }).addTo(map.value);
-
-      marker.bindTooltip(`${i + 1}`, {
-        permanent: true,
-        direction: 'top',
-        className: 'number-tooltip'
-      });
+      const marker = L.marker(
+        [pos.lat, pos.lng],
+        { icon: numberedIcon(pos.precision, i + 1) }
+      ).addTo(map.value);
 
       markers.value.push(marker);
     });
@@ -201,19 +198,22 @@ const updateMap = async () => {
   }
 };
 
-const markerIcon = (color) => L.icon({
-  iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${color}.png`,
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-});
+const precisionColors = {
+  full: { background: '#2E7D32', color: 'white' },
+  simplified: { background: '#F9A825', color: '#212121' },
+  cap: { background: '#C62828', color: 'white' }
+};
 
-const precisionIcons = {
-  full: markerIcon('green'),
-  simplified: markerIcon('yellow'),
-  cap: markerIcon('red')
+const numberedIcon = (precision, number) => {
+  const { background, color } = precisionColors[precision];
+  return L.divIcon({
+    className: '',
+    html: `<div style="width:28px;height:28px;border-radius:50%;background:${background};color:${color};` +
+      'border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.5);display:flex;align-items:center;' +
+      `justify-content:center;font-weight:bold;font-size:13px;">${number}</div>`,
+    iconSize: [28, 28],
+    iconAnchor: [14, 14]
+  });
 };
 
 const openInGoogleMaps = () => {
@@ -253,17 +253,6 @@ watch(
 </script>
 
 <style scoped>
-/* eslint-disable-next-line vue-scoped-css/no-unused-selector */
-.number-tooltip {
-  background: none;
-  border: none;
-  color: white;
-  font-weight: bold;
-  font-size: 14px;
-  text-align: center;
-  padding: 0;
-}
-
 .loading {
   position: absolute;
   top: 0;
