@@ -21,94 +21,68 @@
     <template #[`item.actions`]="{ item }">
       <v-row no-gutters>
         <v-col cols="4">
-          <v-tooltip
+          <v-btn
             v-if="!isComplete(item)"
-            text="Modifica smaltimento"
-          >
-            <template #activator="{ props }">
-              <v-btn
-                v-bind="props"
-                icon="mdi-pencil"
-                variant="text"
-                :color="theme.current.value.primaryColor"
-                @click="editElement(item)"
-              />
-            </template>
-          </v-tooltip>
+            title="Modifica smaltimento"
+            icon="mdi-pencil"
+            variant="text"
+            :color="theme.current.value.primaryColor"
+            @click="editElement(item)"
+          />
         </v-col>
         <v-col cols="4">
-          <v-tooltip text="FIR Prima Copia">
-            <template #activator="{ props }">
-              <v-btn
-                v-bind="props"
-                icon="mdi-file-pdf-box"
-                variant="text"
-                :color="theme.current.value.primaryColor"
-                :href="item.first_copy_document_fir"
-                :disabled="!item.first_copy_document_fir"
-                target="_blank"
-              />
-            </template>
-          </v-tooltip>
+          <v-btn
+            title="FIR Prima Copia"
+            icon="mdi-file-pdf-box"
+            variant="text"
+            :color="theme.current.value.primaryColor"
+            :href="item.first_copy_document_fir"
+            :disabled="!item.first_copy_document_fir"
+            target="_blank"
+          />
         </v-col>
         <v-col cols="4">
-          <v-tooltip text="FIR Quarta Copia">
-            <template #activator="{ props }">
-              <v-btn
-                v-bind="props"
-                icon="mdi-file-pdf-box"
-                variant="text"
-                :color="theme.current.value.primaryColor"
-                :href="item.fourth_copy_document_fir"
-                :disabled="!item.fourth_copy_document_fir"
-                target="_blank"
-              />
-            </template>
-          </v-tooltip>
+          <v-btn
+            title="FIR Quarta Copia"
+            icon="mdi-file-pdf-box"
+            variant="text"
+            :color="theme.current.value.primaryColor"
+            :href="item.fourth_copy_document_fir"
+            :disabled="!item.fourth_copy_document_fir"
+            target="_blank"
+          />
         </v-col>
       </v-row>
       <v-row no-gutters>
         <v-col cols="4">
-          <v-tooltip text="Allegato A">
-            <template #activator="{ props }">
-              <v-btn
-                v-bind="props"
-                icon="mdi-clipboard-list-outline"
-                variant="text"
-                :color="theme.current.value.primaryColor"
-                :loading="exportingAttachedA[item.id]"
-                @click="exportAllegato(item, 1)"
-              />
-            </template>
-          </v-tooltip>
+          <v-btn
+            title="Allegato 1"
+            icon="mdi-clipboard-list-outline"
+            variant="text"
+            :color="theme.current.value.primaryColor"
+            :loading="exportingAttachment1[item.id]"
+            @click="exportAllegato(item, 1)"
+          />
         </v-col>
         <v-col cols="4">
-          <v-tooltip text="Allegato B">
-            <template #activator="{ props }">
-              <v-btn
-                v-bind="props"
-                icon="mdi-chart-bar"
-                variant="text"
-                :color="theme.current.value.primaryColor"
-                :loading="exportingAttachedB[item.id]"
-                @click="exportAllegato(item, 2)"
-              />
-            </template>
-          </v-tooltip>
+          <v-btn
+            title="Allegato 2"
+            icon="mdi-chart-bar"
+            variant="text"
+            :color="theme.current.value.primaryColor"
+            :loading="exportingAttachment2[item.id]"
+            @click="exportAllegato(item, 2)"
+          />
         </v-col>
         <v-col cols="4">
-          <v-tooltip text="Schedari">
-            <template #activator="{ props }">
-              <v-btn
-                v-bind="props"
-                icon="mdi-store-outline"
-                variant="text"
-                :color="theme.current.value.primaryColor"
-                :loading="exportingCardIndex[item.id]"
-                @click="exportAllegato(item, 3)"
-              />
-            </template>
-          </v-tooltip>
+          <v-btn
+            title="Schedari"
+            icon="mdi-store-outline"
+            variant="text"
+            :color="theme.current.value.primaryColor"
+            :loading="exportingCardIndex[item.id]"
+            @click="exportAllegato(item, 3)"
+          />
         </v-col>
       </v-row>
     </template>
@@ -142,13 +116,13 @@ const editElement = (item) => {
   emits('open-dialog');
 };
 
-const exportingAttachedA = reactive({});
-const exportingAttachedB = reactive({});
+const exportingAttachment1 = reactive({});
+const exportingAttachment2 = reactive({});
 const exportingCardIndex = reactive({});
 
 const exportRoutes = {
-  1: { path: 'attached-a', loading: exportingAttachedA },
-  2: { path: 'attached-a', loading: exportingAttachedB },
+  1: { path: 'attached-1', loading: exportingAttachment1 },
+  2: { path: 'attached-2', loading: exportingAttachment2 },
   3: { path: 'card-index', loading: exportingCardIndex },
 };
 
