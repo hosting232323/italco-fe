@@ -13,16 +13,19 @@
       { title: 'Data', value: 'date', sortable: false },
       { title: 'Peso', value: 'weight', sortable: false },
       { title: 'Codice', value: 'code', sortable: false },
+      { title: 'Raggruppamenti', key: 'group_quantities', sortable: false },
       { title: 'Trasportatore', value: 'carrier.company_name', sortable: false },
       { title: 'Centro di raccolta', value: 'collection_center.company_name', sortable: false },
       { title: 'Azioni', key: 'actions', sortable: false }
     ]"
   >
+    <template #[`item.group_quantities`]="{ item }">
+      {{ formatGroupQuantities(item.group_quantities) }}
+    </template>
     <template #[`item.actions`]="{ item }">
       <v-row no-gutters>
         <v-col cols="4">
           <v-btn
-            v-if="!isComplete(item)"
             title="Modifica smaltimento"
             icon="mdi-pencil"
             variant="text"
@@ -107,8 +110,12 @@ const raeDisposalStore = useRaeDisposalStore();
 const { ready, element: disposal } = storeToRefs(raeDisposalStore);
 const raeDisposals = storesUtils.getStoreList(raeDisposalStore, router);
 
-const isComplete = (item) => {
-  return !!item.first_copy_document_fir && !!item.fourth_copy_document_fir && !!item.weight;
+const formatGroupQuantities = (groupQuantities = {}) => {
+  const values = Object.entries(groupQuantities)
+    .filter(([, quantity]) => quantity > 0)
+    .map(([groupCode, quantity]) => `${groupCode}: ${quantity}`);
+
+  return values.join(', ') || '-';
 };
 
 const editElement = (item) => {
