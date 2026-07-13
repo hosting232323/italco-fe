@@ -59,21 +59,21 @@
       <v-row no-gutters>
         <v-col cols="4">
           <v-btn
-            title="Allegato A"
+            title="Allegato 1"
             icon="mdi-clipboard-list-outline"
             variant="text"
             :color="theme.current.value.primaryColor"
-            :loading="exportingAttachedA[item.id]"
+            :loading="exportingAttachment1[item.id]"
             @click="exportAllegato(item, 1)"
           />
         </v-col>
         <v-col cols="4">
           <v-btn
-            title="Allegato B"
+            title="Allegato 2"
             icon="mdi-chart-bar"
             variant="text"
             :color="theme.current.value.primaryColor"
-            :loading="exportingAttachedB[item.id]"
+            :loading="exportingAttachment2[item.id]"
             @click="exportAllegato(item, 2)"
           />
         </v-col>
@@ -118,19 +118,18 @@ const formatGroupQuantities = (groupQuantities = {}) => {
   return values.join(', ') || '-';
 };
 
-
 const editElement = (item) => {
   disposal.value = { ...item };
   emits('open-dialog');
 };
 
-const exportingAttachedA = reactive({});
-const exportingAttachedB = reactive({});
+const exportingAttachment1 = reactive({});
+const exportingAttachment2 = reactive({});
 const exportingCardIndex = reactive({});
 
 const exportRoutes = {
-  1: { path: 'attached-a', loading: exportingAttachedA },
-  2: { path: 'attached-a', loading: exportingAttachedB },
+  1: { path: 'attached-1', loading: exportingAttachment1 },
+  2: { path: 'attached-2', loading: exportingAttachment2 },
   3: { path: 'card-index', loading: exportingCardIndex },
 };
 
