@@ -89,7 +89,6 @@ const searchNominatim = async (query) => {
   }
 };
 
-// Rimuove civici e "SNC" dalle parti dell'indirizzo, mantenendo via e località
 const simplifyAddress = (address) => address
   .split(',')
   .map(part => part
@@ -100,28 +99,30 @@ const simplifyAddress = (address) => address
   .filter(Boolean)
   .join(', ');
 
-// Catena di fallback: indirizzo completo → senza civico → centroide del CAP,
-// così ogni tappa ottiene sempre almeno una posizione approssimata
 const geocode = async (item) => {
   const cacheKey = `${item.address}|${item.cap}`;
   if (geocodeCache.has(cacheKey)) return geocodeCache.get(cacheKey);
 
   const queries = [];
   if (item.address) {
-    queries.push(item.address);
+    queries.push({ query: item.address, precision: 'full' });
     const simplified = simplifyAddress(item.address);
-    if (simplified && simplified !== item.address) queries.push(simplified);
+    if (simplified && simplified !== item.address)
+      queries.push({ query: simplified, precision: 'simplified' });
   }
-  if (item.cap) queries.push(`${item.cap} Italia`);
+  if (item.cap) queries.push({ query: `${item.cap} Italia`, precision: 'cap' });
 
-  let coords = null;
-  for (const query of queries) {
-    coords = await searchNominatim(query);
-    if (coords) break;
+  let result = null;
+  for (const { query, precision } of queries) {
+    const coords = await searchNominatim(query);
+    if (coords) {
+      result = { ...coords, precision };
+      break;
+    }
   }
 
-  geocodeCache.set(cacheKey, coords);
-  return coords;
+  geocodeCache.set(cacheKey, result);
+  return result;
 };
 
 const drawRoute = async (coords) => {
@@ -179,7 +180,7 @@ const updateMap = async () => {
     locations.value = results.filter(coords => coords);
 
     locations.value.forEach((pos, i) => {
-      const marker = L.marker([pos.lat, pos.lng], { icon: redIcon }).addTo(map.value);
+      const marker = L.marker([pos.lat, pos.lng], { icon: precisionIcons[pos.precision] }).addTo(map.value);
 
       marker.bindTooltip(`${i + 1}`, {
         permanent: true,
@@ -200,14 +201,20 @@ const updateMap = async () => {
   }
 };
 
-const redIcon = L.icon({
-  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+const markerIcon = (color) => L.icon({
+  iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${color}.png`,
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
   iconSize: [25, 41],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
   shadowSize: [41, 41]
 });
+
+const precisionIcons = {
+  full: markerIcon('green'),
+  simplified: markerIcon('yellow'),
+  cap: markerIcon('red')
+};
 
 const openInGoogleMaps = () => {
   if (locations.value.length < 2) return;
@@ -239,8 +246,6 @@ onMounted(() => {
   updateMap();
 });
 
-// Ri-geocodifica solo quando cambiano indirizzi, CAP o l'ordine delle tappe,
-// non a ogni modifica dei time slot
 watch(
   () => (schedule.value.schedule_items || []).map(item => `${item.address}|${item.cap}`).join(';'),
   updateMap
