@@ -11,63 +11,17 @@
         <v-icon>mdi-drag</v-icon>
       </div>
     </v-col>
-    <v-col :cols="editingAddressId === (element.order_id || element.collection_point_id) ? 10 : 4">
+    <v-col cols="4">
       <p>
-        {{ element.index + 1 }}: 
+        {{ element.index + 1 }}:
         {{ element.operation_type == 'Order' ? 'Ordine' : 'Punto di ritiro' }}
         ID {{ element.operation_type == 'Order' ? element.order_id : element.collection_point_id }}
       </p>
       <div style="font-size: smaller; padding-right: 5px;">
-        <template v-if="editingAddressId !== (element.order_id || element.collection_point_id)">
-          {{ element.address }}, {{ element.cap }}
-          <template v-if="notFoundAddresses.includes(element.address)">
-            <v-icon
-              color="warning"
-              size="16"
-              class="ml-1"
-              title="Indirizzo non identificato"
-            >
-              mdi-alert-circle
-            </v-icon>
-            <v-icon
-              size="16"
-              class="ml-1"
-              style="cursor:pointer"
-              @click="startEditing(element)"
-            >
-              mdi-pencil
-            </v-icon>
-          </template>
-        </template>
-        <template v-else>
-          <div class="d-flex justify-center align-center">
-            <div
-              class="d-flex flex-column"
-              style="width: 100%;"
-            >
-              {{ previousAddress }}
-              <GooglePlacesAutocomplete
-                v-model="element.address"
-                label="Modifica indirizzo"
-                :rules="validation.requiredRules"
-                custom-class="mt-2"
-                @address-components="(data) => updateAddress(data, element)"
-              />
-            </div>
-            <v-btn
-              icon="mdi-close"
-              variant="text"
-              style="margin-bottom: 22px;"
-              @click="editingAddressId = null"
-            />
-          </div>
-        </template>
+        {{ element.address }}, {{ element.cap }}
       </div>
     </v-col>
-    <v-col   
-      v-if="editingAddressId !== (element.order_id || element.collection_point_id)"
-      cols="6"
-    >
+    <v-col cols="6">
       <div :class="['d-flex', 'align-center', isMobile ? 'flex-column' : '']">
         <v-text-field 
           v-model="element.start_time_slot" 
@@ -104,37 +58,24 @@
 </template>
 
 <script setup>
-import GooglePlacesAutocomplete from '@/components/GooglePlacesAutocomplete';
-
-import http from '@/utils/http';
+import { computed } from 'vue';
 import { useTheme } from 'vuetify';
-import { ref, computed } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import orderUtils from '@/utils/order';
 import validation from '@/utils/validation';
-import { useOrderStore } from '@/stores/order';
 import { useScheduleStore } from '@/stores/schedule';
 
-const { index, notFoundAddresses } = defineProps({
+const { index } = defineProps({
   index: {
     type: Number,
-    required: true
-  },
-  notFoundAddresses: {
-    type: Array,
     required: true
   }
 });
 
 const theme = useTheme();
-const router = useRouter();
-const previousAddress = ref('');
-const editingAddressId = ref(null);
 const isMobile = mobile.setupMobileUtils();
 
-const orderStore = useOrderStore();
 const scheduleStore = useScheduleStore();
 const { element: schedule } = storeToRefs(scheduleStore);
 const element = computed(() => schedule.value.schedule_items.find(item => item.index === index));
@@ -167,31 +108,5 @@ const removeOrder = (order) => {
     else
       return false;
   });
-};
-
-const updateAddress = (value, element) => {
-  element.cap = value.cap;
-  element.address = value.address;
-  if(element.operation_type == 'CollectionPoint')
-    http.postRequest(`collection-point/${element.collection_point_id}`,{ 
-      address: value.address,
-      cap: value.cap
-    }, callback, 'PUT', router);
-  else
-    http.postRequest(`order/${element.order_id}`,{ 
-      address: value.address,
-      cap: value.cap
-    }, callback, 'PUT', router);
-};
-
-const callback = () => {
-  orderStore.initList(router);
-  editingAddressId.value = null;
-};
-
-const startEditing = (element) => {
-  previousAddress.value = element.address;
-  editingAddressId.value = element.order_id || element.collection_point_id;
-  element.address = '';
 };
 </script>

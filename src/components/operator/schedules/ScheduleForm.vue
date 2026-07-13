@@ -86,10 +86,7 @@
               handle=".drag-handle"
             >
               <template #item="{ element }">
-                <ScheduleItem
-                  :index="element.index"
-                  :not-found-addresses="notFoundAddresses"
-                />
+                <ScheduleItem :index="element.index" />
               </template>
             </draggable>
             <FormButtons
@@ -103,10 +100,7 @@
           md="5"
         >
           <div style="height: 100%; border-radius: 12px; overflow: hidden;">
-            <OverStreetMap
-              v-if="schedule.schedule_items && schedule.schedule_items.length > 0"
-              @not-found-addresses="handleNotFound"
-            />
+            <OverStreetMap v-if="schedule.schedule_items && schedule.schedule_items.length > 0" />
           </div>
         </v-col>
       </v-row>
@@ -144,7 +138,6 @@ const error = ref(null);
 const router = useRouter();
 const loading = ref(false);
 const selectedUser = ref(null);
-const notFoundAddresses = ref([]);
 const selectedOrderId = ref(null);
 const isMobile = mobile.setupMobileUtils();
 const emits = defineEmits(['cancel', 'go-back']);
@@ -158,10 +151,6 @@ const { element: schedule } = storeToRefs(scheduleStore);
 const orders = storesUtils.getStoreList(orderStore, router);
 const transports = storesUtils.getStoreList(transportStore, router);
 const users = storesUtils.getStoreList(administrationUserStore, router);
-
-const handleNotFound = (addresses) => {
-  notFoundAddresses.value = addresses;
-};
 
 const addUser = () => {
   if (!selectedUser.value) return;
