@@ -191,7 +191,6 @@ watch([filteredCollectionPoints, () => selectedCollectionPoint.value], async ([l
 }, { immediate: true });
 
 const canDeleteProduct = (product) => {
-  // I prodotti RAE appena aggiunti non hanno ancora uno status: sono sempre eliminabili prima del salvataggio.
   return !product.rae_product || !product.rae_product.status || product.rae_product.status === 'Generated';
 };
 
