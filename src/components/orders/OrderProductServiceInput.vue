@@ -191,7 +191,7 @@ watch([filteredCollectionPoints, () => selectedCollectionPoint.value], async ([l
 }, { immediate: true });
 
 const canDeleteProduct = (product) => {
-  return !product.rae_product || product.rae_product.status === 'Generated';
+  return !product.rae_product || !product.rae_product.status || product.rae_product.status === 'Generated';
 };
 
 const productLocation = (product) => {
