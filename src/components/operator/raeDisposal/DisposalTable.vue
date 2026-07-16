@@ -77,16 +77,6 @@
             @click="exportAllegato(item, 2)"
           />
         </v-col>
-        <v-col cols="4">
-          <v-btn
-            title="Schedari"
-            icon="mdi-store-outline"
-            variant="text"
-            :color="theme.current.value.primaryColor"
-            :loading="exportingCardIndex[item.id]"
-            @click="exportAllegato(item, 3)"
-          />
-        </v-col>
       </v-row>
     </template>
   </v-data-table>
@@ -125,12 +115,10 @@ const editElement = (item) => {
 
 const exportingAttachment1 = reactive({});
 const exportingAttachment2 = reactive({});
-const exportingCardIndex = reactive({});
 
 const exportRoutes = {
   1: { path: 'attached-1', loading: exportingAttachment1 },
   2: { path: 'attached-2', loading: exportingAttachment2 },
-  3: { path: 'card-index', loading: exportingCardIndex },
 };
 
 const exportAllegato = (item, allegato) => {
