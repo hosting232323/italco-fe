@@ -11,17 +11,13 @@
           justify="space-between"
         >
           <h1>Ritiri Raee</h1>
-          <v-tooltip text="Schedario Ritiri Raee">
-            <template #activator="{ props }">
-              <v-btn
-                v-bind="props"
-                icon="mdi-store-outline"
-                variant="text"
-                :color="theme.current.value.primaryColor"
-                @click="cardIndexDialog = true"
-              />
-            </template>
-          </v-tooltip>
+          <v-btn
+            title="Schedario Ritiri Raee"
+            icon="mdi-store-outline"
+            variant="text"
+            :color="theme.current.value.primaryColor"
+            @click="cardIndexDialog = true"
+          />
         </v-row>
         <hr>
         <RaeProductFilters />
