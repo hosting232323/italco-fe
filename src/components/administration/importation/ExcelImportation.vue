@@ -123,11 +123,9 @@ const submitForm = async () => {
     customer_id: user.value
   }, function (data) {
     loading.value = false;
-    if (data.status == 'ko') {
+    if (data.status == 'ko')
       alert(data.message || 'Si è verificato un problema durante l\'importazione del file.');
-      return;
-    }
-    if (data.status == 'ok') {
+    else if (data.status == 'ok') {
       if (data.imported_orders_count > 0)
         alert(`Importati ${data.imported_orders_count} ordini con successo.`);
 
