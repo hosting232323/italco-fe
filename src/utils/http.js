@@ -160,11 +160,18 @@ const sessionHandler = (data, func, router) => {
   }
 };
 
+const withSessionToken = (url) => {
+  if (!url) return url;
+  const separator = url.includes('?') ? '&' : '?';
+  return `${url}${separator}token=${encodeURIComponent(getToken().value)}`;
+};
+
 
 export default {
   postRequest,
   getRequest,
   formDataRequest,
   hostname,
-  downloadRequest
+  downloadRequest,
+  withSessionToken
 };

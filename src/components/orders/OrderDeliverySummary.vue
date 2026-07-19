@@ -53,7 +53,7 @@
               type="image" 
             />
             <v-img
-              :src="photo"
+              :src="http.withSessionToken(photo)"
               max-width="1500"
               max-height="1000"
               class="mt-4"
