@@ -39,7 +39,7 @@
             icon="mdi-file-pdf-box"
             variant="text"
             :color="theme.current.value.primaryColor"
-            :href="item.first_copy_document_fir"
+            :href="http.withSessionToken(item.first_copy_document_fir)"
             :disabled="!item.first_copy_document_fir"
             target="_blank"
           />
@@ -50,7 +50,7 @@
             icon="mdi-file-pdf-box"
             variant="text"
             :color="theme.current.value.primaryColor"
-            :href="item.fourth_copy_document_fir"
+            :href="http.withSessionToken(item.fourth_copy_document_fir)"
             :disabled="!item.fourth_copy_document_fir"
             target="_blank"
           />
