@@ -117,10 +117,8 @@ const submitForm = async () => {
 
   loading.value = true;
   http.uploadRequest('import/excel', 'POST', {
-    body: {
-      file: file.value,
-      customer_id: user.value
-    }
+    body: { customer_id: user.value },
+    files: { file: file.value }
   }, function (data) {
     loading.value = false;
     if (data.status == 'ko')

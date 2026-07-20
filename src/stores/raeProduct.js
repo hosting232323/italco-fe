@@ -27,17 +27,13 @@ export const useRaeProductStore = defineStore('raeProduct', {
       ));
     },
     updateElementWithFormData(func) {
-      const content = {
-        data: JSON.stringify(storesUtils.exclude_keys(this.element, ['document']))
-      };
-
-      if (this.element.document)
-        content.document = this.element.document.selectedFile;
-
       http.uploadRequest(
         `rae/product/${this.element.id}`,
         'PUT',
-        { body: content },
+        {
+          body: storesUtils.exclude_keys(this.element, ['document']),
+          files: { document: this.element.document }
+        },
         func
       );
     },

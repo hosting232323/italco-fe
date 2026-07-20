@@ -36,19 +36,16 @@ export const useOrderStore = defineStore('order', {
       );
     },
     updateElementWithFormData(func) {
-      const content = {
-        data: JSON.stringify(storesUtils.exclude_keys(this.element, EXCLUDED_KEYS.concat(['photo'])))
-      };
-
-      if (this.element.photos)
-        this.element.photos.forEach(element => content[element.name] = element);
-      if (this.element.signature)
-        content.signature = this.element.signature; 
-
       http.uploadRequest(
         `order/${this.element.id}`,
         'PUT',
-        { body: content },
+        {
+          body: storesUtils.exclude_keys(this.element, EXCLUDED_KEYS.concat(['photo', 'photos', 'signature'])),
+          files: {
+            photos: this.element.photos,
+            signature: this.element.signature
+          }
+        },
         func
       );
     },

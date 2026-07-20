@@ -114,16 +114,13 @@ const submitForm = async (isActive) => {
   if (!(await form.value.validate()).valid) return;
 
   loading.value = true;
-  const content = {customer_id: user.value};
-  files.value.forEach(file => {
-    if (file.selectedFile)
-      content[file.selectedFile.name] = file.selectedFile;
-  });
-
   http.uploadRequest(
     'import/pdf',
     'POST',
-    { body: content },
+    {
+      body: { customer_id: user.value },
+      files: { pdf: files.value }
+    },
     function (data) {
       loading.value = false;
       if (data.status == 'ok' && data.imported_orders_count > 0) {
