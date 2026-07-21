@@ -17,7 +17,7 @@
           >
             <v-file-input
               label="File PDF"
-              accept="application/pdf"
+              :accept="fileUtils.buildAccept(fileUtils.pdfExtensions)"
               :rules="validation.requiredRules"
               multiple
               :error-messages="fileError"
@@ -94,6 +94,7 @@ import FormButtons from '@/components/FormButtons';
 import { ref } from 'vue';
 import http from '@/utils/http';
 import { storeToRefs } from 'pinia';
+import { fileUtils } from 'generic-module';
 import storesUtils from '@/utils/stores';
 import validation from '@/utils/validation';
 import { useOrderStore } from '@/stores/order';
@@ -140,12 +141,10 @@ const onFilesSelected = (event) => {
   const selectedFiles = event.target.files;
   if (selectedFiles.length == 0) return;
 
+  fileError.value = fileUtils.validateFiles(selectedFiles, fileUtils.pdfExtensions) || '';
+  if (fileError.value) return;
+
   selectedFiles.forEach(selectedFile => {
-    fileError.value = '';
-    if (selectedFile.type != 'application/pdf') {
-      fileError.value = 'Puoi caricare solo file Excel (.xls, .xlsx).';
-      return;
-    }
     files.value.push({
       selectedFile,
       preview: URL.createObjectURL(selectedFile)

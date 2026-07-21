@@ -17,6 +17,7 @@
             @submit.prevent="submitForm()"
           >
             <v-file-input
+              :accept="fileUtils.buildAccept(fileUtils.spreadsheetExtensions)"
               label="File Excel"
               :rules="validation.requiredRules"
               :error-messages="fileError"
@@ -95,6 +96,7 @@ import ExcelImportationConflicts from '@/components/administration/importation/E
 import { ref } from 'vue';
 import http from '@/utils/http';
 import { storeToRefs } from 'pinia';
+import { fileUtils } from 'generic-module';
 import storesUtils from '@/utils/stores';
 import validation from '@/utils/validation';
 import { useOrderStore } from '@/stores/order';
@@ -142,15 +144,8 @@ const onFilesSelected = (event) => {
   const selectedFile = event.target.files[0];
   if (selectedFile.length == 0) return;
 
-  const validTypes = [
-    'application/vnd.ms-excel',
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-  ];
-  fileError.value = '';
-  if (!validTypes.includes(selectedFile.type)) {
-    fileError.value = 'Puoi caricare solo file Excel (.xls, .xlsx).';
-    return;
-  }
+  fileError.value = fileUtils.validateFiles([selectedFile], fileUtils.spreadsheetExtensions) || '';
+  if (fileError.value) return;
 
   file.value = selectedFile;
 };

@@ -24,7 +24,7 @@
         />
         <v-file-input
           label="File PDF"
-          accept="application/pdf"
+          :accept="fileUtils.buildAccept(fileUtils.pdfExtensions)"
           :error-messages="fileError"
           :rules="validation.requiredRules"
           @change="onFilesSelected"
@@ -82,6 +82,7 @@ import FormButtons from '@/components/FormButtons';
 import { ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import orderUtils from '@/utils/order';
+import { fileUtils } from 'generic-module';
 import validation from '@/utils/validation';
 import { useRaeProductStore } from '@/stores/raeProduct';
 import { useRaeDisposalStore } from '@/stores/raeDisposal';
@@ -114,12 +115,8 @@ const onFilesSelected = (event) => {
   const selectedFile = event.target.files?.[0];
   if (!selectedFile) return;
 
-  fileError.value = '';
-
-  if (selectedFile.type !== 'application/pdf') {
-    fileError.value = 'Puoi caricare solo file PDF';
-    return;
-  }
+  fileError.value = fileUtils.validateFiles([selectedFile], fileUtils.pdfExtensions) || '';
+  if (fileError.value) return;
 
   rae.value.document = {
     selectedFile,
