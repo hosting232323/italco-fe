@@ -1,5 +1,6 @@
 import http from '@/utils/http';
 import { defineStore } from 'pinia';
+import { fileUtils } from 'generic-module';
 import storesUtils from '@/utils/stores';
 
 export const useRaeDisposalStore = defineStore('raeDisposal', {
@@ -27,7 +28,8 @@ export const useRaeDisposalStore = defineStore('raeDisposal', {
           files: {
             first_copy_document_fir: this.element.first_copy_document_fir,
             fourth_copy_document_fir: this.element.fourth_copy_document_fir
-          }
+          },
+          extensions: fileUtils.pdfExtensions
         },
         func
       );

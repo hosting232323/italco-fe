@@ -1,5 +1,6 @@
 import http from '@/utils/http';
 import { defineStore } from 'pinia';
+import { fileUtils } from 'generic-module';
 import storesUtils from '@/utils/stores';
 
 export const useRaeProductStore = defineStore('raeProduct', {
@@ -32,7 +33,8 @@ export const useRaeProductStore = defineStore('raeProduct', {
         'PUT',
         {
           body: storesUtils.exclude_keys(this.element, ['document']),
-          files: { document: this.element.document }
+          files: { document: this.element.document },
+          extensions: fileUtils.pdfExtensions
         },
         func
       );

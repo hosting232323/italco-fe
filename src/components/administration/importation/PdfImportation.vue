@@ -120,7 +120,8 @@ const submitForm = async (isActive) => {
     'POST',
     {
       body: { customer_id: user.value },
-      files: { pdf: files.value }
+      files: { pdf: files.value },
+      extensions: fileUtils.pdfExtensions
     },
     function (data) {
       loading.value = false;

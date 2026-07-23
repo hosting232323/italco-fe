@@ -120,7 +120,8 @@ const submitForm = async () => {
   loading.value = true;
   http.uploadRequest('import/excel', 'POST', {
     body: { customer_id: user.value },
-    files: { file: file.value }
+    files: { file: file.value },
+    extensions: fileUtils.spreadsheetExtensions
   }, function (data) {
     loading.value = false;
     if (data.status == 'ko')
