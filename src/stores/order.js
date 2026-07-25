@@ -1,5 +1,6 @@
 import http from '@/utils/http';
 import { defineStore } from 'pinia';
+import { fileUtils } from 'generic-module';
 import storesUtils from '@/utils/stores';
 
 const EXCLUDED_KEYS = [
@@ -44,7 +45,8 @@ export const useOrderStore = defineStore('order', {
           files: {
             photos: this.element.photos,
             signature: this.element.signature
-          }
+          },
+          extensions: fileUtils.imageExtensions
         },
         func
       );

@@ -16,7 +16,7 @@
           v-if="['Delivered', 'Not Delivered'].includes(order.status) || order.delay || order.anomaly"
           v-model="order.photos"
           multiple
-          accept="image/*"
+          :accept="fileUtils.buildAccept(fileUtils.imageExtensions)"
           label="Foto"
           :rules="(order.status === 'Delivered' || order.anomaly) ? validation.arrayRules : []"
         />
@@ -164,6 +164,7 @@ import { useTheme } from 'vuetify';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import orderUtils from '@/utils/order';
+import { fileUtils } from 'generic-module';
 import validation from '@/utils/validation';
 import { useOrderStore } from '@/stores/order';
 import { useScheduleItemStore } from '@/stores/scheduleItem';
