@@ -140,7 +140,6 @@
 <script setup>
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import validation from '@/utils/validation';
 import { useUserStore } from '@/stores/user';
@@ -153,7 +152,6 @@ import { useCollectionPointStore } from '@/stores/collectionPoint';
 
 const form = ref(null);
 const isRae = ref(false);
-const router = useRouter();
 const raeQuantity = ref(1);
 const selectedServices = ref([]);
 const selectedProduct = ref(null);
@@ -171,10 +169,10 @@ const collectionPointStore = useCollectionPointStore();
 
 const { role } = storeToRefs(userStore);
 const { element: order } = storeToRefs(orderStore);
-const services = storesUtils.getStoreList(serviceStore, router);
-const collectionPoints = storesUtils.getStoreList(collectionPointStore, router);
+const services = storesUtils.getStoreList(serviceStore);
+const collectionPoints = storesUtils.getStoreList(collectionPointStore);
 const raeProductGroups = (role.value != 'Customer')
-  ? storesUtils.getStoreList(raeProductGroupStore, router)
+  ? storesUtils.getStoreList(raeProductGroupStore)
   : ref([]);
 
 const filteredCollectionPoints = computed(() => {
@@ -197,7 +195,7 @@ const canDeleteProduct = (product) => {
 const productLocation = (product) => {
   if (order.value.cloned_order_id) {
     if (product.release_transport_id)
-      return storesUtils.getStoreList(transportStore, router).value
+      return storesUtils.getStoreList(transportStore).value
         .find(transport => transport.id === product.release_transport_id)?.plate;
     if (product.release_collection_point_id)
       return collectionPoints.value.find(collectionPoint => collectionPoint.id === product.release_collection_point_id)?.name;

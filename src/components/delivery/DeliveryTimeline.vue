@@ -151,14 +151,12 @@ import { useTheme } from 'vuetify';
 import { ref, reactive } from 'vue';
 import { storeToRefs } from 'pinia';
 import mobile from '@/utils/mobile';
-import { useRouter } from 'vue-router';
 import orderUtils from '@/utils/order';
 import storesUtils from '@/utils/stores';
 import { useOrderStore } from '@/stores/order';
 import { useScheduleItemStore } from '@/stores/scheduleItem';
 
 const theme = useTheme();
-const router = useRouter();
 const startX = reactive({});
 const swipeOffset = reactive({});
 const isMouseDown = reactive({});
@@ -169,7 +167,7 @@ const orderStore = useOrderStore();
 const scheduleItemStore = useScheduleItemStore();
 const { element: order } = storeToRefs(orderStore);
 const { ready, showForm } = storeToRefs(scheduleItemStore);
-const scheduleItems = storesUtils.getStoreList(scheduleItemStore, router);
+const scheduleItems = storesUtils.getStoreList(scheduleItemStore);
 
 const STATUS_MAP = {
   'Booking': ['Delivered', 'Not Delivered', 'To Reschedule'],
@@ -213,14 +211,14 @@ const endSwipe = (e, index) => {
 };
 
 const completeCollectionPoint = (item) => {
-  http.postRequest(`schedule/item/${item.id}`, {
-    completed: true
+  http.makeRequest(`schedule/item/${item.id}`, 'PUT', {
+    body: { completed: true }
   }, () => {
     ready.value = false;
-    scheduleItemStore.initList(router);
+    scheduleItemStore.initList();
     activeSwipeIndex.value = null;
     swipeOffset[item.id] = 0;
-  }, 'PUT', router);
+  });
 };
 
 const completeOrder = (item, status) => {

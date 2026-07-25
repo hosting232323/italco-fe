@@ -115,7 +115,6 @@ import { ref } from 'vue';
 import http from '@/utils/http';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
@@ -124,7 +123,6 @@ import { useScheduleStore } from '@/stores/schedule';
 const statuses = ref([]);
 const theme = useTheme();
 const dialog = ref(false);
-const router = useRouter();
 const popUpType = ref(null);
 const orderToUpdate = ref(null);
 const userStore = useUserStore();
@@ -137,7 +135,7 @@ const scheduleStore = useScheduleStore();
 const { role } = storeToRefs(userStore);
 const { ready } = storeToRefs(orderStore);
 const { element: schedule } = storeToRefs(scheduleStore);
-const orders = storesUtils.getStoreList(orderStore, router);
+const orders = storesUtils.getStoreList(orderStore);
 schedule.value = {};
 
 const getHeaders = () => {
@@ -176,12 +174,13 @@ const downloadExcel = async () => {
 
   downloadingExcel.value = true;
   http.downloadRequest(
-    'export/orders/excel', 
+    'export/orders/excel',
+    'POST',
     {
-      order_ids: schedule.value.orders.map(order => typeof order === 'object' ? order.id : order)
-    }, 
-    'POST', 
-    router,
+      body: {
+        order_ids: schedule.value.orders.map(order => typeof order === 'object' ? order.id : order)
+      }
+    },
     () => downloadingExcel.value = false
   );
 };
@@ -191,15 +190,15 @@ const openFormPopUp = () => {
   popUpType.value = 'message';
   scheduleFormMessage.value = 'Loading...';
 
-  http.postRequest('schedule/pianification', {
-    orders_id: schedule.value.orders
+  http.makeRequest('schedule/pianification', 'POST', {
+    body: { orders_id: schedule.value.orders }
   }, (data) => {
     if (data.status == 'ok') {
       popUpType.value = 'schedule-form';
       schedule.value.schedule_items = data.schedule_items;
     } else
       scheduleFormMessage.value = data.message;
-  }, 'POST', router);
+  });
 };
 
 const openSchedulationPopUp = () => {
@@ -212,10 +211,10 @@ const openStatusesPopup = (item) => {
   popUpType.value = 'message';
   scheduleFormMessage.value = 'Loading...';
 
-  http.getRequest(`order/statuses/${item.id}`, {}, (data) => {
+  http.makeRequest(`order/statuses/${item.id}`, 'GET', {}, (data) => {
     popUpType.value = 'statuses';
     statuses.value = data.statuses;
-  }, 'GET', router);
+  });
 };
 </script>
 

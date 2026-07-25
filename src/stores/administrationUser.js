@@ -14,37 +14,34 @@ export const useAdministrationUserStore = defineStore('administrationUser', {
     activeForm: false
   }),
   actions: {
-    createElement(router, func) {
-      http.postRequest(
+    createElement(func) {
+      http.makeRequest(
         'user',
-        {
+        'POST',
+        { body: {
           ...this.element,
           password: encryptPassword(this.element.password, secretKey, iv)
-        },
-        func,
-        'POST',
-        router
+        } },
+        func
       );
     },
-    initList(router) {
-      storesUtils.refreshList(this, (callback) => http.getRequest(
+    initList() {
+      storesUtils.refreshList(this, (callback) => http.makeRequest(
         'user',
-        {},
-        callback,
         'GET',
-        router
+        {},
+        callback
       ));
     },
-    deleteElement(force, element, router, func) {
+    deleteElement(force, element, func) {
       const args = {};
       if (force) args.force = force;
 
-      http.getRequest(
+      http.makeRequest(
         `user/${element.id}`,
-        args,
-        func,
         'DELETE',
-        router
+        { params: args },
+        func
       );
     },
     setList(data) {

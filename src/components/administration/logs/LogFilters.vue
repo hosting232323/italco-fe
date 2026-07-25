@@ -42,7 +42,6 @@ import FormButtons from '@/components/FormButtons';
 import { ref } from 'vue';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import { useLogStore } from '@/stores/log';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
@@ -50,18 +49,17 @@ import { useAdministrationUserStore } from '@/stores/administrationUser';
 const form = ref(null);
 const panel = ref(null);
 const theme = useTheme();
-const router = useRouter();
 
 const logStore = useLogStore();
 const administrationUserStore = useAdministrationUserStore();
 const { filters, ready } = storeToRefs(logStore);
-const users = storesUtils.getStoreList(administrationUserStore, router);
+const users = storesUtils.getStoreList(administrationUserStore);
 
 const filterLogs = async () => {
   if (!(await form.value.validate()).valid) return;
 
   ready.value = false;
-  logStore.initList(router);
+  logStore.initList();
   panel.value = null;
 };
 </script>

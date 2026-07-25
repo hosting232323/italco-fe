@@ -10,40 +10,36 @@ export const useTransportStore = defineStore('transport', {
     activeForm: false
   }),
   actions: {
-    createElement(router, func) {
-      http.postRequest(
+    createElement(func) {
+      http.makeRequest(
         'transport',
-        this.element,
-        func,
         'POST',
-        router
+        { body: this.element },
+        func
       );
     },
-    updateElement(router, func) {
-      http.postRequest(
+    updateElement(func) {
+      http.makeRequest(
         `transport/${this.element.id}`,
-        storesUtils.exclude_keys(this.element, ['created_at', 'updated_at']),
-        func,
         'PUT',
-        router
+        { body: storesUtils.exclude_keys(this.element, ['created_at', 'updated_at']) },
+        func
       );
     },
-    initList(router) {
-      storesUtils.refreshList(this, (callback) => http.getRequest(
+    initList() {
+      storesUtils.refreshList(this, (callback) => http.makeRequest(
         'transport',
-        {},
-        callback,
         'GET',
-        router
+        {},
+        callback
       ));
     },
-    deleteElement(element, router, func) {
-      http.getRequest(
+    deleteElement(element, func) {
+      http.makeRequest(
         `transport/${element.id}`,
-        {},
-        func,
         'DELETE',
-        router
+        {},
+        func
       );
     },
     setList(data) {

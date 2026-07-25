@@ -58,7 +58,6 @@ import FormButtons from '@/components/FormButtons';
 import { ref } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import validation from '@/utils/validation';
 import { useServiceStore } from '@/stores/service';
@@ -67,11 +66,10 @@ import { useAdministrationUserStore } from '@/stores/administrationUser';
 const form = ref(null);
 const message = ref('');
 const loading = ref(false);
-const router = useRouter();
 const serviceStore = useServiceStore();
 const isMobile = mobile.setupMobileUtils();
 const administrationUserStore = useAdministrationUserStore();
-const users = storesUtils.getStoreList(administrationUserStore, router);
+const users = storesUtils.getStoreList(administrationUserStore);
 const { innerElement: serviceUser, activePopUpForm } = storeToRefs(serviceStore);
 
 const submitForm = async () => {
@@ -80,15 +78,15 @@ const submitForm = async () => {
   message.value = '';
   loading.value = true;
   if (serviceUser.value.id)
-    serviceStore.updateServiceUserRelationships(serviceUser.value, router, callback);
+    serviceStore.updateServiceUserRelationships(serviceUser.value, callback);
   else
-    serviceStore.createServiceUserRelationships(serviceUser.value, router, callback);
+    serviceStore.createServiceUserRelationships(serviceUser.value, callback);
 };
 
 const callback = (data) => {
   loading.value = false;
   if (data.status == 'ok')
-    serviceStore.initList(router);
+    serviceStore.initList();
   else
     message.value = data.message;
 };

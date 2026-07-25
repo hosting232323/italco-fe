@@ -44,13 +44,11 @@ import { ref } from 'vue';
 import days from '@/utils/days';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import validation from '@/utils/validation';
 import { useGeographicZoneStore } from '@/stores/geographicZone';
 
 const form = ref(null);
 const loading = ref(false);
-const router = useRouter();
 const emits = defineEmits(['closeForm']);
 const isMobile = mobile.setupMobileUtils();
 const geographicZoneStore = useGeographicZoneStore();
@@ -66,10 +64,10 @@ const submitForm = async () => {
   geographicZoneStore.createEntity({
     day_of_week: day.value,
     max_orders: Number(maxOrders.value)
-  }, 'constraint', router, function (data) {
+  }, 'constraint', function (data) {
     loading.value = false;
     if (data.status == 'ok') {
-      geographicZoneStore.initList(router);
+      geographicZoneStore.initList();
       geographicZone.value.constraints.push(data.entity);
       emits('closeForm');
     }

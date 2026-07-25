@@ -10,31 +10,28 @@ export const useCustomerRuleStore = defineStore('customerRule', {
     activeForm: false
   }),
   actions: {
-    createElement(router, func) {
-      http.postRequest(
+    createElement(func) {
+      http.makeRequest(
         'customer-rule',
-        this.element,
-        func,
         'POST',
-        router
+        { body: this.element },
+        func
       );
     },
-    initList(router) {
-      storesUtils.refreshList(this, (callback) => http.getRequest(
+    initList() {
+      storesUtils.refreshList(this, (callback) => http.makeRequest(
         'customer-rule',
-        {},
-        callback,
         'GET',
-        router
+        {},
+        callback
       ));
     },
-    deleteElements(ids, router, func) {
-      http.postRequest(
+    deleteElements(ids, func) {
+      http.makeRequest(
         'customer-rule',
-        {ids: ids},
-        func,
         'DELETE',
-        router
+        { body: { ids: ids } },
+        func
       );
     },
     setList(data) {

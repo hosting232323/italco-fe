@@ -160,10 +160,8 @@ import '@/styles/chatty.scss';
 
 import http from '@/utils/http';
 import { marked } from 'marked';
-import { useRouter } from 'vue-router';
 import { ref, onMounted, nextTick, watch } from 'vue';
 
-const router = useRouter();
 const loading = ref(false);
 const fabWheel = ref(null);
 const threadId = ref(null);
@@ -187,16 +185,18 @@ const sendMessage = () => {
   const messageToSend = userMessage.value;
   userMessage.value = '';
   messages.value.push(messageToSend);
-  http.postRequest('chatty/message', {
-    message: messageToSend,
-    thread_id: threadId.value
+  http.makeRequest('chatty/message', 'POST', {
+    body: {
+      message: messageToSend,
+      thread_id: threadId.value
+    }
   }, (data) => {
     loading.value = false;
     if(data.status == 'ok') {
       messages.value.push(data.message);
       threadId.value = data.thread_id;
     }
-  }, 'POST', router);
+  });
 };
 
 const checkScroll = () => {

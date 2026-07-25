@@ -83,7 +83,6 @@ import FormButtons from '@/components/FormButtons';
 import { ref } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import validation from '@/utils/validation';
 import { useRaeProductStore } from '@/stores/raeProduct';
@@ -91,14 +90,13 @@ import { useRaeCarrierStore } from '@/stores/raeCarrier';
 import { useRaeDisposalStore } from '@/stores/raeDisposal';
 import { useRaeCollectionCenterStore } from '@/stores/raeCollectionCenter';
 
-const router = useRouter();
 const isMobile = mobile.setupMobileUtils();
 
 const raeCarrierStore = useRaeCarrierStore();
-const raeCarriers = storesUtils.getStoreList(raeCarrierStore, router);
+const raeCarriers = storesUtils.getStoreList(raeCarrierStore);
 
 const raeCollectionCenterStore = useRaeCollectionCenterStore();
-const raeCollectionCenters = storesUtils.getStoreList(raeCollectionCenterStore, router);
+const raeCollectionCenters = storesUtils.getStoreList(raeCollectionCenterStore);
 
 const form = ref(null);
 const loading = ref(false);
@@ -119,12 +117,12 @@ const submitForm = async () => {
   loading.value = true;
 
   disposal.value.rae_product_ids = selectedProducts.map(p => p.id);
-  raeDisposalStore.createElement(router, (data) => {
+  raeDisposalStore.createElement((data) => {
     loading.value = false;
     if (data.status == 'ok') {
       disposal.value = {};
-      raeProductStore.initList(router);
-      raeDisposalStore.initList(router);
+      raeProductStore.initList();
+      raeDisposalStore.initList();
       emits('cancel');
       emits('success');
     }

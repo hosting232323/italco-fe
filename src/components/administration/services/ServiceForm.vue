@@ -103,13 +103,11 @@ import { ref, watch } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import orderUtils from '@/utils/order';
-import { useRouter } from 'vue-router';
 import validation from '@/utils/validation';
 import { useServiceStore } from '@/stores/service';
 
 const form = ref(null);
 const loading = ref(false);
-const router = useRouter();
 const isMobile = mobile.setupMobileUtils();
 
 const serviceStore = useServiceStore();
@@ -120,16 +118,16 @@ const submitForm = async () => {
 
   loading.value = true;
   if (service.value.id)
-    serviceStore.updateElement(router, callback);
+    serviceStore.updateElement(callback);
   else
-    serviceStore.createElement(router, callback);
+    serviceStore.createElement(callback);
 };
 
 const callback = (data) => {
   loading.value = false;
   if (data.status == 'ok') {
     service.value = {};
-    serviceStore.initList(router);
+    serviceStore.initList();
     activeForm.value = false;
   }
 };
