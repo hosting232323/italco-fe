@@ -87,6 +87,8 @@ const callback = (data) => {
     orderStore.initList();
     raeProductStore.initList();
     activeForm.value = false;
+  } else if (data.message) {
+    alert(data.message);
   }
 };
 </script>
