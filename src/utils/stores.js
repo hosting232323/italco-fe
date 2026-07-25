@@ -123,7 +123,7 @@ const formatFilters = (filters, dateFilterType) => {
       else return filters[key];
     })
     .map(key => {
-      let value = null;
+      let value;
       if (!formattedKeys.includes(key))
         value = filters[key];
       else if (!filters[key][1])

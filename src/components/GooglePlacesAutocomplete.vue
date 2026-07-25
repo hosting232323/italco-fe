@@ -67,7 +67,6 @@ onMounted(async () => {
 
       isValidAddress.value = true;
       let cap = '';
-      let address = '';
       const parts = [];
       place.address_components.forEach((component) => {
         if (component.types.includes('route')) parts.push(component.long_name);
@@ -76,7 +75,7 @@ onMounted(async () => {
         if (component.types.includes('administrative_area_level_2')) parts.push(component.short_name);
         if (component.types.includes('postal_code')) cap = component.long_name;
       });
-      address = parts.join(', ');
+      const address = parts.join(', ');
 
       if (!cap && place.geometry?.location) {
         const postalComponent = (await new Promise((resolve, reject) => {
