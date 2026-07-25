@@ -16,7 +16,7 @@
           v-if="['Delivered', 'Not Delivered'].includes(order.status) || order.delay || order.anomaly"
           v-model="order.photos"
           multiple
-          accept="image/*"
+          :accept="fileUtils.buildAccept(fileUtils.imageExtensions)"
           label="Foto"
           :rules="(order.status === 'Delivered' || order.anomaly) ? validation.arrayRules : []"
         />
@@ -164,7 +164,7 @@ import { useTheme } from 'vuetify';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import orderUtils from '@/utils/order';
-import { useRouter } from 'vue-router';
+import { fileUtils } from 'generic-module';
 import validation from '@/utils/validation';
 import { useOrderStore } from '@/stores/order';
 import { useScheduleItemStore } from '@/stores/scheduleItem';
@@ -172,7 +172,6 @@ import { useScheduleItemStore } from '@/stores/scheduleItem';
 const form = ref(null);
 const theme = useTheme();
 const loading = ref(false);
-const router = useRouter();
 const signaturePad = ref(null);
 const signatureError = ref(null);
 const signatureSuccess = ref(null);
@@ -193,10 +192,10 @@ const submitForm = async () => {
   }
 
   loading.value = true;
-  orderStore.updateElementWithFormData(router, function (data) {
+  orderStore.updateElementWithFormData(function (data) {
     loading.value = false;
     if (data.status == 'ok') {
-      scheduleItemStore.initList(router);
+      scheduleItemStore.initList();
       order.value = {};
       emits('cancel');
     }

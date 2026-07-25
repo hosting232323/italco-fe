@@ -32,17 +32,15 @@
 <script setup>
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import addressUtils from '@/utils/address';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
 const theme = useTheme();
-const router = useRouter();
 
 const administrationUserStore = useAdministrationUserStore();
 const { element: user, activeForm, ready } = storeToRefs(administrationUserStore);
-const users = storesUtils.getStoreList(administrationUserStore, router);
+const users = storesUtils.getStoreList(administrationUserStore);
 
 const openForm = (item) => {
   user.value = item;

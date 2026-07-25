@@ -24,7 +24,7 @@
         />
         <v-file-input
           label="File PDF"
-          accept="application/pdf"
+          :accept="fileUtils.buildAccept(fileUtils.pdfExtensions)"
           :error-messages="fileError"
           :rules="validation.requiredRules"
           @change="onFilesSelected"
@@ -82,7 +82,7 @@ import FormButtons from '@/components/FormButtons';
 import { ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import orderUtils from '@/utils/order';
-import { useRouter } from 'vue-router';
+import { fileUtils } from 'generic-module';
 import validation from '@/utils/validation';
 import { useRaeProductStore } from '@/stores/raeProduct';
 import { useRaeDisposalStore } from '@/stores/raeDisposal';
@@ -90,7 +90,6 @@ import { useRaeDisposalStore } from '@/stores/raeDisposal';
 const form = ref(null);
 const fileError = ref('');
 const loading = ref(false);
-const router = useRouter();
 const emits = defineEmits(['cancel']);
 
 const raeProductStore = useRaeProductStore();
@@ -102,11 +101,11 @@ const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
   loading.value = true;
 
-  raeProductStore.updateElementWithFormData(router, (data) => {
+  raeProductStore.updateElementWithFormData((data) => {
     loading.value = false;
     if (data.status == 'ok') {
-      raeProductStore.initList(router);
-      raeDisposalStore.initList(router);
+      raeProductStore.initList();
+      raeDisposalStore.initList();
       emits('cancel');
     }
   });
@@ -116,12 +115,8 @@ const onFilesSelected = (event) => {
   const selectedFile = event.target.files?.[0];
   if (!selectedFile) return;
 
-  fileError.value = '';
-
-  if (selectedFile.type !== 'application/pdf') {
-    fileError.value = 'Puoi caricare solo file PDF';
-    return;
-  }
+  fileError.value = fileUtils.validateFiles([selectedFile], fileUtils.pdfExtensions) || '';
+  if (fileError.value) return;
 
   rae.value.document = {
     selectedFile,

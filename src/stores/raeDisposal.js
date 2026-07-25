@@ -1,5 +1,6 @@
 import http from '@/utils/http';
 import { defineStore } from 'pinia';
+import { fileUtils } from 'generic-module';
 import storesUtils from '@/utils/stores';
 
 export const useRaeDisposalStore = defineStore('raeDisposal', {
@@ -10,41 +11,35 @@ export const useRaeDisposalStore = defineStore('raeDisposal', {
     ready: false
   }),
   actions: {
-    createElement(router, func) {
-      http.postRequest(
+    createElement(func) {
+      http.makeRequest(
         'rae/disposal',
-        this.element,
-        func,
         'POST',
-        router
+        { body: this.element },
+        func
       );
     },
-    updateElementWithFormData(router, func) {
-      const content = {
-        data: JSON.stringify(storesUtils.exclude_keys(this.element, ['first_copy_document_fir', 'fourth_copy_document_fir']))
-      };
-
-      if (this.element.first_copy_document_fir)
-        content.first_copy_document_fir = this.element.first_copy_document_fir.selectedFile;
-
-      if (this.element.fourth_copy_document_fir)
-        content.fourth_copy_document_fir = this.element.fourth_copy_document_fir.selectedFile;
-
-      http.formDataRequest(
+    updateElementWithFormData(func) {
+      http.uploadRequest(
         `rae/disposal/${this.element.id}`,
-        content,
-        func,
         'PUT',
-        router
+        {
+          body: storesUtils.exclude_keys(this.element, ['first_copy_document_fir', 'fourth_copy_document_fir']),
+          files: {
+            first_copy_document_fir: this.element.first_copy_document_fir,
+            fourth_copy_document_fir: this.element.fourth_copy_document_fir
+          },
+          extensions: fileUtils.pdfExtensions
+        },
+        func
       );
     },
-    initList(router) {
-      storesUtils.refreshList(this, (callback) => http.getRequest(
+    initList() {
+      storesUtils.refreshList(this, (callback) => http.makeRequest(
         'rae/disposal',
-        {},
-        callback,
         'GET',
-        router
+        {},
+        callback
       ));
     },
     setList(data) {

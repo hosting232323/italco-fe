@@ -111,29 +111,26 @@ import { useTheme } from 'vuetify';
 import { reactive, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import orderUtils from '@/utils/order';
-import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import { useRaeProductStore } from '@/stores/raeProduct';
 
 const theme = useTheme();
 const dialog = ref(false);
-const router = useRouter();
 const selectedProducts = ref([]);
 const exportLoading = reactive({});
 const emits = defineEmits(['open-dialog']);
 
 const raeProductStore = useRaeProductStore();
 const { element: rae, ready } = storeToRefs(raeProductStore);
-const raeProducts = storesUtils.getStoreList(raeProductStore, router);
+const raeProducts = storesUtils.getStoreList(raeProductStore);
 rae.value = {};
 
 const raeExport = (item) => {
   exportLoading[item.id] = true;
   http.downloadRequest(
     `export/rae/product/${item.id}`,
-    {},
     'GET',
-    router,
+    {},
     () => exportLoading[item.id] = false
   );
 };

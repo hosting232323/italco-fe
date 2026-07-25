@@ -22,11 +22,9 @@
 import { reactive } from 'vue';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import { useCustomerGroupStore } from '@/stores/customerGroup';
 
 const theme = useTheme();
-const router = useRouter();
 const deleteLoading = reactive({});
 
 const customerGroupStore = useCustomerGroupStore();
@@ -34,8 +32,8 @@ const { element: customerGroup } = storeToRefs(customerGroupStore);
 
 const deleteItem = (item) => {
   deleteLoading[item.id] = true;
-  customerGroupStore.assignUser(item.id, router, function() {
-    customerGroupStore.initList(router);
+  customerGroupStore.assignUser(item.id, function() {
+    customerGroupStore.initList();
     customerGroup.value.users = customerGroup.value.users.filter(
       user => user.id !== item.id
     );

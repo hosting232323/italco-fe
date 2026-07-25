@@ -15,7 +15,7 @@
           >
             <v-file-input
               label="Documento FIR Prima Copia (PDF)"
-              accept="application/pdf"
+              :accept="fileUtils.buildAccept(fileUtils.pdfExtensions)"
               :error-messages="fileErrors.firstCopy"
               :class="!isMobile ? 'mr-2' : ''"
               :disabled="!!disposal.first_copy_document_fir"
@@ -64,7 +64,7 @@
           >
             <v-file-input
               label="Documento FIR Quarta Copia (PDF)"
-              accept="application/pdf"
+              :accept="fileUtils.buildAccept(fileUtils.pdfExtensions)"
               :error-messages="fileErrors.fourthCopy"
               :class="!isMobile ? 'ml-2' : ''"
               :disabled="!!disposal.fourth_copy_document_fir"
@@ -128,14 +128,13 @@ import FormButtons from '@/components/FormButtons';
 
 import { ref, reactive } from 'vue';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import mobile from '@/utils/mobile';
+import { fileUtils } from 'generic-module';
 import { useRaeDisposalStore } from '@/stores/raeDisposal';
 
 const form = ref(null);
 const fileErrors = reactive({ firstCopy: '', fourthCopy: '' });
 const loading = ref(false);
-const router = useRouter();
 const isMobile = mobile.setupMobileUtils();
 const emits = defineEmits(['cancel']);
 
@@ -147,10 +146,10 @@ const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
   loading.value = true;
 
-  raeDisposalStore.updateElementWithFormData(router, (data) => {
+  raeDisposalStore.updateElementWithFormData((data) => {
     loading.value = false;
     if (data.status == 'ok') {
-      raeDisposalStore.initList(router);
+      raeDisposalStore.initList();
       disposal.value = {};
       emits('cancel');
     }
@@ -167,12 +166,8 @@ const onFilesSelected = (type, event) => {
   const selectedFile = event.target.files?.[0];
   if (!selectedFile) return;
 
-  fileErrors[type] = '';
-
-  if (selectedFile.type !== 'application/pdf') {
-    fileErrors[type] = 'Puoi caricare solo file PDF';
-    return;
-  }
+  fileErrors[type] = fileUtils.validateFiles([selectedFile], fileUtils.pdfExtensions) || '';
+  if (fileErrors[type]) return;
 
   const fieldName = type === 'firstCopy' ? 'first_copy_document_fir' : 'fourth_copy_document_fir';
   disposal.value[fieldName] = {

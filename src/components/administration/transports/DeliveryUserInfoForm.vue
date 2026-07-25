@@ -30,7 +30,6 @@ import FormButtons from '@/components/FormButtons';
 import { ref } from 'vue';
 import http from '@/utils/http';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import addressUtils from '@/utils/address';
 import validation from '@/utils/validation';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
@@ -38,7 +37,6 @@ import { useAdministrationUserStore } from '@/stores/administrationUser';
 const cap = ref(null);
 const form = ref(null);
 const loading = ref(false);
-const router = useRouter();
 
 const administrationUserStore = useAdministrationUserStore();
 const { element: user, activeForm } = storeToRefs(administrationUserStore);
@@ -47,15 +45,17 @@ const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
 
   loading.value = true;
-  http.postRequest('user/info', {
-    class: 'Delivery',
-    data: {cap: cap.value},
-    user_id: user.value.id
+  http.makeRequest('user/info', 'POST', {
+    body: {
+      class: 'Delivery',
+      data: {cap: cap.value},
+      user_id: user.value.id
+    }
   }, function () {
     loading.value = false;
     cap.value = null;
-    administrationUserStore.initList(router);
+    administrationUserStore.initList();
     activeForm.value = false;
-  }, 'POST', router);
+  });
 };
 </script>

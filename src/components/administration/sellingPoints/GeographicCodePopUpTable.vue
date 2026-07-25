@@ -26,11 +26,9 @@
 import { reactive } from 'vue';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import { useGeographicZoneStore } from '@/stores/geographicZone';
 
 const theme = useTheme();
-const router = useRouter();
 const deleteLoading = reactive({});
 
 const geographicZoneStore = useGeographicZoneStore();
@@ -38,8 +36,8 @@ const { element: geographicZone } = storeToRefs(geographicZoneStore);
 
 const deleteItem = (item) => {
   deleteLoading[item.id] = true;
-  geographicZoneStore.deleteEntity(item, 'code', router, function() {
-    geographicZoneStore.initList(router);
+  geographicZoneStore.deleteEntity(item, 'code', function() {
+    geographicZoneStore.initList();
     geographicZone.value.codes = geographicZone.value.codes.filter(
       code => code.id !== item.id
     );

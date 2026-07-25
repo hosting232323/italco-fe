@@ -82,7 +82,6 @@
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { ref, reactive  } from 'vue';
-import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import { decryptPassword } from 'generic-module';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
@@ -92,14 +91,13 @@ const secretKey = import.meta.env.VITE_SECRET_KEY;
 const element = ref({});
 const theme = useTheme();
 const dialog = ref(false);
-const router = useRouter();
 const deleteLoading = reactive({});
 const visiblePasswords = reactive({});
 const decryptedPasswords = reactive({});
 
 const administrationUserStore = useAdministrationUserStore();
 const { ready } = storeToRefs(administrationUserStore);
-const users = storesUtils.getStoreList(administrationUserStore, router);
+const users = storesUtils.getStoreList(administrationUserStore);
 
 const togglePassword = (id, encrypted) => {
   if (!visiblePasswords[id]) {
@@ -114,14 +112,14 @@ const togglePassword = (id, encrypted) => {
 
 const deleteItem = (item, force = false) => {
   deleteLoading[item.id] = true;
-  administrationUserStore.deleteElement(force, item, router, function(data) {
+  administrationUserStore.deleteElement(force, item, function(data) {
     if (data.status == 'ko') {
       dialog.value = true;
       element.value = { ...item, ...data.dependencies };
     } else {
       element.value = {};
       dialog.value = false;
-      administrationUserStore.initList(router);
+      administrationUserStore.initList();
     }
     deleteLoading[item.id] = false;
   });

@@ -28,7 +28,6 @@
 import FormButtons from '@/components/FormButtons';
 
 import { ref } from 'vue';
-import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import validation from '@/utils/validation';
 import { useCollectionPointStore } from '@/stores/collectionPoint';
@@ -45,12 +44,11 @@ const { order } = defineProps({
 });
 
 const form = ref(null);
-const router = useRouter();
 const productName = ref('');
 const collectionPoint = ref(null);
 const emits = defineEmits(['closeForm', 'addProduct']);
 const collectionPointStore = useCollectionPointStore();
-const collectionPoints = storesUtils.getStoreList(collectionPointStore, router);
+const collectionPoints = storesUtils.getStoreList(collectionPointStore);
 
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;

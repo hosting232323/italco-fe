@@ -72,7 +72,6 @@
 <script setup>
 import http from '@/utils/http';
 import { reactive, ref } from 'vue';
-import { useRouter } from 'vue-router';
 import orderUtils from '@/utils/order';
 
 const { order } = defineProps({
@@ -83,14 +82,13 @@ const { order } = defineProps({
 });
 
 const photos = ref([]);
-const router = useRouter();
 const motivations = ref([]);
 const loadingPhoto = ref(true);
 const imageLoading = reactive({});
 
-http.getRequest(`order/delivery-details/${order.id}`, {}, function (data) {
+http.makeRequest(`order/delivery-details/${order.id}`, 'GET', {}, function (data) {
   photos.value = data.photos;
   motivations.value = data.motivations;
   loadingPhoto.value = false;
-}, 'GET', router);
+});
 </script>

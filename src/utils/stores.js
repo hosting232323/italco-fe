@@ -1,9 +1,9 @@
 import { storeToRefs } from 'pinia';
 
 
-const getStoreList = (store, router) => {
+const getStoreList = (store) => {
   const { list, ready } = storeToRefs(store);
-  if (!ready.value) store.initList(router);
+  if (!ready.value) store.initList();
   return list;
 };
 
@@ -123,7 +123,7 @@ const formatFilters = (filters, dateFilterType) => {
       else return filters[key];
     })
     .map(key => {
-      let value = null;
+      let value;
       if (!formattedKeys.includes(key))
         value = filters[key];
       else if (!filters[key][1])
