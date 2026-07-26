@@ -9,7 +9,19 @@ import { useGeographicZoneStore } from '@/stores/geographicZone';
 import { useCollectionPointStore } from '@/stores/collectionPoint';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
+// Revoca il refresh token lato server (il cookie viaggia con credentials).
+// Fetch diretta, senza passare da http.js, per non creare un import circolare.
+const revokeSession = () => {
+  const hostname = import.meta.env.VITE_HOSTNAME;
+  return fetch(`${hostname}user/logout`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include'
+  }).catch(() => {});
+};
+
 const logout = (router) => {
+  revokeSession();
   useUserStore().$reset();
   useOrderStore().$reset();
   useServiceStore().$reset();

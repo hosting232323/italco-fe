@@ -16,24 +16,10 @@
         :headers="[
           { title: 'ID', value: 'id', sortable: false },
           { title: 'Nickname', value: 'nickname', sortable: false },
-          { title: 'Password', value: 'password', sortable: false },
           { title: 'Ruolo', value: 'role', sortable: false },
           { title: 'Azioni', key: 'actions', sortable: false }
         ]"
       >
-        <template #[`item.password`]="{ item }">
-          <template v-if="item.role != 'Admin'">
-            <v-btn
-              :icon="visiblePasswords[item.id] ? 'mdi-eye' : 'mdi-eye-off'"
-              variant="text"
-              :color="theme.current.value.primaryColor"
-              @click="togglePassword(item.id, item.password)"
-            />
-            <span :class="{ 'blur-password': !visiblePasswords[item.id] }">
-              {{ visiblePasswords[item.id] ? decryptedPasswords[item.id] : '••••••••••••••••••••••••••••••••••••••••••••••••' }}
-            </span>
-          </template>
-        </template>
         <template #[`item.actions`]="{ item }">
           <v-btn
             v-if="item.role !== 'Admin'"
@@ -83,32 +69,16 @@ import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { ref, reactive  } from 'vue';
 import storesUtils from '@/utils/stores';
-import { decryptPassword } from 'generic-module';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
-
-const secretKey = import.meta.env.VITE_SECRET_KEY;
 
 const element = ref({});
 const theme = useTheme();
 const dialog = ref(false);
 const deleteLoading = reactive({});
-const visiblePasswords = reactive({});
-const decryptedPasswords = reactive({});
 
 const administrationUserStore = useAdministrationUserStore();
 const { ready } = storeToRefs(administrationUserStore);
 const users = storesUtils.getStoreList(administrationUserStore);
-
-const togglePassword = (id, encrypted) => {
-  if (!visiblePasswords[id]) {
-    try {
-      decryptedPasswords[id] = decryptPassword(encrypted, secretKey);
-    } catch {
-      decryptedPasswords[id] = '[ERRORE DECIFRATURA]';
-    }
-  }
-  visiblePasswords[id] = !visiblePasswords[id];
-};
 
 const deleteItem = (item, force = false) => {
   deleteLoading[item.id] = true;
@@ -125,9 +95,3 @@ const deleteItem = (item, force = false) => {
   });
 };
 </script>
-
-<style scoped>
-.blur-password {
-  filter: blur(6px);
-}
-</style>

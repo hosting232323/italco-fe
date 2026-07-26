@@ -1,10 +1,6 @@
 import http from '@/utils/http';
 import { defineStore } from 'pinia';
 import storesUtils from '@/utils/stores';
-import { encryptPassword } from 'generic-module';
-
-const iv = import.meta.env.VITE_IV;
-const secretKey = import.meta.env.VITE_SECRET_KEY;
 
 export const useAdministrationUserStore = defineStore('administrationUser', {
   state: () => ({
@@ -18,10 +14,7 @@ export const useAdministrationUserStore = defineStore('administrationUser', {
       http.makeRequest(
         'user',
         'POST',
-        { body: {
-          ...this.element,
-          password: encryptPassword(this.element.password, secretKey, iv)
-        } },
+        { body: { ...this.element } },
         func
       );
     },
