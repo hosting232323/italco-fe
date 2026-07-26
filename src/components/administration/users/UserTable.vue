@@ -16,10 +16,25 @@
         :headers="[
           { title: 'ID', value: 'id', sortable: false },
           { title: 'Nickname', value: 'nickname', sortable: false },
+          { title: 'Password', value: 'password', sortable: false },
           { title: 'Ruolo', value: 'role', sortable: false },
           { title: 'Azioni', key: 'actions', sortable: false }
         ]"
       >
+        <template #[`item.password`]="{ item }">
+          <template v-if="item.role != 'Admin'">
+            <v-btn
+              :icon="visiblePasswords[item.id] ? 'mdi-eye' : 'mdi-eye-off'"
+              variant="text"
+              :loading="passwordLoading[item.id]"
+              :color="theme.current.value.primaryColor"
+              @click="togglePassword(item.id)"
+            />
+            <span :class="{ 'blur-password': !visiblePasswords[item.id] }">
+              {{ visiblePasswords[item.id] ? revealedPasswords[item.id] : '••••••••••••••••••••••••••••••••' }}
+            </span>
+          </template>
+        </template>
         <template #[`item.actions`]="{ item }">
           <v-btn
             v-if="item.role !== 'Admin'"
@@ -75,10 +90,35 @@ const element = ref({});
 const theme = useTheme();
 const dialog = ref(false);
 const deleteLoading = reactive({});
+const passwordLoading = reactive({});
+const visiblePasswords = reactive({});
+const revealedPasswords = reactive({});
 
 const administrationUserStore = useAdministrationUserStore();
 const { ready } = storeToRefs(administrationUserStore);
 const users = storesUtils.getStoreList(administrationUserStore);
+
+const togglePassword = (id) => {
+  if (visiblePasswords[id]) {
+    visiblePasswords[id] = false;
+    return;
+  }
+  if (revealedPasswords[id] !== undefined) {
+    visiblePasswords[id] = true;
+    return;
+  }
+  passwordLoading[id] = true;
+  administrationUserStore.revealPassword(id, (data) => {
+    passwordLoading[id] = false;
+    if (data.status === 'ok') {
+      revealedPasswords[id] = data.password;
+      visiblePasswords[id] = true;
+    } else {
+      revealedPasswords[id] = data.message || '[non disponibile]';
+      visiblePasswords[id] = true;
+    }
+  });
+};
 
 const deleteItem = (item, force = false) => {
   deleteLoading[item.id] = true;
@@ -95,3 +135,9 @@ const deleteItem = (item, force = false) => {
   });
 };
 </script>
+
+<style scoped>
+.blur-password {
+  filter: blur(6px);
+}
+</style>
