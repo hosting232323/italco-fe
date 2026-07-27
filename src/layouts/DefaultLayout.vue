@@ -29,6 +29,7 @@ const theme = useTheme();
 const botItalco = {
   name: 'Italco.mi Bot',
   image: '/logo.png',
+  session: true,
   message: 'Ciao! Sono qui per rispondere alle tue domande sugli ordini.<br>Chiedimi quello che ti serve sapere specificando la data di creazione degli ordini interessati.',
   color: {
     theme_color: '#354c7c',
