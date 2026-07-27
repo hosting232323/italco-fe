@@ -26,8 +26,15 @@ const client = createHttpClient({
   }
 });
 
+const withSessionToken = (url) => {
+  if (!url) return url;
+  const separator = url.includes('?') ? '&' : '?';
+  return `${url}${separator}token=${encodeURIComponent(getTokenRef().value)}`;
+};
+
 
 export default {
   ...client,
-  hostname
+  hostname,
+  withSessionToken
 };
