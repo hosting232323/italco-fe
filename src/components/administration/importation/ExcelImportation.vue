@@ -14,7 +14,7 @@
           <v-form
             v-if="conflictsOrders.length == 0"
             ref="form"
-            @submit.prevent="submitForm()"
+            @submit.prevent="submitForm(isActive)"
           >
             <v-file-input
               :accept="fileUtils.buildAccept(fileUtils.spreadsheetExtensions)"
@@ -114,7 +114,7 @@ const administrationUserStore = useAdministrationUserStore();
 const { ready } = storeToRefs(orderStore);
 const users = storesUtils.getStoreList(administrationUserStore);
 
-const submitForm = async () => {
+const submitForm = async (isActive) => {
   if (!(await form.value.validate()).valid) return;
 
   loading.value = true;
@@ -136,6 +136,7 @@ const submitForm = async () => {
         ready.value = false;
         orderStore.initList();
         resetForm();
+        isActive.value = false;
       }
     }
   });

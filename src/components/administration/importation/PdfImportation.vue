@@ -125,14 +125,16 @@ const submitForm = async (isActive) => {
     },
     function (data) {
       loading.value = false;
-      if (data.status == 'ok' && data.imported_orders_count > 0) {
-        alert(`Importati ${data.imported_orders_count} ordini con successo.`);
-
-        files.value = [];
-        user.value = null;
+      if (data.status == 'ko')
+        alert(data.message || 'Si è verificato un problema durante l\'importazione dei file.');
+      else if (data.status == 'ok') {
+        alert(data.imported_orders_count > 0
+          ? `Importati ${data.imported_orders_count} ordini con successo.`
+          : 'Nessun ordine importato dai file selezionati.');
 
         ready.value = false;
         orderStore.initList();
+        resetForm();
         isActive.value = false;
       }
     });
