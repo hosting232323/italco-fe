@@ -2,10 +2,10 @@
   <v-container>
     <h1>Informativa sulla Privacy</h1>
     <p>ai sensi degli artt. 13 e 14 del Regolamento UE 2016/679 (GDPR)</p>
-    <p><i>Data di ultima modifica: 25/07/2026</i></p>
+    <p><i>Data di ultima modifica: 27/07/2026</i></p>
     <br>
     <h3>1. Titolare del trattamento</h3>
-    <p>Il Titolare del trattamento dei dati personali è Italco.mi Logistribuzioni 2.0 Società a Responsabilità Limitata Semplificata, con sede legale in Via Emanuele Filiberto Duca 24/A, Mesagne BR 72023, P. IVA 02808910745, contattabile all’indirizzo email italco.misrls@pec.it.</p>
+    <p>Il Titolare del trattamento dei dati personali è Italco.mi Logistribuzioni 2.0 Società a Responsabilità Limitata Semplificata, con sede legale in Via Emanuele Filiberto Duca 24/A, Mesagne BR 72023, P. IVA 02808910745, contattabile all’indirizzo email italcomilogistribuzioni20@pec.it.</p>
     <br>
     <h3>2. Tipologie di dati trattati</h3>
     <p>La piattaforma tratta le seguenti categorie di dati personali:</p>
