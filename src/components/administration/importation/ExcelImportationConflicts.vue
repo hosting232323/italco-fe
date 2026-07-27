@@ -190,14 +190,25 @@ const submitConflictsForm = async () => {
     }
   }, function (data) {
     loading.value = false;
-    if (data.status == 'ok') {
-      if (data.imported_orders_count > 0)
-        alert(`Importati ${data.imported_orders_count} ordini con successo.`);
-
-      ready.value = false;
-      orderStore.initList();
-      emits('cancel', isActive);
+    if (data.status == 'ko') {
+      alert(data.message || 'Si è verificato un problema durante l\'importazione degli ordini.');
+      return;
     }
+
+    if (data.imported_orders_count > 0)
+      alert(`Importati ${data.imported_orders_count} ordini con successo.`);
+
+    // Il backend scarta gli ordini che non superano la validazione: senza questo
+    // avviso sparirebbero senza che l'utente se ne accorga.
+    if (data.failed_orders && data.failed_orders.length > 0)
+      alert(
+        'Non è stato possibile importare i seguenti ordini:\n' +
+        data.failed_orders.map(order => `${order.external_id}: ${order.error}`).join('\n')
+      );
+
+    ready.value = false;
+    orderStore.initList();
+    emits('cancel', isActive);
   });
 };
 
