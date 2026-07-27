@@ -86,7 +86,7 @@
             icon="mdi-file-pdf-box"
             variant="text"
             :color="theme.current.value.primaryColor"
-            :href="item.link"
+            :href="http.withSessionToken(item.link)"
             target="_blank"
           />
         </template>
