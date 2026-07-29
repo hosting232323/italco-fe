@@ -47,6 +47,40 @@
       </v-form>
     </v-card-text>
   </v-card>
+
+  <!-- Dialog password creata -->
+  <v-dialog
+    v-model="createdDialog"
+    max-width="500"
+    persistent
+  >
+    <v-card title="Utente creato">
+      <v-card-text>
+        <v-alert type="success" class="mb-4">
+          Utente creato con successo
+        </v-alert>
+        <v-text-field
+          :model-value="createdPassword"
+          label="Password"
+          readonly
+          variant="outlined"
+          append-inner-icon="mdi-content-copy"
+          @click:append-inner="copyPassword"
+        />
+        <v-alert type="warning" variant="tonal" density="compact">
+          Comunica la password all'utente. Non sarà più visibile dopo la chiusura.
+        </v-alert>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer />
+        <v-btn
+          text="Chiudi"
+          :color="theme.current.value.primaryColor"
+          @click="closeCreatedDialog"
+        />
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup>
@@ -55,6 +89,7 @@ import FormButtons from '@/components/FormButtons';
 import { ref } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
+import { useTheme } from 'vuetify';
 import storesUtils from '@/utils/stores';
 import validation from '@/utils/validation';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
@@ -62,11 +97,23 @@ import { useAdministrationUserStore } from '@/stores/administrationUser';
 const MAX_USERS = 75;
 
 const form = ref(null);
+const theme = useTheme();
 const loading = ref(false);
+const createdDialog = ref(false);
+const createdPassword = ref('');
 const isMobile = mobile.setupMobileUtils();
 const administrationUserStore = useAdministrationUserStore();
 const { element: user, activeForm } = storeToRefs(administrationUserStore);
 const users = storesUtils.getStoreList(administrationUserStore);
+
+const copyPassword = () => {
+  navigator.clipboard.writeText(createdPassword.value);
+};
+
+const closeCreatedDialog = () => {
+  createdDialog.value = false;
+  createdPassword.value = '';
+};
 
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
@@ -75,6 +122,8 @@ const submitForm = async () => {
   administrationUserStore.createElement(function (data) {
     loading.value = false;
     if (data.status == 'ok') {
+      createdPassword.value = data.password;
+      createdDialog.value = true;
       user.value = {};
       administrationUserStore.initList();
       activeForm.value = false;
@@ -82,3 +131,4 @@ const submitForm = async () => {
   });
 };
 </script>
+

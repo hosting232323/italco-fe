@@ -26,8 +26,9 @@ export const useAdministrationUserStore = defineStore('administrationUser', {
         callback
       ));
     },
-    revealPassword(id, func) {
-      http.makeRequest(`user/${id}/password`, 'GET', {}, func);
+    resetPassword(id, password, func) {
+      const body = password ? { password } : {};
+      http.makeRequest(`user/${id}/password`, 'POST', { body }, func);
     },
     deleteElement(force, element, func) {
       const args = {};
