@@ -8,8 +8,6 @@
       docker build \
         --build-arg VITE_HOSTNAME=$VITE_HOSTNAME \
         --build-arg VITE_GOOGLE_API_KEY=$VITE_GOOGLE_API_KEY \
-        --build-arg VITE_IV=$VITE_IV \
-        --build-arg VITE_SECRET_KEY=$VITE_SECRET_KEY \
         -t $PJ_NAME:latest .
     
       set -e
