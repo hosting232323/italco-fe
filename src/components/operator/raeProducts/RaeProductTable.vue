@@ -113,6 +113,7 @@ import { storeToRefs } from 'pinia';
 import orderUtils from '@/utils/order';
 import storesUtils from '@/utils/stores';
 import { useRaeProductStore } from '@/stores/raeProduct';
+import { useRaeDisposalStore } from '@/stores/raeDisposal';
 
 const theme = useTheme();
 const dialog = ref(false);
@@ -121,9 +122,13 @@ const exportLoading = reactive({});
 const emits = defineEmits(['open-dialog']);
 
 const raeProductStore = useRaeProductStore();
+const raeDisposalStore = useRaeDisposalStore();
+const { element: disposal } = storeToRefs(raeDisposalStore);
 const { element: rae, ready } = storeToRefs(raeProductStore);
 const raeProducts = storesUtils.getStoreList(raeProductStore);
+
 rae.value = {};
+disposal.value = {};
 
 const raeExport = (item) => {
   exportLoading[item.id] = true;
