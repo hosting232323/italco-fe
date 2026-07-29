@@ -89,7 +89,10 @@
           />
         </template>
         <template v-else>
-          <v-alert type="success" class="mb-4">
+          <v-alert
+            type="success"
+            class="mb-4"
+          >
             Password reimpostata con successo
           </v-alert>
           <v-text-field
@@ -100,7 +103,11 @@
             append-inner-icon="mdi-content-copy"
             @click:append-inner="copyPassword"
           />
-          <v-alert type="warning" variant="tonal" density="compact">
+          <v-alert
+            type="warning"
+            variant="tonal"
+            density="compact"
+          >
             Copia la password adesso. Non sarà più visibile dopo la chiusura.
           </v-alert>
         </template>
