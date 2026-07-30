@@ -16,11 +16,16 @@
     </v-list-item>
     <v-divider class="mb-4" />
     <v-list-item
-      to="/dashboard"
-      title="Dashboard"
-      prepend-icon="mdi-view-dashboard"
+      to="/orders"
+      title="Ordini"
+      prepend-icon="mdi-package-variant-closed"
     />
     <template v-if="['Admin', 'Operator'].includes(role)">
+      <v-list-item
+        to="/dashboard"
+        title="Dashboard"
+        prepend-icon="mdi-view-dashboard"
+      />
       <v-list-item
         to="/schedules"
         title="Borderò"
