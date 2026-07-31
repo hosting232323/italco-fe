@@ -19,7 +19,7 @@
             cols="12"
             md="6"
           >
-            <GooglePlacesAutocomplete
+            <AddressAutocomplete
               v-model="collectionPoint.address"
               :custom-class="isMobile ? '' : 'mr-2'"
               label="Indirizzo"
@@ -72,7 +72,7 @@
 
 <script setup>
 import FormButtons from '@/components/FormButtons';
-import GooglePlacesAutocomplete from '@/components/GooglePlacesAutocomplete.vue';
+import AddressAutocomplete from '@/components/AddressAutocomplete.vue';
 
 import { ref } from 'vue';
 import mobile from '@/utils/mobile';
