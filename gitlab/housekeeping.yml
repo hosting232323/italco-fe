@@ -1,10 +1,7 @@
 lint_frontend:
   stage: housekeeping
   image: node:22
-  interruptible: true
   allow_failure: true
-  tags:
-    - test
   rules:
     - if: '$CI_COMMIT_BRANCH != "main"'
   script:
@@ -14,10 +11,7 @@ lint_frontend:
 deps_check:
   stage: housekeeping
   image: node:22
-  interruptible: true
   allow_failure: true
-  tags:
-    - test
   rules:
     - if: '$CI_COMMIT_BRANCH != "main"'
   script:

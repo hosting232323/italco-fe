@@ -1,6 +1,7 @@
 .deploy:
   stage: deploy
   when: manual
+  interruptible: false
   tags:
     - "${SERVER_NAME}-deploy"
   script:
