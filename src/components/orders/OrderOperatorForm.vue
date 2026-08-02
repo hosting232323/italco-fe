@@ -29,6 +29,7 @@
         label="Indirizzo"
         :rules="validation.requiredRules"
         @address-components="handleAddressComponents"
+        @valid="orderStore.addressValid = $event"
       />
     </v-col>
     <v-col

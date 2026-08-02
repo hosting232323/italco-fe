@@ -64,6 +64,11 @@ const submitForm = async () => {
   errorMsg.value = '';
   if (!(await form.value.validate()).valid) return;
 
+  if (!orderStore.addressValid) {
+    alert('Indirizzo non valido: selezionane uno dai suggerimenti.');
+    return;
+  }
+
   if (!order.value.products || Object.keys(order.value.products).length === 0) {
     errorMsg.value = 'Devi aggiungere almeno un prodotto o servizio all\'ordine.';
     return;

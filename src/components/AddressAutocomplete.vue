@@ -35,7 +35,7 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['update:modelValue', 'addressComponents']);
+const emit = defineEmits(['update:modelValue', 'addressComponents', 'valid']);
 
 const NOMINATIM_URL = 'https://nominatim.ares-logistics.it';
 
@@ -116,6 +116,8 @@ const onSearch = (query) => {
 const onSelect = (value) => {
   emit('update:modelValue', value);
   const item = results.get(value);
+  // valido solo se il valore committato corrisponde a un suggerimento Nominatim
+  emit('valid', Boolean(item));
   if (item)
     emit('addressComponents', { address: value, cap: item.address?.postcode || '' });
 };

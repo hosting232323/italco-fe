@@ -14,6 +14,7 @@ export const useOrderStore = defineStore('order', {
     filters: {},
     ready: false,
     activeForm: false,
+    addressValid: false,
     filtersSetting: {
       doubleDates: false,
       dateType: Object.keys(storesUtils.ORDER_DATE_FILTER_TYPES)[0]
