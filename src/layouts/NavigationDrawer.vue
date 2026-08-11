@@ -15,10 +15,17 @@
       <br>{{ role }}
     </v-list-item>
     <v-divider class="mb-4" />
+    <template v-if="['Admin', 'Operator'].includes(role)">
+      <v-list-item
+        to="/dashboard"
+        title="Dashboard"
+        prepend-icon="mdi-view-dashboard"
+      />
+    </template>
     <v-list-item
-      to="/dashboard"
-      title="Dashboard"
-      prepend-icon="mdi-view-dashboard"
+      to="/orders"
+      title="Ordini"
+      prepend-icon="mdi-package-variant-closed"
     />
     <template v-if="['Admin', 'Operator'].includes(role)">
       <v-list-item
