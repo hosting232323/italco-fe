@@ -13,9 +13,11 @@ default:
     - test
 
 stages:
+  - build
   - deploy
   - housekeeping
 
 include:
+  - local: 'gitlab/build.yml'
   - local: 'gitlab/deploy.yml'
   - local: 'gitlab/housekeeping.yml'
