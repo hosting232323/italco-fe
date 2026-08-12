@@ -1,0 +1,46 @@
+.build:
+  stage: build
+  interruptible: true
+  tags:
+    - "${SERVER_NAME}-deploy"
+  variables:
+    DOCKER_CONFIG: "$CI_PROJECT_DIR/.docker-$CI_JOB_ID"
+  after_script:
+    - docker image prune -f || true
+    - docker builder prune -f || true
+    - docker logout "$CI_REGISTRY" || true
+    - rm -rf "$CI_PROJECT_DIR/.docker-$CI_JOB_ID" || true
+
+build_test:
+  extends: .build
+  rules:
+    - when: always
+  script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+    - >
+      docker build --provenance=false --sbom=false
+      --build-arg VITE_GOOGLE_API_KEY="$VITE_GOOGLE_API_KEY_TEST"
+      --build-arg VITE_HOSTNAME="$VITE_HOSTNAME_TEST"
+      --build-arg VITE_IV="$VITE_IV"
+      --build-arg VITE_SECRET_KEY="$VITE_SECRET_KEY"
+      -t "$CI_REGISTRY_IMAGE:test-$CI_COMMIT_SHA"
+      -t "$CI_REGISTRY_IMAGE:test-$CI_COMMIT_REF_SLUG" .
+    - docker push "$CI_REGISTRY_IMAGE:test-$CI_COMMIT_SHA"
+    - docker push "$CI_REGISTRY_IMAGE:test-$CI_COMMIT_REF_SLUG"
+
+build_prod:
+  extends: .build
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+  script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+    - >
+      docker build --provenance=false --sbom=false
+      --build-arg VITE_GOOGLE_API_KEY="$VITE_GOOGLE_API_KEY_PROD"
+      --build-arg VITE_HOSTNAME="$VITE_HOSTNAME_PROD"
+      --build-arg VITE_IV="$VITE_IV"
+      --build-arg VITE_SECRET_KEY="$VITE_SECRET_KEY"
+      -t "$CI_REGISTRY_IMAGE:prod-$CI_COMMIT_SHA"
+      -t "$CI_REGISTRY_IMAGE:prod-$CI_COMMIT_REF_SLUG" .
+    - docker push "$CI_REGISTRY_IMAGE:prod-$CI_COMMIT_SHA"
+    - docker push "$CI_REGISTRY_IMAGE:prod-$CI_COMMIT_REF_SLUG"
