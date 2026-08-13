@@ -154,6 +154,7 @@ const openExternalLink = (link) => {
 const openForm = (item) => {
   updatedOrder.value = item;
   updatedOrder.value.user_id = updatedOrder.value.user.id;
+  orderStore.addressValid = true;
   activeForm.value = true;
 };
 
@@ -204,6 +205,7 @@ const copyOrder = (selectedOrder) => {
       )
     )
   };
+  orderStore.addressValid = false; // clone: l'indirizzo copiato va riselezionato da Nominatim
   activeForm.value = true;
 };
 

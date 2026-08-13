@@ -77,7 +77,7 @@ const geocodeCache = new Map();
 const searchNominatim = async (query) => {
   try {
     const res = await fetch(
-      `https://nominatim.ares-logistics.it/search?format=json&q=${encodeURIComponent(query)}`
+      `https://nominatim.fastsite.it/search?format=json&q=${encodeURIComponent(query)}`
     );
     const data = await res.json();
 
