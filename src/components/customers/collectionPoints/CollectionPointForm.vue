@@ -19,8 +19,9 @@
             cols="12"
             md="6"
           >
-            <GooglePlacesAutocomplete
+            <AddressAutocomplete
               v-model="collectionPoint.address"
+              :formatted="true"
               :custom-class="isMobile ? '' : 'mr-2'"
               label="Indirizzo"
               :rules="validation.requiredRules"
@@ -72,7 +73,7 @@
 
 <script setup>
 import FormButtons from '@/components/FormButtons';
-import GooglePlacesAutocomplete from '@/components/GooglePlacesAutocomplete.vue';
+import { AddressAutocomplete } from 'generic-module';
 
 import { ref } from 'vue';
 import mobile from '@/utils/mobile';

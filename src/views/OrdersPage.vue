@@ -59,6 +59,7 @@ const { element: order, activeForm } = storeToRefs(orderStore);
 
 const openForm = () => {
   order.value = {};
+  orderStore.addressValid = false;
   if (role.value == 'Customer')
     order.value.user_id = userId.value;
   activeForm.value = true;

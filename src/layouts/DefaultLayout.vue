@@ -20,9 +20,7 @@ import { ChattyBot } from 'generic-module';
 import Footer from '@/layouts/FooterBar';
 import NavigationDrawer from '@/layouts/NavigationDrawer';
 
-import { onMounted } from 'vue';
 import { useTheme } from 'vuetify';
-import { loadGoogleMapsScript } from '@/utils/googleMapsScript';
 
 const theme = useTheme();
 
@@ -39,6 +37,4 @@ const botItalco = {
     fab_border: '#26375a'
   }
 };
-
-onMounted(() => loadGoogleMapsScript());
 </script>

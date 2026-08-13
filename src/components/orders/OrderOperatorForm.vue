@@ -23,12 +23,14 @@
       cols="12"
       md="4"
     >
-      <GooglePlacesAutocomplete
+      <AddressAutocomplete
         v-model="order.address"
+        :formatted="true"
         :custom-class="isMobile ? '' : 'ml-2 mr-2'"
         label="Indirizzo"
         :rules="validation.requiredRules"
         @address-components="handleAddressComponents"
+        @update:is-valid="orderStore.addressValid = $event"
       />
     </v-col>
     <v-col
@@ -126,7 +128,7 @@
 
 <script setup>
 import ProductServiceInput from '@/components/orders/OrderProductServiceInput';
-import GooglePlacesAutocomplete from '@/components/GooglePlacesAutocomplete';
+import { AddressAutocomplete } from 'generic-module';
 
 import { ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
