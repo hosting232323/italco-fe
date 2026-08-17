@@ -16,8 +16,10 @@ stages:
   - build
   - deploy
   - housekeeping
+  - test
 
 include:
   - local: 'gitlab/build.yml'
   - local: 'gitlab/deploy.yml'
   - local: 'gitlab/housekeeping.yml'
+  - local: 'gitlab/test.yml'
