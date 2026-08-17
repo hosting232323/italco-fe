@@ -12,6 +12,7 @@ export const useScheduleStore = defineStore('schedule', {
     element: {},
     filters: {},
     ready: false,
+    geocodeResults: {},
     filtersSetting: {
       doubleDates: false,
       dateType: Object.keys(storesUtils.SCHEDULE_DATE_FILTER_TYPES)[0]
@@ -31,6 +32,15 @@ export const useScheduleStore = defineStore('schedule', {
         `schedule/${this.element.id}`,
         'PUT',
         { body: storesUtils.exclude_keys(this.element, EXCLUDED_KEYS) },
+        func
+      );
+    },
+    updateItemAddress(item, address, func) {
+      const isOrder = item.operation_type === 'Order';
+      http.makeRequest(
+        isOrder ? `order/${item.order_id}` : `collection-point/${item.collection_point_id}`,
+        'PUT',
+        { body: isOrder ? { ...address, version: item.version } : address },
         func
       );
     },
