@@ -1,0 +1,22 @@
+test_frontend:
+  stage: test
+  image: node:22
+  interruptible: true
+  needs: []
+  tags:
+    - test
+  rules:
+    - if: '$GITLAB_CI == "false"'
+    - if: '$CI_COMMIT_BRANCH != "main"'
+  coverage: '/^Lines\s*:\s*([\d.]+)%/'
+  script:
+    - npm ci
+    - npm run test:coverage
+  artifacts:
+    when: always
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage/cobertura-coverage.xml
+    paths:
+      - coverage/cobertura-coverage.xml

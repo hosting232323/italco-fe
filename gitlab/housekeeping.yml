@@ -6,7 +6,7 @@ lint_frontend:
     - if: '$CI_COMMIT_BRANCH != "main"'
   script:
     - npm ci
-    - npx eslint "src/**/*.{js,vue}"
+    - npx eslint "src/**/*.{js,vue}" "tests/**/*.js"
 
 deps_check:
   stage: housekeeping
