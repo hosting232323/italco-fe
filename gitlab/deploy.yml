@@ -1,57 +1,74 @@
 .deploy:
   stage: deploy
-  when: manual
+  interruptible: false
   tags:
     - "${SERVER_NAME}-deploy"
   script:
     - |
-      docker build \
-        --build-arg VITE_HOSTNAME=$VITE_HOSTNAME \
-        --build-arg VITE_GOOGLE_API_KEY=$VITE_GOOGLE_API_KEY \
-        -t $PJ_NAME:latest .
-    
-      set -e
-      docker rm -f "${CONTAINER_NEXT}" 2>/dev/null || true
-      docker run -d --name ${CONTAINER_NEXT} \
-        -p ${SECOND_PORT}:3000 \
-        $PJ_NAME:latest
+      set -eu
 
-      sleep 10
-
-      if curl --fail http://localhost:$SECOND_PORT; then
-        docker rm -f ${CONTAINER_ACTIVE} 2>/dev/null || true
-        docker run -d --restart unless-stopped \
-          --name ${CONTAINER_ACTIVE} \
-          -p ${FIRST_PORT}:3000 \
-          $PJ_NAME:latest
-        docker rm -f ${CONTAINER_NEXT} 2>/dev/null || true
+      if [ "$CI_JOB_NAME" = "deploy_test" ]; then
+        CONTAINER_ACTIVE="${PROJECT_NAME}-test"
+        CONTAINER_NEXT="${PROJECT_NAME}-test-next"
+        FIRST_PORT="${PORT_TEST%%-*}"
+        SECOND_PORT="${PORT_TEST#*-}"
+        IMAGE_TAG="test-$CI_COMMIT_SHA"
       else
-        docker logs ${CONTAINER_NEXT} || true
+        CONTAINER_ACTIVE="${PROJECT_NAME}"
+        CONTAINER_NEXT="${PROJECT_NAME}-next"
+        FIRST_PORT="${PORT_PROD%%-*}"
+        SECOND_PORT="${PORT_PROD#*-}"
+        IMAGE_TAG="prod-$CI_COMMIT_SHA"
+      fi
+
+      echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+      IMAGE="$CI_REGISTRY_IMAGE:$IMAGE_TAG"
+      docker pull "$IMAGE"
+
+      docker rm -f "${CONTAINER_NEXT}" 2>/dev/null || true
+
+      docker run -d --name "${CONTAINER_NEXT}" \
+        -p ${SECOND_PORT}:3000 \
+        "$IMAGE"
+
+      READY=0
+      for _ in $(seq 1 30); do
+        if curl -fs "http://localhost:${SECOND_PORT}" >/dev/null 2>&1; then
+          READY=1; break
+        fi
+        sleep 2
+      done
+
+      if [ "${READY}" = "1" ]; then
+        docker rm -f "${CONTAINER_ACTIVE}" 2>/dev/null || true
+
+        docker run -d --restart unless-stopped \
+          --name "${CONTAINER_ACTIVE}" \
+          -p ${FIRST_PORT}:3000 \
+          "$IMAGE"
+
+        docker rm -f "${CONTAINER_NEXT}" 2>/dev/null || true
+        echo "✅ Deploy completato con successo su ${CONTAINER_ACTIVE} (porta ${FIRST_PORT})"
+      else
+        echo "❌ Il nuovo container non è diventato pronto sulla porta ${SECOND_PORT}"
+        docker logs "${CONTAINER_NEXT}" --tail 50 || true
+        docker rm -f "${CONTAINER_NEXT}" 2>/dev/null || true
         exit 1
       fi
 
+  after_script:
+    - docker logout "$CI_REGISTRY" || true
+
 deploy_test:
   extends: .deploy
-  variables:
-    PJ_NAME: "${PROJECT_NAME}-test"
-    CONTAINER_ACTIVE: "${PROJECT_NAME}-test"
-    CONTAINER_NEXT: "${PROJECT_NAME}-test-next"
-    VITE_HOSTNAME: $VITE_HOSTNAME_TEST
-    VITE_GOOGLE_API_KEY: $VITE_GOOGLE_API_KEY_TEST
-  before_script:
-    - export FIRST_PORT="${PORT_TEST%%-*}"
-    - export SECOND_PORT="${PORT_TEST#*-}"
+  needs:
+    - build_test
+  when: manual
 
 deploy_prod:
   extends: .deploy
+  needs:
+    - build_prod
+  when: manual
   only:
     - main
-  variables:
-    PJ_NAME: $PROJECT_NAME
-    CONTAINER_ACTIVE: $PROJECT_NAME
-    CONTAINER_NEXT: "${PROJECT_NAME}-next"
-    VITE_HOSTNAME: $VITE_HOSTNAME_PROD
-    VITE_GOOGLE_API_KEY: $VITE_GOOGLE_API_KEY_PROD
-  before_script:
-    - export FIRST_PORT="${PORT_PROD%%-*}"
-    - export SECOND_PORT="${PORT_PROD#*-}"

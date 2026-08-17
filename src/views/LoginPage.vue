@@ -28,6 +28,6 @@ const goToDashboard = (data) => {
   role.value = data.role;
   userId.value = data.user_id;
   token.value = data.access_token;
-  router.push('dashboard');
+  router.push(['Admin', 'Operator'].includes(data.role) ? 'dashboard' : 'orders');
 };
 </script>
