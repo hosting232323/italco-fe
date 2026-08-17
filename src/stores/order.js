@@ -7,6 +7,16 @@ const EXCLUDED_KEYS = [
   'created_at', 'updated_at', 'delivery_group', 'services', 'user', 'dates_form', 'schedulation'
 ];
 
+const NUMERIC_KEYS = ['floor', 'mark'];
+
+const formatBody = (element, excludedKeys) => {
+  const body = storesUtils.exclude_keys(element, excludedKeys);
+  NUMERIC_KEYS.forEach((key) => {
+    if (body[key] === '') body[key] = null;
+  });
+  return body;
+};
+
 export const useOrderStore = defineStore('order', {
   state: () => ({
     list: [],
@@ -25,7 +35,7 @@ export const useOrderStore = defineStore('order', {
       http.makeRequest(
         'order',
         'POST',
-        { body: storesUtils.exclude_keys(this.element, EXCLUDED_KEYS) },
+        { body: formatBody(this.element, EXCLUDED_KEYS) },
         func
       );
     },
@@ -33,7 +43,7 @@ export const useOrderStore = defineStore('order', {
       http.makeRequest(
         `order/${this.element.id}`,
         'PUT',
-        { body: storesUtils.exclude_keys(this.element, EXCLUDED_KEYS) },
+        { body: formatBody(this.element, EXCLUDED_KEYS) },
         func
       );
     },
@@ -42,7 +52,7 @@ export const useOrderStore = defineStore('order', {
         `order/${this.element.id}`,
         'PUT',
         {
-          body: storesUtils.exclude_keys(this.element, EXCLUDED_KEYS.concat(['photo', 'photos', 'signature'])),
+          body: formatBody(this.element, EXCLUDED_KEYS.concat(['photo', 'photos', 'signature'])),
           files: {
             photos: this.element.photos,
             signature: this.element.signature
