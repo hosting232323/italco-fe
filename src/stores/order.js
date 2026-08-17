@@ -9,8 +9,6 @@ const EXCLUDED_KEYS = [
 
 const NUMERIC_KEYS = ['floor', 'mark'];
 
-// I campi numerici svuotati arrivano come stringa vuota: il backend li scrive su colonne
-// numeriche e la stringa vuota non è un numero valido.
 const formatBody = (element, excludedKeys) => {
   const body = storesUtils.exclude_keys(element, excludedKeys);
   NUMERIC_KEYS.forEach((key) => {
