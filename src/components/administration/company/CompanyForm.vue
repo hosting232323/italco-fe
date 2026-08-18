@@ -16,11 +16,42 @@
           >
             <v-text-field
               v-model="company.name"
-              label="Nome"
+              label="Nome company"
               :rules="validation.requiredRules"
             />
           </v-col>
         </v-row>
+        <!-- Campi admin: solo in creazione -->
+        <template v-if="!company.id">
+          <v-divider class="my-4" />
+          <div class="text-subtitle-1 mb-2">
+            Amministratore della company
+          </div>
+          <v-row no-gutters>
+            <v-col
+              cols="12"
+              md="6"
+              class="pr-md-2"
+            >
+              <v-text-field
+                v-model="company.adminNickname"
+                label="Nickname (usato per il login)"
+                :rules="validation.requiredRules"
+              />
+            </v-col>
+            <v-col
+              cols="12"
+              md="6"
+            >
+              <v-text-field
+                v-model="company.adminPassword"
+                label="Password"
+                type="password"
+                :rules="validation.requiredRules"
+              />
+            </v-col>
+          </v-row>
+        </template>
         <FormButtons
           :loading="loading"
           @cancel="activeForm = false"

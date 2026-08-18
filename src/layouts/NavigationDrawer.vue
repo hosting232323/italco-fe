@@ -9,7 +9,7 @@
   >
     <v-list-item
       prepend-icon="mdi-menu"
-      class="mt-2"
+      class="mt-2 mb-2"
     >
       <b>Ares Logistics</b>
       <br>{{ company ? company.name : 'Nessuna company' }}
@@ -24,6 +24,7 @@
       />
     </template>
     <v-list-item
+      v-if="menuRole != 'Super Admin'"
       to="/orders"
       title="Ordini"
       prepend-icon="mdi-package-variant-closed"
