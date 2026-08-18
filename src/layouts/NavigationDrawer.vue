@@ -9,13 +9,17 @@
   >
     <v-list-item
       prepend-icon="mdi-menu"
-      class="mt-2 mb-2"
+      class="mt-2 header-item"
     >
-      <b>Ares Logistics</b>
-      <br>{{ company ? company.name : 'Nessuna company' }}
-      <br>{{ role }}
+      <template #title>
+        <span class="font-weight-bold text-truncate d-block">Ares Logistics</span>
+      </template>
+      <template #subtitle>
+        <div class="text-truncate">{{ company ? company.name : 'Nessuna company' }}</div>
+        <div class="text-truncate">{{ role }}</div>
+      </template>
     </v-list-item>
-    <v-divider class="mb-4" />
+    <v-divider class="my-2" />
     <template v-if="['Admin', 'Operator'].includes(menuRole)">
       <v-list-item
         to="/dashboard"
@@ -62,7 +66,7 @@
           prepend-icon="mdi-math-log"
         />
       </template>
-      <v-divider class="mb-4 mt-4" />
+      <v-divider class="my-2" />
       <v-list-item
         to="/rae-dashboard"
         title="Ritiri Raee"
@@ -98,14 +102,17 @@
       prepend-icon="mdi-store"
     />
     <template v-if="role == 'Super Admin'">
-      <v-divider class="mb-4 mt-4" />
+      <v-divider
+        v-if="company"
+        class="my-2"
+      />
       <v-list-item
         to="/companies"
         title="Company"
         prepend-icon="mdi-factory"
       />
     </template>
-    <v-divider class="mb-4 mt-4" />
+    <v-divider class="my-2" />
     <v-list-item
       title="Logout"
       prepend-icon="mdi-logout"
