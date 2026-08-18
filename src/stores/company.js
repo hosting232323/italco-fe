@@ -1,6 +1,7 @@
 import http from '@/utils/http';
 import { defineStore } from 'pinia';
 import storesUtils from '@/utils/stores';
+import { encryptPassword } from 'generic-module';
 import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
 import { useScheduleStore } from '@/stores/schedule';
@@ -19,6 +20,9 @@ import { useRaeDisposalStore } from '@/stores/raeDisposal';
 import { useRaeCarrierStore } from '@/stores/raeCarrier';
 import { useRaeCollectionCenterStore } from '@/stores/raeCollectionCenter';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
+
+const iv = import.meta.env.VITE_IV;
+const secretKey = import.meta.env.VITE_SECRET_KEY;
 
 // Resetta tutti gli store tenant-dipendenti impostando ready=false.
 // Va chiamata ogni volta che il super admin cambia company, così i dati
@@ -66,7 +70,7 @@ export const useCompanyStore = defineStore('company', {
           body: {
             name: this.element.name,
             admin_nickname: this.element.adminNickname,
-            admin_password: this.element.adminPassword,
+            admin_password: encryptPassword(this.element.adminPassword, secretKey, iv),
           }
         },
         func
