@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import { useUserStore } from '@/stores/user';
 
 const routes = [
   {
@@ -101,6 +102,11 @@ const routes = [
         path: 'rae-disposal',
         name: 'Smaltimenti Raee',
         component: () => import('@/views/operator/RaeDisposal.vue')
+      },
+      {
+        path: 'companies',
+        name: 'Company',
+        component: () => import('@/views/administration/AdministrationCompanies.vue')
       }
     ]
   }
@@ -121,5 +127,19 @@ const router = createRouter({
       return { left: 0, top: 0 };
   }
 });
+
+// Rotte raggiungibili senza sessione: fuori dal perimetro della guard.
+const PUBLIC_ROUTES = ['Login', 'Privacy Policy', 'OrderStatus', 'NotFound'];
+
+
+router.beforeEach((to) => {
+  const { role, company } = useUserStore();
+
+  // Il super admin non possiede dati propri: finché non sceglie una company
+  // non c'è niente da mostrargli, e ogni altra rotta lo riporta alla scelta.
+  if (role == 'Super Admin' && !company && to.name != 'Company' && !PUBLIC_ROUTES.includes(to.name))
+    return { name: 'Company' };
+});
+
 
 export default router;

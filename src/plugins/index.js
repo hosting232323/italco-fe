@@ -5,9 +5,11 @@ import apexcharts from './apexcharts';
 
 
 export function registerPlugins(app) {
+  // pinia prima di router: l'installazione del router fa partire subito la
+  // prima navigazione, e le guard leggono gli store.
   app.
     use(vuetify).
-    use(router).
     use(pinia).
+    use(router).
     use(apexcharts);
 }

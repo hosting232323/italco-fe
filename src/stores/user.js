@@ -5,7 +5,9 @@ export const useUserStore = defineStore('user', {
     role: '',
     userId: 0,
     token: '',
-    company: {}
+    // Company su cui si sta operando. Per tutti i ruoli tranne il super admin è
+    // la propria e non cambia mai; il super admin parte senza e la sceglie.
+    company: null
   }),
   persist: true
 });

@@ -33,6 +33,10 @@ const goToDashboard = (data) => {
   userId.value = data.user_id;
   token.value = data.token;
   company.value = data.company;
-  router.push(['Admin', 'Operator'].includes(data.role) ? 'dashboard' : 'orders');
+  // Il super admin arriva senza company: prima sceglie, poi entra.
+  if (data.role == 'Super Admin')
+    router.push('companies');
+  else
+    router.push(['Admin', 'Operator'].includes(data.role) ? 'dashboard' : 'orders');
 };
 </script>
