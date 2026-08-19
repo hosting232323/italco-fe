@@ -19,6 +19,24 @@
       </p>
       <div style="font-size: smaller; padding-right: 5px;">
         {{ element.address }}, {{ element.cap }}
+        <v-icon
+          v-if="invalidAddress"
+          icon="mdi-pencil"
+          size="x-small"
+          color="#C62828"
+          style="cursor: pointer;"
+          title="Indirizzo non riconosciuto: correggilo per posizionare la tappa"
+          @click="addressFormFlag = true"
+        />
+        <v-dialog
+          v-model="addressFormFlag"
+          max-width="800"
+        >
+          <AddressForm
+            :index="index"
+            @close-form="addressFormFlag = false"
+          />
+        </v-dialog>
       </div>
     </v-col>
     <v-col cols="6">
@@ -58,7 +76,9 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import AddressForm from '@/components/operator/schedules/ScheduleItemAddressForm';
+
+import { computed, ref } from 'vue';
 import { useTheme } from 'vuetify';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
@@ -75,10 +95,20 @@ const { index } = defineProps({
 
 const theme = useTheme();
 const isMobile = mobile.setupMobileUtils();
+const addressFormFlag = ref(false);
 
 const scheduleStore = useScheduleStore();
-const { element: schedule } = storeToRefs(scheduleStore);
+const { element: schedule, geocodeResults } = storeToRefs(scheduleStore);
 const element = computed(() => schedule.value.schedule_items.find(item => item.index === index));
+
+// La mappa ripiega sul CAP (pallino rosso) quando l'indirizzo non viene
+// riconosciuto: in quel caso si offre la correzione.
+const invalidAddress = computed(() => {
+  if (!element.value.address) return true;
+
+  const result = geocodeResults.value[`${element.value.address}|${element.value.cap}`];
+  return result === null || result?.precision === 'cap';
+});
 
 if (!element.value?.id) {
   element.value.start_time_slot = '08:00';

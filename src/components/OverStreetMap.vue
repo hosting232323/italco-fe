@@ -70,9 +70,7 @@ const durationMin = ref(0);
 const osmUrl = ref('');
 
 const scheduleStore = useScheduleStore();
-const { element: schedule } = storeToRefs(scheduleStore);
-
-const geocodeCache = new Map();
+const { element: schedule, geocodeResults } = storeToRefs(scheduleStore);
 
 const searchNominatim = async (query) => {
   try {
@@ -101,7 +99,7 @@ const simplifyAddress = (address) => address
 
 const geocode = async (item) => {
   const cacheKey = `${item.address}|${item.cap}`;
-  if (geocodeCache.has(cacheKey)) return geocodeCache.get(cacheKey);
+  if (cacheKey in geocodeResults.value) return geocodeResults.value[cacheKey];
 
   const queries = [];
   if (item.address) {
@@ -121,7 +119,7 @@ const geocode = async (item) => {
     }
   }
 
-  geocodeCache.set(cacheKey, result);
+  geocodeResults.value[cacheKey] = result;
   return result;
 };
 
