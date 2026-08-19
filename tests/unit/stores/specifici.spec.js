@@ -41,7 +41,12 @@ afterEach(() => vi.useRealTimers());
 
 
 describe('administrationUser store', () => {
-  it('non manda mai la password in chiaro', () => {
+  it('manda la password in chiaro: a hasharla ci pensa il server', () => {
+    // La vecchia cifratura AES lato client aveva chiave e IV nel bundle, quindi
+    // non proteggeva niente: chiunque apra i devtools li legge. Peggio, rendeva
+    // il ciphertext la vera credenziale, replicabile da chi lo intercetta.
+    // Sotto HTTPS la password viaggia già dentro un canale cifrato, e l'unico
+    // punto dove va protetta è il database: lì ci pensa scrypt lato backend.
     const store = useAdministrationUserStore();
     store.element = { nickname: 'mario', password: 'segreta', role: 'Customer' };
 
@@ -50,8 +55,7 @@ describe('administrationUser store', () => {
     const [url, method, payload] = lastRequest();
     expect([url, method]).toEqual(['user', 'POST']);
     expect(payload.body.nickname).toBe('mario');
-    expect(payload.body.password).not.toBe('segreta');
-    expect(payload.body.password).toBeTruthy();
+    expect(payload.body.password).toBe('segreta');
   });
 
   it('cancella senza forzare per default', () => {
