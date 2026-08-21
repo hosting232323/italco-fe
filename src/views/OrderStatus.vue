@@ -125,9 +125,9 @@
       </v-timeline>
     </div>
     <Map
-      v-if="order.status === 'Booking'"
-      :lat="order.lat"
-      :lon="order.lon"
+      v-if="hasCourierPosition"
+      :lat="Number(order.lat)"
+      :lon="Number(order.lon)"
     />
   </v-container>
 </template>
@@ -137,7 +137,7 @@ import Map from '@/components/OpenLayerMap';
 
 import http from '@/utils/http';
 import mobile from '@/utils/mobile';
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import orderUtils from '@/utils/order';
 import { decodeId } from '@/utils/hashids';
 
@@ -152,6 +152,13 @@ const order = ref({});
 const show = ref(false);
 const orderIdNumeric = ref(null);
 const isMobile = mobile.setupMobileUtils();
+
+// Il backend allega lat/lon solo se un corriere del borderò ha una posizione
+// recente: senza questo controllo la mappa veniva montata con coordinate
+// undefined e si centrava su NaN.
+const hasCourierPosition = computed(() =>
+  order.value.status === 'Booking' && order.value.lat != null && order.value.lon != null
+);
 
 const isStepDelivered = (index) => {
   if (!order.value.status) return false;
