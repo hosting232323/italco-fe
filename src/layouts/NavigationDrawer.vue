@@ -1,6 +1,5 @@
 <template>
   <v-navigation-drawer
-    v-if="role != 'Delivery'"
     permanent
     expand-on-hover
     rail
