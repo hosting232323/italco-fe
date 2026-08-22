@@ -66,33 +66,35 @@
           prepend-icon="mdi-math-log"
         />
       </template>
-      <v-divider class="my-2" />
-      <v-list-item
-        to="/rae-dashboard"
-        title="Ritiri Raee"
-        prepend-icon="mdi-human-dolly"
-      />
-      <v-list-item
-        to="/rae-disposal"
-        title="Smaltimenti"
-        prepend-icon="mdi-delete-empty"
-      />
-      <template v-if="menuRole == 'Admin'">
+      <template v-if="rae">
+        <v-divider class="my-2" />
         <v-list-item
-          to="/rae-product-groups"
-          title="Raggruppamenti"
-          prepend-icon="mdi-file-code"
+          to="/rae-dashboard"
+          title="Ritiri Raee"
+          prepend-icon="mdi-human-dolly"
         />
         <v-list-item
-          to="/rae-carrier"
-          title="Trasportatori"
-          prepend-icon="mdi-car-pickup"
+          to="/rae-disposal"
+          title="Smaltimenti"
+          prepend-icon="mdi-delete-empty"
         />
-        <v-list-item
-          to="/rae-collection-center"
-          title="Centri di Raccolta"
-          prepend-icon="mdi-map-marker-radius"
-        />
+        <template v-if="menuRole == 'Admin'">
+          <v-list-item
+            to="/rae-product-groups"
+            title="Raggruppamenti"
+            prepend-icon="mdi-file-code"
+          />
+          <v-list-item
+            to="/rae-carrier"
+            title="Trasportatori"
+            prepend-icon="mdi-car-pickup"
+          />
+          <v-list-item
+            to="/rae-collection-center"
+            title="Centri di Raccolta"
+            prepend-icon="mdi-map-marker-radius"
+          />
+        </template>
       </template>
     </template>
     <v-list-item
@@ -137,4 +139,8 @@ const { role, company } = storeToRefs(userStore);
 // Un super admin che ha scelto una company opera dentro quella company con i
 // permessi di un admin: il menu deve rispecchiarlo senza duplicare ogni voce.
 const menuRole = computed(() => (role.value == 'Super Admin' && company.value ? 'Admin' : role.value));
+
+// Modulo RAEE dell'attività su cui si sta operando: senza, il blocco di voci
+// RAEE non esiste per nessun ruolo.
+const rae = computed(() => !!company.value?.rae);
 </script>
