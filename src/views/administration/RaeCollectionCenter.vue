@@ -1,20 +1,21 @@
 <template>
-  <v-dialog max-width="1500">
-    <template #activator="{ props: activatorProps }">
-      <v-container>
-        <h1>
-          Gestione Centro di Raccolta
-          <v-btn
-            icon="mdi-plus"
-            style="float: right;"
-            variant="text"
-            @click="openForm"
-          />
-        </h1><hr>
-        <CollectionCenterForm />
-        <CollectionCenterTable :activator-props="activatorProps" />
-      </v-container>
-    </template>
+  <v-container>
+    <h1>
+      Gestione Centro di Raccolta
+      <v-btn
+        icon="mdi-plus"
+        style="float: right;"
+        variant="text"
+        @click="openForm"
+      />
+    </h1><hr>
+    <CollectionCenterTable />
+  </v-container>
+  <v-dialog
+    v-model="activeForm"
+    max-width="1500"
+  >
+    <CollectionCenterForm />
   </v-dialog>
 </template>
 
