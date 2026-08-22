@@ -2,6 +2,7 @@ import http from '@/utils/http';
 import { defineStore } from 'pinia';
 import { fileUtils } from 'generic-module';
 import storesUtils from '@/utils/stores';
+import rae from '@/utils/rae';
 
 export const useRaeProductStore = defineStore('raeProduct', {
   state: () => ({
@@ -16,6 +17,14 @@ export const useRaeProductStore = defineStore('raeProduct', {
   }),
   actions: {
     initList() {
+      // Attività senza modulo RAEE: nessuna lista da chiedere, ma ready va
+      // messo lo stesso o getStoreList continuerebbe a richiamare initList.
+      if (!rae.isEnabled()) {
+        this.list = [];
+        this.ready = true;
+        return;
+      }
+
       storesUtils.refreshList(this, (callback) => http.makeRequest(
         'rae/product/filter',
         'POST',

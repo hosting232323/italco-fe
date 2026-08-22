@@ -69,6 +69,7 @@ export const useCompanyStore = defineStore('company', {
         {
           body: {
             name: this.element.name,
+            rae: this.element.rae || false,
             admin_nickname: this.element.adminNickname,
             admin_password: encryptPassword(this.element.adminPassword, secretKey, iv),
           }
@@ -80,7 +81,7 @@ export const useCompanyStore = defineStore('company', {
       http.makeRequest(
         `company/${this.element.id}`,
         'PUT',
-        { body: { name: this.element.name } },
+        { body: { name: this.element.name, rae: this.element.rae || false } },
         func
       );
     },

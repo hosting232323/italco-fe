@@ -13,12 +13,32 @@
           <v-col
             cols="12"
             md="6"
+            class="pr-md-2"
           >
             <v-text-field
               v-model="company.name"
               label="Nome company"
               :rules="validation.requiredRules"
             />
+          </v-col>
+          <v-col
+            cols="12"
+            md="6"
+          >
+            <label class="mr-2">Modulo RAEE</label>
+            <v-radio-group
+              v-model="company.rae"
+              inline
+            >
+              <v-radio
+                label="Sì"
+                :value="true"
+              />
+              <v-radio
+                label="No"
+                :value="false"
+              />
+            </v-radio-group>
           </v-col>
         </v-row>
         <!-- Campi admin: solo in creazione -->
@@ -64,14 +84,16 @@
 <script setup>
 import FormButtons from '@/components/FormButtons';
 
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import validation from '@/utils/validation';
+import { useUserStore } from '@/stores/user';
 import { useCompanyStore } from '@/stores/company';
 
 const form = ref(null);
 const loading = ref(false);
 
+const userStore = useUserStore();
 const companyStore = useCompanyStore();
 const { activeForm, element: company } = storeToRefs(companyStore);
 
@@ -88,9 +110,21 @@ const submitForm = async () => {
 const callback = (data) => {
   loading.value = false;
   if (data.status == 'ok') {
+    // Se il super admin ha appena modificato la company su cui sta operando,
+    // il flag RAEE in sessione è vecchio: menù e rotte deciderebbero sul dato
+    // precedente fino al prossimo login.
+    if (data.company && data.company.id == userStore.company?.id)
+      userStore.company = data.company;
+
     company.value = {};
     companyStore.initList();
     activeForm.value = false;
   }
 };
+
+watch(activeForm, (val) => {
+  if (val && company.value.rae == undefined) {
+    company.value.rae = false;
+  }
+});
 </script>
