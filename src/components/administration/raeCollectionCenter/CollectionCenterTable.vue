@@ -50,13 +50,6 @@ import { storeToRefs } from 'pinia';
 import storesUtils from '@/utils/stores';
 import { useRaeCollectionCenterStore } from '@/stores/raeCollectionCenter';
 
-defineProps({
-  activatorProps: {
-    type: Object,
-    required: true
-  }
-});
-
 const theme = useTheme();
 const deleteLoading = reactive({});
 

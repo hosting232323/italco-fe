@@ -9,14 +9,24 @@
         @click="openTransportForm"
       />
     </h1><hr>
-    <TransportForm />
     <TransportTable />
     <h1 id="delivery-form">
       Utenti Delivery
     </h1><hr>
-    <DeliveryUserInfoForm />
     <DeliveryUserInfoTable />
   </v-container>
+  <v-dialog
+    v-model="activeTransportForm"
+    max-width="1500"
+  >
+    <TransportForm />
+  </v-dialog>
+  <v-dialog
+    v-model="deliveryUserInfoForm"
+    max-width="1500"
+  >
+    <DeliveryUserInfoForm />
+  </v-dialog>
 </template>
 
 <script setup>
@@ -27,9 +37,12 @@ import DeliveryUserInfoTable from '@/components/administration/transports/Delive
 
 import { storeToRefs } from 'pinia';
 import { useTransportStore } from '@/stores/transport';
+import { useAdministrationUserStore } from '@/stores/administrationUser';
 
 const transportStore = useTransportStore();
+const administrationUserStore = useAdministrationUserStore();
 const { activeForm: activeTransportForm, element: transport } = storeToRefs(transportStore);
+const { activeForm: deliveryUserInfoForm } = storeToRefs(administrationUserStore);
 
 const openTransportForm = () => {
   transport.value = {};
