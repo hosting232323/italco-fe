@@ -14,7 +14,9 @@
         <i v-if="order.products[product].rae_product?.quantity > 1">
           x{{ order.products[product].rae_product.quantity }}
         </i>
-        [{{ productLocation(order.products[product]) }}]
+        <template v-if="productLocation(order.products[product])">
+          [{{ productLocation(order.products[product]) }}]
+        </template>
       </v-list-item-title>
       <v-list-item-subtitle>
         {{ order.products[product].services.map(service => service.name).join(', ') }}
