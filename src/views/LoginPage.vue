@@ -1,6 +1,6 @@
 <template>
   <AuthManager
-    class="mt-10"
+    class="mt-10 rounded-login-logo"
     title="Login"
     logo="/ares-app-icon.png"
     :secondary-color="theme.current.value.primaryColor"
@@ -40,3 +40,10 @@ const goToDashboard = (data) => {
     router.push(['Admin', 'Operator'].includes(data.role) ? 'dashboard' : 'orders');
 };
 </script>
+
+<style scoped>
+.rounded-login-logo :deep(.v-img) {
+  overflow: hidden;
+  border-radius: 20px;
+}
+</style>
