@@ -2,7 +2,7 @@
   <AuthManager
     class="mt-10"
     title="Login"
-    logo="/logo.png"
+    logo="/ares-app-icon.png"
     :secondary-color="theme.current.value.primaryColor"
     :sign-up="false"
     :hostname="hostname"
