@@ -26,12 +26,17 @@ const secretKey = import.meta.env.VITE_SECRET_KEY;
 const theme = useTheme();
 const router = useRouter();
 const userStore = useUserStore();
-const { role, userId, token } = storeToRefs(userStore);
+const { role, userId, token, company } = storeToRefs(userStore);
 
 const goToDashboard = (data) => {
   role.value = data.role;
   userId.value = data.user_id;
   token.value = data.token;
-  router.push(['Admin', 'Operator'].includes(data.role) ? 'dashboard' : 'orders');
+  company.value = data.company;
+  // Il super admin arriva senza company: prima sceglie, poi entra.
+  if (data.role == 'Super Admin')
+    router.push('companies');
+  else
+    router.push(['Admin', 'Operator'].includes(data.role) ? 'dashboard' : 'orders');
 };
 </script>

@@ -1,5 +1,6 @@
 import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
+import { useCompanyStore } from '@/stores/company';
 import { useServiceStore } from '@/stores/service';
 import { useScheduleStore } from '@/stores/schedule';
 import { useTransportStore } from '@/stores/transport';
@@ -12,6 +13,7 @@ import { useAdministrationUserStore } from '@/stores/administrationUser';
 const logout = (router) => {
   useUserStore().$reset();
   useOrderStore().$reset();
+  useCompanyStore().$reset();
   useServiceStore().$reset();
   useScheduleStore().$reset();
   useTransportStore().$reset();
