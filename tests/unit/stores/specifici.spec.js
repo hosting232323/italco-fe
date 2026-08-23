@@ -4,9 +4,11 @@ import { createPinia, setActivePinia } from 'pinia';
 import http from '@/utils/http';
 import storesUtils from '@/utils/stores';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
+import { useCompanyStore } from '@/stores/company';
 import { useCustomerGroupStore } from '@/stores/customerGroup';
 import { useCustomerRuleStore } from '@/stores/customerRule';
 import { useDashboardStore } from '@/stores/dashboard';
+import { useUserStore } from '@/stores/user';
 import { useGeographicZoneStore } from '@/stores/geographicZone';
 import { useLogStore } from '@/stores/log';
 import { useOrderStore } from '@/stores/order';
@@ -72,6 +74,44 @@ describe('administrationUser store', () => {
     expect(lastRequest()[2].params).toEqual({ force: true });
   });
 });
+
+describe('company store', () => {
+  it('seleziona la company e invalida i dati del tenant precedente', () => {
+    const store = useCompanyStore();
+    const userStore = useUserStore();
+    const orderStore = useOrderStore();
+    const callback = vi.fn();
+    const response = { status: 'ok', company: { id: 4, name: 'Ares Bari' } };
+    orderStore.ready = true;
+    orderStore.list = [{ id: 9 }];
+
+    store.selectElement(response.company, callback);
+
+    const [url, method, payload, onResponse] = lastRequest();
+    expect([url, method]).toEqual(['company/select', 'POST']);
+    expect(payload.body).toEqual({ company_id: 4 });
+
+    onResponse(response);
+
+    expect(userStore.company).toEqual(response.company);
+    expect(orderStore.ready).toBe(false);
+    expect(orderStore.list).toEqual([]);
+    expect(callback).toHaveBeenCalledWith(response);
+  });
+
+  it('gestisce una selezione fallita senza company e callback', () => {
+    const store = useCompanyStore();
+
+    store.selectElement(null);
+
+    const [url, method, payload, onResponse] = lastRequest();
+    expect([url, method]).toEqual(['company/select', 'POST']);
+    expect(payload.body).toEqual({ company_id: null });
+    expect(() => onResponse({ status: 'error' })).not.toThrow();
+    expect(useUserStore().company).toBeNull();
+  });
+});
+
 
 
 describe('customerGroup store', () => {
@@ -227,6 +267,19 @@ describe('order store', () => {
 
     expect(lastRequest()[0]).toBe('order/7');
     expect(lastRequest()[2].body).toEqual({ id: 7, addressee: 'Mario' });
+  });
+
+  it('normalizza a null i campi numerici vuoti', () => {
+    const store = useOrderStore();
+    store.element = { addressee: 'Mario', floor: '', mark: '' };
+
+    store.createElement(vi.fn());
+
+    expect(lastRequest()[2].body).toEqual({
+      addressee: 'Mario',
+      floor: null,
+      mark: null
+    });
   });
 
   it('manda foto e firma come upload separato', () => {
