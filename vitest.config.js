@@ -8,6 +8,7 @@ import viteConfig from './vite.config';
 export default mergeConfig(viteConfig, defineConfig({
   test: {
     globals: true,
+    maxWorkers: 1,
     environment: 'jsdom',
     include: ['tests/**/*.spec.js'],
     setupFiles: ['tests/setup.js'],

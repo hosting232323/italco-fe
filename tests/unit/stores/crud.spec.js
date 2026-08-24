@@ -14,6 +14,7 @@ import { useScheduleItemStore } from '@/stores/scheduleItem';
 import { useScheduleStore } from '@/stores/schedule';
 import { useServiceStore } from '@/stores/service';
 import { useTransportStore } from '@/stores/transport';
+import { useUserStore } from '@/stores/user';
 
 import { describeCrudStore } from '../../helpers/stores';
 
@@ -134,6 +135,7 @@ const stores = [
 describe.each(stores)('$name store', (config) => {
   beforeEach(() => {
     setActivePinia(createPinia());
+    useUserStore().company = { id: 1, name: 'Test', rae: true };
     vi.useFakeTimers();
     vi.clearAllMocks();
   });

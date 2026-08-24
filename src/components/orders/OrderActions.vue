@@ -123,6 +123,7 @@ import http from '@/utils/http';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { encodeId } from '@/utils/hashids';
+import rae from '@/utils/rae';
 import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
 import { useRaeProductStore } from '@/stores/raeProduct';
@@ -189,11 +190,7 @@ const copyOrderLink = (id) => {
 
 const copyOrder = (selectedOrder) => {
   const { user, id, products, ...rest } = selectedOrder;
-  const filteredProducts = Object.fromEntries(
-    Object.entries(products).filter(
-      ([, product]) => !product.rae_product || product.rae_product.status === 'Annulled'
-    )
-  );
+  const filteredProducts = rae.filterCloneProducts(products);
 
   updatedOrder.value = {
     user,

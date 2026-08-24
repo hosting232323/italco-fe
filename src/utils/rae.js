@@ -8,6 +8,19 @@ import { useUserStore } from '@/stores/user';
 const isEnabled = () => !!useUserStore().company?.rae;
 
 
+// Durante la clonazione gli elementi non RAEE restano sempre disponibili;
+// quelli RAEE annullati si possono rigenerare solo se il modulo è ancora acceso.
+const filterCloneProducts = (products) => {
+  const enabled = isEnabled();
+  return Object.fromEntries(
+    Object.entries(products).filter(
+      ([, product]) => !product.rae_product || (enabled && product.rae_product.status === 'Annulled')
+    )
+  );
+};
+
+
 export default {
-  isEnabled
+  isEnabled,
+  filterCloneProducts
 };
