@@ -9,13 +9,22 @@
   >
     <v-list-item
       prepend-icon="mdi-menu"
-      class="mt-2"
+      class="mt-2 header-item"
     >
-      <b>Ares Logistics</b>
-      <br>{{ role }}
+      <template #title>
+        <span class="font-weight-bold text-truncate d-block">Ares Logistics</span>
+      </template>
+      <template #subtitle>
+        <div class="text-truncate">
+          {{ company ? company.name : 'Nessuna company' }}
+        </div>
+        <div class="text-truncate">
+          {{ role }}
+        </div>
+      </template>
     </v-list-item>
-    <v-divider class="mb-4" />
-    <template v-if="['Admin', 'Operator'].includes(role)">
+    <v-divider class="my-2" />
+    <template v-if="['Admin', 'Operator'].includes(menuRole)">
       <v-list-item
         to="/dashboard"
         title="Dashboard"
@@ -23,17 +32,18 @@
       />
     </template>
     <v-list-item
+      v-if="menuRole != 'Super Admin'"
       to="/orders"
       title="Ordini"
       prepend-icon="mdi-package-variant-closed"
     />
-    <template v-if="['Admin', 'Operator'].includes(role)">
+    <template v-if="['Admin', 'Operator'].includes(menuRole)">
       <v-list-item
         to="/schedules"
         title="Borderò"
         prepend-icon="mdi-text-box-multiple-outline"
       />
-      <template v-if="role == 'Admin'">
+      <template v-if="menuRole == 'Admin'">
         <v-list-item
           to="/services"
           title="Servizi"
@@ -60,7 +70,7 @@
           prepend-icon="mdi-math-log"
         />
       </template>
-      <v-divider class="mb-4 mt-4" />
+      <v-divider class="my-2" />
       <v-list-item
         to="/rae-dashboard"
         title="Ritiri Raee"
@@ -71,7 +81,7 @@
         title="Smaltimenti"
         prepend-icon="mdi-delete-empty"
       />
-      <template v-if="role == 'Admin'">
+      <template v-if="menuRole == 'Admin'">
         <v-list-item
           to="/rae-product-groups"
           title="Raggruppamenti"
@@ -90,12 +100,23 @@
       </template>
     </template>
     <v-list-item
-      v-else
+      v-else-if="role == 'Customer'"
       to="/collection-points"
       title="Punti di Ritiro"
       prepend-icon="mdi-store"
     />
-    <v-divider class="mb-4 mt-4" />
+    <template v-if="role == 'Super Admin'">
+      <v-divider
+        v-if="company"
+        class="my-2"
+      />
+      <v-list-item
+        to="/companies"
+        title="Company"
+        prepend-icon="mdi-factory"
+      />
+    </template>
+    <v-divider class="my-2" />
     <v-list-item
       title="Logout"
       prepend-icon="mdi-logout"
@@ -105,6 +126,7 @@
 </template>
 
 <script setup>
+import { computed } from 'vue';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
@@ -114,5 +136,9 @@ import { useUserStore } from '@/stores/user';
 const theme = useTheme();
 const router = useRouter();
 const userStore = useUserStore();
-const { role } = storeToRefs(userStore);
+const { role, company } = storeToRefs(userStore);
+
+// Un super admin che ha scelto una company opera dentro quella company con i
+// permessi di un admin: il menu deve rispecchiarlo senza duplicare ogni voce.
+const menuRole = computed(() => (role.value == 'Super Admin' && company.value ? 'Admin' : role.value));
 </script>

@@ -4,15 +4,23 @@ import { defineStore } from 'pinia';
 // completo, token incluso. Va ripulito *prima* della reidratazione: `pick` da
 // solo impedisce le scritture future ma non cancella il valore gia' salvato,
 // che resterebbe leggibile da qualunque XSS finche' lo stato non cambia.
-const purgeLegacyToken = (key) => {
+const sanitizePersistedUser = (key) => {
   try {
     const raw = localStorage.getItem(key);
     if (!raw) return;
     const stored = JSON.parse(raw);
+    let changed = false;
     if (stored && 'token' in stored) {
       delete stored.token;
-      localStorage.setItem(key, JSON.stringify(stored));
+      changed = true;
     }
+    // La company selezionata dal Super Admin vive nel solo access token:
+    // dopo un reload va scelta di nuovo, non simulata dal localStorage.
+    if (stored?.role == 'Super Admin' && stored.company) {
+      delete stored.company;
+      changed = true;
+    }
+    if (changed) localStorage.setItem(key, JSON.stringify(stored));
   } catch {
     localStorage.removeItem(key);
   }
@@ -22,16 +30,20 @@ export const useUserStore = defineStore('user', {
   state: () => ({
     role: '',
     userId: 0,
-    token: ''
+    token: '',
+    // Company su cui si sta operando. Per tutti i ruoli tranne il super admin è
+    // la propria e non cambia mai; il super admin parte senza e la sceglie.
+    company: null
   }),
   // L'access token vive solo in memoria: al reload viene riottenuto dal
-  // refresh token (cookie HttpOnly). Persistiamo solo role/userId per la UI.
+  // refresh token (cookie HttpOnly). Persistiamo ruolo, id e la company fissa dei
+  // normali utenti; per il Super Admin la company viene eliminata in hydrate.
   //
   // L'opzione si chiama `pick`: in pinia-plugin-persistedstate v4 `paths` non
   // esiste piu' e viene ignorata in silenzio, con l'effetto di persistere lo
   // stato intero — token compreso, cioe' esattamente cio' che si vuole evitare.
   persist: {
-    pick: ['role', 'userId'],
-    beforeHydrate: (context) => purgeLegacyToken(context.store.$id)
+    pick: ['role', 'userId', 'company'],
+    beforeHydrate: (context) => sanitizePersistedUser(context.store.$id)
   }
 });
