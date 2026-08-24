@@ -1,6 +1,7 @@
 import { expect, it, vi } from 'vitest';
 
 import http from '@/utils/http';
+import { useUserStore } from '@/stores/user';
 
 
 /**
@@ -18,7 +19,8 @@ export const describeCrudStore = ({
   excludedKeys = [],
   listMethod = 'GET',
   listEndpoint = endpoint,
-  listBody = {}
+  listBody = {},
+  rae = false
 }) => {
   const lastCall = () => http.makeRequest.mock.calls.at(-1);
 
@@ -40,6 +42,19 @@ export const describeCrudStore = ({
     expect(method).toBe(listMethod);
     if (listMethod !== 'GET') expect(payload.body).toEqual(listBody);
   });
+
+  if (rae)
+    it('non chiede la lista quando il modulo RAEE non e attivo', () => {
+      useUserStore().company = { id: 1, name: 'Test', rae: false };
+      const store = useStore();
+
+      store.initList();
+      vi.advanceTimersByTime(50);
+
+      expect(http.makeRequest).not.toHaveBeenCalled();
+      expect(store.list).toEqual([]);
+      expect(store.ready).toBe(true);
+    });
 
   it('salva la lista ricevuta e si segna pronta', () => {
     const store = useStore();
