@@ -116,6 +116,8 @@
         <v-checkbox
           v-model="isRae"
           label="Ritiro Rae"
+          :disabled="!raeEnabled"
+          :messages="raeEnabled ? '' : 'Modulo RAEE non attivo'"
         />
       </v-col>
     </v-row>
@@ -167,11 +169,15 @@ const transportStore = useTransportStore();
 const raeProductGroupStore = useRaeProductGroupStore();
 const collectionPointStore = useCollectionPointStore();
 
-const { role } = storeToRefs(userStore);
+const { role, company } = storeToRefs(userStore);
 const { element: order } = storeToRefs(orderStore);
 const services = storesUtils.getStoreList(serviceStore);
 const collectionPoints = storesUtils.getStoreList(collectionPointStore);
-const raeProductGroups = (role.value != 'Customer')
+
+// Il ritiro RAEE è un modulo dell'attività: senza, la spunta resta visibile ma
+// disattivata, così chi la cerca capisce che è spenta e non che è sparita.
+const raeEnabled = computed(() => !!company.value?.rae);
+const raeProductGroups = (role.value != 'Customer' && raeEnabled.value)
   ? storesUtils.getStoreList(raeProductGroupStore)
   : ref([]);
 

@@ -2,6 +2,7 @@ import { flushPromises } from '@vue/test-utils';
 import { expect, it, vi } from 'vitest';
 
 import { createTestPinia, mountComponent } from './mount';
+import { useUserStore } from '@/stores/user';
 
 
 /**
@@ -14,6 +15,7 @@ import { createTestPinia, mountComponent } from './mount';
 
 const setup = (useStore) => {
   const pinia = createTestPinia();
+  useUserStore().company = { id: 1, name: 'Test', rae: true };
   return { pinia, store: useStore() };
 };
 

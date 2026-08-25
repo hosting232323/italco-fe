@@ -76,7 +76,7 @@
           </v-col>
           <v-col cols="3">
             <v-btn
-              v-if="Object.values(item.products).some(product => product.rae_product) && !['Acquired', 'Booked'].includes(item.status)"
+              v-if="raeEnabled && Object.values(item.products).some(product => product.rae_product) && !['Acquired', 'Booked'].includes(item.status)"
               icon="mdi-human-dolly"
               variant="text"
               :loading="raeLoading"
@@ -118,11 +118,12 @@
 import ChangeOrderUser from '@/components/orders/ChangeOrderUser';
 import OrderDeliverySummary from '@/components/orders/OrderDeliverySummary';
 
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import http from '@/utils/http';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { encodeId } from '@/utils/hashids';
+import rae from '@/utils/rae';
 import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
 import { useRaeProductStore } from '@/stores/raeProduct';
@@ -143,8 +144,12 @@ const loadingDelete = ref(false);
 
 const userStore = useUserStore();
 const orderStore = useOrderStore();
-const { role } = storeToRefs(userStore);
+const { role, company } = storeToRefs(userStore);
 const raeProductStore = useRaeProductStore();
+
+// Un'attività può spegnere il modulo dopo averlo usato: gli ordini con ritiro
+// restano, ma l'esportazione RAEE non è più un endpoint raggiungibile.
+const raeEnabled = computed(() => !!company.value?.rae);
 const { element: updatedOrder, activeForm, ready } = storeToRefs(orderStore);
 
 const openExternalLink = (link) => {
@@ -185,11 +190,7 @@ const copyOrderLink = (id) => {
 
 const copyOrder = (selectedOrder) => {
   const { user, id, products, ...rest } = selectedOrder;
-  const filteredProducts = Object.fromEntries(
-    Object.entries(products).filter(
-      ([, product]) => !product.rae_product || product.rae_product.status === 'Annulled'
-    )
-  );
+  const filteredProducts = rae.filterCloneProducts(products);
 
   updatedOrder.value = {
     user,
