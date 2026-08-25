@@ -63,7 +63,7 @@
       </v-col>
       <v-col
         cols="12"
-        :md="role === 'Customer' ? 4 : 3"
+        :md="role === 'Customer' || !raeEnabled ? 4 : 3"
       >
         <v-select
           v-model="selectedService"
@@ -86,7 +86,7 @@
       <v-col
         v-if="!isRae"
         cols="12"
-        :md="role === 'Customer' ? 4 : 3"
+        :md="role === 'Customer' || !raeEnabled ? 4 : 3"
       >
         <v-autocomplete
           v-model="selectedCollectionPoint"
@@ -112,15 +112,13 @@
         />
       </v-col>
       <v-col
-        v-if="role != 'Customer'"
+        v-if="role != 'Customer' && raeEnabled"
         cols="12"
         md="2"
       >
         <v-checkbox
           v-model="isRae"
           label="Ritiro Rae"
-          :disabled="!raeEnabled"
-          :messages="raeEnabled ? '' : 'Modulo RAEE non attivo'"
         />
       </v-col>
     </v-row>
