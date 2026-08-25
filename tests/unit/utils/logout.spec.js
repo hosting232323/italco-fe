@@ -39,6 +39,24 @@ describe('logout', () => {
     expect(transportStore.list).toEqual([]);
   });
 
+  it('si disconnette lo stesso se fetch non e disponibile', async () => {
+    vi.stubGlobal('fetch', undefined);
+    const router = { push: vi.fn() };
+
+    await logoutModule.logout(router);
+
+    expect(router.push).toHaveBeenCalledWith('/');
+  });
+
+  it('si disconnette lo stesso se la revoca solleva subito', async () => {
+    vi.stubGlobal('fetch', () => { throw new Error('rete assente'); });
+    const router = { push: vi.fn() };
+
+    await logoutModule.logout(router);
+
+    expect(router.push).toHaveBeenCalledWith('/');
+  });
+
   it('riporta alla pagina iniziale', async () => {
     const router = { push: vi.fn() };
 
