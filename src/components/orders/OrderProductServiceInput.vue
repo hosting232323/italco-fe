@@ -106,7 +106,7 @@
       >
         <v-text-field
           v-model="raeQuantity"
-          :class="isMobile ? '' : 'ml-2 mr-2'"
+          :class="isMobile ? '' : 'ml-2'"
           label="Quantità"
           type="number"
         />
