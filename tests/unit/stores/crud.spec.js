@@ -14,6 +14,7 @@ import { useScheduleItemStore } from '@/stores/scheduleItem';
 import { useScheduleStore } from '@/stores/schedule';
 import { useServiceStore } from '@/stores/service';
 import { useTransportStore } from '@/stores/transport';
+import { useUserStore } from '@/stores/user';
 
 import { describeCrudStore } from '../../helpers/stores';
 
@@ -73,6 +74,7 @@ const stores = [
     useStore: useRaeCarrierStore,
     endpoint: 'rae/carrier',
     listKey: 'rae_carriers',
+    rae: true,
     excludedKeys: [...READ_ONLY_KEYS, 'users']
   },
   {
@@ -80,6 +82,7 @@ const stores = [
     useStore: useRaeCollectionCenterStore,
     endpoint: 'rae/collection-center',
     listKey: 'rae_collection_centers',
+    rae: true,
     excludedKeys: [...READ_ONLY_KEYS, 'users']
   },
   {
@@ -87,6 +90,7 @@ const stores = [
     useStore: useRaeProductGroupStore,
     endpoint: 'rae/product-group',
     listKey: 'rae_product_groups',
+    rae: true,
     excludedKeys: READ_ONLY_KEYS
   },
   {
@@ -94,6 +98,7 @@ const stores = [
     useStore: useRaeDisposalStore,
     endpoint: 'rae/disposal',
     listKey: 'rae_disposals',
+    rae: true,
     update: false,
     remove: false
   },
@@ -102,6 +107,7 @@ const stores = [
     useStore: useRaeProductStore,
     endpoint: 'rae/product',
     listKey: 'rae_products',
+    rae: true,
     listEndpoint: 'rae/product/filter',
     listMethod: 'POST',
     listBody: { filters: [] },
@@ -134,6 +140,7 @@ const stores = [
 describe.each(stores)('$name store', (config) => {
   beforeEach(() => {
     setActivePinia(createPinia());
+    useUserStore().company = { id: 1, name: 'Test', rae: true };
     vi.useFakeTimers();
     vi.clearAllMocks();
   });

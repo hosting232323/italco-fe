@@ -11,9 +11,16 @@
     :headers="[
       { title: 'ID', value: 'id', sortable: false },
       { title: 'Nome', value: 'name', sortable: false },
+      { title: 'Modulo RAEE', key: 'rae', sortable: false },
       { title: 'Azioni', key: 'actions', sortable: false }
     ]"
   >
+    <template #[`item.rae`]="{ item }">
+      <v-icon
+        :icon="item.rae ? 'mdi-check-circle' : 'mdi-close-circle'"
+        :color="item.rae ? 'success' : 'grey'"
+      />
+    </template>
     <template #[`item.actions`]="{ item }">
       <v-row no-gutters>
         <v-col cols="6">

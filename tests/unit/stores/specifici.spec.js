@@ -339,6 +339,10 @@ describe('raeDisposal store', () => {
 
 
 describe('raeProduct store', () => {
+  beforeEach(() => {
+    useUserStore().company = { id: 1, name: 'Test', rae: true };
+  });
+
   it('manda il documento come upload pdf', () => {
     const store = useRaeProductStore();
     const document = new File(['x'], 'dtr.pdf', { type: 'application/pdf' });
@@ -363,6 +367,18 @@ describe('raeProduct store', () => {
     expect(payload.body.filters).toEqual([
       { value: ['2026-09-01', '2026-09-30'], model: 'RaeProduct', field: 'dtr_date' }
     ]);
+  });
+
+  it('non chiama il backend quando il modulo non e attivo', () => {
+    const store = useRaeProductStore();
+    useUserStore().company = { id: 1, name: 'Test', rae: false };
+
+    store.initList();
+    vi.advanceTimersByTime(50);
+
+    expect(http.makeRequest).not.toHaveBeenCalled();
+    expect(store.list).toEqual([]);
+    expect(store.ready).toBe(true);
   });
 });
 

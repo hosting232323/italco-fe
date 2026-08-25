@@ -131,6 +131,15 @@ const router = createRouter({
 // Rotte raggiungibili senza sessione: fuori dal perimetro della guard.
 const PUBLIC_ROUTES = ['Login', 'Privacy Policy', 'OrderStatus', 'NotFound'];
 
+// Rotte del modulo RAEE: esistono solo per le attività che lo hanno acceso.
+const RAE_ROUTES = [
+  'Ritiri Raee',
+  'Smaltimenti Raee',
+  'Raggruppamenti Raee',
+  'Trasportatori Raee',
+  'Centri di raccolta Raee'
+];
+
 
 router.beforeEach((to) => {
   const { role, company } = useUserStore();
@@ -139,6 +148,11 @@ router.beforeEach((to) => {
   // non c'è niente da mostrargli, e ogni altra rotta lo riporta alla scelta.
   if (role == 'Super Admin' && !company && to.name != 'Company' && !PUBLIC_ROUTES.includes(to.name))
     return { name: 'Company' };
+
+  // Togliere le voci dal menù non basta: l'URL resta digitabile e i preferiti
+  // pure. Chi ci arriva con il modulo spento torna alla dashboard.
+  if (RAE_ROUTES.includes(to.name) && !company?.rae)
+    return { name: 'Dashboard' };
 });
 
 
