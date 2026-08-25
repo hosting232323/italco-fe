@@ -14,7 +14,9 @@
         <i v-if="order.products[product].rae_product?.quantity > 1">
           x{{ order.products[product].rae_product.quantity }}
         </i>
-        [{{ productLocation(order.products[product]) }}]
+        <template v-if="productLocation(order.products[product])">
+          [{{ productLocation(order.products[product]) }}]
+        </template>
       </v-list-item-title>
       <v-list-item-subtitle>
         {{ order.products[product].services.map(service => service.name).join(', ') }}
@@ -82,12 +84,13 @@
         </v-select>
       </v-col>
       <v-col
+        v-if="!isRae"
         cols="12"
-        :md="role === 'Customer' ? 4 : (isRae ? 2 : 3)"
+        :md="role === 'Customer' ? 4 : 3"
       >
         <v-autocomplete
           v-model="selectedCollectionPoint"
-          :class="isMobile ? '' : (isRae ? 'ml-2 mr-2' : 'ml-2')"
+          :class="isMobile ? '' : 'ml-2'"
           label="Punto di Ritiro"
           :items="filteredCollectionPoints"
           item-title="name"
@@ -99,11 +102,11 @@
       <v-col
         v-if="role != 'Customer' && isRae"
         cols="12"
-        md="2"
+        md="4"
       >
         <v-text-field
           v-model="raeQuantity"
-          :class="isMobile ? '' : 'ml-2'"
+          :class="isMobile ? '' : 'ml-2 mr-2'"
           label="Quantità"
           type="number"
         />
@@ -228,8 +231,9 @@ const addProduct = async () => {
 
   order.value.products[selectedProduct.value] = {
     services: selectedServices.value,
-    collection_point: selectedCollectionPoint.value
   };
+  if (!isRae.value)
+    order.value.products[selectedProduct.value].collection_point = selectedCollectionPoint.value;
   if (isRae.value)
     order.value.products[selectedProduct.value].rae_product= {
       quantity: raeQuantity.value,
