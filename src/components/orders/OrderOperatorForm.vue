@@ -25,6 +25,7 @@
     >
       <AddressAutocomplete
         v-model="order.address"
+        :api-key="GOOGLE_API_KEY"
         :formatted="true"
         :custom-class="isMobile ? '' : 'ml-2 mr-2'"
         label="Indirizzo"
@@ -124,6 +125,7 @@
 <script setup>
 import ProductServiceInput from '@/components/orders/OrderProductServiceInput';
 import { AddressAutocomplete } from 'generic-module';
+import { GOOGLE_API_KEY } from '@/utils/googleMaps';
 
 import { ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
