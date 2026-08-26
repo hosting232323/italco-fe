@@ -33,10 +33,12 @@
               <v-radio
                 label="Sì"
                 :value="true"
+                @click="company.rae = true"
               />
               <v-radio
                 label="No"
                 :value="false"
+                @click="company.rae = false"
               />
             </v-radio-group>
           </v-col>
