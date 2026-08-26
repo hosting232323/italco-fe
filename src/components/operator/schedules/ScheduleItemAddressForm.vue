@@ -16,6 +16,7 @@
           >
             <AddressAutocomplete
               v-model="address"
+              :api-key="GOOGLE_API_KEY"
               :formatted="true"
               :custom-class="isMobile ? '' : 'mr-2'"
               label="Indirizzo"
@@ -54,6 +55,7 @@
 <script setup>
 import FormButtons from '@/components/FormButtons';
 import { AddressAutocomplete } from 'generic-module';
+import { GOOGLE_API_KEY } from '@/utils/googleMaps';
 
 import { ref, computed } from 'vue';
 import mobile from '@/utils/mobile';
