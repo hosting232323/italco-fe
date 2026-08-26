@@ -18,6 +18,7 @@ const client = createHttpClient({
   hostname,
   authHeader: 'Authorization',
   router,
+  refreshEndpoint: 'user/refresh',
   getToken: () => getTokenRef().value,
   setToken: (newToken) => { getTokenRef().value = newToken; },
   onSessionExpired: (data) => {

@@ -15,8 +15,12 @@
         <span class="font-weight-bold text-truncate d-block">Ares Logistics</span>
       </template>
       <template #subtitle>
-        <div class="text-truncate">{{ company ? company.name : 'Nessuna company' }}</div>
-        <div class="text-truncate">{{ role }}</div>
+        <div class="text-truncate">
+          {{ company ? company.name : 'Nessuna company' }}
+        </div>
+        <div class="text-truncate">
+          {{ role }}
+        </div>
       </template>
     </v-list-item>
     <v-divider class="my-2" />
