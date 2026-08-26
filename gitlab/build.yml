@@ -21,8 +21,6 @@ build_test:
       docker build --provenance=false --sbom=false
       --build-arg VITE_GOOGLE_API_KEY="$VITE_GOOGLE_API_KEY_TEST"
       --build-arg VITE_HOSTNAME="$VITE_HOSTNAME_TEST"
-      --build-arg VITE_IV="$VITE_IV"
-      --build-arg VITE_SECRET_KEY="$VITE_SECRET_KEY"
       -t "$CI_REGISTRY_IMAGE:test-$CI_COMMIT_SHA"
       -t "$CI_REGISTRY_IMAGE:test-$CI_COMMIT_REF_SLUG" .
     - docker push "$CI_REGISTRY_IMAGE:test-$CI_COMMIT_SHA"
@@ -38,8 +36,6 @@ build_prod:
       docker build --provenance=false --sbom=false
       --build-arg VITE_GOOGLE_API_KEY="$VITE_GOOGLE_API_KEY_PROD"
       --build-arg VITE_HOSTNAME="$VITE_HOSTNAME_PROD"
-      --build-arg VITE_IV="$VITE_IV"
-      --build-arg VITE_SECRET_KEY="$VITE_SECRET_KEY"
       -t "$CI_REGISTRY_IMAGE:prod-$CI_COMMIT_SHA"
       -t "$CI_REGISTRY_IMAGE:prod-$CI_COMMIT_REF_SLUG" .
     - docker push "$CI_REGISTRY_IMAGE:prod-$CI_COMMIT_SHA"

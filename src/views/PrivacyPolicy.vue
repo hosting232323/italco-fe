@@ -2,7 +2,7 @@
   <v-container>
     <h1>Informativa sulla Privacy</h1>
     <p>ai sensi degli artt. 13 e 14 del Regolamento UE 2016/679 (GDPR)</p>
-    <p><i>Data di ultima modifica: 27/07/2026</i></p>
+    <p><i>Data di ultima modifica: 25/08/2026</i></p>
     <br>
     <h3>1. Titolare del trattamento</h3>
     <p>Il Titolare del trattamento dei dati personali è Italco.mi Logistribuzioni 2.0 Società a Responsabilità Limitata Semplificata, con sede legale in Via Emanuele Filiberto Duca 24/A, Mesagne BR 72023, P. IVA 02808910745, contattabile all’indirizzo email italcomilogistribuzioni20@pec.it.</p>
@@ -116,7 +116,33 @@
     <h3>10. Reclamo all’Autorità di controllo</h3>
     <p>Gli interessati che ritengano che il trattamento dei dati personali avvenga in violazione della normativa vigente hanno il diritto di proporre reclamo al Garante per la Protezione dei Dati Personali o ad altra autorità di controllo competente ai sensi del GDPR.</p>
     <br>
-    <h3>11. Modifiche alla presente informativa</h3>
+    <h3>11. Cookie e strumenti di archiviazione</h3>
+    <p>La piattaforma utilizza esclusivamente cookie tecnici e strumenti di archiviazione necessari al suo funzionamento. Non sono utilizzati cookie di profilazione, cookie analitici o cookie di terze parti, e non viene effettuato alcun tracciamento della navigazione. Per questo motivo, ai sensi dell’art. 122, comma 1, del D.Lgs. 196/2003, non è richiesto il consenso preventivo dell’utente e non viene mostrato alcun banner.</p>
+    <ul style="margin-left:20px;">
+      <li>
+        <strong>Cookie tecnici (di sessione)</strong>
+        <ul style="margin-left:20px;">
+          <li><strong>Nome:</strong> refresh_token</li>
+          <li><strong>Titolare:</strong> prima parte (dominio della piattaforma)</li>
+          <li><strong>Finalità:</strong> mantenere l’utente autenticato tra una visita e l’altra, consentendo di rinnovare le credenziali di accesso senza richiedere nuovamente email e password</li>
+          <li><strong>Durata:</strong> 30 giorni, rinnovati a ogni utilizzo; il cookie viene eliminato al logout</li>
+          <li><strong>Caratteristiche:</strong> non accessibile da codice JavaScript (HttpOnly), trasmesso solo su connessione cifrata (Secure) e non inviato a siti terzi (SameSite)</li>
+        </ul>
+      </li>
+      <li>
+        <strong>Archiviazione locale nel browser (localStorage)</strong>
+        <ul style="margin-left:20px;">
+          <li><strong>Chiave:</strong> user</li>
+          <li><strong>Finalità:</strong> conservare le informazioni necessarie a ricostruire l’interfaccia dopo un aggiornamento della pagina</li>
+          <li><strong>Dati conservati:</strong> ruolo dell’utente, identificativo dell’utente e azienda selezionata</li>
+          <li><strong>Durata:</strong> fino al logout, che ne determina la cancellazione, o fino alla rimozione manuale dei dati del browser</li>
+        </ul>
+      </li>
+    </ul>
+    <p>Le credenziali di accesso vere e proprie non vengono mai salvate nel browser: sono conservate nella sola memoria volatile della pagina e vengono perse alla sua chiusura.</p>
+    <p>L’utente può in qualsiasi momento bloccare o cancellare i cookie tramite le impostazioni del proprio browser. Trattandosi di cookie tecnici indispensabili, il loro blocco impedisce l’accesso alla piattaforma e il mantenimento della sessione di lavoro.</p>
+    <br>
+    <h3>12. Modifiche alla presente informativa</h3>
     <p>Il Titolare si riserva il diritto di modificare la presente Informativa sulla Privacy in qualsiasi momento. Le modifiche saranno pubblicate sulla piattaforma e, ove necessario, comunicate agli utenti tramite i canali appropriati.</p>
   </v-container>
 </template>
