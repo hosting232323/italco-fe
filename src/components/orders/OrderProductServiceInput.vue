@@ -37,7 +37,7 @@
     >
       <v-col
         cols="12"
-        :md="isRae ? 3 : 4"
+        md="4"
       >
         <v-text-field
           v-if="!isRae"
@@ -102,7 +102,7 @@
       <v-col
         v-if="role != 'Customer' && isRae"
         cols="12"
-        md="4"
+        md="3"
       >
         <v-text-field
           v-model="raeQuantity"
