@@ -87,6 +87,7 @@ describe('company store', () => {
     store.createElement(vi.fn());
 
     expect(lastRequest()[2].body).toEqual({
+      rae: false,
       name: 'Ares Lecce',
       admin_nickname: 'admin-lecce',
       admin_password: 'segreta'
