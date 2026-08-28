@@ -9,9 +9,14 @@
         @click="openForm"
       />
     </h1><hr>
-    <CollectionPointForm />
     <CollectionPointTable />
   </v-container>
+  <v-dialog
+    v-model="activeForm"
+    max-width="1500"
+  >
+    <CollectionPointForm />
+  </v-dialog>
 </template>
 
 <script setup>
