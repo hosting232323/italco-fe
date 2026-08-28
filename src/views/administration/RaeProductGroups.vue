@@ -9,9 +9,14 @@
         @click="openForm"
       />
     </h1><hr>
-    <RaeProductGroupForm />
     <RaeProductGroupTable />
   </v-container>
+  <v-dialog
+    v-model="activeForm"
+    max-width="1500"
+  >
+    <RaeProductGroupForm />
+  </v-dialog>
 </template>
 
 <script setup>
