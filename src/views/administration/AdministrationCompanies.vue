@@ -1,6 +1,9 @@
 <template>
-  <v-dialog max-width="1500">
-    <template #activator="{ props: activatorProps }">
+  <v-dialog
+    v-model="activeForm"
+    max-width="1500"
+  >
+    <template #activator>
       <v-container>
         <h1>
           Gestione Company
@@ -15,9 +18,11 @@
           Seleziona la company su cui operare: da quel momento in poi vedi e
           modifichi soltanto i suoi dati.
         </p>
-        <CompanyForm />
-        <CompanyTable :activator-props="activatorProps" />
+        <CompanyTable />
       </v-container>
+    </template>
+    <template #default>
+      <CompanyForm />
     </template>
   </v-dialog>
 </template>

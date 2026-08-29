@@ -82,16 +82,29 @@ describe('administrationUser store', () => {
 describe('company store', () => {
   it('invia la password admin raw al backend che la hasha', () => {
     const store = useCompanyStore();
-    store.element = { name: 'Ares Lecce', adminNickname: 'admin-lecce', adminPassword: 'segreta' };
+    store.element = {
+      name: 'Ares Lecce',
+      adminNickname: 'admin-lecce',
+      adminPassword: 'segreta',
+      legal_name: 'Ares Lecce SRL',
+      address: 'Via Lecce 1',
+      city: 'Lecce'
+    };
 
     store.createElement(vi.fn());
 
-    expect(lastRequest()[2].body).toEqual({
+    // Con il logo opzionale la creazione passa da uploadRequest (FormData).
+    const [url, method, options] = lastUpload();
+    expect([url, method]).toEqual(['company', 'POST']);
+    expect(options.body).toMatchObject({
       rae: false,
       name: 'Ares Lecce',
       admin_nickname: 'admin-lecce',
-      admin_password: 'segreta'
+      admin_password: 'segreta',
+      legal_name: 'Ares Lecce SRL',
+      tax_code: null
     });
+    expect(options.files).toHaveProperty('logo');
   });
   it('seleziona la company e invalida i dati del tenant precedente', () => {
     const store = useCompanyStore();

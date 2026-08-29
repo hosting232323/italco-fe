@@ -55,13 +55,6 @@ import storesUtils from '@/utils/stores';
 import { useUserStore } from '@/stores/user';
 import { useCompanyStore } from '@/stores/company';
 
-defineProps({
-  activatorProps: {
-    type: Object,
-    required: true
-  }
-});
-
 const theme = useTheme();
 const router = useRouter();
 const selectLoading = reactive({});
@@ -75,11 +68,6 @@ const companies = storesUtils.getStoreList(companyStore);
 const openForm = (item) => {
   company.value = { ...item };
   activeForm.value = true;
-
-  window.scrollTo({
-    top: 0,
-    behavior: 'smooth'
-  });
 };
 
 const selectItem = (item) => {
