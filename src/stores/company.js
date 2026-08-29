@@ -1,5 +1,6 @@
 import http from '@/utils/http';
 import { defineStore } from 'pinia';
+import { fileUtils } from 'generic-module';
 import storesUtils from '@/utils/stores';
 import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
@@ -58,8 +59,23 @@ export const useCompanyStore = defineStore('company', {
     activeForm: false
   }),
   actions: {
+    // Dati legali stampati nei PDF. tax_code e logo sono opzionali; i campi
+    // rae_ li rende obbligatori il backend solo quando il modulo RAEE è acceso.
+    legalBody() {
+      return {
+        legal_name: this.element.legal_name,
+        vat_number: this.element.vat_number,
+        tax_code: this.element.tax_code || null,
+        address: this.element.address,
+        city: this.element.city,
+        rae_registration: this.element.rae_registration || null,
+        rae_grouping_place: this.element.rae_grouping_place || null,
+      };
+    },
     createElement(func) {
-      http.makeRequest(
+      // uploadRequest anche senza logo: il backend legge sempre il body dal
+      // campo 'data' del FormData, e il file (se scelto) viaggia a parte.
+      http.uploadRequest(
         'company',
         'POST',
         {
@@ -68,16 +84,27 @@ export const useCompanyStore = defineStore('company', {
             rae: this.element.rae || false,
             admin_nickname: this.element.adminNickname,
             admin_password: this.element.adminPassword,
-          }
+            ...this.legalBody(),
+          },
+          files: { logo: this.element.logo },
+          extensions: fileUtils.imageExtensions,
         },
         func
       );
     },
     updateElement(func) {
-      http.makeRequest(
+      http.uploadRequest(
         `company/${this.element.id}`,
         'PUT',
-        { body: { name: this.element.name, rae: this.element.rae || false } },
+        {
+          body: {
+            name: this.element.name,
+            rae: this.element.rae || false,
+            ...this.legalBody(),
+          },
+          files: { logo: this.element.logo },
+          extensions: fileUtils.imageExtensions,
+        },
         func
       );
     },
