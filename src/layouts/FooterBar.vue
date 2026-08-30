@@ -7,8 +7,8 @@
       <v-row>
         <v-col cols="6">
           {{ new Date().getFullYear() }} —
-          <strong>Italco.mi Logistribuzioni 2.0 srls</strong>
-          <div>P. IVA 02808910745</div>
+          <strong>Fast-Site</strong>
+          <div>P. IVA IT09007480727</div>
         </v-col>
         <v-col
           cols="6"

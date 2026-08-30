@@ -5,7 +5,7 @@
     <p><i>Data di ultima modifica: 25/08/2026</i></p>
     <br>
     <h3>1. Titolare del trattamento</h3>
-    <p>Il Titolare del trattamento dei dati personali è Italco.mi Logistribuzioni 2.0 Società a Responsabilità Limitata Semplificata, con sede legale in Via Emanuele Filiberto Duca 24/A, Mesagne BR 72023, P. IVA 02808910745, contattabile all’indirizzo email italcomilogistribuzioni20@pec.it.</p>
+    <p>Il Titolare del trattamento dei dati personali è Giovanni Colasanto, con sede legale in Via Andrea Doria 15, Molfetta BA 70056, P. IVA IT09007480727, contattabile all’indirizzo email giovanni.colasanto@pec.it.</p>
     <br>
     <h3>2. Tipologie di dati trattati</h3>
     <p>La piattaforma tratta le seguenti categorie di dati personali:</p>
