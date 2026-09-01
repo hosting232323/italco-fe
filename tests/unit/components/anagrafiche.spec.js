@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import CarrierForm from '@/components/administration/raeCarrier/CarrierForm.vue';
 import CarrierTable from '@/components/administration/raeCarrier/CarrierTable.vue';
@@ -26,6 +26,10 @@ import { useRaeProductGroupStore } from '@/stores/raeProductGroup';
 import { useServiceStore } from '@/stores/service';
 import { useTransportStore } from '@/stores/transport';
 
+import { flushPromises } from '@vue/test-utils';
+import http from '@/utils/http';
+
+import { createTestPinia, mountComponent } from '../../helpers/mount';
 import { describeCrudForm, describeCrudTable } from '../../helpers/crudComponents';
 
 
@@ -179,4 +183,29 @@ describe.each(forms)('$name', (config) => {
   afterEach(() => vi.useRealTimers());
 
   describeCrudForm(config);
+});
+
+
+describe('UserForm', () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it('mostra il messaggio di errore del backend quando il nickname esiste gia', async () => {
+    // Il mock deve rispondere 'ko' solo alla POST di creazione: intercettare
+    // anche la GET della lista (fatta da getStoreList al mount) svuoterebbe
+    // store.list e farebbe esplodere il template su `users.length`.
+    http.makeRequest.mockImplementation((url, method, options, func) => {
+      if (method === 'POST') func({ status: 'ko', message: 'Nickname già in uso' });
+    });
+    const pinia = createTestPinia();
+    const store = useAdministrationUserStore();
+    store.activeForm = true;
+    store.ready = true;
+    store.element = { nickname: 'mario', password: 'Password1', role: 'Customer' };
+    const wrapper = mountComponent(UserForm, { pinia });
+
+    await wrapper.find('form').trigger('submit');
+    await flushPromises();
+
+    expect(wrapper.text()).toContain('Nickname già in uso');
+  });
 });
