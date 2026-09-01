@@ -190,12 +190,16 @@ describe('UserForm', () => {
   beforeEach(() => vi.clearAllMocks());
 
   it('mostra il messaggio di errore del backend quando il nickname esiste gia', async () => {
-    http.makeRequest.mockImplementation((url, method, options, func) =>
-      func({ status: 'ko', message: 'Nickname già in uso' })
-    );
+    // Il mock deve rispondere 'ko' solo alla POST di creazione: intercettare
+    // anche la GET della lista (fatta da getStoreList al mount) svuoterebbe
+    // store.list e farebbe esplodere il template su `users.length`.
+    http.makeRequest.mockImplementation((url, method, options, func) => {
+      if (method === 'POST') func({ status: 'ko', message: 'Nickname già in uso' });
+    });
     const pinia = createTestPinia();
     const store = useAdministrationUserStore();
     store.activeForm = true;
+    store.ready = true;
     store.element = { nickname: 'mario', password: 'Password1', role: 'Customer' };
     const wrapper = mountComponent(UserForm, { pinia });
 
