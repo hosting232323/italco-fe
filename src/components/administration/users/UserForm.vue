@@ -45,6 +45,12 @@
           @cancel="activeForm = false"
         />
       </v-form>
+      <v-alert
+        v-if="message"
+        class="mt-5 mb-5"
+      >
+        {{ message }}
+      </v-alert>
     </v-card-text>
   </v-card>
 
@@ -108,6 +114,9 @@ const theme = useTheme();
 const loading = ref(false);
 const createdDialog = ref(false);
 const createdPassword = ref('');
+// Messaggio di errore del backend (es. nickname già in uso): senza questo
+// l'esito 'ko' resterebbe muto e il form sembrerebbe non rispondere.
+const message = ref('');
 const isMobile = mobile.setupMobileUtils();
 const administrationUserStore = useAdministrationUserStore();
 const { element: user, activeForm } = storeToRefs(administrationUserStore);
@@ -125,6 +134,7 @@ const closeCreatedDialog = () => {
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
 
+  message.value = '';
   loading.value = true;
   administrationUserStore.createElement(function (data) {
     loading.value = false;
@@ -134,6 +144,8 @@ const submitForm = async () => {
       user.value = {};
       administrationUserStore.initList();
       activeForm.value = false;
+    } else {
+      message.value = data.message || 'Errore durante la creazione dell\'utente';
     }
   });
 };
