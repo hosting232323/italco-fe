@@ -3,52 +3,7 @@ import { defineStore } from 'pinia';
 import { fileUtils } from 'generic-module';
 import storesUtils from '@/utils/stores';
 import { useUserStore } from '@/stores/user';
-import { useOrderStore } from '@/stores/order';
-import { useScheduleStore } from '@/stores/schedule';
-import { useScheduleItemStore } from '@/stores/scheduleItem';
-import { useServiceStore } from '@/stores/service';
-import { useTransportStore } from '@/stores/transport';
-import { useCollectionPointStore } from '@/stores/collectionPoint';
-import { useCustomerGroupStore } from '@/stores/customerGroup';
-import { useCustomerRuleStore } from '@/stores/customerRule';
-import { useGeographicZoneStore } from '@/stores/geographicZone';
-import { useLogStore } from '@/stores/log';
-import { useDashboardStore } from '@/stores/dashboard';
-import { useRaeProductStore } from '@/stores/raeProduct';
-import { useRaeProductGroupStore } from '@/stores/raeProductGroup';
-import { useRaeDisposalStore } from '@/stores/raeDisposal';
-import { useRaeCarrierStore } from '@/stores/raeCarrier';
-import { useRaeCollectionCenterStore } from '@/stores/raeCollectionCenter';
-import { useAdministrationUserStore } from '@/stores/administrationUser';
-
-// Resetta tutti gli store tenant-dipendenti impostando ready=false.
-// Va chiamata ogni volta che il super admin cambia company, così i dati
-// vengono ricaricati dal backend col token aggiornato.
-const resetTenantStores = () => {
-  const tenantStores = [
-    useOrderStore(),
-    useScheduleStore(),
-    useScheduleItemStore(),
-    useServiceStore(),
-    useTransportStore(),
-    useCollectionPointStore(),
-    useCustomerGroupStore(),
-    useCustomerRuleStore(),
-    useGeographicZoneStore(),
-    useLogStore(),
-    useDashboardStore(),
-    useRaeProductStore(),
-    useRaeProductGroupStore(),
-    useRaeDisposalStore(),
-    useRaeCarrierStore(),
-    useRaeCollectionCenterStore(),
-    useAdministrationUserStore(),
-  ];
-  for (const store of tenantStores) {
-    if ('ready' in store) store.ready = false;
-    if ('list' in store) store.list = [];
-  }
-};
+import tenantStores from '@/utils/tenantStores';
 
 
 export const useCompanyStore = defineStore('company', {
@@ -123,7 +78,7 @@ export const useCompanyStore = defineStore('company', {
             // precedente non devono essere mostrati nella nuova. Impostando
             // ready=false la prossima getStoreList li ricaricherà dal backend
             // col token aggiornato che porta il nuovo company_id.
-            resetTenantStores();
+            tenantStores.invalidate();
           }
           if (func) func(data);
         }
