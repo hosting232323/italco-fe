@@ -44,6 +44,14 @@
           :loading="loading"
           @cancel="activeForm = false"
         />
+        <v-alert
+          v-if="message"
+          type="error"
+          variant="tonal"
+          class="mt-4"
+        >
+          {{ message }}
+        </v-alert>
       </v-form>
     </v-card-text>
   </v-card>
@@ -93,7 +101,7 @@
 <script setup>
 import FormButtons from '@/components/FormButtons';
 
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import { useTheme } from 'vuetify';
@@ -108,10 +116,17 @@ const theme = useTheme();
 const loading = ref(false);
 const createdDialog = ref(false);
 const createdPassword = ref('');
+// Messaggio di errore del backend (es. nickname già in uso): senza questo
+// l'esito 'ko' resterebbe muto e il form sembrerebbe non rispondere.
+const message = ref('');
 const isMobile = mobile.setupMobileUtils();
 const administrationUserStore = useAdministrationUserStore();
 const { element: user, activeForm } = storeToRefs(administrationUserStore);
 const users = storesUtils.getStoreList(administrationUserStore);
+
+watch(activeForm, (val) => {
+  if (val) message.value = '';
+});
 
 const copyPassword = () => {
   navigator.clipboard.writeText(createdPassword.value);
@@ -125,6 +140,7 @@ const closeCreatedDialog = () => {
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
 
+  message.value = '';
   loading.value = true;
   administrationUserStore.createElement(function (data) {
     loading.value = false;
@@ -134,6 +150,8 @@ const submitForm = async () => {
       user.value = {};
       administrationUserStore.initList();
       activeForm.value = false;
+    } else {
+      message.value = data.message || 'Errore durante la creazione dell\'utente';
     }
   });
 };
