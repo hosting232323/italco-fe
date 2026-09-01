@@ -44,15 +44,13 @@
           :loading="loading"
           @cancel="activeForm = false"
         />
-        <v-alert
-          v-if="message"
-          type="error"
-          variant="tonal"
-          class="mt-4"
-        >
-          {{ message }}
-        </v-alert>
       </v-form>
+      <v-alert
+        v-if="message"
+        class="mt-5 mb-5"
+      >
+        {{ message }}
+      </v-alert>
     </v-card-text>
   </v-card>
 
@@ -101,7 +99,7 @@
 <script setup>
 import FormButtons from '@/components/FormButtons';
 
-import { ref, watch } from 'vue';
+import { ref } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import { useTheme } from 'vuetify';
@@ -123,10 +121,6 @@ const isMobile = mobile.setupMobileUtils();
 const administrationUserStore = useAdministrationUserStore();
 const { element: user, activeForm } = storeToRefs(administrationUserStore);
 const users = storesUtils.getStoreList(administrationUserStore);
-
-watch(activeForm, (val) => {
-  if (val) message.value = '';
-});
 
 const copyPassword = () => {
   navigator.clipboard.writeText(createdPassword.value);
