@@ -19,7 +19,7 @@
               v-model="user.email"
               :class="isMobile ? '' : 'mr-2'"
               label="Email"
-              :rules="validation.requiredRules"
+              :rules="validation.emailRules"
             />
           </v-col>
           <v-col
