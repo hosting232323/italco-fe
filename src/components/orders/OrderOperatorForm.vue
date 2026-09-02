@@ -100,11 +100,12 @@
       md="6"
     >
       <v-text-field
-        v-model="order.floor"
+        v-model.number="order.floor"
         :class="isMobile ? '' : 'ml-2'"
         label="Piano"
         type="number"
-        :rules="validation.positiveNumberRules"
+        step="1"
+        :rules="validation.nonNegativeIntegerRules"
       />
     </v-col>
   </v-row>
