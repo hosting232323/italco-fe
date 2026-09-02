@@ -29,12 +29,6 @@
               @click="openEditForm(item)"
             />
             <v-btn
-              icon="mdi-lock-reset"
-              variant="text"
-              :color="theme.current.value.primaryColor"
-              @click="openResetDialog(item)"
-            />
-            <v-btn
               icon="mdi-delete"
               variant="text"
               :loading="deleteLoading[item.id]"
@@ -75,67 +69,6 @@
       </v-card>
     </template>
   </v-dialog>
-
-  <!-- Dialog Reimposta Password -->
-  <v-dialog
-    v-model="resetDialog"
-    max-width="500"
-    persistent
-  >
-    <v-card title="Reimposta password">
-      <v-card-subtitle>{{ resetTarget?.email }}</v-card-subtitle>
-      <v-card-text>
-        <template v-if="!resetResult">
-          <v-text-field
-            v-model="resetInput"
-            label="Nuova password (lascia vuoto per generarne una)"
-            :append-inner-icon="showResetInput ? 'mdi-eye-off' : 'mdi-eye'"
-            :type="showResetInput ? 'text' : 'password'"
-            @click:append-inner="showResetInput = !showResetInput"
-          />
-        </template>
-        <template v-else>
-          <v-alert
-            type="success"
-            class="mb-4"
-          >
-            Password reimpostata con successo
-          </v-alert>
-          <v-text-field
-            :model-value="resetResult"
-            label="Nuova password"
-            readonly
-            variant="outlined"
-            append-inner-icon="mdi-content-copy"
-            @click:append-inner="copyPassword"
-          />
-          <v-alert
-            type="warning"
-            variant="tonal"
-            density="compact"
-          >
-            Copia la password adesso. Non sarà più visibile dopo la chiusura.
-          </v-alert>
-        </template>
-      </v-card-text>
-      <v-card-actions>
-        <v-btn
-          :text="resetResult ? 'Chiudi' : 'Annulla'"
-          :color="theme.current.value.primaryColor"
-          @click="closeResetDialog"
-        />
-        <v-spacer />
-        <v-btn
-          v-if="!resetResult"
-          text="Salva"
-          variant="elevated"
-          :color="theme.current.value.primaryColor"
-          :loading="resetLoading"
-          @click="submitReset"
-        />
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
 </template>
 
 <script setup>
@@ -150,14 +83,6 @@ const theme = useTheme();
 const deleteDialog = ref(false);
 const deleteLoading = reactive({});
 
-// Reset password state
-const resetDialog = ref(false);
-const resetTarget = ref(null);
-const resetInput = ref('');
-const resetResult = ref('');
-const resetLoading = ref(false);
-const showResetInput = ref(false);
-
 const administrationUserStore = useAdministrationUserStore();
 const { ready, element: user, activeForm } = storeToRefs(administrationUserStore);
 const users = storesUtils.getStoreList(administrationUserStore);
@@ -165,36 +90,6 @@ const users = storesUtils.getStoreList(administrationUserStore);
 const openEditForm = (item) => {
   user.value = { ...item, password: '' };
   activeForm.value = true;
-};
-
-const openResetDialog = (item) => {
-  resetTarget.value = item;
-  resetInput.value = '';
-  resetResult.value = '';
-  resetLoading.value = false;
-  showResetInput.value = false;
-  resetDialog.value = true;
-};
-
-const closeResetDialog = () => {
-  resetDialog.value = false;
-  resetTarget.value = null;
-  resetInput.value = '';
-  resetResult.value = '';
-};
-
-const submitReset = () => {
-  resetLoading.value = true;
-  administrationUserStore.resetPassword(resetTarget.value.id, resetInput.value || null, (data) => {
-    resetLoading.value = false;
-    if (data.status === 'ok') {
-      resetResult.value = data.password;
-    }
-  });
-};
-
-const copyPassword = () => {
-  navigator.clipboard.writeText(resetResult.value);
 };
 
 const deleteItem = (item, force = false) => {
