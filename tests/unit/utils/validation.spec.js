@@ -23,6 +23,19 @@ describe('positiveNumberRules', () => {
 });
 
 
+describe('nonNegativeIntegerRules', () => {
+  it.each([null, undefined, '', 0, 5, '12'])('accetta %s', (value) => {
+    expect(check(value, validation.nonNegativeIntegerRules)).toBe(true);
+  });
+
+  it.each([-1, 1.5, '1.5', 'abc'])('rifiuta %s', (value) => {
+    expect(check(value, validation.nonNegativeIntegerRules)).toBe(
+      'Deve essere un numero intero maggiore o uguale a zero'
+    );
+  });
+});
+
+
 describe('requiredRules', () => {
   it('accetta un valore valorizzato', () => {
     expect(check('Mario', validation.requiredRules)).toBe(true);
