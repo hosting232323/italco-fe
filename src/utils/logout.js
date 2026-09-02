@@ -1,14 +1,7 @@
 import { useUserStore } from '@/stores/user';
-import { useOrderStore } from '@/stores/order';
 import { useCompanyStore } from '@/stores/company';
-import { useServiceStore } from '@/stores/service';
-import { useScheduleStore } from '@/stores/schedule';
-import { useTransportStore } from '@/stores/transport';
-import { useCustomerRuleStore } from '@/stores/customerRule';
-import { useCustomerGroupStore } from '@/stores/customerGroup';
-import { useGeographicZoneStore } from '@/stores/geographicZone';
-import { useCollectionPointStore } from '@/stores/collectionPoint';
-import { useAdministrationUserStore } from '@/stores/administrationUser';
+import tenantStores from '@/utils/tenantStores';
+
 
 // Revoca il refresh token lato server (il cookie viaggia con credentials).
 // Fetch diretta, senza passare da http.js, per non creare un import circolare.
@@ -48,17 +41,12 @@ const logout = async (router) => {
 
 const resetStores = () => {
   useUserStore().$reset();
-  useOrderStore().$reset();
+  // La lista delle company e' del super admin, non di un'attivita': sta fuori
+  // dagli store tenant ma al logout va via come tutto il resto.
   useCompanyStore().$reset();
-  useServiceStore().$reset();
-  useScheduleStore().$reset();
-  useTransportStore().$reset();
-  useCustomerRuleStore().$reset();
-  useCustomerGroupStore().$reset();
-  useGeographicZoneStore().$reset();
-  useCollectionPointStore().$reset();
-  useAdministrationUserStore().$reset();
+  tenantStores.reset();
 };
+
 
 export default {
   logout
