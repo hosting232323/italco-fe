@@ -59,7 +59,7 @@
           </v-chip>
         </template>
         <template #[`item.user.company_name`]="{ item }">
-          {{ item.user?.company_name || item.user?.nickname || '' }}
+          {{ item.user?.company_name || item.user?.email || item.user?.nickname || '' }}
         </template>
         <template #[`item.actions`]="{ item }">
           <v-btn

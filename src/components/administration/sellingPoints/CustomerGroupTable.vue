@@ -15,7 +15,7 @@
     ]"
   >
     <template #[`item.users`]="{ item }">
-      {{ item.users.map(user => user.nickname).join(', ') }}
+      {{ item.users.map(user => user.email).join(', ') }}
     </template>
     <template #[`item.actions`]="{ item }">
       <v-row no-gutters>

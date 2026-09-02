@@ -160,7 +160,7 @@ const forms = [
     name: 'UserForm',
     component: UserForm,
     useStore: useAdministrationUserStore,
-    validElement: { nickname: 'mario', password: 'Password1', role: 'Customer' },
+    validElement: { email: 'mario', password: 'Password1', role: 'Customer' },
     createTitle: 'Crea',
     update: false
   }
@@ -189,23 +189,23 @@ describe.each(forms)('$name', (config) => {
 describe('UserForm', () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it('mostra il messaggio di errore del backend quando il nickname esiste gia', async () => {
+  it('mostra il messaggio di errore del backend quando il email esiste gia', async () => {
     // Il mock deve rispondere 'ko' solo alla POST di creazione: intercettare
     // anche la GET della lista (fatta da getStoreList al mount) svuoterebbe
     // store.list e farebbe esplodere il template su `users.length`.
     http.makeRequest.mockImplementation((url, method, options, func) => {
-      if (method === 'POST') func({ status: 'ko', message: 'Nickname già in uso' });
+      if (method === 'POST') func({ status: 'ko', message: 'Email già in uso' });
     });
     const pinia = createTestPinia();
     const store = useAdministrationUserStore();
     store.activeForm = true;
     store.ready = true;
-    store.element = { nickname: 'mario', password: 'Password1', role: 'Customer' };
+    store.element = { email: 'mario', password: 'Password1', role: 'Customer' };
     const wrapper = mountComponent(UserForm, { pinia });
 
     await wrapper.find('form').trigger('submit');
     await flushPromises();
 
-    expect(wrapper.text()).toContain('Nickname già in uso');
+    expect(wrapper.text()).toContain('Email già in uso');
   });
 });

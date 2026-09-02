@@ -39,7 +39,7 @@ export const useCompanyStore = defineStore('company', {
             name: this.element.name,
             rae: this.element.rae || false,
             automatic_planning: this.element.automatic_planning || false,
-            admin_nickname: this.element.adminNickname,
+            admin_email: this.element.adminEmail,
             admin_password: this.element.adminPassword,
             ...this.legalBody(),
           },

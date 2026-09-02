@@ -2,7 +2,7 @@
   <v-data-table
     :items="service.users"
     :headers="[
-      { title: 'Nickname', value: 'nickname', sortable: false },
+      { title: 'Email', value: 'email', sortable: false },
       { title: 'Prezzo', value: 'price', sortable: false },
       { title: 'Codice', value: 'code', sortable: false },
       { title: 'Azioni', key: 'actions', sortable: false }

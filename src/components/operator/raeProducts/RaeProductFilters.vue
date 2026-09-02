@@ -46,7 +46,7 @@
                 :class="isMobile ? '' : 'ml-2 mr-2'"
                 label="Punto Vendita"
                 :items="users.filter(user => user.role == 'Customer')"
-                item-title="nickname"
+                item-title="email"
                 item-value="id"
                 clearable
               />

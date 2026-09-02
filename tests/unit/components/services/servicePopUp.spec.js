@@ -28,8 +28,8 @@ beforeEach(() => {
   const users = useAdministrationUserStore();
   users.ready = true;
   users.list = [
-    { id: 7, nickname: 'mario', role: 'Customer' },
-    { id: 8, nickname: 'admin', role: 'Admin' }
+    { id: 7, email: 'mario', role: 'Customer' },
+    { id: 8, email: 'admin', role: 'Admin' }
   ];
   window.innerWidth = 1280;
   vi.clearAllMocks();
@@ -47,7 +47,7 @@ describe('ServicePopUp', () => {
   it('mostra la tabella solo quando ci sono utenti', () => {
     expect(mountComponent(ServicePopUp, { pinia }).findComponent(ServicePopUpTable).exists()).toBe(false);
 
-    store.element = service([{ id: 1, nickname: 'mario', price: 10 }]);
+    store.element = service([{ id: 1, email: 'mario', price: 10 }]);
 
     expect(mountComponent(ServicePopUp, { pinia }).findComponent(ServicePopUpTable).exists()).toBe(true);
   });
@@ -90,9 +90,9 @@ describe('ServicePopUp', () => {
     await flushPromises();
     const callback = http.makeRequest.mock.calls.at(-1)[3];
 
-    callback({ status: 'ok', service_users: [{ id: 1, nickname: 'mario' }] });
+    callback({ status: 'ok', service_users: [{ id: 1, email: 'mario' }] });
 
-    expect(store.element.users).toEqual([{ id: 1, nickname: 'mario' }]);
+    expect(store.element.users).toEqual([{ id: 1, email: 'mario' }]);
   });
 
   it('il piu apre il form di associazione', async () => {
@@ -119,7 +119,7 @@ describe('ServicePopUpForm', () => {
     const wrapper = openForm();
 
     const items = wrapper.findComponent({ name: 'VAutocomplete' }).props('items');
-    expect(items.map(({ nickname }) => nickname)).toEqual(['mario']);
+    expect(items.map(({ email }) => email)).toEqual(['mario']);
   });
 
   it('non invia nulla senza utente e prezzo', async () => {
@@ -178,8 +178,8 @@ describe('ServicePopUpForm', () => {
 describe('ServicePopUpTable', () => {
   beforeEach(() => {
     store.element = service([
-      { id: 1, nickname: 'mario', price: 10, code: 'A1' },
-      { id: 2, nickname: 'anna', price: 12, code: 'A2' }
+      { id: 1, email: 'mario', price: 10, code: 'A1' },
+      { id: 2, email: 'anna', price: 12, code: 'A2' }
     ]);
   });
 
@@ -192,7 +192,7 @@ describe('ServicePopUpTable', () => {
 
     await wrapper.findAll('tbody tr')[0].find('.mdi-pencil').trigger('click');
 
-    expect(store.innerElement).toEqual({ id: 1, nickname: 'mario', price: 10, code: 'A1' });
+    expect(store.innerElement).toEqual({ id: 1, email: 'mario', price: 10, code: 'A1' });
     expect(store.activePopUpForm).toBe(true);
   });
 

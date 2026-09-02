@@ -29,7 +29,7 @@ import { useOrderStore } from '@/stores/order';
 
 const orderStore = useOrderStore();
 const { activeForm, element: order } = storeToRefs(orderStore);
-const subtitle = ref(order.user ? `Punto Vendita: ${order.user.company_name || order.user.nickname}` : '');
+const subtitle = ref(order.user ? `Punto Vendita: ${order.user.company_name || order.user.email || order.user.nickname}` : '');
 
 const setSubtitle = (value) => {
   subtitle.value = value;

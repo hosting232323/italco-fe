@@ -23,8 +23,8 @@ const withCustomers = () => {
   const users = useAdministrationUserStore();
   users.ready = true;
   users.list = [
-    { id: 7, nickname: 'mario', role: 'Customer' },
-    { id: 8, nickname: 'admin', role: 'Admin' }
+    { id: 7, email: 'mario', role: 'Customer' },
+    { id: 8, email: 'admin', role: 'Admin' }
   ];
 };
 
@@ -60,7 +60,7 @@ describe('CustomerGroupPopUp', () => {
   it('mostra la tabella solo con almeno un utente', () => {
     expect(mountComponent(CustomerGroupPopUp, { pinia }).findComponent(CustomerGroupPopUpTable).exists()).toBe(false);
 
-    store.element.users = [{ id: 7, nickname: 'mario' }];
+    store.element.users = [{ id: 7, email: 'mario' }];
 
     expect(mountComponent(CustomerGroupPopUp, { pinia }).findComponent(CustomerGroupPopUpTable).exists()).toBe(true);
   });
@@ -80,7 +80,7 @@ describe('CustomerGroupPopUpForm', () => {
       .findComponent({ name: 'VAutocomplete' })
       .props('items');
 
-    expect(items.map(({ nickname }) => nickname)).toEqual(['mario']);
+    expect(items.map(({ email }) => email)).toEqual(['mario']);
   });
 
   it('non assegna nulla senza utente', async () => {
@@ -104,10 +104,10 @@ describe('CustomerGroupPopUpForm', () => {
 
     expect(assignUser).toHaveBeenCalledWith(7, expect.any(Function));
 
-    assignUser.mock.calls.at(-1)[1]({ status: 'ok', user: { id: 7, nickname: 'mario' } });
+    assignUser.mock.calls.at(-1)[1]({ status: 'ok', user: { id: 7, email: 'mario' } });
 
     expect(initList).toHaveBeenCalled();
-    expect(store.element.users).toEqual([{ id: 7, nickname: 'mario' }]);
+    expect(store.element.users).toEqual([{ id: 7, email: 'mario' }]);
     expect(wrapper.emitted('closeForm')).toHaveLength(1);
   });
 });
@@ -121,7 +121,7 @@ describe('CustomerGroupPopUpTable', () => {
     store.element = {
       id: 3,
       name: 'Gruppo Bari',
-      users: [{ id: 7, nickname: 'mario' }, { id: 8, nickname: 'anna' }]
+      users: [{ id: 7, email: 'mario' }, { id: 8, email: 'anna' }]
     };
   });
 
@@ -166,7 +166,7 @@ describe('CustomerRuleForm', () => {
       .findComponent({ name: 'VAutocomplete' })
       .props('items');
 
-    expect(items.map(({ nickname }) => nickname)).toEqual(['mario']);
+    expect(items.map(({ email }) => email)).toEqual(['mario']);
   });
 
   it('non crea nulla con il form vuoto', async () => {
@@ -198,7 +198,7 @@ describe('CustomerRuleForm', () => {
 
 describe('CustomerRuleTable', () => {
   const righe = [
-    { id: 1, nickname: 'mario', rules: [{ id: 10, day_of_week: 0, max_orders: 5 }, { id: 11, day_of_week: 6, max_orders: 2 }] }
+    { id: 1, email: 'mario', rules: [{ id: 10, day_of_week: 0, max_orders: 5 }, { id: 11, day_of_week: 6, max_orders: 2 }] }
   ];
 
   it('mostra lo scheletro finche la lista non e pronta', () => {

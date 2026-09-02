@@ -33,7 +33,7 @@
           v-for="(user, index) in item.users"
           :key="index"
         >
-          {{ user.nickname }}<span v-if="index < item.users.length - 1">, </span>
+          {{ user.email }}<span v-if="index < item.users.length - 1">, </span>
         </span>
       </div>
       <span v-else>-</span>

@@ -35,7 +35,7 @@
         :class="isMobile ? '' : 'ml-2 mr-2'"
         label="Punto Vendita"
         :items="users.filter(user => user.role == 'Customer')"
-        item-title="nickname"
+        item-title="email"
         item-value="id"
         clearable
       />
@@ -49,7 +49,7 @@
         :class="isMobile ? '' : 'ml-2'"
         label="Utenti Delivery"
         :items="users.filter(user => user.role == 'Delivery')"
-        item-title="nickname"
+        item-title="email"
         item-value="id"
         clearable
       />
