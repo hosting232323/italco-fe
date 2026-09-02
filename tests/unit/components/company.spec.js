@@ -57,7 +57,7 @@ describe('CompanyForm', () => {
     store.element = {
       name: 'Nuova',
       rae: false,
-      adminNickname: 'admin',
+      adminEmail: 'admin',
       adminPassword: 'pw',
       ...LEGAL
     };
@@ -77,7 +77,7 @@ describe('CompanyForm', () => {
     const pinia = createTestPinia();
     const store = useCompanyStore();
     store.activeForm = true;
-    store.element = { name: 'Nuova', rae: false, adminNickname: 'admin', adminPassword: 'pw' };
+    store.element = { name: 'Nuova', rae: false, adminEmail: 'admin', adminPassword: 'pw' };
     const wrapper = mountComponent(CompanyForm, { pinia });
 
     await wrapper.find('form').trigger('submit');
@@ -110,18 +110,18 @@ describe('CompanyForm', () => {
 
   it('mostra il messaggio di errore del backend quando la creazione fallisce', async () => {
     http.uploadRequest.mockImplementation((url, method, options, func) =>
-      func({ status: 'ko', message: 'Nickname già in uso' })
+      func({ status: 'ko', message: 'Email già in uso' })
     );
     const pinia = createTestPinia();
     const store = useCompanyStore();
     store.activeForm = true;
-    store.element = { name: 'Nuova', rae: false, adminNickname: 'admin', adminPassword: 'pw', ...LEGAL };
+    store.element = { name: 'Nuova', rae: false, adminEmail: 'admin', adminPassword: 'pw', ...LEGAL };
     const wrapper = mountComponent(CompanyForm, { pinia });
 
     await wrapper.find('form').trigger('submit');
     await flushPromises();
 
-    expect(wrapper.text()).toContain('Nickname già in uso');
+    expect(wrapper.text()).toContain('Email già in uso');
     expect(store.activeForm).toBe(true);
   });
 });

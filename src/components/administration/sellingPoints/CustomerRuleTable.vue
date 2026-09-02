@@ -9,7 +9,7 @@
     v-else
     :items="customerRules"
     :headers="[
-      { title: 'Utente', value: 'nickname', sortable: false },
+      { title: 'Utente', value: 'email', sortable: false },
       { title: 'Regole', value: 'rules', sortable: false },
       { title: 'Azioni', key: 'actions', sortable: false }
     ]"

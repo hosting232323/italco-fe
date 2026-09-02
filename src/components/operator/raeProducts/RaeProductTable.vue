@@ -30,7 +30,7 @@
           { title: 'Prodotto', value: 'product', sortable: false },
           { title: 'Raggruppamento', value: 'product_group.group_code', sortable: false },
           { title: 'Destinatario', value: 'order.addressee', sortable: false },
-          { title: 'Punto Vendita', value: 'user.nickname', sortable: false },
+          { title: 'Punto Vendita', value: 'user.email', sortable: false },
           { title: 'Data DTR', value: 'dtr_date', sortable: false },
           { title: 'Data di emissione', value: 'emission_date', sortable: false },
           { title: 'Azioni', key: 'actions', sortable: false }

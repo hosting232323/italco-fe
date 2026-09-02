@@ -181,8 +181,8 @@
               class="pr-md-2"
             >
               <v-text-field
-                v-model="company.adminNickname"
-                label="Nickname (usato per il login)"
+                v-model="company.adminEmail"
+                label="Email (usato per il login)"
                 :rules="validation.requiredRules"
               />
             </v-col>
@@ -230,7 +230,7 @@ import { useCompanyStore } from '@/stores/company';
 const form = ref(null);
 const loading = ref(false);
 const logoError = ref('');
-// Messaggio di errore del backend (es. nickname admin già in uso): senza
+// Messaggio di errore del backend (es. email admin già in uso): senza
 // questo l'esito 'ko' resterebbe muto e il form sembrerebbe non rispondere.
 const message = ref('');
 

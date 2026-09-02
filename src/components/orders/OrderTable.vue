@@ -145,7 +145,7 @@ const getHeaders = () => {
     { title: 'Recapito', value: 'addressee_contact', sortable: false }
   ];
   if (role.value != 'Customer')
-    headers.push({ title: 'Punto Vendita', value: 'user.nickname', sortable: false });
+    headers.push({ title: 'Punto Vendita', value: 'user.email', sortable: false });
   headers.push(
     { title: 'D.P.C.', value: 'dpc', sortable: false },
     { title: 'D.R.C.', value: 'drc', sortable: false },

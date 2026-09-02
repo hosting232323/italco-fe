@@ -50,13 +50,13 @@ describe('administrationUser store', () => {
     // Sotto HTTPS la password viaggia già dentro un canale cifrato, e l'unico
     // punto dove va protetta è il database: lì ci pensa scrypt lato backend.
     const store = useAdministrationUserStore();
-    store.element = { nickname: 'mario', password: 'segreta', role: 'Customer' };
+    store.element = { email: 'mario', password: 'segreta', role: 'Customer' };
 
     store.createElement(vi.fn());
 
     const [url, method, payload] = lastRequest();
     expect([url, method]).toEqual(['user', 'POST']);
-    expect(payload.body.nickname).toBe('mario');
+    expect(payload.body.email).toBe('mario');
     expect(payload.body.password).toBe('segreta');
   });
 
@@ -84,7 +84,7 @@ describe('company store', () => {
     const store = useCompanyStore();
     store.element = {
       name: 'Ares Lecce',
-      adminNickname: 'admin-lecce',
+      adminEmail: 'admin-lecce',
       adminPassword: 'segreta',
       legal_name: 'Ares Lecce SRL',
       address: 'Via Lecce 1',
@@ -99,7 +99,7 @@ describe('company store', () => {
     expect(options.body).toMatchObject({
       rae: false,
       name: 'Ares Lecce',
-      admin_nickname: 'admin-lecce',
+      admin_email: 'admin-lecce',
       admin_password: 'segreta',
       legal_name: 'Ares Lecce SRL',
       tax_code: null

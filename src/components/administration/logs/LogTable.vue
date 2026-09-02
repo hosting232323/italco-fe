@@ -12,7 +12,7 @@
       { title: 'Data', value: 'logs.created_at', sortable: false },
       { title: 'Metodo', value: 'logs.method', sortable: false },
       { title: 'Endpoint', value: 'logs.endpoint', sortable: false },
-      { title: 'User', value: 'user.nickname', sortable: false },
+      { title: 'User', value: 'user.email', sortable: false },
       { title: 'Azioni', key: 'actions', sortable: false }
     ]"
   >

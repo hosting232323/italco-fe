@@ -10,7 +10,7 @@
     :items="users.filter(user => user.role == 'Customer')"
     :headers="[
       { title: 'ID', value: 'id', sortable: false },
-      { title: 'Nickname', value: 'nickname', sortable: false },
+      { title: 'Email', value: 'email', sortable: false },
       { title: 'Codice Importazioni', value: 'import_code', sortable: false },
       { title: 'Città', value: 'city', sortable: false },
       { title: 'Indirizzo', value: 'address', sortable: false },

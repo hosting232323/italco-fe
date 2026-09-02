@@ -40,7 +40,7 @@
           v-model="customerRule.user_id"
           label="Utente"
           :items="users.filter(user => user.role == 'Customer')"
-          item-title="nickname"
+          item-title="email"
           item-value="id"
           :rules="validation.requiredRules"
         />

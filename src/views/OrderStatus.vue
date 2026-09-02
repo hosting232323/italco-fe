@@ -27,7 +27,7 @@
             <td class="label">
               Punto vendita
             </td>
-            <td>{{ order.user.nickname }}</td>
+            <td>{{ order.user.email }}</td>
           </tr>
         </tbody>
       </table>
