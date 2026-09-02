@@ -160,7 +160,7 @@ const forms = [
     name: 'UserForm',
     component: UserForm,
     useStore: useAdministrationUserStore,
-    validElement: { email: 'mario', password: 'Password1', role: 'Customer' },
+    validElement: { email: 'mario@example.com', password: 'Password1', role: 'Customer' },
     createTitle: 'Crea',
     update: false
   }
@@ -200,7 +200,7 @@ describe('UserForm', () => {
     const store = useAdministrationUserStore();
     store.activeForm = true;
     store.ready = true;
-    store.element = { email: 'mario', password: 'Password1', role: 'Customer' };
+    store.element = { email: 'mario@example.com', password: 'Password1', role: 'Customer' };
     const wrapper = mountComponent(UserForm, { pinia });
 
     await wrapper.find('form').trigger('submit');
