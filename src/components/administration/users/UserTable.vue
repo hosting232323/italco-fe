@@ -15,13 +15,19 @@
         :items="users"
         :headers="[
           { title: 'ID', value: 'id', sortable: false },
-          { title: 'Nickname', value: 'nickname', sortable: false },
+          { title: 'Email', value: 'email', sortable: false },
           { title: 'Ruolo', value: 'role', sortable: false },
           { title: 'Azioni', key: 'actions', sortable: false }
         ]"
       >
         <template #[`item.actions`]="{ item }">
           <template v-if="item.role !== 'Admin'">
+            <v-btn
+              icon="mdi-pencil"
+              variant="text"
+              :color="theme.current.value.primaryColor"
+              @click="openEditForm(item)"
+            />
             <v-btn
               icon="mdi-lock-reset"
               variant="text"
@@ -42,7 +48,7 @@
     <template #default>
       <v-card title="Attenzione!">
         <v-card-text>
-          <p>Stai per cancellare l'utente: <strong>{{ element.nickname }}</strong></p>
+          <p>Stai per cancellare l'utente: <strong>{{ element.email }}</strong></p>
           <ul style="margin-left: 20px;">
             <li>Verranno rimossi {{ element.serviceUsers }} servizi collegati</li>
             <li>Verranno rimosse {{ element.customerRules }} regole personalizzate</li>
@@ -77,7 +83,7 @@
     persistent
   >
     <v-card title="Reimposta password">
-      <v-card-subtitle>{{ resetTarget?.nickname }}</v-card-subtitle>
+      <v-card-subtitle>{{ resetTarget?.email }}</v-card-subtitle>
       <v-card-text>
         <template v-if="!resetResult">
           <v-text-field
@@ -153,8 +159,13 @@ const resetLoading = ref(false);
 const showResetInput = ref(false);
 
 const administrationUserStore = useAdministrationUserStore();
-const { ready } = storeToRefs(administrationUserStore);
+const { ready, element: user, activeForm } = storeToRefs(administrationUserStore);
 const users = storesUtils.getStoreList(administrationUserStore);
+
+const openEditForm = (item) => {
+  user.value = { ...item, password: '' };
+  activeForm.value = true;
+};
 
 const openResetDialog = (item) => {
   resetTarget.value = item;

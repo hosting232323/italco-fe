@@ -1,7 +1,7 @@
 <template>
   <v-card
     v-if="activeForm"
-    :title="`Modifica Località per ${user.nickname} ID ${user.id}`"
+    :title="`Modifica Località per ${user.email} ID ${user.id}`"
     class="mt-10 mb-5"
   >
     <v-card-text>

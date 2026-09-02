@@ -13,7 +13,7 @@
       <li>
         <strong>Dati degli utenti registrati (amministratori, clienti, delivery, operatori)</strong>
         <ul style="margin-left:20px;">
-          <li>Nickname</li>
+          <li>Email</li>
           <li>Indirizzo email</li>
           <li>Password (in forma cifrata)</li>
           <li>Ruolo utente all’interno della piattaforma</li>

@@ -20,7 +20,7 @@ let store;
 
 const logRow = (extra = {}) => ({
   logs: { id: 1, created_at: '2026-09-01T08:30:15Z', method: 'POST', endpoint: '/order', ...extra },
-  user: { nickname: 'mario' }
+  user: { email: 'mario' }
 });
 
 
@@ -72,7 +72,7 @@ describe('LogFilters', () => {
   beforeEach(() => {
     const users = useAdministrationUserStore();
     users.ready = true;
-    users.list = [{ id: 7, nickname: 'mario' }];
+    users.list = [{ id: 7, email: 'mario' }];
   });
 
   const panelIsOpen = (wrapper) => wrapper.find('.v-expansion-panel').classes().includes('v-expansion-panel--active');
@@ -87,7 +87,7 @@ describe('LogFilters', () => {
     await wrapper.find('.v-expansion-panel-title').trigger('click');
 
     expect(wrapper.findComponent({ name: 'VAutocomplete' }).props('items')).toEqual([
-      { id: 7, nickname: 'mario' }
+      { id: 7, email: 'mario' }
     ]);
   });
 

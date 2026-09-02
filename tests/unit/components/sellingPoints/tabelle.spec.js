@@ -31,7 +31,7 @@ beforeEach(() => {
 
 describe('CustomerGroupTable', () => {
   const gruppi = [
-    { id: 1, name: 'Gruppo Bari', users: [{ nickname: 'mario' }, { nickname: 'anna' }] },
+    { id: 1, name: 'Gruppo Bari', users: [{ email: 'mario' }, { email: 'anna' }] },
     { id: 2, name: 'Gruppo Nord', users: [] }
   ];
 

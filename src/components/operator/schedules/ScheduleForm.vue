@@ -26,15 +26,15 @@
               append-icon="mdi-close-circle"
               @click="removeUser(user.id)"
             >
-              {{ user.nickname }}
+              {{ user.email }}
             </v-chip>
             <v-autocomplete
               v-model="selectedUser"
               label="Utenti"
               :items="users.filter(
-                (u) => u.role === 'Delivery' && (!schedule.users || !schedule.users.some(su => su.nickname === u.nickname))
+                (u) => u.role === 'Delivery' && (!schedule.users || !schedule.users.some(su => su.email === u.email))
               )"
-              item-title="nickname"
+              item-title="email"
               append-icon="mdi-plus"
               return-object
               :error-messages="error"

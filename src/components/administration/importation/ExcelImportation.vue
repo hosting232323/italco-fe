@@ -66,7 +66,7 @@
               v-model="user"
               label="Punto Vendita"
               :items="users.filter(user => user.role == 'Customer')"
-              item-title="nickname"
+              item-title="email"
               item-value="id"
               :rules="validation.requiredRules"
             />
