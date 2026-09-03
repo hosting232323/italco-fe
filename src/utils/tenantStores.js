@@ -11,7 +11,6 @@ import { useRaeCollectionCenterStore } from '@/stores/raeCollectionCenter';
 import { useRaeDisposalStore } from '@/stores/raeDisposal';
 import { useRaeProductGroupStore } from '@/stores/raeProductGroup';
 import { useRaeProductStore } from '@/stores/raeProduct';
-import { useScheduleItemStore } from '@/stores/scheduleItem';
 import { useScheduleStore } from '@/stores/schedule';
 import { useServiceStore } from '@/stores/service';
 import { useTransportStore } from '@/stores/transport';
@@ -35,7 +34,6 @@ const tenantStores = () => [
   useRaeDisposalStore(),
   useRaeProductGroupStore(),
   useRaeProductStore(),
-  useScheduleItemStore(),
   useScheduleStore(),
   useServiceStore(),
   useTransportStore()
