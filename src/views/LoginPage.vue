@@ -9,8 +9,9 @@
     @call-back="goToDashboard"
   />
   <div class="mt-4 text-center">
+    Sei un corriere? Scarica
     <router-link :to="{ name: 'Download App' }">
-      Sei un corriere? Scarica l'app Ares Delivery
+      l'app Ares Delivery
     </router-link>
   </div>
 </template>
