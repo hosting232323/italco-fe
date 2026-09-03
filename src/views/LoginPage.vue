@@ -8,19 +8,14 @@
     :hostname="hostname"
     @call-back="goToDashboard"
   />
-  <v-alert
-    v-if="deliveryBlocked"
-    class="mt-4 mx-auto"
-    type="info"
-    variant="tonal"
-    style="max-width: 500px;"
-  >
-    Gli utenti Delivery non accedono più dal gestionale: usa l'app Ares Delivery.
-  </v-alert>
+  <div class="mt-4 text-center">
+    <router-link :to="{ name: 'Download App' }">
+      Sei un corriere? Scarica l'app Ares Delivery
+    </router-link>
+  </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
@@ -32,17 +27,18 @@ const hostname = import.meta.env.VITE_HOSTNAME;
 const theme = useTheme();
 const router = useRouter();
 const userStore = useUserStore();
-const deliveryBlocked = ref(false);
 const { role, userId, token, company } = storeToRefs(userStore);
 
 const goToDashboard = (data) => {
+  // Difesa in profondità: il backend rifiuta già il login Delivery dal web
+  // (vedi TRANSPORT_HEADER in italco-be), ma se un token Delivery arrivasse
+  // comunque qui non c'è più una UI ad accoglierlo.
   if (data.role === 'Delivery') {
     userStore.$reset();
-    deliveryBlocked.value = true;
+    router.push({ name: 'Download App' });
     return;
   }
 
-  deliveryBlocked.value = false;
   role.value = data.role;
   userId.value = data.user_id;
   token.value = data.access_token;

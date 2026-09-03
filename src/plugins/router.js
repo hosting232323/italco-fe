@@ -23,6 +23,11 @@ const routes = [
         component: () => import('@/views/PrivacyPolicy.vue')
       },
       {
+        path: 'download-app',
+        name: 'Download App',
+        component: () => import('@/views/DownloadDeliveryApp.vue')
+      },
+      {
         path: '/:pathMatch(.*)*',
         name: 'NotFound',
         component: () => import('@/views/NotFound.vue')
@@ -129,7 +134,7 @@ const router = createRouter({
 });
 
 // Rotte raggiungibili senza sessione: fuori dal perimetro della guard.
-const PUBLIC_ROUTES = ['Login', 'Privacy Policy', 'OrderStatus', 'NotFound'];
+const PUBLIC_ROUTES = ['Login', 'Privacy Policy', 'Download App', 'OrderStatus', 'NotFound'];
 
 // Rotte del modulo RAEE: esistono solo per le attività che lo hanno acceso.
 const RAE_ROUTES = [
@@ -142,7 +147,16 @@ const RAE_ROUTES = [
 
 
 router.beforeEach((to) => {
-  const { role, company } = useUserStore();
+  const userStore = useUserStore();
+  const { role, company } = userStore;
+
+  // Sessioni Delivery aperte da prima della rimozione della UI web: la
+  // company web non offre più nulla per questo ruolo, quindi si chiude la
+  // sessione e si manda alla stessa pagina del login.
+  if (role == 'Delivery' && !PUBLIC_ROUTES.includes(to.name)) {
+    userStore.$reset();
+    return { name: 'Download App' };
+  }
 
   // Il super admin non possiede dati propri: finché non sceglie una company
   // non c'è niente da mostrargli, e ogni altra rotta lo riporta alla scelta.
