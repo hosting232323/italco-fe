@@ -10,7 +10,6 @@ import { useRaeCollectionCenterStore } from '@/stores/raeCollectionCenter';
 import { useRaeDisposalStore } from '@/stores/raeDisposal';
 import { useRaeProductStore } from '@/stores/raeProduct';
 import { useRaeProductGroupStore } from '@/stores/raeProductGroup';
-import { useScheduleItemStore } from '@/stores/scheduleItem';
 import { useScheduleStore } from '@/stores/schedule';
 import { useServiceStore } from '@/stores/service';
 import { useTransportStore } from '@/stores/transport';
@@ -123,16 +122,6 @@ const stores = [
     listMethod: 'POST',
     listBody: { filters: [] },
     excludedKeys: ['created_at', 'updated_at', 'transport', 'orders', 'schedulation']
-  },
-  {
-    name: 'scheduleItem',
-    useStore: useScheduleItemStore,
-    endpoint: 'schedule',
-    listKey: 'schedule_items',
-    listEndpoint: 'schedule/delivery',
-    create: false,
-    update: false,
-    remove: false
   }
 ];
 

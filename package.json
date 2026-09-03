@@ -28,7 +28,6 @@
     "vue": "^3.5.29",
     "vue-router": "^5.0.3",
     "vue3-apexcharts": "^1.11.1",
-    "vue3-signature-pad": "^1.0.7",
     "vuedraggable": "^4.1.0",
     "vuetify": "^3.0.0"
   },

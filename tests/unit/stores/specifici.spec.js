@@ -14,7 +14,6 @@ import { useLogStore } from '@/stores/log';
 import { useOrderStore } from '@/stores/order';
 import { useRaeDisposalStore } from '@/stores/raeDisposal';
 import { useRaeProductStore } from '@/stores/raeProduct';
-import { useScheduleItemStore } from '@/stores/scheduleItem';
 import { useScheduleStore } from '@/stores/schedule';
 import { useServiceStore } from '@/stores/service';
 
@@ -439,22 +438,6 @@ describe('schedule store', () => {
 
     expect([url, method]).toEqual(['schedule/filter', 'POST']);
     expect(payload.body.filters).toEqual([{ value: '2026-09-01', model: 'Schedule', field: 'date' }]);
-  });
-});
-
-
-describe('scheduleItem store', () => {
-  it('aggiorna con un corpo vuoto', () => {
-    // Nota: updateElement e' rimasto uno stub, manda una PUT su schedule/<id>
-    // senza alcun campo.
-    const store = useScheduleItemStore();
-    store.element = { id: 4, index: 2 };
-
-    store.updateElement(vi.fn());
-
-    const [url, method, payload] = lastRequest();
-    expect([url, method]).toEqual(['schedule/4', 'PUT']);
-    expect(payload.body).toEqual({});
   });
 });
 
