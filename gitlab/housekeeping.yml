@@ -15,7 +15,13 @@ deps_check:
   rules:
     - if: '$CI_COMMIT_BRANCH != "main"'
   script:
-    - npm ci --prefer-offline 2>/dev/null || npm ci
+    # node:22 imbarca un npm che chiama ancora l'endpoint /audits/quick, ormai
+    # dismesso da npmjs.org (risposte 400/503): npm audit fallisce sempre,
+    # a prescindere dalle vulnerabilita' reali. La versione nuova usa il
+    # bulk endpoint che l'ha sostituito, ma per default blocca il fetch delle
+    # dipendenze git (qui generic-module e' git+ssh): va riabilitato esplicitamente.
+    - npm install -g npm@latest
+    - npm ci --allow-git=all --prefer-offline 2>/dev/null || npm ci --allow-git=all
     - npm audit --audit-level=high || AUDIT_EXIT=$?
     - npm audit --audit-level=high --json > npm-audit-report.json || true
     - exit ${AUDIT_EXIT:-0}
