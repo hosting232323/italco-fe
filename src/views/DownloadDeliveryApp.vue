@@ -85,11 +85,23 @@
         Installa TestFlight
       </v-btn>
     </v-card>
+
+    <v-btn
+      class="mt-6"
+      variant="text"
+      prepend-icon="mdi-logout"
+      @click="logoutModule.logout(router)"
+    >
+      Torna al login
+    </v-btn>
   </v-container>
 </template>
 
 <script setup>
-//
+import { useRouter } from 'vue-router';
+import logoutModule from '@/utils/logout';
+
+const router = useRouter();
 </script>
 
 <style scoped>
