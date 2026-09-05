@@ -10,45 +10,12 @@
         @submit.prevent="submitForm"
       >
         <v-row no-gutters>
-          <v-col
-            cols="12"
-            md="6"
-            class="pr-md-2"
-          >
+          <v-col cols="12">
             <v-text-field
               v-model="company.name"
               label="Nome company"
               :rules="validation.requiredRules"
             />
-          </v-col>
-          <v-col
-            cols="12"
-            md="6"
-          >
-            <label class="mr-2">Modulo RAEE</label>
-            <v-radio-group
-              v-model="company.rae"
-              inline
-            >
-              <v-radio
-                label="Sì"
-                :value="true"
-                :disabled="!company.id"
-                @click="company.rae = true"
-              />
-              <v-radio
-                label="No"
-                :value="false"
-                @click="company.rae = false"
-              />
-            </v-radio-group>
-            <div
-              v-if="!company.id"
-              class="text-caption text-medium-emphasis"
-              style="margin-top: -8px;"
-            >
-              Disponibile dopo aver creato l'attività e configurato almeno un luogo di smaltimento RAEE
-            </div>
           </v-col>
         </v-row>
 
@@ -115,23 +82,6 @@
             />
           </v-col>
         </v-row>
-
-        <!-- Luoghi di smaltimento RAEE: solo su una company già creata, e -->
-        <!-- solo mentre il modulo è (o sta per essere) acceso. -->
-        <template v-if="company.id && company.rae">
-          <v-divider class="my-4" />
-          <div class="text-subtitle-1 mb-2">
-            Luoghi di smaltimento RAEE
-            <v-btn
-              icon="mdi-plus"
-              style="float: right;"
-              variant="text"
-              @click="openDisposalPlaceForm"
-            />
-          </div>
-          <RaeDisposalPlaceTable :company-id="company.id" />
-          <RaeDisposalPlaceForm :company-id="company.id" />
-        </template>
 
         <v-row no-gutters>
           <v-col
@@ -215,8 +165,6 @@
 
 <script setup>
 import FormButtons from '@/components/FormButtons';
-import RaeDisposalPlaceTable from '@/components/administration/companyRaeDisposalPlace/RaeDisposalPlaceTable';
-import RaeDisposalPlaceForm from '@/components/administration/companyRaeDisposalPlace/RaeDisposalPlaceForm';
 
 import http from '@/utils/http';
 import { ref, computed, watch, onBeforeUnmount } from 'vue';
@@ -225,7 +173,6 @@ import { fileUtils } from 'generic-module';
 import validation from '@/utils/validation';
 import { useUserStore } from '@/stores/user';
 import { useCompanyStore } from '@/stores/company';
-import { useCompanyRaeDisposalPlaceStore } from '@/stores/companyRaeDisposalPlace';
 
 const form = ref(null);
 const loading = ref(false);
@@ -242,14 +189,6 @@ const newLogoObjectUrl = ref(null);
 const userStore = useUserStore();
 const companyStore = useCompanyStore();
 const { activeForm, element: company } = storeToRefs(companyStore);
-
-const disposalPlaceStore = useCompanyRaeDisposalPlaceStore();
-const { element: disposalPlace, activeForm: disposalPlaceFormActive } = storeToRefs(disposalPlaceStore);
-
-const openDisposalPlaceForm = () => {
-  disposalPlace.value = {};
-  disposalPlaceFormActive.value = true;
-};
 
 // In modifica il logo arriva come URL (stringa); un nuovo file lo rimpiazza
 // con { selectedFile }, che è quello che l'http client sa impacchettare.
@@ -325,11 +264,8 @@ const callback = (data) => {
 watch(
   activeForm,
   (val) => {
-    disposalPlaceFormActive.value = false;
-    disposalPlace.value = {};
     if (!val) return;
 
-    if (company.value.rae == undefined) company.value.rae = false;
     logoError.value = '';
     message.value = '';
     releaseObjectUrl();

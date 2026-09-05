@@ -58,13 +58,6 @@ import { storeToRefs } from 'pinia';
 import validation from '@/utils/validation';
 import { useCompanyRaeDisposalPlaceStore } from '@/stores/companyRaeDisposalPlace';
 
-const { companyId } = defineProps({
-  companyId: {
-    type: Number,
-    required: true
-  }
-});
-
 const form = ref(null);
 const loading = ref(false);
 
@@ -76,16 +69,16 @@ const submitForm = async () => {
 
   loading.value = true;
   if (place.value.id)
-    store.updateElement(companyId, callback);
+    store.updateElement(callback);
   else
-    store.createElement(companyId, callback);
+    store.createElement(callback);
 };
 
 const callback = (data) => {
   loading.value = false;
   if (data.status == 'ok') {
     place.value = {};
-    store.initList(companyId);
+    store.initList();
     activeForm.value = false;
   }
 };

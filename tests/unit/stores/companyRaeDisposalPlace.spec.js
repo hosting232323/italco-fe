@@ -4,9 +4,11 @@ import { createPinia, setActivePinia } from 'pinia';
 import http from '@/utils/http';
 import { useCompanyRaeDisposalPlaceStore } from '@/stores/companyRaeDisposalPlace';
 
-// Store diverso dagli altri CRUD: ogni azione porta il companyId esplicito
-// della company che il super admin sta editando, non quella della sessione -
-// non entra quindi nel contratto generico di describeCrudStore.
+// Store diverso dagli altri CRUD: companyId vive nello store (non e' quello
+// della sessione), impostato da open() quando si apre il popup su una riga
+// della tabella Company. Le azioni restano a zero argomenti come ogni altro
+// store, quindi non entra nel contratto generico di describeCrudStore solo
+// per l'inizializzazione via open() e per l'assenza del gate rae/tenant.
 vi.mock('@/utils/http', () => ({
   default: { makeRequest: vi.fn(), uploadRequest: vi.fn() }
 }));
@@ -20,12 +22,18 @@ describe('companyRaeDisposalPlace store', () => {
 
   const lastCall = () => http.makeRequest.mock.calls.at(-1);
 
-  it('chiede la lista per la company passata', () => {
+  it('open imposta la company, apre il popup e chiede la lista', () => {
     const store = useCompanyRaeDisposalPlaceStore();
+    store.element = { id: 1, name: 'da svuotare' };
+    store.activeForm = true;
 
-    store.initList(42);
+    store.open(42);
     vi.advanceTimersByTime(50);
 
+    expect(store.companyId).toBe(42);
+    expect(store.dialogOpen).toBe(true);
+    expect(store.element).toEqual({});
+    expect(store.activeForm).toBe(false);
     const [url, method] = lastCall();
     expect(url).toBe('company/42/rae-disposal-place');
     expect(method).toBe('GET');
@@ -40,22 +48,24 @@ describe('companyRaeDisposalPlace store', () => {
     expect(store.ready).toBe(true);
   });
 
-  it('crea un elemento sulla company passata', () => {
+  it('crea un elemento sulla company impostata da open', () => {
     const store = useCompanyRaeDisposalPlaceStore();
+    store.companyId = 42;
     store.element = { name: 'Deposito' };
 
-    store.createElement(42, vi.fn());
+    store.createElement(vi.fn());
 
     const [url, method, payload] = lastCall();
     expect([url, method]).toEqual(['company/42/rae-disposal-place', 'POST']);
     expect(payload.body).toMatchObject({ name: 'Deposito' });
   });
 
-  it('aggiorna un elemento sulla company e sull-id passati', () => {
+  it('aggiorna un elemento sulla company impostata da open', () => {
     const store = useCompanyRaeDisposalPlaceStore();
+    store.companyId = 42;
     store.element = { id: 7, name: 'Aggiornato', created_at: 'x', updated_at: 'y', company_id: 42 };
 
-    store.updateElement(42, vi.fn());
+    store.updateElement(vi.fn());
 
     const [url, method, payload] = lastCall();
     expect([url, method]).toEqual(['company/42/rae-disposal-place/7', 'PUT']);
@@ -64,11 +74,12 @@ describe('companyRaeDisposalPlace store', () => {
     expect(payload.body).not.toHaveProperty('company_id');
   });
 
-  it('cancella un elemento sulla company passata', () => {
+  it('cancella un elemento sulla company impostata da open', () => {
     const store = useCompanyRaeDisposalPlaceStore();
+    store.companyId = 42;
     const func = vi.fn();
 
-    store.deleteElement(42, { id: 9 }, func);
+    store.deleteElement({ id: 9 }, func);
 
     const [url, method, , callback] = lastCall();
     expect([url, method]).toEqual(['company/42/rae-disposal-place/9', 'DELETE']);

@@ -23,7 +23,7 @@
     </template>
     <template #[`item.actions`]="{ item }">
       <v-row no-gutters>
-        <v-col cols="6">
+        <v-col cols="4">
           <v-btn
             variant="text"
             :loading="selectLoading[item.id]"
@@ -33,12 +33,21 @@
             @click="selectItem(item)"
           />
         </v-col>
-        <v-col cols="6">
+        <v-col cols="4">
           <v-btn
             icon="mdi-pencil"
             variant="text"
             :color="theme.current.value.primaryColor"
             @click="openForm(item)"
+          />
+        </v-col>
+        <v-col cols="4">
+          <v-btn
+            icon="mdi-recycle"
+            variant="text"
+            title="Luoghi di smaltimento RAEE"
+            :color="theme.current.value.primaryColor"
+            @click="openDisposalPlaces(item)"
           />
         </v-col>
       </v-row>
@@ -54,6 +63,7 @@ import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import { useUserStore } from '@/stores/user';
 import { useCompanyStore } from '@/stores/company';
+import { useCompanyRaeDisposalPlaceStore } from '@/stores/companyRaeDisposalPlace';
 
 const theme = useTheme();
 const router = useRouter();
@@ -65,9 +75,18 @@ const { company: activeCompany } = storeToRefs(useUserStore());
 
 const companies = storesUtils.getStoreList(companyStore);
 
+const disposalPlaceStore = useCompanyRaeDisposalPlaceStore();
+
 const openForm = (item) => {
   company.value = { ...item };
   activeForm.value = true;
+};
+
+// Popup a parte, non dentro il form di modifica: gestire i luoghi è una
+// responsabilità diversa dal modificare i dati della company, e va tenuta
+// disponibile a prescindere dal fatto che il modulo RAEE sia già acceso.
+const openDisposalPlaces = (item) => {
+  disposalPlaceStore.open(item.id);
 };
 
 const selectItem = (item) => {
