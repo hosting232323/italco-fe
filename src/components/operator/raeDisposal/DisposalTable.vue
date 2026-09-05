@@ -16,6 +16,7 @@
       { title: 'Raggruppamenti', key: 'group_quantities', sortable: false },
       { title: 'Trasportatore', value: 'carrier.company_name', sortable: false },
       { title: 'Centro di raccolta', value: 'collection_center.company_name', sortable: false },
+      { title: 'Luogo di smaltimento', value: 'rae_disposal_place.name', sortable: false },
       { title: 'Azioni', key: 'actions', sortable: false }
     ]"
   >

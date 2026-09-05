@@ -8,6 +8,7 @@ import { useGeographicZoneStore } from '@/stores/geographicZone';
 import { useRaeCarrierStore } from '@/stores/raeCarrier';
 import { useRaeCollectionCenterStore } from '@/stores/raeCollectionCenter';
 import { useRaeDisposalStore } from '@/stores/raeDisposal';
+import { useRaeDisposalPlaceStore } from '@/stores/raeDisposalPlace';
 import { useRaeProductStore } from '@/stores/raeProduct';
 import { useRaeProductGroupStore } from '@/stores/raeProductGroup';
 import { useScheduleStore } from '@/stores/schedule';
@@ -83,6 +84,16 @@ const stores = [
     listKey: 'rae_collection_centers',
     rae: true,
     excludedKeys: [...READ_ONLY_KEYS, 'users']
+  },
+  {
+    name: 'raeDisposalPlace',
+    useStore: useRaeDisposalPlaceStore,
+    endpoint: 'rae/disposal-place',
+    listKey: 'rae_disposal_places',
+    rae: true,
+    create: false,
+    update: false,
+    remove: false
   },
   {
     name: 'raeProductGroup',

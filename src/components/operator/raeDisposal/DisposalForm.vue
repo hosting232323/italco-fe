@@ -67,6 +67,23 @@
             />
           </v-col>
         </v-row>
+        <!-- Con un solo luogo lo si prende di default, senza mostrare nulla:
+        il selettore compare solo quando c'è davvero da scegliere. -->
+        <v-row
+          v-if="raeDisposalPlaces.length > 1"
+          no-gutters
+        >
+          <v-col cols="12">
+            <v-autocomplete
+              v-model="disposal.rae_disposal_place_id"
+              label="Luogo di smaltimento"
+              :items="raeDisposalPlaces"
+              item-title="name"
+              item-value="id"
+              :rules="validation.requiredRules"
+            />
+          </v-col>
+        </v-row>
         <FormButtons
           class="mb-5"
           :loading="loading"
@@ -80,7 +97,7 @@
 <script setup>
 import FormButtons from '@/components/FormButtons';
 
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import storesUtils from '@/utils/stores';
@@ -89,6 +106,7 @@ import { useRaeProductStore } from '@/stores/raeProduct';
 import { useRaeCarrierStore } from '@/stores/raeCarrier';
 import { useRaeDisposalStore } from '@/stores/raeDisposal';
 import { useRaeCollectionCenterStore } from '@/stores/raeCollectionCenter';
+import { useRaeDisposalPlaceStore } from '@/stores/raeDisposalPlace';
 
 const isMobile = mobile.setupMobileUtils();
 
@@ -97,6 +115,9 @@ const raeCarriers = storesUtils.getStoreList(raeCarrierStore);
 
 const raeCollectionCenterStore = useRaeCollectionCenterStore();
 const raeCollectionCenters = storesUtils.getStoreList(raeCollectionCenterStore);
+
+const raeDisposalPlaceStore = useRaeDisposalPlaceStore();
+const raeDisposalPlaces = storesUtils.getStoreList(raeDisposalPlaceStore);
 
 const form = ref(null);
 const loading = ref(false);
@@ -111,6 +132,12 @@ const { selectedProducts } = defineProps({
     required: true
   }
 });
+
+// Con un solo luogo non c'è scelta da fare: lo si imposta da solo, anche se
+// il selettore resta nascosto.
+watch(raeDisposalPlaces, (places) => {
+  if (places.length === 1) disposal.value.rae_disposal_place_id = places[0].id;
+}, { immediate: true });
 
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
