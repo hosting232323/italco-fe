@@ -14,8 +14,9 @@ export const useCompanyStore = defineStore('company', {
     activeForm: false
   }),
   actions: {
-    // Dati legali stampati nei PDF. tax_code e logo sono opzionali; i campi
-    // rae_ li rende obbligatori il backend solo quando il modulo RAEE è acceso.
+    // Dati legali stampati nei PDF. tax_code è opzionale, il resto obbligatorio
+    // lato backend. I dati RAE specifici (iscrizione Albo, luogo di
+    // raggruppamento) non sono più qui: vivono su RaeDisposalPlace.
     legalBody() {
       return {
         legal_name: this.element.legal_name,
@@ -23,8 +24,6 @@ export const useCompanyStore = defineStore('company', {
         tax_code: this.element.tax_code || null,
         address: this.element.address,
         city: this.element.city,
-        rae_registration: this.element.rae_registration || null,
-        rae_grouping_place: this.element.rae_grouping_place || null,
       };
     },
     createElement(func) {

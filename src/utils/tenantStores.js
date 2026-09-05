@@ -9,6 +9,7 @@ import { useOrderStore } from '@/stores/order';
 import { useRaeCarrierStore } from '@/stores/raeCarrier';
 import { useRaeCollectionCenterStore } from '@/stores/raeCollectionCenter';
 import { useRaeDisposalStore } from '@/stores/raeDisposal';
+import { useRaeDisposalPlaceStore } from '@/stores/raeDisposalPlace';
 import { useRaeProductGroupStore } from '@/stores/raeProductGroup';
 import { useRaeProductStore } from '@/stores/raeProduct';
 import { useScheduleStore } from '@/stores/schedule';
@@ -32,6 +33,7 @@ const tenantStores = () => [
   useRaeCarrierStore(),
   useRaeCollectionCenterStore(),
   useRaeDisposalStore(),
+  useRaeDisposalPlaceStore(),
   useRaeProductGroupStore(),
   useRaeProductStore(),
   useScheduleStore(),

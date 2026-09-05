@@ -20,9 +20,7 @@ const LEGAL = {
   legal_name: 'Attivita SRL',
   vat_number: '11122233344',
   address: 'Via Test 1',
-  city: 'Bari',
-  rae_registration: 'RD000S00000000 del 01/01/26',
-  rae_grouping_place: 'Via Deposito 1'
+  city: 'Bari'
 };
 
 
@@ -48,6 +46,18 @@ describe('CompanyForm', () => {
     const [url, method, options] = http.uploadRequest.mock.calls.at(-1);
     expect([url, method]).toEqual(['company/7', 'PUT']);
     expect(options.body).toMatchObject({ name: 'Attivita senza RAEE', rae: true, legal_name: 'Attivita SRL' });
+  });
+
+  it('blocca il modulo RAEE in creazione: nessuna company su cui appendere un luogo', async () => {
+    const pinia = createTestPinia();
+    const store = useCompanyStore();
+    store.activeForm = true;
+    store.element = { name: 'Nuova', adminNickname: 'admin', adminPassword: 'pw', ...LEGAL };
+    const wrapper = mountComponent(CompanyForm, { pinia });
+
+    const radios = wrapper.findAll('input[type="radio"]');
+    expect(radios[0].attributes('disabled')).toBeDefined();
+    expect(wrapper.text()).toContain('Disponibile dopo aver creato l\'attività');
   });
 
   it('manda i dati legali e il codice fiscale nullo quando vuoto in creazione', async () => {
