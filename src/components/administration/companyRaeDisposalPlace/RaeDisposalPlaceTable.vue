@@ -40,7 +40,7 @@
 </template>
 
 <script setup>
-import { reactive, watch } from 'vue';
+import { reactive } from 'vue';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { useCompanyRaeDisposalPlaceStore } from '@/stores/companyRaeDisposalPlace';
@@ -48,22 +48,8 @@ import { useCompanyRaeDisposalPlaceStore } from '@/stores/companyRaeDisposalPlac
 const theme = useTheme();
 const deleteLoading = reactive({});
 
-const { companyId } = defineProps({
-  companyId: {
-    type: Number,
-    required: true
-  }
-});
-
 const store = useCompanyRaeDisposalPlaceStore();
 const { list: places, element: place, activeForm, ready } = storeToRefs(store);
-
-// A differenza degli store tenant, la lista dipende da QUALE company si sta
-// editando, non da quella della sessione: va richiesta ogni volta che questa
-// tabella compare per una company, non solo la prima (getStoreList non basta).
-watch(() => companyId, (id) => {
-  if (id) store.initList(id);
-}, { immediate: true });
 
 const openForm = (item) => {
   place.value = { ...item };
@@ -72,8 +58,8 @@ const openForm = (item) => {
 
 const deleteItem = (item) => {
   deleteLoading[item.id] = true;
-  store.deleteElement(companyId, item, () => {
-    store.initList(companyId);
+  store.deleteElement(item, () => {
+    store.initList();
     deleteLoading[item.id] = false;
   });
 };
