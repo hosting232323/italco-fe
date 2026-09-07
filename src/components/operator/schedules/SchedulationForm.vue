@@ -48,6 +48,14 @@
             />
           </v-col>
         </v-row>
+        <v-switch
+          v-model="useAi"
+          color="primary"
+          density="compact"
+          hide-details
+          label="Pianifica con AI (sperimentale)"
+          class="mb-2"
+        />
         <FormButtons
           :loading="loading"
           :submit-text="suggestions.length > 0 ? 'Aggiorna' : 'Invia'"
@@ -105,6 +113,7 @@ const suggestions = ref([]);
 const minSizeGroup = ref(9);
 const maxSizeGroup = ref(12);
 const maxDistanceKm = ref(50);
+const useAi = ref(false);
 const deliveryUsers = ref([]);
 const newSuggestionOrders = ref([]);
 const isMobile = mobile.setupMobileUtils();
@@ -243,6 +252,8 @@ const submitForm = async () => {
         min_size_group: minSizeGroup.value,
         max_size_group: maxSizeGroup.value,
         max_distance_km: maxDistanceKm.value,
+        // 'ai' passa dal planner LLM sperimentale; il default resta il motore a regole.
+        strategy: useAi.value ? 'ai' : 'rules',
       }
     },
     function (data) {
