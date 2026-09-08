@@ -10,23 +10,14 @@
         @submit.prevent="submitForm"
       >
         <v-row no-gutters>
-          <v-col cols="12">
-            <v-text-field
-              v-model="place.name"
-              label="Nome"
-              :rules="validation.requiredRules"
-            />
-          </v-col>
-        </v-row>
-        <v-row no-gutters>
           <v-col
             cols="12"
             md="6"
             class="pr-md-2"
           >
             <v-text-field
-              v-model="place.rae_registration"
-              label="Estremi iscrizione Albo Gestori Ambientali"
+              v-model="place.name"
+              label="Nome"
               :rules="validation.requiredRules"
             />
           </v-col>

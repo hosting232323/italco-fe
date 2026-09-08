@@ -15,8 +15,10 @@ export const useCompanyStore = defineStore('company', {
   }),
   actions: {
     // Dati legali stampati nei PDF. tax_code è opzionale, il resto obbligatorio
-    // lato backend. I dati RAE specifici (iscrizione Albo, luogo di
-    // raggruppamento) non sono più qui: vivono su RaeDisposalPlace.
+    // lato backend. rae_registration (iscrizione Albo) e il luogo di
+    // raggruppamento non passano di qui: il primo si modifica dal popup dei
+    // luoghi di smaltimento insieme al flag RAEE, il secondo vive su
+    // RaeDisposalPlace.
     legalBody() {
       return {
         legal_name: this.element.legal_name,

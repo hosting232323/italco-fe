@@ -10,7 +10,6 @@
     :items="places"
     :headers="[
       { title: 'Nome', value: 'name', sortable: false },
-      { title: 'Estremi iscrizione Albo Gestori Ambientali', value: 'rae_registration', sortable: false },
       { title: 'Luogo di raggruppamento RAEE', value: 'rae_grouping_place', sortable: false },
       { title: 'Azioni', key: 'actions', sortable: false }
     ]"

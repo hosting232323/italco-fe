@@ -21,7 +21,6 @@ vi.mock('@/utils/http', () => ({
 
 const VALID_ELEMENT = {
   name: 'Deposito Bari',
-  rae_registration: 'RD1 del 01/01/26',
   rae_grouping_place: 'Via Bari 1'
 };
 
@@ -243,8 +242,8 @@ describe('RaeDisposalPlaceDialog', () => {
     expect(store.element).toEqual({});
   });
 
-  it('accendere il modulo mostra subito la sezione dei luoghi e salva sulla company giusta', async () => {
-    const { pinia } = setup({ rae: false });
+  it('accendere il modulo mostra subito la sezione dei luoghi e inoltra l-iscrizione della company', async () => {
+    const { pinia } = setup({ rae: false, rae_registration: 'RD-ESISTENTE' });
     http.makeRequest.mockImplementation((url, method, options, func) =>
       func({ status: 'ok', company: { id: 42, name: 'Attivita Test', rae: true } })
     );
@@ -257,11 +256,35 @@ describe('RaeDisposalPlaceDialog', () => {
     // assumere che la PUT sia l'ultima chiamata registrata, va cercata.
     const [url, method, options] = http.makeRequest.mock.calls.find(([, requestMethod]) => requestMethod === 'PUT');
     expect([url, method]).toEqual(['company/42', 'PUT']);
-    expect(options.body).toEqual({ name: 'Attivita Test', rae: true });
+    expect(options.body).toEqual({ name: 'Attivita Test', rae: true, rae_registration: 'RD-ESISTENTE' });
     expect(wrapper.find('.mdi-plus').exists()).toBe(true);
   });
 
-  it('se il backend rifiuta (nessun luogo) la sezione resta aperta e mostra l-errore', async () => {
+  it('il campo iscrizione Albo compare solo con il modulo acceso', () => {
+    const spento = mountComponent(RaeDisposalPlaceDialog, { pinia: setup({ rae: false }).pinia });
+    expect(spento.text()).not.toContain('Estremi iscrizione Albo Gestori Ambientali');
+
+    const acceso = mountComponent(RaeDisposalPlaceDialog, { pinia: setup({ rae: true }).pinia });
+    expect(acceso.text()).toContain('Estremi iscrizione Albo Gestori Ambientali');
+  });
+
+  it('Salva inoltra l-iscrizione digitata con rae gia a true', async () => {
+    const { pinia } = setup({ rae: true, rae_registration: 'RD-VECCHIO' });
+    http.makeRequest.mockImplementation((url, method, options, func) =>
+      func({ status: 'ok', company: { id: 42, name: 'Attivita Test', rae: true } })
+    );
+    const wrapper = mountComponent(RaeDisposalPlaceDialog, { pinia });
+
+    await wrapper.find('input[type="text"]').setValue('RD-NUOVO del 02/02/26');
+    await wrapper.findAll('button').find((button) => button.text() === 'Salva').trigger('click');
+    await flushPromises();
+
+    const [url, method, options] = http.makeRequest.mock.calls.find(([, requestMethod]) => requestMethod === 'PUT');
+    expect([url, method]).toEqual(['company/42', 'PUT']);
+    expect(options.body).toEqual({ name: 'Attivita Test', rae: true, rae_registration: 'RD-NUOVO del 02/02/26' });
+  });
+
+  it('se il backend rifiuta (nessun luogo o iscrizione mancante) la sezione resta aperta e mostra l-errore', async () => {
     const { pinia } = setup({ rae: false });
     http.makeRequest.mockImplementation((url, method, options, func) =>
       func({ status: 'ko', message: 'Configura almeno un luogo di smaltimento RAEE prima di attivare il modulo' })
@@ -272,7 +295,7 @@ describe('RaeDisposalPlaceDialog', () => {
     await flushPromises();
 
     expect(wrapper.text()).toContain('Configura almeno un luogo di smaltimento RAEE');
-    // La sezione resta visibile: e' cosi' che si arriva a crearne uno.
+    // La sezione resta visibile: e' cosi' che si arriva a compilare cio' che manca.
     expect(wrapper.find('.mdi-plus').exists()).toBe(true);
   });
 

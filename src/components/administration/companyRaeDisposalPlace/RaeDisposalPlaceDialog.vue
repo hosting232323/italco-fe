@@ -21,6 +21,39 @@
           @click="setRae(false)"
         />
       </v-radio-group>
+
+      <template v-if="raeValue">
+        <!-- Iscrizione all'Albo Gestori Ambientali: dell'attività, una sola.
+        Va compilata per accendere il modulo (il backend rifiuta senza), e da
+        qui si modifica anche a modulo già acceso. -->
+        <v-row no-gutters>
+          <v-col
+            cols="12"
+            md="8"
+            class="pr-md-2"
+          >
+            <v-text-field
+              v-model="registration"
+              label="Estremi iscrizione Albo Gestori Ambientali"
+              :disabled="raeLoading"
+            />
+          </v-col>
+          <v-col
+            cols="12"
+            md="4"
+            class="d-flex align-center"
+          >
+            <v-btn
+              :loading="raeLoading"
+              :color="theme.current.value.primaryColor"
+              @click="saveRegistration"
+            >
+              Salva
+            </v-btn>
+          </v-col>
+        </v-row>
+      </template>
+
       <v-alert
         v-if="raeError"
         type="error"
@@ -73,16 +106,18 @@ const company = computed(() => companies.value?.find((item) => item.id == compan
 const companyName = computed(() => company.value?.name ?? companyId.value);
 
 // Stato desiderato del toggle, non (solo) quello confermato dal backend: un
-// primo "Sì" senza nessun luogo va rifiutato dal server (vedi
-// RAE_WITHOUT_PLACE_ERROR), ma la sezione dei luoghi deve restare visibile
-// per poterne creare uno, non richiudersi sull'errore.
+// primo "Sì" senza iscrizione o senza nessun luogo va rifiutato dal server,
+// ma la sezione deve restare visibile per poterli compilare, non richiudersi
+// sull'errore.
 const raeValue = ref(false);
+const registration = ref('');
 const raeError = ref('');
 const raeLoading = ref(false);
 
 watch(companyId, (id) => {
   if (!id) return;
   raeValue.value = !!company.value?.rae;
+  registration.value = company.value?.rae_registration ?? '';
   raeError.value = '';
 }, { immediate: true });
 
@@ -94,7 +129,7 @@ const setRae = (value) => {
   http.makeRequest(
     `company/${companyId.value}`,
     'PUT',
-    { body: { name: company.value.name, rae: value } },
+    { body: { name: company.value.name, rae: value, ...(value ? { rae_registration: registration.value } : {}) } },
     (data) => {
       raeLoading.value = false;
       if (data.status == 'ok') {
@@ -109,6 +144,10 @@ const setRae = (value) => {
     }
   );
 };
+
+// Salva l'iscrizione a modulo acceso: è la stessa PUT che accende il modulo,
+// con rae già a true.
+const saveRegistration = () => setRae(true);
 
 const openForm = () => {
   place.value = {};
