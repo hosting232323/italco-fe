@@ -39,7 +39,8 @@ import { useOrderStore } from '@/stores/order';
 
 const userStore = useUserStore();
 const orderStore = useOrderStore();
-const { role, userId } = storeToRefs(userStore);
+// effectiveRole: il super admin in una company vede l'import Excel/PDF come un admin.
+const { effectiveRole: role, userId } = storeToRefs(userStore);
 const { element: order, activeForm } = storeToRefs(orderStore);
 
 const openForm = () => {

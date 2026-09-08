@@ -23,7 +23,7 @@
       </template>
     </v-list-item>
     <v-divider class="my-2" />
-    <template v-if="['Admin', 'Operator'].includes(menuRole)">
+    <template v-if="['Admin', 'Operator'].includes(effectiveRole)">
       <v-list-item
         to="/dashboard"
         title="Dashboard"
@@ -31,18 +31,18 @@
       />
     </template>
     <v-list-item
-      v-if="menuRole != 'Super Admin'"
+      v-if="effectiveRole != 'Super Admin'"
       to="/orders"
       title="Ordini"
       prepend-icon="mdi-package-variant-closed"
     />
-    <template v-if="['Admin', 'Operator'].includes(menuRole)">
+    <template v-if="['Admin', 'Operator'].includes(effectiveRole)">
       <v-list-item
         to="/schedules"
         title="Borderò"
         prepend-icon="mdi-text-box-multiple-outline"
       />
-      <template v-if="menuRole == 'Admin'">
+      <template v-if="effectiveRole == 'Admin'">
         <v-list-item
           to="/services"
           title="Servizi"
@@ -81,7 +81,7 @@
           title="Smaltimenti"
           prepend-icon="mdi-delete-empty"
         />
-        <template v-if="menuRole == 'Admin'">
+        <template v-if="effectiveRole == 'Admin'">
           <v-list-item
             to="/rae-product-groups"
             title="Raggruppamenti"
@@ -137,11 +137,9 @@ import { useUserStore } from '@/stores/user';
 const theme = useTheme();
 const router = useRouter();
 const userStore = useUserStore();
-const { role, company } = storeToRefs(userStore);
-
-// Un super admin che ha scelto una company opera dentro quella company con i
-// permessi di un admin: il menu deve rispecchiarlo senza duplicare ogni voce.
-const menuRole = computed(() => (role.value == 'Super Admin' && company.value ? 'Admin' : role.value));
+// role: identita' (intestazione, sezione Company). effectiveRole: permessi, con
+// il super admin che opera in una company visto come admin (getter dello store).
+const { role, company, effectiveRole } = storeToRefs(userStore);
 
 // Modulo RAEE dell'attività su cui si sta operando: senza, il blocco di voci
 // RAEE non esiste per nessun ruolo.

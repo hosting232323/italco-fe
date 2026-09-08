@@ -144,7 +144,8 @@ const loadingDelete = ref(false);
 
 const userStore = useUserStore();
 const orderStore = useOrderStore();
-const { role, company } = storeToRefs(userStore);
+// effectiveRole: il super admin in una company agisce con i permessi di un admin.
+const { effectiveRole: role, company } = storeToRefs(userStore);
 const raeProductStore = useRaeProductStore();
 
 // Un'attività può spegnere il modulo dopo averlo usato: gli ordini con ritiro

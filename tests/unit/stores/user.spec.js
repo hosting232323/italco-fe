@@ -93,3 +93,35 @@ describe('user store, stato persistito', () => {
     expect(salvato()).toEqual({ role: 'Admin', userId: 7, company: null });
   });
 });
+
+
+describe('user store, effectiveRole', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    attivaPinia();
+  });
+
+  it('vede il super admin con una company come un admin', () => {
+    const store = useUserStore();
+
+    store.$patch({ role: 'Super Admin', company: { id: 4 } });
+
+    expect(store.effectiveRole).toBe('Admin');
+  });
+
+  it('lascia il super admin senza company com-e', () => {
+    const store = useUserStore();
+
+    store.role = 'Super Admin';
+
+    expect(store.effectiveRole).toBe('Super Admin');
+  });
+
+  it('non tocca gli altri ruoli', () => {
+    const store = useUserStore();
+
+    store.$patch({ role: 'Operator', company: { id: 4 } });
+
+    expect(store.effectiveRole).toBe('Operator');
+  });
+});

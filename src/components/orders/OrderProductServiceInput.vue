@@ -170,7 +170,8 @@ const transportStore = useTransportStore();
 const raeProductGroupStore = useRaeProductGroupStore();
 const collectionPointStore = useCollectionPointStore();
 
-const { role, company } = storeToRefs(userStore);
+// effectiveRole: il super admin in una company compila la riga come un admin.
+const { effectiveRole: role, company } = storeToRefs(userStore);
 const { element: order } = storeToRefs(orderStore);
 const services = storesUtils.getStoreList(serviceStore);
 const collectionPoints = storesUtils.getStoreList(collectionPointStore);

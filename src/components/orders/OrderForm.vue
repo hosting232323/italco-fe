@@ -48,7 +48,8 @@ const loading = ref(false);
 
 const userStore = useUserStore();
 const orderStore = useOrderStore();
-const { role } = storeToRefs(userStore);
+// effectiveRole: il super admin in una company segue lo stesso flusso di un admin.
+const { effectiveRole: role } = storeToRefs(userStore);
 const raeProductStore = useRaeProductStore();
 const { element: order, activeForm } = storeToRefs(orderStore);
 

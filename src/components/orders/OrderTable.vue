@@ -132,7 +132,9 @@ const downloadingExcel = ref(false);
 
 const orderStore = useOrderStore();
 const scheduleStore = useScheduleStore();
-const { role, company } = storeToRefs(userStore);
+// Il super admin che opera in una company ha i permessi di un admin: i pulsanti
+// gated su Admin/Operator (Crea Borderò, selezione righe, ...) devono comparirgli.
+const { effectiveRole: role, company } = storeToRefs(userStore);
 const { ready } = storeToRefs(orderStore);
 const { element: schedule } = storeToRefs(scheduleStore);
 const orders = storesUtils.getStoreList(orderStore);
