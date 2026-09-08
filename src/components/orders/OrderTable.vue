@@ -5,7 +5,7 @@
   >
     <template #activator>
       <v-btn
-        v-if="role == 'Admin'"
+        v-if="role == 'Admin' && company?.automatic_planning"
         text="Pianificazione Automatica"
         class="mr-5"
         :color="theme.current.value.primaryColor"
@@ -132,7 +132,7 @@ const downloadingExcel = ref(false);
 
 const orderStore = useOrderStore();
 const scheduleStore = useScheduleStore();
-const { role } = storeToRefs(userStore);
+const { role, company } = storeToRefs(userStore);
 const { ready } = storeToRefs(orderStore);
 const { element: schedule } = storeToRefs(scheduleStore);
 const orders = storesUtils.getStoreList(orderStore);

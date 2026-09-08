@@ -37,6 +37,7 @@ export const useCompanyStore = defineStore('company', {
           body: {
             name: this.element.name,
             rae: this.element.rae || false,
+            automatic_planning: this.element.automatic_planning || false,
             admin_nickname: this.element.adminNickname,
             admin_password: this.element.adminPassword,
             ...this.legalBody(),
@@ -55,6 +56,7 @@ export const useCompanyStore = defineStore('company', {
           body: {
             name: this.element.name,
             rae: this.element.rae || false,
+            automatic_planning: this.element.automatic_planning || false,
             ...this.legalBody(),
           },
           files: { logo: this.element.logo },
