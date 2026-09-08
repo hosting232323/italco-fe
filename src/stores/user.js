@@ -35,6 +35,17 @@ export const useUserStore = defineStore('user', {
     // la propria e non cambia mai; il super admin parte senza e la sceglie.
     company: null
   }),
+  getters: {
+    // Un super admin che ha scelto una company opera dentro quella company con
+    // i permessi di un admin: ogni controllo "cosa puoi fare" nel frontend deve
+    // vederlo come 'Admin', perche' nessuna lista di ruoli contempla
+    // 'Super Admin' e i pulsanti gated su Admin/Operator resterebbero nascosti.
+    // Il ruolo grezzo resta per l'identita' (intestazione del menu, voce
+    // Company, redirect alla scelta della company). Il backend fa gia' lo
+    // stesso bypass in flask_session_authentication.
+    effectiveRole: (state) =>
+      (state.role == 'Super Admin' && state.company ? 'Admin' : state.role)
+  },
   // L'access token vive solo in memoria: al reload viene riottenuto dal
   // refresh token (cookie HttpOnly). Persistiamo ruolo, id e la company fissa dei
   // normali utenti; per il Super Admin la company viene eliminata in hydrate.

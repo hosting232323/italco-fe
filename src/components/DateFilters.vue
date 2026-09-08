@@ -75,7 +75,8 @@ const userStore = useUserStore();
 const orderStore = useOrderStore();
 const scheduleStore = useScheduleStore();
 const raeProductStore = useRaeProductStore();
-const { role } = storeToRefs(userStore);
+// effectiveRole: il super admin in una company filtra come un admin, non un customer.
+const { effectiveRole: role } = storeToRefs(userStore);
 const { filters, filtersSetting } = storeToRefs(
   element == 'Order' ? orderStore :
     element == 'Schedule' ? scheduleStore :

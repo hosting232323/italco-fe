@@ -117,7 +117,8 @@ const userStore = useUserStore();
 const orderStore = useOrderStore();
 const serviceStore = useServiceStore();
 const collectionPointStore = useCollectionPointStore();
-const { role } = storeToRefs(userStore);
+// effectiveRole: il super admin in una company vede l'export fatturazione come un admin.
+const { effectiveRole: role } = storeToRefs(userStore);
 const { filters, ready } = storeToRefs(orderStore);
 const services = storesUtils.getStoreList(serviceStore);
 const collectionPoints = storesUtils.getStoreList(collectionPointStore);
