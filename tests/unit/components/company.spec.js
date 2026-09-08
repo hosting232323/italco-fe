@@ -36,8 +36,9 @@ describe('CompanyForm', () => {
     store.element = { id: 7, name: 'Attivita senza RAEE', rae: false, ...LEGAL };
     const wrapper = mountComponent(CompanyForm, { pinia });
 
+    // Due gruppi Sì/No: [0-1] modulo RAEE, [2-3] pianificazione automatica.
     const radios = wrapper.findAll('input[type="radio"]');
-    expect(radios).toHaveLength(2);
+    expect(radios).toHaveLength(4);
 
     await radios[0].trigger('click');
     expect(store.element.rae).toBe(true);
@@ -47,7 +48,31 @@ describe('CompanyForm', () => {
 
     const [url, method, options] = http.uploadRequest.mock.calls.at(-1);
     expect([url, method]).toEqual(['company/7', 'PUT']);
-    expect(options.body).toMatchObject({ name: 'Attivita senza RAEE', rae: true, legal_name: 'Attivita SRL' });
+    expect(options.body).toMatchObject({
+      name: 'Attivita senza RAEE',
+      rae: true,
+      automatic_planning: false,
+      legal_name: 'Attivita SRL'
+    });
+  });
+
+  it('invia true quando il super admin attiva la pianificazione automatica', async () => {
+    const pinia = createTestPinia();
+    const store = useCompanyStore();
+    store.activeForm = true;
+    store.element = { id: 7, name: 'Attivita senza pianificazione', rae: false, automatic_planning: false, ...LEGAL };
+    const wrapper = mountComponent(CompanyForm, { pinia });
+
+    const radios = wrapper.findAll('input[type="radio"]');
+    await radios[2].trigger('click');
+    expect(store.element.automatic_planning).toBe(true);
+
+    await wrapper.find('form').trigger('submit');
+    await flushPromises();
+
+    const [url, method, options] = http.uploadRequest.mock.calls.at(-1);
+    expect([url, method]).toEqual(['company/7', 'PUT']);
+    expect(options.body).toMatchObject({ name: 'Attivita senza pianificazione', rae: false, automatic_planning: true });
   });
 
   it('manda i dati legali e il codice fiscale nullo quando vuoto in creazione', async () => {

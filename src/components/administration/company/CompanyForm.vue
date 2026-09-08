@@ -44,6 +44,30 @@
           </v-col>
         </v-row>
 
+        <v-row no-gutters>
+          <v-col
+            cols="12"
+            md="6"
+          >
+            <label class="mr-2">Pianificazione automatica ordini</label>
+            <v-radio-group
+              v-model="company.automatic_planning"
+              inline
+            >
+              <v-radio
+                label="Sì"
+                :value="true"
+                @click="company.automatic_planning = true"
+              />
+              <v-radio
+                label="No"
+                :value="false"
+                @click="company.automatic_planning = false"
+              />
+            </v-radio-group>
+          </v-col>
+        </v-row>
+
         <!-- Dati legali: finiscono nei PDF (oggi il DDT RAEE) -->
         <v-divider class="my-4" />
         <div class="text-subtitle-1 mb-2">
@@ -320,6 +344,7 @@ watch(
     if (!val) return;
 
     if (company.value.rae == undefined) company.value.rae = false;
+    if (company.value.automatic_planning == undefined) company.value.automatic_planning = false;
     logoError.value = '';
     message.value = '';
     releaseObjectUrl();
