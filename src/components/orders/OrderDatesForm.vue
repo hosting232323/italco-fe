@@ -88,7 +88,8 @@ const isMobile = mobile.setupMobileUtils();
 const nextTwoMonths = days.getDateRangeArray();
 const emits = defineEmits(['go-to-schedulation']);
 
-const { role } = storeToRefs(userStore);
+// effectiveRole: il super admin in una company edita le date come un admin.
+const { effectiveRole: role } = storeToRefs(userStore);
 const { element: order, activeForm } = storeToRefs(orderStore);
 
 if (role.value == 'Customer')

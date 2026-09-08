@@ -141,7 +141,8 @@ const isMobile = mobile.setupMobileUtils();
 
 const userStore = useUserStore();
 const orderStore = useOrderStore();
-const { role } = storeToRefs(userStore);
+// effectiveRole: il super admin in una company non e' un customer.
+const { effectiveRole: role } = storeToRefs(userStore);
 const { element: order } = storeToRefs(orderStore);
 
 watch(
