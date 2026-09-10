@@ -11,8 +11,8 @@ export const useRaeDisposalPlaceStore = defineStore('raeDisposalPlace', {
   actions: {
     // Sola lettura: la gestione (crea/modifica/elimina) è del super admin da
     // Gestione Company, su un'altra rotta (vedi companyRaeDisposalPlace.js).
-    // Questo store serve solo al form di smaltimento per proporre/scegliere
-    // il luogo dell'attività corrente.
+    // Questo store serve al form del borderò per scegliere il luogo di
+    // smaltimento dell'attività corrente quando ci sono ordini con RAE.
     initList() {
       // Attività senza modulo RAEE: nessuna lista da chiedere, ma ready va
       // messo lo stesso o getStoreList continuerebbe a richiamare initList.

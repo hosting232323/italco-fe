@@ -4,23 +4,26 @@
     :title="`Luoghi di smaltimento RAEE — ${companyName}`"
   >
     <v-card-text>
-      <label class="mr-2">Modulo RAEE</label>
-      <v-radio-group
-        :model-value="raeValue"
-        inline
-        :disabled="raeLoading"
-      >
-        <v-radio
-          label="Sì"
-          :value="true"
-          @click="setRae(true)"
-        />
-        <v-radio
-          label="No"
-          :value="false"
-          @click="setRae(false)"
-        />
-      </v-radio-group>
+      <div class="d-flex align-center mb-4">
+        <label class="mr-2">Modulo RAEE</label>
+        <v-radio-group
+          :model-value="raeValue"
+          inline
+          hide-details
+          :disabled="raeLoading"
+        >
+          <v-radio
+            label="Sì"
+            :value="true"
+            @click="setRae(true)"
+          />
+          <v-radio
+            label="No"
+            :value="false"
+            @click="setRae(false)"
+          />
+        </v-radio-group>
+      </div>
 
       <template v-if="raeValue">
         <!-- Iscrizione all'Albo Gestori Ambientali: dell'attività, una sola.
@@ -35,6 +38,7 @@
             <v-text-field
               v-model="registration"
               label="Estremi iscrizione Albo Gestori Ambientali"
+              hide-details
               :disabled="raeLoading"
             />
           </v-col>
@@ -44,6 +48,7 @@
             class="d-flex align-center"
           >
             <v-btn
+              block
               :loading="raeLoading"
               :color="theme.current.value.primaryColor"
               @click="saveRegistration"
