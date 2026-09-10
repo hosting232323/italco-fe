@@ -26,6 +26,26 @@ build_test:
     - docker push "$CI_REGISTRY_IMAGE:test-$CI_COMMIT_SHA"
     - docker push "$CI_REGISTRY_IMAGE:test-$CI_COMMIT_REF_SLUG"
 
+# Immagine dedicata all'ambiente demo (lavori lunghi, es. pianificazione
+# automatica). Punta al backend demo, che sta a demo.<dominio>/api/ come il
+# test sta a test.<dominio>/api/.
+build_demo:
+  extends: .build
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "demo/pianificazione-automatica"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "trigger"'
+  script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+    - >
+      docker build --provenance=false --sbom=false
+      --build-arg VITE_GOOGLE_API_KEY="$VITE_GOOGLE_API_KEY_TEST"
+      --build-arg VITE_HOSTNAME="https://demo.ares-logistics.it/api/"
+      -t "$CI_REGISTRY_IMAGE:demo-$CI_COMMIT_SHA"
+      -t "$CI_REGISTRY_IMAGE:demo-$CI_COMMIT_REF_SLUG" .
+    - docker push "$CI_REGISTRY_IMAGE:demo-$CI_COMMIT_SHA"
+    - docker push "$CI_REGISTRY_IMAGE:demo-$CI_COMMIT_REF_SLUG"
+
 build_prod:
   extends: .build
   rules:
