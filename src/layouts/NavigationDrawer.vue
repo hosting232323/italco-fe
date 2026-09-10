@@ -42,6 +42,11 @@
         title="Borderò"
         prepend-icon="mdi-text-box-multiple-outline"
       />
+      <v-list-item
+        to="/delivery-coverage"
+        title="Copertura corrieri"
+        prepend-icon="mdi-calendar-account"
+      />
       <template v-if="effectiveRole == 'Admin'">
         <v-list-item
           to="/services"
