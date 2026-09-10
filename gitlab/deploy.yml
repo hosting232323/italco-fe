@@ -28,6 +28,30 @@ deploy_test:
     name: pages-test
     url: https://hubstra-fe-test.pages.dev
 
+# Ambiente demo per i lavori lunghi (es. pianificazione automatica): terzo
+# progetto Pages direct upload (hubstra-fe-demo), cosi' il branch resta online
+# per giorni senza toccare test. Punta al backend demo (demo.<dominio>/api/).
+deploy_demo:
+  extends: .deploy_pages
+  resource_group: hubstra-fe-demo
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "demo/pianificazione-automatica"'
+      when: manual
+      allow_failure: true
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: manual
+      allow_failure: true
+    - if: '$CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "trigger"'
+      when: manual
+      allow_failure: true
+  script:
+    - npm ci
+    - VITE_HOSTNAME="https://demo.ares-logistics.it/api/" VITE_GOOGLE_API_KEY="$VITE_GOOGLE_API_KEY_TEST" npm run build
+    - npx wrangler pages deploy dist --project-name=hubstra-fe-demo --branch=main --commit-dirty=true
+  environment:
+    name: pages-demo
+    url: https://hubstra-fe-demo.pages.dev
+
 deploy_prod:
   extends: .deploy_pages
   resource_group: hubstra-fe
