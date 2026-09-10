@@ -13,12 +13,6 @@
         FIRST_PORT="${PORT_TEST%%-*}"
         SECOND_PORT="${PORT_TEST#*-}"
         IMAGE_TAG="test-$CI_COMMIT_SHA"
-      elif [ "$CI_JOB_NAME" = "deploy_demo" ]; then
-        CONTAINER_ACTIVE="${PROJECT_NAME}-demo"
-        CONTAINER_NEXT="${PROJECT_NAME}-demo-next"
-        FIRST_PORT="${PORT_DEMO%%-*}"
-        SECOND_PORT="${PORT_DEMO#*-}"
-        IMAGE_TAG="demo-$CI_COMMIT_SHA"
       else
         CONTAINER_ACTIVE="${PROJECT_NAME}"
         CONTAINER_NEXT="${PROJECT_NAME}-next"
@@ -71,9 +65,13 @@ deploy_test:
     - build_test
   when: manual
 
-# Ambiente demo per i lavori lunghi (es. pianificazione automatica): container
-# e coppia di porte separate (PORT_DEMO, formato "primo-secondo" come PORT_TEST),
-# cosi' il branch resta online per giorni senza toccare test.
+# Ambiente demo per i lavori lunghi (es. pianificazione automatica). Non usa le
+# porte pubblicate come test/prod: il container sta sulla rete "web" e si
+# registra da solo su Traefik con Host(demo.ares-logistics.it), esattamente come
+# fa il backend. Serve solo il DNS del sottodominio verso Traefik, nessuna CI
+# var e nessuna rotta da aggiungere a mano sul reverse proxy dell'host.
+# Blue/green come il backend: il colore nuovo diventa attivo solo dopo che
+# risponde, poi si rimuove il vecchio.
 deploy_demo:
   extends: .deploy
   needs:
@@ -83,6 +81,63 @@ deploy_demo:
     - if: '$CI_COMMIT_BRANCH == "demo/pianificazione-automatica"'
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "trigger"'
+  variables:
+    SERVICE: "${PROJECT_NAME}-demo"
+    PUBLIC_HOST_PIPELINE: "demo.ares-logistics.it"
+  script:
+    - |
+      set -eu
+
+      echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+      IMAGE="$CI_REGISTRY_IMAGE:demo-$CI_COMMIT_SHA"
+      docker pull "$IMAGE"
+
+      if docker ps -q -f "name=^/${SERVICE}-blue$" | grep -q .; then
+        CURRENT=blue; NEXT=green
+      elif docker ps -q -f "name=^/${SERVICE}-green$" | grep -q .; then
+        CURRENT=green; NEXT=blue
+      else
+        CURRENT=""; NEXT=blue
+      fi
+      echo "Colore attivo: ${CURRENT:-nessuno} -> nuovo: ${NEXT}"
+
+      docker rm -f "${SERVICE}-${NEXT}" 2>/dev/null || true
+
+      # "web" e' la rete condivisa creata da generic-deploy su cui gira Traefik
+      # (--providers.docker.network=web, entrypoint "web" su :8080). La SPA sta
+      # sulla radice: Host senza PathPrefix, l'/api dello stesso host lo prende
+      # il router del backend che e' piu' specifico.
+      docker run -d --restart unless-stopped \
+        --name "${SERVICE}-${NEXT}" \
+        --network web \
+        --label "traefik.enable=true" \
+        --label "traefik.http.routers.${SERVICE}-${NEXT}.rule=Host(\`${PUBLIC_HOST_PIPELINE}\`)" \
+        --label "traefik.http.routers.${SERVICE}-${NEXT}.entrypoints=web" \
+        --label "traefik.http.routers.${SERVICE}-${NEXT}.service=${SERVICE}" \
+        --label "traefik.http.services.${SERVICE}.loadbalancer.server.port=3000" \
+        --label "traefik.http.services.${SERVICE}.loadbalancer.healthcheck.path=/" \
+        --label "traefik.http.services.${SERVICE}.loadbalancer.healthcheck.interval=5s" \
+        --label "traefik.http.services.${SERVICE}.loadbalancer.healthcheck.timeout=3s" \
+        "$IMAGE"
+
+      READY=0
+      for _ in $(seq 1 30); do
+        if docker exec "${SERVICE}-${NEXT}" curl -fsS "http://localhost:3000/" >/dev/null 2>&1; then
+          READY=1; break
+        fi
+        sleep 2
+      done
+      if [ "${READY}" != "1" ]; then
+        echo "❌ Il nuovo container non è diventato pronto"
+        docker logs "${SERVICE}-${NEXT}" --tail 50 || true
+        docker rm -f "${SERVICE}-${NEXT}" || true
+        exit 1
+      fi
+
+      if [ -n "${CURRENT}" ]; then
+        docker rm -f "${SERVICE}-${CURRENT}" || true
+      fi
+      echo "✅ Deploy demo completato su ${SERVICE}-${NEXT} (Host: ${PUBLIC_HOST_PIPELINE})"
 
 deploy_prod:
   extends: .deploy
