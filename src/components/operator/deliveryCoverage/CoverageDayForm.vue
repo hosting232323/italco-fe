@@ -69,7 +69,7 @@ const { managedCoverage } = storeToRefs(store);
 
 const dayOfWeek = ref(null);
 const startTime = ref('08:00');
-const endTime = ref('17:00');
+const endTime = ref('18:00');
 
 // Un solo orario per giorno della settimana: i giorni già impostati spariscono
 // dalla tendina (stesso vincolo lato backend).
