@@ -4,60 +4,68 @@
     :title="`Luoghi di smaltimento RAEE — ${companyName}`"
   >
     <v-card-text>
-      <div class="d-flex align-center mb-4">
-        <label class="mr-2">Modulo RAEE</label>
-        <v-radio-group
-          :model-value="raeValue"
-          inline
-          hide-details
-          :disabled="raeLoading"
+      <!-- Modulo RAEE (Sì/No) ed estremi iscrizione all'Albo Gestori Ambientali
+      sulla stessa riga: l'iscrizione è dell'attività, una sola, va compilata
+      per accendere il modulo (il backend rifiuta senza) e da qui si modifica
+      anche a modulo già acceso. -->
+      <v-row
+        no-gutters
+        align="center"
+        class="mb-4"
+      >
+        <v-col
+          cols="12"
+          md="4"
+          class="d-flex align-center pr-md-2"
         >
-          <v-radio
-            label="Sì"
-            :value="true"
-            @click="setRae(true)"
-          />
-          <v-radio
-            label="No"
-            :value="false"
-            @click="setRae(false)"
-          />
-        </v-radio-group>
-      </div>
-
-      <template v-if="raeValue">
-        <!-- Iscrizione all'Albo Gestori Ambientali: dell'attività, una sola.
-        Va compilata per accendere il modulo (il backend rifiuta senza), e da
-        qui si modifica anche a modulo già acceso. -->
-        <v-row no-gutters>
-          <v-col
-            cols="12"
-            md="8"
-            class="pr-md-2"
+          <label class="mr-2">Modulo RAEE</label>
+          <v-radio-group
+            :model-value="raeValue"
+            inline
+            hide-details
+            :disabled="raeLoading"
           >
-            <v-text-field
-              v-model="registration"
-              label="Estremi iscrizione Albo Gestori Ambientali"
-              hide-details
-              :disabled="raeLoading"
+            <v-radio
+              label="Sì"
+              :value="true"
+              @click="setRae(true)"
             />
-          </v-col>
-          <v-col
-            cols="12"
-            md="4"
-            class="d-flex align-center"
+            <v-radio
+              label="No"
+              :value="false"
+              @click="setRae(false)"
+            />
+          </v-radio-group>
+        </v-col>
+        <v-col
+          v-if="raeValue"
+          cols="12"
+          md="6"
+          class="px-md-2"
+        >
+          <v-text-field
+            v-model="registration"
+            label="Estremi iscrizione Albo Gestori Ambientali"
+            hide-details
+            :disabled="raeLoading"
+          />
+        </v-col>
+        <v-col
+          v-if="raeValue"
+          cols="12"
+          md="2"
+          class="d-flex align-center pl-md-2"
+        >
+          <v-btn
+            block
+            :loading="raeLoading"
+            :color="theme.current.value.primaryColor"
+            @click="saveRegistration"
           >
-            <v-btn
-              block
-              :loading="raeLoading"
-              :color="theme.current.value.primaryColor"
-              @click="saveRegistration"
-            >
-              Salva
-            </v-btn>
-          </v-col>
-        </v-row>
-      </template>
+            Salva
+          </v-btn>
+        </v-col>
+      </v-row>
 
       <v-alert
         v-if="raeError"
