@@ -13,6 +13,12 @@
         FIRST_PORT="${PORT_TEST%%-*}"
         SECOND_PORT="${PORT_TEST#*-}"
         IMAGE_TAG="test-$CI_COMMIT_SHA"
+      elif [ "$CI_JOB_NAME" = "deploy_demo" ]; then
+        CONTAINER_ACTIVE="${PROJECT_NAME}-demo"
+        CONTAINER_NEXT="${PROJECT_NAME}-demo-next"
+        FIRST_PORT="${PORT_DEMO%%-*}"
+        SECOND_PORT="${PORT_DEMO#*-}"
+        IMAGE_TAG="demo-$CI_COMMIT_SHA"
       else
         CONTAINER_ACTIVE="${PROJECT_NAME}"
         CONTAINER_NEXT="${PROJECT_NAME}-next"
@@ -64,6 +70,19 @@ deploy_test:
   needs:
     - build_test
   when: manual
+
+# Ambiente demo per i lavori lunghi (es. pianificazione automatica): container
+# e coppia di porte separate (PORT_DEMO, formato "primo-secondo" come PORT_TEST),
+# cosi' il branch resta online per giorni senza toccare test.
+deploy_demo:
+  extends: .deploy
+  needs:
+    - build_demo
+  when: manual
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "demo/pianificazione-automatica"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "trigger"'
 
 deploy_prod:
   extends: .deploy
