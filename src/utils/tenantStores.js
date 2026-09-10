@@ -3,6 +3,7 @@ import { useCollectionPointStore } from '@/stores/collectionPoint';
 import { useCustomerGroupStore } from '@/stores/customerGroup';
 import { useCustomerRuleStore } from '@/stores/customerRule';
 import { useDashboardStore } from '@/stores/dashboard';
+import { useDeliveryCoverageStore } from '@/stores/deliveryCoverage';
 import { useGeographicZoneStore } from '@/stores/geographicZone';
 import { useLogStore } from '@/stores/log';
 import { useOrderStore } from '@/stores/order';
@@ -26,6 +27,7 @@ const tenantStores = () => [
   useCustomerGroupStore(),
   useCustomerRuleStore(),
   useDashboardStore(),
+  useDeliveryCoverageStore(),
   useGeographicZoneStore(),
   useLogStore(),
   useOrderStore(),
