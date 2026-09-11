@@ -6,11 +6,15 @@
       { title: 'ID', value: 'id', sortable: false },
       { title: 'Nome', value: 'name', sortable: false },
       { title: 'Targa', value: 'plate', sortable: false },
-      { title: 'Località', value: 'cap', sortable: false }
+      { title: 'Località', value: 'cap', sortable: false },
+      { title: 'Utenti Delivery', value: 'delivery_users', sortable: false }
     ]"
   >
     <template #[`item.cap`]="{ item }">
       {{ addressUtils.getCityByCap(item.cap) }}
+    </template>
+    <template #[`item.delivery_users`]="{ item }">
+      {{ (item.delivery_users || []).map(user => user.nickname).join(', ') }}
     </template>
     <template #actions="{ item }">
       <v-btn
