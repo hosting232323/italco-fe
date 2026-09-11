@@ -79,6 +79,11 @@ const routes = [
         component: () => import('@/views/operator/OperatorSchedules.vue')
       },
       {
+        path: 'delivery-coverage',
+        name: 'Copertura corrieri',
+        component: () => import('@/views/operator/DeliveryCoverage.vue')
+      },
+      {
         path: 'collection-points',
         name: 'Punti di ritiro',
         component: () => import('@/views/customer/CollectionPoints.vue')
