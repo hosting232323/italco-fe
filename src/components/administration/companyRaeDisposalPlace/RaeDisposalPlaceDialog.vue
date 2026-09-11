@@ -4,10 +4,10 @@
     :title="`Luoghi di smaltimento RAEE — ${companyName}`"
   >
     <v-card-text>
-      <!-- Modulo RAEE (Sì/No) ed estremi iscrizione all'Albo Gestori Ambientali
-      sulla stessa riga: l'iscrizione è dell'attività, una sola, va compilata
-      per accendere il modulo (il backend rifiuta senza) e da qui si modifica
-      anche a modulo già acceso. -->
+      <!-- Modulo RAEE (Sì/No) da solo sulla riga: gli estremi iscrizione
+      all'Albo Gestori Ambientali stanno sotto il divider, impilati con il
+      bottone Salva invece che affiancati, perché il campo è troppo lungo per
+      stare in una colonna stretta accanto al radio group. -->
       <v-row
         no-gutters
         align="center"
@@ -15,8 +15,7 @@
       >
         <v-col
           cols="12"
-          md="4"
-          class="d-flex align-center pr-md-2"
+          class="d-flex align-center"
         >
           <label class="mr-2">Modulo RAEE</label>
           <v-radio-group
@@ -37,34 +36,6 @@
             />
           </v-radio-group>
         </v-col>
-        <v-col
-          v-if="raeValue"
-          cols="12"
-          md="6"
-          class="px-md-2"
-        >
-          <v-text-field
-            v-model="registration"
-            label="Estremi iscrizione Albo Gestori Ambientali"
-            hide-details
-            :disabled="raeLoading"
-          />
-        </v-col>
-        <v-col
-          v-if="raeValue"
-          cols="12"
-          md="2"
-          class="d-flex align-center pl-md-2"
-        >
-          <v-btn
-            block
-            :loading="raeLoading"
-            :color="theme.current.value.primaryColor"
-            @click="saveRegistration"
-          >
-            Salva
-          </v-btn>
-        </v-col>
       </v-row>
 
       <v-alert
@@ -79,6 +50,22 @@
 
       <template v-if="raeValue">
         <v-divider class="mb-4" />
+        <v-text-field
+          v-model="registration"
+          label="Estremi iscrizione Albo Gestori Ambientali"
+          hide-details
+          :disabled="raeLoading"
+          class="mb-2"
+        />
+        <v-btn
+          block
+          :loading="raeLoading"
+          :color="theme.current.value.primaryColor"
+          class="mb-4"
+          @click="saveRegistration"
+        >
+          Salva
+        </v-btn>
         <div class="text-right mb-2">
           <v-btn
             icon="mdi-plus"

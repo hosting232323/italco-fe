@@ -90,6 +90,7 @@
               item-title="name"
               item-value="id"
               :rules="validation.requiredRules"
+              :disabled="raeDisposalPlaces.length == 1"
             />
             <draggable
               v-model="schedule.schedule_items"
@@ -172,6 +173,14 @@ const hasRaeOrders = computed(() => (schedule.value.schedule_items || []).some(
   item => item.operation_type === 'Order' &&
     Object.values(item.products || {}).some(product => product.rae_product)
 ));
+
+// Con un solo luogo di smaltimento non ha senso farlo scegliere: si preseleziona
+// e il campo resta disabilitato (sopra). Con più luoghi il campo parte vuoto e
+// la scelta è dell'operatore.
+watch([hasRaeOrders, raeDisposalPlaces], ([hasRae, places]) => {
+  if (hasRae && places.length === 1)
+    schedule.value.rae_disposal_place_id = places[0].id;
+}, { immediate: true });
 
 const addUser = () => {
   if (!selectedUser.value) return;
