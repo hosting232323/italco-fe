@@ -10,37 +10,12 @@
         @submit.prevent="submitForm"
       >
         <v-row no-gutters>
-          <v-col
-            cols="12"
-            md="6"
-            class="pr-md-2"
-          >
+          <v-col cols="12">
             <v-text-field
               v-model="company.name"
               label="Nome company"
               :rules="validation.requiredRules"
             />
-          </v-col>
-          <v-col
-            cols="12"
-            md="6"
-          >
-            <label class="mr-2">Modulo RAEE</label>
-            <v-radio-group
-              v-model="company.rae"
-              inline
-            >
-              <v-radio
-                label="Sì"
-                :value="true"
-                @click="company.rae = true"
-              />
-              <v-radio
-                label="No"
-                :value="false"
-                @click="company.rae = false"
-              />
-            </v-radio-group>
           </v-col>
         </v-row>
 
@@ -128,34 +103,6 @@
             <v-text-field
               v-model="company.tax_code"
               label="Codice fiscale (opzionale)"
-            />
-          </v-col>
-        </v-row>
-
-        <!-- Campi legali specifici RAEE: obbligatori solo con il modulo acceso -->
-        <v-row
-          v-if="company.rae"
-          no-gutters
-        >
-          <v-col
-            cols="12"
-            md="6"
-            class="pr-md-2"
-          >
-            <v-text-field
-              v-model="company.rae_registration"
-              label="Estremi iscrizione Albo Gestori Ambientali"
-              :rules="validation.requiredRules"
-            />
-          </v-col>
-          <v-col
-            cols="12"
-            md="6"
-          >
-            <v-text-field
-              v-model="company.rae_grouping_place"
-              label="Luogo di raggruppamento RAEE"
-              :rules="validation.requiredRules"
             />
           </v-col>
         </v-row>
@@ -343,7 +290,6 @@ watch(
   (val) => {
     if (!val) return;
 
-    if (company.value.rae == undefined) company.value.rae = false;
     if (company.value.automatic_planning == undefined) company.value.automatic_planning = false;
     logoError.value = '';
     message.value = '';
