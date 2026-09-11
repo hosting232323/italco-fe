@@ -14,7 +14,7 @@
     <template v-else>
       <CoverageCalendar :entries="entries" />
 
-      <h2 class="mt-8">
+      <h1 class="mt-8">
         Blocchi di copertura
         <v-btn
           icon="mdi-plus"
@@ -22,7 +22,7 @@
           variant="text"
           @click="openEntryForm"
         />
-      </h2><hr>
+      </h1><hr>
       <CoverageEntryForm />
       <CoverageEntryTable />
     </template>
