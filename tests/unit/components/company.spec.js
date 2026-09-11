@@ -2,9 +2,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
 
 import CompanyForm from '@/components/administration/company/CompanyForm.vue';
+import CompanyTable from '@/components/administration/company/CompanyTable.vue';
 import http from '@/utils/http';
 import { useCompanyStore } from '@/stores/company';
-import { createTestPinia, mountComponent } from '../../helpers/mount';
+import { useCompanyRaeDisposalPlaceStore } from '@/stores/companyRaeDisposalPlace';
+import { createTestPinia, createTestRouter, mountComponent } from '../../helpers/mount';
 
 
 vi.mock('@/utils/http', () => ({
@@ -20,40 +22,24 @@ const LEGAL = {
   legal_name: 'Attivita SRL',
   vat_number: '11122233344',
   address: 'Via Test 1',
-  city: 'Bari',
-  rae_registration: 'RD000S00000000 del 01/01/26',
-  rae_grouping_place: 'Via Deposito 1'
+  city: 'Bari'
 };
 
 
 describe('CompanyForm', () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it('invia true quando il super admin attiva il modulo RAEE', async () => {
+  it('non ha piu il modulo RAEE: si gestisce dal popup dei luoghi di smaltimento', () => {
     const pinia = createTestPinia();
     const store = useCompanyStore();
     store.activeForm = true;
-    store.element = { id: 7, name: 'Attivita senza RAEE', rae: false, ...LEGAL };
+    store.element = { id: 7, name: 'Attivita', rae: false, ...LEGAL };
     const wrapper = mountComponent(CompanyForm, { pinia });
 
-    // Due gruppi Sì/No: [0-1] modulo RAEE, [2-3] pianificazione automatica.
-    const radios = wrapper.findAll('input[type="radio"]');
-    expect(radios).toHaveLength(4);
-
-    await radios[0].trigger('click');
-    expect(store.element.rae).toBe(true);
-
-    await wrapper.find('form').trigger('submit');
-    await flushPromises();
-
-    const [url, method, options] = http.uploadRequest.mock.calls.at(-1);
-    expect([url, method]).toEqual(['company/7', 'PUT']);
-    expect(options.body).toMatchObject({
-      name: 'Attivita senza RAEE',
-      rae: true,
-      automatic_planning: false,
-      legal_name: 'Attivita SRL'
-    });
+    // Il modulo RAEE non è più qui: nessun testo dedicato, restano solo i due
+    // radio della pianificazione automatica.
+    expect(wrapper.text()).not.toContain('Modulo RAEE');
+    expect(wrapper.findAll('input[type="radio"]')).toHaveLength(2);
   });
 
   it('invia true quando il super admin attiva la pianificazione automatica', async () => {
@@ -64,7 +50,7 @@ describe('CompanyForm', () => {
     const wrapper = mountComponent(CompanyForm, { pinia });
 
     const radios = wrapper.findAll('input[type="radio"]');
-    await radios[2].trigger('click');
+    await radios[0].trigger('click');
     expect(store.element.automatic_planning).toBe(true);
 
     await wrapper.find('form').trigger('submit');
@@ -148,5 +134,26 @@ describe('CompanyForm', () => {
 
     expect(wrapper.text()).toContain('Nickname già in uso');
     expect(store.activeForm).toBe(true);
+  });
+});
+
+
+describe('CompanyTable', () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it('il bottone dedicato apre il popup dei luoghi di smaltimento su un popup a parte, non sul form di modifica', async () => {
+    const pinia = createTestPinia();
+    const companyStore = useCompanyStore();
+    companyStore.ready = true;
+    companyStore.list = [{ id: 7, name: 'Attivita RAEE', rae: true }];
+    const disposalPlaceStore = useCompanyRaeDisposalPlaceStore();
+    const wrapper = mountComponent(CompanyTable, { pinia, router: createTestRouter() });
+
+    await wrapper.find('.mdi-recycle').trigger('click');
+
+    expect(disposalPlaceStore.companyId).toBe(7);
+    expect(disposalPlaceStore.dialogOpen).toBe(true);
+    // Il form di modifica della company resta chiuso: sono due popup distinti.
+    expect(companyStore.activeForm).toBe(false);
   });
 });
