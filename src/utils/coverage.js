@@ -1,8 +1,8 @@
-// Regole di copertura per la pagina a calendario. Un corriere è "coperto" in
-// un dato giorno se quel giorno cade dentro una copertura fissa, è uno dei
-// giorni della settimana previsti da quella copertura e non è toccato da
-// un'assenza. Lunedì = 0 ... Domenica = 6, come date.weekday() lato backend
-// e come utils/days.
+// Utility per la pagina a calendario della copertura corrieri. I blocchi
+// arrivano dal backend per giorno della settimana (ricorrenti, non legati a
+// una data), il calendario li proietta sulla settimana visualizzata.
+// Lunedì = 0 ... Domenica = 6, come date.weekday() lato backend e come
+// utils/days.
 
 const toISO = (date) => {
   const year = date.getFullYear();
@@ -15,55 +15,40 @@ const toISO = (date) => {
 const weekDayIndex = (date) => (date.getDay() + 6) % 7;
 
 
-const inRange = (iso, start, end) => iso >= start && iso <= end;
-
-
-// Fasce orarie coperte da un corriere in un giorno preciso: una per ogni
-// copertura fissa che quel giorno prevede, ordinate per orario di inizio.
-const coverageSlotsFor = (userId, date, coverages, absences) => {
-  const iso = toISO(date);
-
-  if (absences.some((absence) =>
-    absence.user_id === userId && inRange(iso, absence.start_date, absence.end_date)
-  ))
-    return [];
-
-  const weekDay = weekDayIndex(date);
-  return coverages
-    .filter((coverage) =>
-      coverage.user_id === userId && inRange(iso, coverage.start_date, coverage.end_date)
-    )
-    .flatMap((coverage) => (coverage.days || []).filter((day) => day.day_of_week === weekDay))
-    .map((day) => ({ start_time: day.start_time, end_time: day.end_time }))
-    .sort((a, b) => a.start_time.localeCompare(b.start_time));
+// Lunedì (mezzanotte) della settimana a cui appartiene `date`.
+const startOfWeek = (date) => {
+  const monday = new Date(date.getFullYear(), date.getMonth(), date.getDate() - weekDayIndex(date));
+  monday.setHours(0, 0, 0, 0);
+  return monday;
 };
 
 
-// true se il corriere è assente in quel giorno pur avendo una copertura fissa
-// che lo prevederebbe: è il "buco" che il calendario evidenzia.
-const isAbsentOnCoveredDay = (userId, date, coverages, absences) => {
-  const iso = toISO(date);
-  if (!absences.some((absence) =>
-    absence.user_id === userId && inRange(iso, absence.start_date, absence.end_date)
-  ))
-    return false;
-
-  const weekDay = weekDayIndex(date);
-  return coverages.some((coverage) =>
-    coverage.user_id === userId &&
-    inRange(iso, coverage.start_date, coverage.end_date) &&
-    (coverage.days || []).some((day) => day.day_of_week === weekDay)
+// I 7 giorni, da Lunedì a Domenica, della settimana che contiene `date`.
+const weekDays = (date) => {
+  const monday = startOfWeek(date);
+  return Array.from(
+    { length: 7 },
+    (_, index) => new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + index)
   );
 };
 
 
-const formatSlot = (slot) => `${slot.start_time.slice(0, 5)}-${slot.end_time.slice(0, 5)}`;
+// Blocchi previsti in un giorno della settimana, ordinati per orario di inizio.
+const entriesForWeekDay = (weekDay, entries) =>
+  (entries || [])
+    .filter((entry) => entry.day_of_week === weekDay)
+    .slice()
+    .sort((a, b) => a.start_time.localeCompare(b.start_time));
+
+
+const formatSlot = (entry) => `${entry.start_time.slice(0, 5)}-${entry.end_time.slice(0, 5)}`;
 
 
 export default {
   toISO,
   weekDayIndex,
-  coverageSlotsFor,
-  isAbsentOnCoveredDay,
+  startOfWeek,
+  weekDays,
+  entriesForWeekDay,
   formatSlot
 };

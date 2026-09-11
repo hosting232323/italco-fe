@@ -2,21 +2,18 @@ import http from '@/utils/http';
 import { defineStore } from 'pinia';
 import storesUtils from '@/utils/stores';
 
-// Copertura dei corrieri per la pagina a calendario: coperture fisse (finestra
-// di date + giorni della settimana con orari) e assenze puntuali. La stessa
-// GET porta a casa anche l'elenco degli utenti delivery, così i form non
-// devono passare da /user.
+// Schedulazione settimanale della copertura corrieri: blocchi per giorno
+// della settimana (Lunedì = 0 ... Domenica = 6), ciascuno con un veicolo,
+// una fascia oraria e i CAP coperti in quel blocco. Più blocchi sullo
+// stesso giorno sono normali (fasce orarie diverse). Nome e targa del
+// veicolo si risolvono lato frontend dal transport_id via useTransportStore,
+// niente join nella risposta.
 export const useDeliveryCoverageStore = defineStore('deliveryCoverage', {
   state: () => ({
-    deliveryUsers: [],
-    coverages: [],
-    absences: [],
+    entries: [],
     element: {},
-    // Copertura di cui si stanno gestendo i giorni della settimana nel popup.
-    managedCoverage: null,
     ready: false,
-    coverageForm: false,
-    absenceForm: false
+    entryForm: false
   }),
   actions: {
     initList() {
@@ -27,7 +24,7 @@ export const useDeliveryCoverageStore = defineStore('deliveryCoverage', {
         callback
       ));
     },
-    createCoverage(func) {
+    createEntry(func) {
       http.makeRequest(
         'delivery-coverage',
         'POST',
@@ -35,15 +32,15 @@ export const useDeliveryCoverageStore = defineStore('deliveryCoverage', {
         func
       );
     },
-    updateCoverage(func) {
+    updateEntry(func) {
       http.makeRequest(
         `delivery-coverage/${this.element.id}`,
         'PUT',
-        { body: storesUtils.exclude_keys(this.element, ['created_at', 'updated_at', 'days', 'company_id']) },
+        { body: storesUtils.exclude_keys(this.element, ['created_at', 'updated_at', 'company_id']) },
         func
       );
     },
-    deleteCoverage(element, func) {
+    deleteEntry(element, func) {
       http.makeRequest(
         `delivery-coverage/${element.id}`,
         'DELETE',
@@ -51,63 +48,8 @@ export const useDeliveryCoverageStore = defineStore('deliveryCoverage', {
         func
       );
     },
-    createCoverageDay(coverageId, data, func) {
-      http.makeRequest(
-        `delivery-coverage/${coverageId}/day`,
-        'POST',
-        { body: data },
-        func
-      );
-    },
-    updateCoverageDay(dayId, data, func) {
-      http.makeRequest(
-        `delivery-coverage/day/${dayId}`,
-        'PUT',
-        { body: data },
-        func
-      );
-    },
-    deleteCoverageDay(dayId, func) {
-      http.makeRequest(
-        `delivery-coverage/day/${dayId}`,
-        'DELETE',
-        {},
-        func
-      );
-    },
-    createAbsence(func) {
-      http.makeRequest(
-        'delivery-coverage/absence',
-        'POST',
-        { body: this.element },
-        func
-      );
-    },
-    updateAbsence(func) {
-      http.makeRequest(
-        `delivery-coverage/absence/${this.element.id}`,
-        'PUT',
-        { body: storesUtils.exclude_keys(this.element, ['created_at', 'updated_at', 'company_id']) },
-        func
-      );
-    },
-    deleteAbsence(element, func) {
-      http.makeRequest(
-        `delivery-coverage/absence/${element.id}`,
-        'DELETE',
-        {},
-        func
-      );
-    },
     setList(data) {
-      this.deliveryUsers = data.delivery_users;
-      this.coverages = data.coverages;
-      this.absences = data.absences;
-      // Il popup dei giorni tiene un riferimento a una copertura: dopo un
-      // refresh va riagganciato alla versione appena arrivata, o mostrerebbe
-      // ancora i giorni vecchi.
-      if (this.managedCoverage)
-        this.managedCoverage = data.coverages.find((coverage) => coverage.id === this.managedCoverage.id) || null;
+      this.entries = data.entries;
       this.ready = true;
     }
   }

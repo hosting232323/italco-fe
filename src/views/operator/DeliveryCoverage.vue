@@ -2,8 +2,8 @@
   <v-container>
     <h1>Copertura corrieri</h1><hr>
     <p class="text-medium-emphasis my-3">
-      Giorni lavorativi dei corrieri: la copertura fissa definisce il periodo e i giorni della settimana
-      con orario, le assenze specifiche ritagliano i giorni non lavorati.
+      Schedulazione settimanale della copertura: per ogni giorno della settimana uno o più blocchi, ciascuno con
+      i CAP coperti, il veicolo assegnato e la fascia oraria.
     </p>
 
     <v-skeleton-loader
@@ -12,86 +12,41 @@
       :color="theme.current.value.secondaryColor"
     />
     <template v-else>
-      <CoverageCalendar
-        :delivery-users="deliveryUsers"
-        :coverages="coverages"
-        :absences="absences"
-      />
+      <CoverageCalendar :entries="entries" />
 
       <h2 class="mt-8">
-        Copertura fissa
+        Blocchi di copertura
         <v-btn
           icon="mdi-plus"
           style="float: right;"
           variant="text"
-          @click="openCoverageForm"
+          @click="openEntryForm"
         />
       </h2><hr>
-      <CoverageForm />
-      <CoverageTable @manage-days="openDays" />
-
-      <h2 class="mt-8">
-        Assenze specifiche
-        <v-btn
-          icon="mdi-plus"
-          style="float: right;"
-          variant="text"
-          @click="openAbsenceForm"
-        />
-      </h2><hr>
-      <AbsenceForm />
-      <AbsenceTable />
+      <CoverageEntryForm />
+      <CoverageEntryTable />
     </template>
   </v-container>
-
-  <v-dialog
-    v-model="daysDialog"
-    max-width="900"
-  >
-    <CoverageDayPopUp />
-  </v-dialog>
 </template>
 
 <script setup>
 import CoverageCalendar from '@/components/operator/deliveryCoverage/CoverageCalendar';
-import CoverageForm from '@/components/operator/deliveryCoverage/CoverageForm';
-import CoverageTable from '@/components/operator/deliveryCoverage/CoverageTable';
-import CoverageDayPopUp from '@/components/operator/deliveryCoverage/CoverageDayPopUp';
-import AbsenceForm from '@/components/operator/deliveryCoverage/AbsenceForm';
-import AbsenceTable from '@/components/operator/deliveryCoverage/AbsenceTable';
+import CoverageEntryForm from '@/components/operator/deliveryCoverage/CoverageEntryForm';
+import CoverageEntryTable from '@/components/operator/deliveryCoverage/CoverageEntryTable';
 
-import { ref, watch } from 'vue';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { useDeliveryCoverageStore } from '@/stores/deliveryCoverage';
 
 const theme = useTheme();
-const daysDialog = ref(false);
 
 const store = useDeliveryCoverageStore();
-const {
-  ready, deliveryUsers, coverages, absences, element, managedCoverage, coverageForm, absenceForm
-} = storeToRefs(store);
+const { ready, entries, element, entryForm } = storeToRefs(store);
 
 store.initList();
 
-// Chiuso il popup, si lascia andare la copertura gestita.
-watch(daysDialog, (open) => {
-  if (!open) managedCoverage.value = null;
-});
-
-const openCoverageForm = () => {
-  element.value = {};
-  coverageForm.value = true;
-};
-
-const openAbsenceForm = () => {
-  element.value = {};
-  absenceForm.value = true;
-};
-
-const openDays = (coverage) => {
-  managedCoverage.value = coverage;
-  daysDialog.value = true;
+const openEntryForm = () => {
+  element.value = { caps: [] };
+  entryForm.value = true;
 };
 </script>

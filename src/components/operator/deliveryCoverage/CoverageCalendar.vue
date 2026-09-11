@@ -6,110 +6,74 @@
     >
       <v-btn
         icon="mdi-chevron-left"
-        @click="shiftMonth(-1)"
+        @click="shiftWeek(-1)"
       />
       <v-toolbar-title class="text-center text-capitalize">
-        {{ monthLabel }}
+        {{ weekLabel }}
       </v-toolbar-title>
       <v-btn
         icon="mdi-chevron-right"
-        @click="shiftMonth(1)"
+        @click="shiftWeek(1)"
       />
       <v-btn
         variant="text"
         class="mr-2"
         @click="goToday"
       >
-        Oggi
+        Settimana corrente
       </v-btn>
     </v-toolbar>
 
     <v-card-text>
-      <v-autocomplete
-        v-model="selectedUserId"
-        label="Filtra corriere"
-        :items="[{ id: null, nickname: 'Tutti i corrieri' }, ...deliveryUsers]"
-        item-title="nickname"
-        item-value="id"
-        density="comfortable"
-        hide-details
-        clearable
-        class="mb-4"
-      />
-
-      <div class="calendar-grid week-header">
-        <div
-          v-for="label in weekDayLabels"
-          :key="label"
-          class="week-header-cell"
-        >
-          {{ label }}
-        </div>
-      </div>
-      <div class="calendar-grid">
-        <div
-          v-for="(cell, index) in cells"
-          :key="index"
-          class="day-cell"
-          :class="{
-            'day-cell--muted': !cell.inMonth,
-            'day-cell--today': cell.iso === todayIso,
-            'day-cell--weekend': cell.weekend
-          }"
-        >
-          <template v-if="cell.date">
-            <div class="day-number">
-              {{ cell.date.getDate() }}
+      <div class="calendar-grid-wrapper">
+        <div class="calendar-grid">
+          <div
+            v-for="cell in cells"
+            :key="cell.iso"
+            class="day-cell"
+            :class="{ 'day-cell--today': cell.iso === todayIso, 'day-cell--weekend': cell.weekend }"
+          >
+            <div class="day-header">
+              <span class="day-title">{{ cell.label }}</span>
+              <span class="day-date">{{ cell.dateLabel }}</span>
             </div>
             <div class="day-body">
-              <v-chip
-                v-for="entry in cell.entries"
-                :key="entry.userId"
-                size="x-small"
-                class="mb-1 mr-1"
-                :color="entry.absent ? 'warning' : theme.current.value.primaryColor"
-                :variant="entry.absent ? 'outlined' : 'flat'"
-              >
-                <span class="text-truncate">{{ entry.nickname }}</span>
-                <v-tooltip
-                  activator="parent"
-                  location="top"
-                >
-                  <template v-if="entry.absent">
-                    {{ entry.nickname }} — assente
-                  </template>
-                  <template v-else>
-                    {{ entry.nickname }}:
-                    {{ entry.slots.map(coverage.formatSlot).join(', ') }}
-                  </template>
-                </v-tooltip>
-              </v-chip>
               <div
-                v-if="cell.inMonth && cell.entries.length === 0"
+                v-for="entry in cell.entries"
+                :key="entry.id"
+                class="entry-block"
+              >
+                <div class="entry-time">
+                  {{ coverage.formatSlot(entry) }}
+                </div>
+                <div class="entry-transport">
+                  <v-icon size="x-small">
+                    mdi-truck
+                  </v-icon>
+                  {{ transportName(entry.transport_id) }}
+                </div>
+                <div class="entry-caps">
+                  <v-chip
+                    v-for="cap in entry.caps"
+                    :key="cap"
+                    size="x-small"
+                    class="mr-1 mb-1"
+                    :color="theme.current.value.primaryColor"
+                    variant="flat"
+                  >
+                    {{ cap }}
+                  </v-chip>
+                </div>
+              </div>
+              <div
+                v-if="cell.entries.length === 0"
                 class="day-empty"
               >
-                —
+                Nessuna copertura
               </div>
             </div>
-          </template>
+          </div>
         </div>
-      </div>
-
-      <div class="legend mt-4">
-        <span class="legend-item">
-          <v-icon
-            size="small"
-            :color="theme.current.value.primaryColor"
-          >mdi-square-rounded</v-icon>
-          Corriere in copertura
-        </span>
-        <span class="legend-item">
-          <v-icon
-            size="small"
-            color="warning"
-          >mdi-square-rounded-outline</v-icon>
-          Assenza in un giorno altrimenti coperto
-        </span>
       </div>
     </v-card-text>
   </v-card>
@@ -120,111 +84,85 @@ import { computed, ref } from 'vue';
 import days from '@/utils/days';
 import { useTheme } from 'vuetify';
 import coverage from '@/utils/coverage';
+import storesUtils from '@/utils/stores';
+import { useTransportStore } from '@/stores/transport';
 
 const props = defineProps({
-  deliveryUsers: {
-    type: Array,
-    required: true
-  },
-  coverages: {
-    type: Array,
-    required: true
-  },
-  absences: {
+  entries: {
     type: Array,
     required: true
   }
 });
 
 const theme = useTheme();
-const weekDayLabels = days.weekDays.map((day) => day.title.slice(0, 3));
+const transportStore = useTransportStore();
+const transports = storesUtils.getStoreList(transportStore);
 
 const today = new Date();
 const todayIso = coverage.toISO(today);
-const cursor = ref(new Date(today.getFullYear(), today.getMonth(), 1));
-const selectedUserId = ref(null);
+const cursor = ref(coverage.startOfWeek(today));
 
-const monthLabel = computed(() =>
-  cursor.value.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' })
-);
+// "3 - 9 novembre 2026" nella stessa settimana/mese, "28 ott - 3 nov 2026"
+// quando la settimana scavalca il mese.
+const weekLabel = computed(() => {
+  const week = coverage.weekDays(cursor.value);
+  const start = week[0];
+  const end = week[6];
+  const sameMonth = start.getMonth() === end.getMonth();
 
-const shiftMonth = (delta) => {
-  cursor.value = new Date(cursor.value.getFullYear(), cursor.value.getMonth() + delta, 1);
+  const startLabel = sameMonth
+    ? start.getDate()
+    : start.toLocaleDateString('it-IT', { day: 'numeric', month: 'short' });
+  const endLabel = end.toLocaleDateString('it-IT', { day: 'numeric', month: 'short', year: 'numeric' });
+
+  return `${startLabel} - ${endLabel}`;
+});
+
+const shiftWeek = (delta) => {
+  const next = new Date(cursor.value.getFullYear(), cursor.value.getMonth(), cursor.value.getDate() + delta * 7);
+  cursor.value = coverage.startOfWeek(next);
 };
 
 const goToday = () => {
-  cursor.value = new Date(today.getFullYear(), today.getMonth(), 1);
+  cursor.value = coverage.startOfWeek(today);
 };
 
-const visibleUsers = computed(() =>
-  selectedUserId.value
-    ? props.deliveryUsers.filter((user) => user.id === selectedUserId.value)
-    : props.deliveryUsers
-);
+const transportName = (transportId) =>
+  transports.value.find((transport) => transport.id === transportId)?.name || `ID ${transportId}`;
 
-const cells = computed(() => {
-  const year = cursor.value.getFullYear();
-  const month = cursor.value.getMonth();
-  const firstOfMonth = new Date(year, month, 1);
-  const leading = coverage.weekDayIndex(firstOfMonth);
-  const gridStart = new Date(year, month, 1 - leading);
-
-  return Array.from({ length: 42 }, (_, index) => {
-    const date = new Date(gridStart.getFullYear(), gridStart.getMonth(), gridStart.getDate() + index);
-    const inMonth = date.getMonth() === month;
+const cells = computed(() =>
+  coverage.weekDays(cursor.value).map((date) => {
     const weekDay = coverage.weekDayIndex(date);
-
-    const entries = visibleUsers.value
-      .map((user) => {
-        const slots = coverage.coverageSlotsFor(user.id, date, props.coverages, props.absences);
-        const absent = coverage.isAbsentOnCoveredDay(user.id, date, props.coverages, props.absences);
-        if (slots.length === 0 && !absent) return null;
-        return { userId: user.id, nickname: user.nickname, slots, absent };
-      })
-      .filter((entry) => entry);
-
     return {
-      date,
-      inMonth,
       iso: coverage.toISO(date),
+      label: days.weekDays[weekDay].title,
+      dateLabel: date.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit' }),
       weekend: weekDay >= 5,
-      entries
+      entries: coverage.entriesForWeekDay(weekDay, props.entries)
     };
-  });
-});
+  })
+);
 </script>
 
 <style scoped>
+.calendar-grid-wrapper {
+  overflow-x: auto;
+}
+
 .calendar-grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
-}
-
-.week-header {
-  margin-bottom: 4px;
-}
-
-.week-header-cell {
-  text-align: center;
-  font-weight: 600;
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  opacity: 0.7;
+  grid-template-columns: repeat(7, minmax(140px, 1fr));
+  gap: 8px;
+  min-width: 900px;
 }
 
 .day-cell {
-  min-height: 96px;
+  min-height: 180px;
   border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 8px;
-  padding: 4px 6px;
+  padding: 6px 8px;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-}
-
-.day-cell--muted {
-  opacity: 0.35;
 }
 
 .day-cell--weekend {
@@ -236,32 +174,56 @@ const cells = computed(() => {
   border-width: 2px;
 }
 
-.day-number {
-  font-size: 0.8rem;
+.day-header {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 6px;
+}
+
+.day-title {
   font-weight: 600;
-  margin-bottom: 2px;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.day-date {
+  font-size: 0.85rem;
 }
 
 .day-body {
   flex: 1;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.entry-block {
+  border-radius: 6px;
+  padding: 4px 6px;
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.entry-time {
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+.entry-transport {
+  font-size: 0.75rem;
+  opacity: 0.8;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.entry-caps {
+  margin-top: 2px;
 }
 
 .day-empty {
   font-size: 0.75rem;
   opacity: 0.4;
-}
-
-.legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  font-size: 0.8rem;
-}
-
-.legend-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
 }
 </style>
