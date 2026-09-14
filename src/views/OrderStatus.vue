@@ -42,6 +42,12 @@
             </td>
             <td>{{ order.dpc ?? '/' }}</td>
           </tr>
+          <tr v-if="order.delivery_slot_start">
+            <td class="label">
+              Fascia oraria consegna
+            </td>
+            <td>{{ order.delivery_slot_start.slice(0, 5) }} - {{ order.delivery_slot_end.slice(0, 5) }}</td>
+          </tr>
           <tr>
             <td class="label">
               Data richiesta consegna
