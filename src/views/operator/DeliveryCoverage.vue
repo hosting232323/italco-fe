@@ -23,10 +23,15 @@
           @click="openEntryForm"
         />
       </h1><hr>
-      <CoverageEntryForm />
       <CoverageEntryTable />
     </template>
   </v-container>
+  <v-dialog
+    v-model="entryForm"
+    max-width="1500"
+  >
+    <CoverageEntryForm />
+  </v-dialog>
 </template>
 
 <script setup>
