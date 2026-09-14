@@ -76,3 +76,41 @@ describe('OrderTable, permessi del super admin', () => {
     expect(wrapper.text()).toContain('Crea Borderò');
   });
 });
+
+describe('OrderTable, fascia oraria assegnata dalla copertura corrieri', () => {
+  it('mostra la fascia sotto la D.P.C. quando l\'ordine ne ha una', () => {
+    useUserStore().role = 'Admin';
+    useOrderStore().list = [{
+      id: 1,
+      products: {},
+      addressee: 'Mario Rossi',
+      address: 'Via Test 1',
+      cap: '70100',
+      dpc: '2026-07-20',
+      created_at: '20/07/2026 10:00',
+      delivery_slot_start: '08:00:00',
+      delivery_slot_end: '12:00:00'
+    }];
+
+    const wrapper = mountTable();
+
+    expect(wrapper.text()).toContain('08:00 - 12:00');
+  });
+
+  it('non mostra nulla quando l\'ordine non ha una fascia assegnata', () => {
+    useUserStore().role = 'Admin';
+    useOrderStore().list = [{
+      id: 1,
+      products: {},
+      addressee: 'Mario Rossi',
+      address: 'Via Test 1',
+      cap: '70100',
+      dpc: '2026-07-20',
+      created_at: '20/07/2026 10:00'
+    }];
+
+    const wrapper = mountTable();
+
+    expect(wrapper.text()).not.toContain(' - ');
+  });
+});

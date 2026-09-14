@@ -19,11 +19,14 @@
         cols="12"
         :md="role == 'Customer' ? 6 : 4"
       >
-        <DateField 
+        <DpcCalendarField
           v-model="order.dpc"
+          v-model:slot-start="order.delivery_slot_start"
+          v-model:slot-end="order.delivery_slot_end"
           label="Data Prevista dal Cliente"
           :class-style="isMobile ? '' : 'ml-2 mr-2'"
           :allowed-dates="allowedDpcDates"
+          :slots="dpcSlots"
           :rules="validation.requiredRules"
           :disabled="role == 'Operator' && order.id"
           :clearable="false"
@@ -68,6 +71,7 @@
 <script setup>
 import DateField from '@/components/DateField';
 import FormButtons from '@/components/FormButtons';
+import DpcCalendarField from '@/components/orders/DpcCalendarField';
 
 import { ref } from 'vue';
 import days from '@/utils/days';
@@ -82,6 +86,7 @@ const form = ref(null);
 const loading = ref(false);
 const loadingDates = ref(true);
 const allowedDpcDates = ref([]);
+const dpcSlots = ref({});
 const userStore = useUserStore();
 const orderStore = useOrderStore();
 const isMobile = mobile.setupMobileUtils();
@@ -101,10 +106,13 @@ if (role.value == 'Customer')
       ]
     }
   }, (data) => {
-    if (data.status === 'ok')
+    if (data.status === 'ok') {
       allowedDpcDates.value = data.dates;
-    else
+      dpcSlots.value = data.slots || {};
+    } else {
       allowedDpcDates.value = [];
+      dpcSlots.value = {};
+    }
     loadingDates.value = false;
   });
 else {
