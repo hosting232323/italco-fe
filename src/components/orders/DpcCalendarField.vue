@@ -1,103 +1,83 @@
 <template>
-  <v-menu
-    v-model="menu"
-    :close-on-content-click="false"
-    transition="scale-transition"
-    min-width="auto"
+  <v-input
+    :model-value="formattedValue"
+    :rules="rules"
+    :disabled="disabled"
+    :class="classStyle"
+    hide-details="auto"
   >
-    <template #activator="{ props: activatorProps }">
-      <v-text-field
-        v-bind="activatorProps"
-        :model-value="formattedValue"
-        :label="label"
-        :class="classStyle"
-        readonly
-        :clearable="clearable"
-        :rules="rules"
-        :disabled="disabled"
-        @click:clear="clearSelection"
-      >
-        <template #append-inner>
-          <v-icon>mdi-calendar-clock</v-icon>
-        </template>
-      </v-text-field>
-    </template>
-
-    <v-card
-      class="dpc-calendar"
-      min-width="290"
-    >
-      <div class="dpc-calendar-header">
-        <v-btn
-          icon="mdi-chevron-left"
-          size="small"
-          variant="text"
-          :disabled="!canGoPrevMonth"
-          @click="shiftMonth(-1)"
-        />
-        <span class="text-capitalize">{{ monthLabel }}</span>
-        <v-btn
-          icon="mdi-chevron-right"
-          size="small"
-          variant="text"
-          :disabled="!canGoNextMonth"
-          @click="shiftMonth(1)"
-        />
-      </div>
-
-      <div class="dpc-calendar-grid">
-        <span
-          v-for="weekDayTitle in weekDayTitles"
-          :key="weekDayTitle"
-          class="dpc-calendar-weekday"
-        >
-          {{ weekDayTitle }}
-        </span>
-        <button
-          v-for="cell in cells"
-          :key="cell.iso"
-          type="button"
-          class="dpc-calendar-day"
-          :class="{
-            'dpc-calendar-day--outside': !cell.inMonth,
-            'dpc-calendar-day--disabled': !cell.allowed,
-            'dpc-calendar-day--selected': cell.iso === selectedDate
-          }"
-          :disabled="!cell.allowed"
-          @click="selectDate(cell.iso)"
-        >
-          {{ cell.day }}
-        </button>
-      </div>
-
-      <template v-if="selectedDate">
-        <v-divider class="my-3" />
-        <div class="dpc-calendar-slots">
-          <template v-if="slotsForSelectedDate.length > 0">
-            <p class="text-caption text-medium-emphasis mb-2">
-              Fasce orarie disponibili:
-            </p>
-            <v-chip
-              v-for="slot in slotsForSelectedDate"
-              :key="`${slot.start}-${slot.end}`"
-              class="mr-2 mb-2"
-              :variant="isSlotSelected(slot) ? 'flat' : 'outlined'"
-              :color="theme.current.value.primaryColor"
-              @click="selectSlot(slot)"
-            >
-              {{ slot.start }} - {{ slot.end }}
-            </v-chip>
-          </template>
-          <p
-            v-else
-            class="text-caption text-medium-emphasis"
-          >
-            Nessuna fascia oraria specifica per questa data.
-          </p>
+    <div class="dpc-calendar-field">
+      <label class="dpc-calendar-label text-caption text-medium-emphasis">{{ label }}</label>
+      <div class="dpc-calendar mt-1">
+        <div class="dpc-calendar-header">
+          <v-btn
+            icon="mdi-chevron-left"
+            size="small"
+            variant="text"
+            :disabled="disabled || !canGoPrevMonth"
+            @click="shiftMonth(-1)"
+          />
+          <span class="text-capitalize font-weight-medium">{{ monthLabel }}</span>
+          <v-btn
+            icon="mdi-chevron-right"
+            size="small"
+            variant="text"
+            :disabled="disabled || !canGoNextMonth"
+            @click="shiftMonth(1)"
+          />
         </div>
-      </template>
-    </v-card>
-  </v-menu>
+
+        <div class="dpc-calendar-grid-wrapper">
+          <div class="dpc-calendar-grid">
+            <span
+              v-for="weekDayTitle in weekDayTitles"
+              :key="weekDayTitle"
+              class="dpc-calendar-weekday"
+            >
+              {{ weekDayTitle }}
+            </span>
+            <div
+              v-for="cell in cells"
+              :key="cell.iso"
+              class="dpc-calendar-cell"
+              :class="{ 'dpc-calendar-cell--outside': !cell.inMonth }"
+              :data-date="cell.iso"
+            >
+              <button
+                type="button"
+                class="dpc-calendar-day"
+                :class="{
+                  'dpc-calendar-day--disabled': !cell.allowed,
+                  'dpc-calendar-day--selected': cell.iso === selectedDate && cell.slots.length === 0
+                }"
+                :disabled="!cell.allowed || disabled"
+                @click="selectDate(cell.iso)"
+              >
+                {{ cell.day }}
+              </button>
+              <div
+                v-if="cell.slots.length > 0"
+                class="dpc-calendar-chips"
+              >
+                <v-chip
+                  v-for="slot in cell.slots"
+                  :key="`${slot.start}-${slot.end}`"
+                  size="x-small"
+                  class="mb-1"
+                  :variant="isSlotSelected(cell.iso, slot) ? 'flat' : 'outlined'"
+                  :color="theme.current.value.primaryColor"
+                  :disabled="disabled"
+                  @click="selectSlot(cell.iso, slot)"
+                >
+                  {{ slot.start }}-{{ slot.end }}
+                </v-chip>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </v-input>
 </template>
 
 <script setup>
@@ -140,10 +120,6 @@ const props = defineProps({
   disabled: {
     type: Boolean,
     default: false
-  },
-  clearable: {
-    type: Boolean,
-    default: true
   }
 });
 
@@ -170,7 +146,6 @@ function weekDayIndex(date) {
   return (date.getDay() + 6) % 7;
 }
 
-const menu = ref(false);
 const selectedDate = ref(toISODate(props.modelValue));
 const viewMonth = ref(startOfMonth(selectedDate.value ? new Date(selectedDate.value) : new Date()));
 
@@ -190,12 +165,11 @@ const cells = computed(() => {
       iso,
       day: date.getDate(),
       inMonth: date.getMonth() === firstOfMonth.getMonth(),
-      allowed: props.allowedDates.includes('all') || props.allowedDates.includes(iso)
+      allowed: props.allowedDates.includes('all') || props.allowedDates.includes(iso),
+      slots: props.slots[iso] || []
     };
   });
 });
-
-const slotsForSelectedDate = computed(() => props.slots[selectedDate.value] || []);
 
 const canGoPrevMonth = computed(() => viewMonth.value > startOfMonth(new Date()));
 
@@ -210,46 +184,39 @@ const canGoNextMonth = computed(() => {
 // passata dal form, niente logica di validazione duplicata qui.
 const formattedValue = computed(() => {
   if (!selectedDate.value) return '';
-  const [year, month, day] = selectedDate.value.split('-');
-  const datePart = `${day}/${month}/${year}`;
-  if (slotsForSelectedDate.value.length > 0) {
-    if (!props.slotStart || !props.slotEnd) return '';
-    return `${datePart} ${props.slotStart}-${props.slotEnd}`;
-  }
-  return datePart;
+  const slotsForDate = props.slots[selectedDate.value] || [];
+  if (slotsForDate.length > 0 && (!props.slotStart || !props.slotEnd)) return '';
+  return selectedDate.value;
 });
 
 function shiftMonth(delta) {
   viewMonth.value = new Date(viewMonth.value.getFullYear(), viewMonth.value.getMonth() + delta, 1);
 }
 
+function isDateAllowed(iso) {
+  return props.allowedDates.includes('all') || props.allowedDates.includes(iso);
+}
+
 function selectDate(iso) {
-  if (!props.allowedDates.includes('all') && !props.allowedDates.includes(iso)) return;
+  if (props.disabled || !isDateAllowed(iso)) return;
 
   selectedDate.value = iso;
   emits('update:modelValue', iso);
   emits('update:slotStart', null);
   emits('update:slotEnd', null);
-
-  if ((props.slots[iso] || []).length === 0) menu.value = false;
 }
 
-function selectSlot(slot) {
+function selectSlot(iso, slot) {
+  if (props.disabled || !isDateAllowed(iso)) return;
+
+  selectedDate.value = iso;
+  emits('update:modelValue', iso);
   emits('update:slotStart', slot.start);
   emits('update:slotEnd', slot.end);
-  menu.value = false;
 }
 
-function isSlotSelected(slot) {
-  return slot.start === props.slotStart && slot.end === props.slotEnd;
-}
-
-function clearSelection() {
-  selectedDate.value = null;
-  emits('update:modelValue', null);
-  emits('update:slotStart', null);
-  emits('update:slotEnd', null);
-  menu.value = false;
+function isSlotSelected(iso, slot) {
+  return iso === selectedDate.value && slot.start === props.slotStart && slot.end === props.slotEnd;
 }
 
 watch(() => props.modelValue, (value) => {
@@ -262,22 +229,37 @@ watch(() => props.modelValue, (value) => {
 </script>
 
 <style scoped>
+.dpc-calendar-field {
+  width: 100%;
+  flex: 1 1 auto;
+}
+
+.dpc-calendar-label {
+  display: block;
+}
+
 .dpc-calendar {
-  padding: 12px;
+  width: 100%;
+  padding: 12px 0;
 }
 
 .dpc-calendar-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-weight: 600;
   margin-bottom: 8px;
+}
+
+.dpc-calendar-grid-wrapper {
+  overflow-x: auto;
 }
 
 .dpc-calendar-grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 2px;
+  grid-template-columns: repeat(7, minmax(64px, 1fr));
+  gap: 4px;
+  width: 100%;
+  min-width: 448px;
 }
 
 .dpc-calendar-weekday {
@@ -288,8 +270,22 @@ watch(() => props.modelValue, (value) => {
   padding-bottom: 4px;
 }
 
+.dpc-calendar-cell {
+  min-height: 44px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2px;
+  border-radius: 6px;
+}
+
+.dpc-calendar-cell--outside {
+  opacity: 0.35;
+}
+
 .dpc-calendar-day {
-  aspect-ratio: 1;
+  width: 28px;
+  height: 28px;
   border: none;
   border-radius: 50%;
   background: transparent;
@@ -299,10 +295,6 @@ watch(() => props.modelValue, (value) => {
 
 .dpc-calendar-day:hover:not(:disabled) {
   background: rgba(0, 0, 0, 0.06);
-}
-
-.dpc-calendar-day--outside {
-  opacity: 0.35;
 }
 
 .dpc-calendar-day--disabled {
@@ -315,7 +307,11 @@ watch(() => props.modelValue, (value) => {
   color: rgb(var(--v-theme-on-primary));
 }
 
-.dpc-calendar-slots {
-  padding-top: 4px;
+.dpc-calendar-chips {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin-top: 2px;
 }
 </style>
