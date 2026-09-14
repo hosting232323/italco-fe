@@ -5,78 +5,77 @@ import DpcCalendarField from '@/components/orders/DpcCalendarField.vue';
 import { mountComponent } from '../../../helpers/mount';
 
 
+const todayIso = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 const mountField = (props = {}) => mountComponent(DpcCalendarField, {
   props: { label: 'Data Prevista dal Cliente', allowedDates: ['all'], rules: [], ...props }
 });
 
-const input = (wrapper) => wrapper.find('input');
+const dayButton = (wrapper, iso) => wrapper.find(`[data-date="${iso}"] button`);
 
 
 describe('DpcCalendarField', () => {
-  it('parte vuoto senza valore', () => {
-    expect(input(mountField()).element.value).toBe('');
-  });
-
-  it('mostra la data in formato italiano quando la data non ha fasce a disposizione', () => {
-    const wrapper = mountField({ modelValue: '2026-09-01', slots: {} });
-
-    expect(input(wrapper).element.value).toBe('01/09/2026');
-  });
-
-  it('non mostra la data finche manca la fascia, se per quella data ce ne sono', () => {
-    const wrapper = mountField({
-      modelValue: '2026-09-01',
-      slots: { '2026-09-01': [{ start: '08:00', end: '12:00' }] }
-    });
-
-    expect(input(wrapper).element.value).toBe('');
-  });
-
-  it('mostra data e fascia insieme quando entrambe sono scelte', () => {
-    const wrapper = mountField({
-      modelValue: '2026-09-01',
-      slotStart: '08:00',
-      slotEnd: '12:00',
-      slots: { '2026-09-01': [{ start: '08:00', end: '12:00' }] }
-    });
-
-    expect(input(wrapper).element.value).toBe('01/09/2026 08:00-12:00');
-  });
-
-  it('ignora un valore non parsabile', () => {
-    expect(input(mountField({ modelValue: 'non-una-data' })).element.value).toBe('');
-  });
-
   it('mostra l-etichetta ricevuta', () => {
-    expect(mountField({ label: 'Data di consegna' }).text()).toContain('Data di consegna');
+    expect(mountField().text()).toContain('Data Prevista dal Cliente');
   });
 
-  it('puo essere disabilitato', () => {
-    expect(input(mountField({ disabled: true })).attributes('disabled')).toBeDefined();
+  it('mostra un calendario mensile con i giorni cliccabili', () => {
+    const wrapper = mountField();
+
+    expect(wrapper.findAll('button.dpc-calendar-day').length).toBeGreaterThanOrEqual(28);
   });
 
-  it('applica la classe richiesta', () => {
-    const wrapper = mountField({ classStyle: 'mr-2' });
+  it('un giorno non ammesso e disabilitato', () => {
+    const wrapper = mountField({ allowedDates: [] });
 
-    expect(wrapper.findComponent({ name: 'VTextField' }).classes()).toContain('mr-2');
-  });
-
-  it('e sempre in sola lettura: la data si sceglie dal calendario', () => {
-    expect(input(mountField()).attributes('readonly')).toBeDefined();
-  });
-
-  it('svuota data e fascia al click sulla x', async () => {
-    const wrapper = mountField({
-      modelValue: '2026-09-01',
-      slotStart: '08:00',
-      slotEnd: '12:00',
-      slots: { '2026-09-01': [{ start: '08:00', end: '12:00' }] }
+    wrapper.findAll('button.dpc-calendar-day').forEach((button) => {
+      expect(button.attributes('disabled')).toBeDefined();
     });
+  });
 
-    await wrapper.findComponent({ name: 'VTextField' }).vm.$emit('click:clear');
+  it('cliccare un giorno senza fasce emette solo la data', async () => {
+    const iso = todayIso();
+    const wrapper = mountField();
 
-    expect(wrapper.emitted('update:modelValue').at(-1)).toEqual([null]);
+    await dayButton(wrapper, iso).trigger('click');
+
+    expect(wrapper.emitted('update:modelValue').at(-1)).toEqual([iso]);
     expect(wrapper.emitted('update:slotStart').at(-1)).toEqual([null]);
     expect(wrapper.emitted('update:slotEnd').at(-1)).toEqual([null]);
+  });
+
+  it('mostra le fasce orarie disponibili direttamente nel giorno', () => {
+    const iso = todayIso();
+    const wrapper = mountField({ slots: { [iso]: [{ start: '08:00', end: '12:00' }, { start: '14:00', end: '18:00' }] } });
+
+    expect(wrapper.text()).toContain('08:00-12:00');
+    expect(wrapper.text()).toContain('14:00-18:00');
+  });
+
+  it('cliccare una fascia emette data e fascia insieme', async () => {
+    const iso = todayIso();
+    const wrapper = mountField({ slots: { [iso]: [{ start: '08:00', end: '12:00' }] } });
+
+    await wrapper.findComponent({ name: 'VChip' }).trigger('click');
+
+    expect(wrapper.emitted('update:modelValue').at(-1)).toEqual([iso]);
+    expect(wrapper.emitted('update:slotStart').at(-1)).toEqual(['08:00']);
+    expect(wrapper.emitted('update:slotEnd').at(-1)).toEqual(['12:00']);
+  });
+
+  it('da disabilitato non emette nulla al click', async () => {
+    const iso = todayIso();
+    const wrapper = mountField({ disabled: true, slots: { [iso]: [{ start: '08:00', end: '12:00' }] } });
+
+    await dayButton(wrapper, iso).trigger('click');
+    await wrapper.findComponent({ name: 'VChip' }).trigger('click');
+
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined();
   });
 });
