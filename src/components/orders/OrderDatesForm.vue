@@ -114,6 +114,7 @@ if (role.value == 'Customer')
   http.makeRequest('check-constraints', 'POST', {
     body: {
       cap: order.value.cap,
+      address: order.value.address,
       services_id: getServicesIds(),
       products: order.value.products,
       order_id: order.value.id,
