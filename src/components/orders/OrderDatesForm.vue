@@ -97,13 +97,26 @@ const emits = defineEmits(['go-to-schedulation']);
 const { effectiveRole: role } = storeToRefs(userStore);
 const { element: order, activeForm } = storeToRefs(orderStore);
 
+const getServicesIds = () => {
+  if (!order.value.products) return [];
+  const ids = [];
+  for (const product of Object.values(order.value.products)) {
+    const services = Array.isArray(product?.services) ? product.services : (Array.isArray(product) ? product : []);
+    for (const service of services) {
+      const id = typeof service === 'object' && service !== null ? service.id : service;
+      if (id != null) ids.push(id);
+    }
+  }
+  return [...new Set(ids)];
+};
+
 if (role.value == 'Customer')
   http.makeRequest('check-constraints', 'POST', {
     body: {
       cap: order.value.cap,
-      services_id: [
-        ...new Set(Object.values(order.value.products).flat().map(s => s.id))
-      ]
+      services_id: getServicesIds(),
+      products: order.value.products,
+      order_id: order.value.id,
     }
   }, (data) => {
     if (data.status === 'ok') {
