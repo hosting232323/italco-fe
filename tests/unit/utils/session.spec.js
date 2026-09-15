@@ -1,0 +1,188 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { createPinia, setActivePinia } from 'pinia';
+
+
+vi.mock('@/utils/http', () => ({
+  default: { makeRequest: vi.fn(), uploadRequest: vi.fn() }
+}));
+
+
+// Payload in base64url come lo emette il backend: {"sub":"70",...}.
+const jwt = (payload) => {
+  const encode = (value) => btoa(JSON.stringify(value)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  return `${encode({ alg: 'HS256', typ: 'JWT' })}.${encode(payload)}.firma`;
+};
+
+const storageEvent = (newValue, key = 'user') => ({ key, newValue });
+
+
+describe('session', () => {
+  let session;
+  let useUserStore;
+  let useOrderStore;
+  let useCompanyStore;
+
+  // Il modulo ricorda se il cambio sessione e' gia' partito: ogni test ne
+  // importa una copia nuova, insieme agli store, sullo stesso pinia.
+  beforeEach(async () => {
+    vi.resetModules();
+    setActivePinia(createPinia());
+    session = (await import('@/utils/session')).default;
+    ({ useUserStore } = await import('@/stores/user'));
+    ({ useOrderStore } = await import('@/stores/order'));
+    ({ useCompanyStore } = await import('@/stores/company'));
+    vi.spyOn(session, 'reload').mockImplementation(() => {});
+  });
+
+  const loggedAs = (userId) => {
+    const userStore = useUserStore();
+    userStore.$patch({ role: 'Admin', userId, token: jwt({ sub: String(userId) }) });
+    useOrderStore().setList({ orders: [{ id: 1 }] });
+    useCompanyStore().setList({ companies: [{ id: 1 }] });
+    return userStore;
+  };
+
+  describe('tokenUserId', () => {
+    it('legge il sub del token', () => {
+      expect(session.tokenUserId(jwt({ sub: '70', role: 'Admin', company_id: 2 }))).toBe('70');
+    });
+
+    it('decodifica il base64url anche con caratteri - e _', () => {
+      expect(session.tokenUserId(jwt({ sub: '1', note: '??>>' }))).toBe('1');
+    });
+
+    it('restituisce null per token vuoti, malformati o senza sub', () => {
+      expect(session.tokenUserId('')).toBeNull();
+      expect(session.tokenUserId(undefined)).toBeNull();
+      expect(session.tokenUserId('non-un-jwt')).toBeNull();
+      expect(session.tokenUserId(jwt({ role: 'Admin' }))).toBeNull();
+    });
+  });
+
+  describe('clearTenantData', () => {
+    it('svuota attivita- e company ma lascia l-utente a chi chiama', () => {
+      const userStore = loggedAs(1);
+
+      session.clearTenantData();
+
+      expect(useOrderStore().list).toEqual([]);
+      expect(useCompanyStore().list).toEqual([]);
+      expect(userStore.userId).toBe(1);
+    });
+  });
+
+  describe('belongsToAnotherUser', () => {
+    it('e- vero se il token rinnovato e- di un altro utente', () => {
+      loggedAs(1);
+      expect(session.belongsToAnotherUser(jwt({ sub: '70' }))).toBe(true);
+    });
+
+    it('e- falso per lo stesso utente, anche con company diversa', () => {
+      // company/select del super admin riemette il token con lo stesso sub.
+      loggedAs(69);
+      expect(session.belongsToAnotherUser(jwt({ sub: '69', company_id: 4 }))).toBe(false);
+    });
+
+    it('e- falso se la scheda non ha ancora un utente o il token e- illeggibile', () => {
+      expect(session.belongsToAnotherUser(jwt({ sub: '70' }))).toBe(false);
+      loggedAs(1);
+      expect(session.belongsToAnotherUser('')).toBe(false);
+    });
+  });
+
+  describe('handleSessionSwitch', () => {
+    it('toglie il token, svuota i dati, avvisa e ricarica', () => {
+      const userStore = loggedAs(1);
+
+      session.handleSessionSwitch();
+
+      expect(userStore.token).toBe('');
+      expect(useOrderStore().list).toEqual([]);
+      expect(useCompanyStore().list).toEqual([]);
+      expect(alert).toHaveBeenCalledTimes(1);
+      expect(session.reload).toHaveBeenCalledTimes(1);
+      expect(session.isSwitching()).toBe(true);
+    });
+
+    it('non azzera lo store utente persistito, che le altre schede leggerebbero come logout', () => {
+      const userStore = loggedAs(1);
+
+      session.handleSessionSwitch();
+
+      expect(userStore.userId).toBe(1);
+      expect(userStore.role).toBe('Admin');
+    });
+
+    it('parte una volta sola anche con piu- richieste in volo', () => {
+      loggedAs(1);
+
+      session.handleSessionSwitch();
+      session.handleSessionSwitch();
+
+      expect(alert).toHaveBeenCalledTimes(1);
+      expect(session.reload).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('onStorage', () => {
+    it('login di un altro utente in un-altra scheda', () => {
+      loggedAs(1);
+
+      session.onStorage(storageEvent(JSON.stringify({ role: 'Admin', userId: '70' })));
+
+      expect(session.reload).toHaveBeenCalledTimes(1);
+    });
+
+    it('logout in un-altra scheda', () => {
+      loggedAs(1);
+
+      session.onStorage(storageEvent(JSON.stringify({ role: '', userId: 0, company: null })));
+
+      expect(session.reload).toHaveBeenCalledTimes(1);
+    });
+
+    it('localStorage svuotato (key null) o valore illeggibile', () => {
+      loggedAs(1);
+      session.onStorage(storageEvent(null, null));
+      expect(session.reload).toHaveBeenCalledTimes(1);
+    });
+
+    it('valore non JSON vale come nessun utente', () => {
+      loggedAs(1);
+      session.onStorage(storageEvent('{rotto'));
+      expect(session.reload).toHaveBeenCalledTimes(1);
+    });
+
+    it('ignora lo stesso utente, per esempio il cambio company del super admin', () => {
+      loggedAs(69);
+
+      session.onStorage(storageEvent(JSON.stringify({ role: 'Super Admin', userId: 69, company: { id: 4 } })));
+
+      expect(session.reload).not.toHaveBeenCalled();
+    });
+
+    it('ignora altre chiavi e schede senza utente', () => {
+      session.onStorage(storageEvent(JSON.stringify({ userId: 70 })));
+      loggedAs(1);
+      session.onStorage(storageEvent('qualcosa', 'altro'));
+
+      expect(session.reload).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('watchOtherTabs', () => {
+    it('ascolta gli eventi storage e si puo- staccare', () => {
+      const target = new EventTarget();
+      loggedAs(1);
+
+      const stop = session.watchOtherTabs(target);
+      stop();
+      target.dispatchEvent(Object.assign(new Event('storage'), { key: 'user', newValue: '{"userId":70}' }));
+      expect(session.reload).not.toHaveBeenCalled();
+
+      session.watchOtherTabs(target);
+      target.dispatchEvent(Object.assign(new Event('storage'), { key: 'user', newValue: '{"userId":70}' }));
+      expect(session.reload).toHaveBeenCalledTimes(1);
+    });
+  });
+});
