@@ -34,9 +34,9 @@ describe('session', () => {
     vi.spyOn(session, 'reload').mockImplementation(() => {});
   });
 
-  const loggedAs = (userId) => {
+  const loggedAs = (userId, role = 'Admin') => {
     const userStore = useUserStore();
-    userStore.$patch({ role: 'Admin', userId, token: jwt({ sub: String(userId) }) });
+    userStore.$patch({ role, userId, token: jwt({ sub: String(userId) }) });
     useOrderStore().setList({ orders: [{ id: 1 }] });
     useCompanyStore().setList({ companies: [{ id: 1 }] });
     return userStore;
@@ -154,9 +154,25 @@ describe('session', () => {
     });
 
     it('ignora lo stesso utente, per esempio il cambio company del super admin', () => {
-      loggedAs(69);
+      loggedAs(69, 'Super Admin');
 
       session.onStorage(storageEvent(JSON.stringify({ role: 'Super Admin', userId: 69, company: { id: 4 } })));
+
+      expect(session.reload).not.toHaveBeenCalled();
+    });
+
+    it('stesso utente ma ruolo cambiato in un-altra scheda (utente promosso o ri-creato)', () => {
+      loggedAs(70);
+
+      session.onStorage(storageEvent(JSON.stringify({ role: 'Super Admin', userId: 70 })));
+
+      expect(session.reload).toHaveBeenCalledTimes(1);
+    });
+
+    it('stesso utente e stesso ruolo ma company diversa resta ignorato', () => {
+      loggedAs(70);
+
+      session.onStorage(storageEvent(JSON.stringify({ role: 'Admin', userId: 70, company: { id: 9 } })));
 
       expect(session.reload).not.toHaveBeenCalled();
     });

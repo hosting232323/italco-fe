@@ -55,27 +55,32 @@ const handleSessionSwitch = () => {
   switching = true;
   useUserStore().token = '';
   clearTenantData();
-  alert('In un\'altra scheda è stato effettuato l\'accesso con un altro utente o il logout: la pagina verrà ricaricata.');
+  alert('In un\'altra scheda la sessione è cambiata (nuovo accesso o logout): la pagina verrà ricaricata.');
   session.reload();
 };
 
 // Evento `storage`: arriva alle altre schede quando una scrive in localStorage,
-// cioe' subito dopo un login o un logout, senza aspettare il refresh.
+// cioe' subito dopo un login o un logout, senza aspettare il refresh. Si
+// confrontano identita' e ruolo: a parita' di userId un ruolo diverso (utente
+// ri-creato o promosso, re-login con permessi cambiati) va allineato lo stesso,
+// perche' il refresh riconoscerebbe lo stesso `sub` e terrebbe il ruolo vecchio.
 const onStorage = (event) => {
   if (event.key !== USER_STORAGE_KEY && event.key !== null)
     return;
 
-  const { userId } = useUserStore();
+  const { userId, role } = useUserStore();
   if (!hasUser(userId))
     return;
 
-  let storedUserId;
+  let stored;
   try {
-    storedUserId = JSON.parse(event.newValue)?.userId ?? 0;
+    stored = JSON.parse(event.newValue) ?? {};
   } catch {
-    storedUserId = 0;
+    stored = {};
   }
-  if (String(storedUserId) !== String(userId))
+  const sameUser = String(stored.userId ?? 0) === String(userId);
+  const sameRole = String(stored.role ?? '') === String(role);
+  if (!sameUser || !sameRole)
     handleSessionSwitch();
 };
 
