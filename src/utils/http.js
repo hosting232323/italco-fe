@@ -1,7 +1,6 @@
 import { storeToRefs } from 'pinia';
 import { createHttpClient } from 'generic-module';
 import router from '@/plugins/router';
-import logoutModule from '@/utils/logout';
 import session from '@/utils/session';
 import { useUserStore } from '@/stores/user';
 
@@ -32,12 +31,9 @@ const client = createHttpClient({
     getTokenRef().value = newToken;
   },
   onSessionExpired: (data) => {
-    // La richiesta ripetuta senza token fallisce: il logout qui revocherebbe
-    // la sessione, che e' quella valida dell'altra scheda.
-    if (session.isSwitching())
-      return;
-    alert(data.message);
-    logoutModule.logout(router);
+    // Chiusura locale: niente revoca sul server. Il cookie e' condiviso da tutte
+    // le schede e potrebbe gia' essere di una sessione aperta altrove.
+    session.expireLocally(data.message);
   }
 });
 

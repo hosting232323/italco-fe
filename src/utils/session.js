@@ -30,6 +30,16 @@ const tokenUserId = (token) => {
 
 const hasUser = (userId) => Boolean(userId) && String(userId) !== '0';
 
+// Utente che il browser considera attivo adesso: lo scrive l'ultima scheda che
+// ha fatto login o logout, e non e' detto che sia quello di questa scheda.
+const storedUser = (raw) => {
+  try {
+    return JSON.parse(raw ?? localStorage.getItem(USER_STORAGE_KEY)) ?? {};
+  } catch {
+    return {};
+  }
+};
+
 // Dati dell'attivita' e lista company del super admin. Lo store utente resta
 // fuori: chi chiama decide se azzerarlo (logout) o sovrascriverlo (login).
 const clearTenantData = () => {
@@ -43,20 +53,48 @@ const belongsToAnotherUser = (token) => {
   return hasUser(userId) && owner !== null && owner !== String(userId);
 };
 
-// La sessione del browser e' ormai quella di un altro utente: questa scheda non
-// deve piu' mandare niente. Lo store utente non si azzera con $reset perche' e'
-// persistito, e la scrittura in localStorage arriverebbe alle altre schede come
-// un logout, chiudendo anche la sessione valida. Si toglie il solo token (non
-// persistito), si svuotano i dati e si ricarica: al reload la scheda si allinea
-// all'utente attivo nel browser, o torna al login.
+// Azzera lo store utente solo se in localStorage non c'e' gia' l'utente di
+// un'altra scheda: quella scrittura arriverebbe la' come un logout e la
+// farebbe uscire a sua volta.
+const clearUserKeepingOtherTabs = () => {
+  const userStore = useUserStore();
+  const stored = storedUser();
+  if (!hasUser(stored.userId) || String(stored.userId) === String(userStore.userId))
+    userStore.$reset();
+  else
+    userStore.token = '';
+  clearTenantData();
+};
+
+// La sessione del browser e' ormai di un altro utente (o non c'e' piu').
+// Con un utente attivo si ricarica, cosi' la scheda riparte allineata a lui;
+// dopo un logout si va al login senza ricaricare, perche' una pagina protetta
+// senza sessione manderebbe richieste destinate a fallire, e ogni fallimento
+// chiuderebbe la sessione che intanto un'altra scheda puo' aver aperto.
 const handleSessionSwitch = () => {
   if (switching)
     return;
   switching = true;
-  useUserStore().token = '';
-  clearTenantData();
+  const stillLoggedIn = hasUser(storedUser().userId);
+  clearUserKeepingOtherTabs();
   alert('In un\'altra scheda la sessione è cambiata (nuovo accesso o logout): la pagina verrà ricaricata.');
-  session.reload();
+  if (stillLoggedIn)
+    session.reload();
+  else
+    session.goToLogin();
+};
+
+// Sessione non piu' valida per questa scheda. Niente revoca sul server: se il
+// refresh e' fallito il cookie e' gia' inservibile, e se nel frattempo e' di
+// un'altra scheda la revoca chiuderebbe la sessione sbagliata. Le richieste in
+// volo falliscono tutte insieme, ma l'utente vede un avviso solo.
+const expireLocally = (message) => {
+  if (switching)
+    return;
+  switching = true;
+  clearUserKeepingOtherTabs();
+  alert(message || 'Sessione scaduta');
+  session.goToLogin();
 };
 
 // Evento `storage`: arriva alle altre schede quando una scrive in localStorage,
@@ -72,12 +110,7 @@ const onStorage = (event) => {
   if (!hasUser(userId))
     return;
 
-  let stored;
-  try {
-    stored = JSON.parse(event.newValue) ?? {};
-  } catch {
-    stored = {};
-  }
+  const stored = storedUser(event.newValue);
   const sameUser = String(stored.userId ?? 0) === String(userId);
   const sameRole = String(stored.role ?? '') === String(role);
   if (!sameUser || !sameRole)
@@ -94,10 +127,12 @@ const session = {
   clearTenantData,
   belongsToAnotherUser,
   handleSessionSwitch,
+  expireLocally,
   isSwitching: () => switching,
   onStorage,
   watchOtherTabs,
-  reload: () => window.location.reload()
+  reload: () => window.location.reload(),
+  goToLogin: () => window.location.assign('/')
 };
 
 
