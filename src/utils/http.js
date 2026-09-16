@@ -21,6 +21,10 @@ const client = createHttpClient({
   refreshEndpoint: 'user/refresh',
   getToken: () => getTokenRef().value,
   setToken: (newToken) => {
+    // Durante un cambio sessione lo store utente non si tocca (vedi session.js):
+    // la richiesta ripetuta parte col token scaduto e il backend la rifiuta.
+    if (session.isSwitching())
+      return;
     // Il cookie di refresh e' del browser, non della scheda: dopo un login con
     // un altro utente altrove, il rinnovo restituisce il token di quell'utente
     // e il client ripeterebbe la richiesta a suo nome con i dati di questa pagina.

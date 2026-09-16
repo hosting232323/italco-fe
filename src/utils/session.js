@@ -53,16 +53,16 @@ const belongsToAnotherUser = (token) => {
   return hasUser(userId) && owner !== null && owner !== String(userId);
 };
 
-// Azzera lo store utente solo se in localStorage non c'e' gia' l'utente di
-// un'altra scheda: quella scrittura arriverebbe la' come un logout e la
-// farebbe uscire a sua volta.
+// Lo store utente e' persistito: ogni sua modifica, anche solo del token,
+// riscrive in localStorage ruolo e id di questa scheda. Se li' c'e' gia'
+// l'utente di un'altra scheda non va toccato, altrimenti quella riceverebbe
+// un utente vecchio (o un logout) e si allineerebbe a lui. Si azzera solo
+// quando in localStorage c'e' lo stesso utente o nessuno.
 const clearUserKeepingOtherTabs = () => {
   const userStore = useUserStore();
   const stored = storedUser();
   if (!hasUser(stored.userId) || String(stored.userId) === String(userStore.userId))
     userStore.$reset();
-  else
-    userStore.token = '';
   clearTenantData();
 };
 

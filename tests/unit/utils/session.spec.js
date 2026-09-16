@@ -112,12 +112,11 @@ describe('session', () => {
 
   describe('handleSessionSwitch', () => {
     it('con un altro utente attivo ricarica per allinearsi a lui', () => {
-      const userStore = loggedAs(1);
+      loggedAs(1);
       inAltraScheda({ role: 'Admin', userId: 70 });
 
       session.handleSessionSwitch();
 
-      expect(userStore.token).toBe('');
       expect(useOrderStore().list).toEqual([]);
       expect(useCompanyStore().list).toEqual([]);
       expect(alert).toHaveBeenCalledTimes(1);
@@ -126,14 +125,19 @@ describe('session', () => {
       expect(session.isSwitching()).toBe(true);
     });
 
-    it('non azzera lo store utente di un-altra scheda, che lo leggerebbe come logout', () => {
+    it('non modifica lo store utente se in localStorage c-e- un-altra scheda', () => {
+      // Qualunque mutazione, anche solo del token, riscriverebbe in localStorage
+      // l'utente di questa scheda e l'altra si allineerebbe a un utente vecchio
+      // (e2e: ping-pong di ricariche fra le due schede).
       const userStore = loggedAs(1);
       inAltraScheda({ role: 'Admin', userId: 70 });
+      const mutations = [];
+      userStore.$subscribe((mutation) => mutations.push(mutation), { flush: 'sync' });
 
       session.handleSessionSwitch();
 
+      expect(mutations).toEqual([]);
       expect(userStore.userId).toBe(1);
-      expect(userStore.role).toBe('Admin');
     });
 
     it('dopo un logout altrove va al login senza ricaricare', () => {
@@ -189,11 +193,12 @@ describe('session', () => {
     it('non tocca lo store utente se in localStorage c-e- gia- un-altra scheda', () => {
       const userStore = loggedAs(1);
       inAltraScheda({ role: 'Admin', userId: 70 });
+      const mutations = [];
+      userStore.$subscribe((mutation) => mutations.push(mutation), { flush: 'sync' });
 
       session.expireLocally('Sessione scaduta');
 
-      expect(userStore.userId).toBe(1);
-      expect(userStore.token).toBe('');
+      expect(mutations).toEqual([]);
       expect(useOrderStore().list).toEqual([]);
     });
 
