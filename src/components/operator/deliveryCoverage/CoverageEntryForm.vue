@@ -61,7 +61,7 @@
               type="time"
               label="Alle"
               :class="isMobile ? '' : 'ml-2'"
-              :rules="validation.futureTime(element.start_time)"
+              :rules="[...validation.futureTime(element.start_time), ...overlapRules]"
             />
           </v-col>
         </v-row>
@@ -87,7 +87,7 @@
 <script setup>
 import FormButtons from '@/components/FormButtons';
 
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import days from '@/utils/days';
 import mobile from '@/utils/mobile';
 import storesUtils from '@/utils/stores';
@@ -105,6 +105,34 @@ const { element, entryForm } = storeToRefs(store);
 
 const transportStore = useTransportStore();
 const transports = storesUtils.getStoreList(transportStore);
+
+const toMinutes = (time) => {
+  const [hours, minutes] = time.split(':').map(Number);
+  return hours * 60 + minutes;
+};
+
+// Stesso veicolo non può avere due fasce sovrapposte nello stesso giorno;
+// veicoli diversi possono invece coprire la stessa fascia (vedi anche il
+// controllo gemello lato backend in end_points/delivery_coverage.py).
+const overlapRules = computed(() => [
+  () => {
+    const { id, day_of_week, transport_id, start_time, end_time } = element.value;
+    if (day_of_week === undefined || day_of_week === null || !transport_id || !start_time || !end_time) return true;
+
+    const startMinutes = toMinutes(start_time);
+    const endMinutes = toMinutes(end_time);
+
+    const overlaps = store.entries.some((entry) => (
+      entry.id !== id &&
+      entry.transport_id === transport_id &&
+      entry.day_of_week === day_of_week &&
+      startMinutes < toMinutes(entry.end_time) &&
+      endMinutes > toMinutes(entry.start_time)
+    ));
+
+    return !overlaps || 'Il veicolo ha già una fascia sovrapposta in quel giorno';
+  }
+]);
 
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
