@@ -1,6 +1,5 @@
 import { useUserStore } from '@/stores/user';
-import { useCompanyStore } from '@/stores/company';
-import tenantStores from '@/utils/tenantStores';
+import session from '@/utils/session';
 
 
 // Revoca il refresh token lato server (il cookie viaggia con credentials).
@@ -41,10 +40,8 @@ const logout = async (router) => {
 
 const resetStores = () => {
   useUserStore().$reset();
-  // La lista delle company e' del super admin, non di un'attivita': sta fuori
-  // dagli store tenant ma al logout va via come tutto il resto.
-  useCompanyStore().$reset();
-  tenantStores.reset();
+  // Dati dell'attivita' e lista company del super admin, la stessa pulizia del login.
+  session.clearTenantData();
 };
 
 

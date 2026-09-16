@@ -16,6 +16,7 @@ import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import { AuthManager } from 'generic-module';
 import { useUserStore } from '@/stores/user';
+import session from '@/utils/session';
 
 const hostname = import.meta.env.VITE_HOSTNAME;
 
@@ -25,6 +26,11 @@ const userStore = useUserStore();
 const { role, userId, token, company } = storeToRefs(userStore);
 
 const goToDashboard = (data) => {
+  // Il logout svuota gia' gli store, ma non e' l'unica strada per arrivare qui
+  // (sessione caduta, scheda riaperta): chi entra non deve trovare in memoria
+  // i dati di un'altra attivita'.
+  session.clearTenantData();
+
   // Il gestionale web non ha più una dashboard Delivery: chi accede con
   // quel ruolo va mandato alla pagina di download dell'app.
   if (data.role === 'Delivery') {
