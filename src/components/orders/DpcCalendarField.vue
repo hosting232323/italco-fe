@@ -7,7 +7,7 @@
     hide-details="auto"
   >
     <div class="dpc-calendar-field">
-      <label class="dpc-calendar-label text-caption text-medium-emphasis">{{ label }}</label>
+      <label class="dpc-calendar-label text-body-1 text-medium-emphasis">{{ label }}</label>
       <div class="dpc-calendar mt-1">
         <div class="dpc-calendar-header">
           <v-btn
@@ -22,7 +22,7 @@
             icon="mdi-chevron-right"
             size="small"
             variant="text"
-            :disabled="disabled || !canGoNextMonth"
+            :disabled="disabled"
             @click="shiftMonth(1)"
           />
         </div>
@@ -172,12 +172,6 @@ const cells = computed(() => {
 });
 
 const canGoPrevMonth = computed(() => viewMonth.value > startOfMonth(new Date()));
-
-const canGoNextMonth = computed(() => {
-  const limit = startOfMonth(new Date());
-  limit.setMonth(limit.getMonth() + 2);
-  return viewMonth.value < limit;
-});
 
 // Finché esistono fasce per la data scelta, il campo non è "completo" senza
 // una fascia selezionata: la stringa vuota fa scattare la requiredRule già

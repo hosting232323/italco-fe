@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import DpcCalendarField from '@/components/orders/DpcCalendarField.vue';
 
@@ -18,6 +18,9 @@ const mountField = (props = {}) => mountComponent(DpcCalendarField, {
 });
 
 const dayButton = (wrapper, iso) => wrapper.find(`[data-date="${iso}"] button`);
+const prevBtn = (wrapper) => wrapper.findAll('.dpc-calendar-header button.v-btn')[0];
+const nextBtn = (wrapper) => wrapper.findAll('.dpc-calendar-header button.v-btn')[1];
+const monthLabel = (wrapper) => wrapper.find('.text-capitalize').text();
 
 
 describe('DpcCalendarField', () => {
@@ -77,5 +80,40 @@ describe('DpcCalendarField', () => {
     await wrapper.findComponent({ name: 'VChip' }).trigger('click');
 
     expect(wrapper.emitted('update:modelValue')).toBeUndefined();
+  });
+
+  describe('navigazione tra mesi', () => {
+    afterEach(() => vi.useRealTimers());
+
+    it('permette di avanzare oltre la finestra delle date ammesse senza bloccarsi', async () => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date(2026, 8, 16, 12));
+
+      const wrapper = mountField();
+
+      expect(monthLabel(wrapper)).toBe('settembre 2026');
+
+      for (const expected of ['ottobre 2026', 'novembre 2026', 'dicembre 2026', 'gennaio 2027']) {
+        expect(nextBtn(wrapper).attributes('disabled')).toBeUndefined();
+        await nextBtn(wrapper).trigger('click');
+        expect(monthLabel(wrapper)).toBe(expected);
+      }
+    });
+
+    it('non permette di tornare a un mese precedente a quello corrente', async () => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date(2026, 8, 16, 12));
+
+      const wrapper = mountField();
+
+      expect(prevBtn(wrapper).attributes('disabled')).toBeDefined();
+
+      await nextBtn(wrapper).trigger('click');
+      expect(prevBtn(wrapper).attributes('disabled')).toBeUndefined();
+
+      await prevBtn(wrapper).trigger('click');
+      expect(monthLabel(wrapper)).toBe('settembre 2026');
+      expect(prevBtn(wrapper).attributes('disabled')).toBeDefined();
+    });
   });
 });
