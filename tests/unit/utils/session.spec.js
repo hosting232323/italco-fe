@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createPinia, setActivePinia } from 'pinia';
 
 
@@ -29,6 +29,16 @@ describe('session', () => {
   let useUserStore;
   let useOrderStore;
   let useCompanyStore;
+
+  // Il primo import di session e store trasforma buona parte dell'app: con
+  // la suite intera su un solo worker superava il timeout degli hook. Si paga
+  // una volta qui, i reimport dopo resetModules restano veloci.
+  beforeAll(async () => {
+    await import('@/utils/session');
+    await import('@/stores/user');
+    await import('@/stores/order');
+    await import('@/stores/company');
+  }, 120_000);
 
   // Il modulo ricorda se il cambio sessione e' gia' partito: ogni test ne
   // importa una copia nuova, insieme agli store, sullo stesso pinia.
