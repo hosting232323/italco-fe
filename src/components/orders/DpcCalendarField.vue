@@ -7,7 +7,7 @@
     hide-details="auto"
   >
     <div class="dpc-calendar-field">
-      <label class="dpc-calendar-label text-body-1 text-medium-emphasis">{{ label }}</label>
+      <label class="dpc-calendar-label">{{ label }}</label>
       <div class="dpc-calendar mt-1">
         <div class="dpc-calendar-header">
           <v-btn
