@@ -88,8 +88,8 @@ const map = ref(null);
 const layers = ref([]);
 const loading = ref(false);
 
-// Zone reali dei CAP (Bari + BAT, le uniche coperte dall'attivita'): caricate una
-// volta sola e condivise tra tutti i mount del componente (calendario <-> mappa).
+// Zone reali dei CAP di tutta la Puglia: caricate una volta sola e condivise tra
+// tutti i mount del componente (calendario <-> mappa).
 let capZonesPromise = null;
 const loadCapZoneByCap = () => {
   if (!capZonesPromise) {
