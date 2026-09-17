@@ -317,13 +317,21 @@ watch(() => props.modelValue, (value) => {
 
 /* Piu' blocchi di copertura diversi possono coprire la stessa fascia oraria
    (veicoli diversi): il CAP sotto l'orario e' il dato che li distingue,
-   così la fascia ripetuta non sembra un bug agli occhi del cliente. */
+   così la fascia ripetuta non sembra un bug agli occhi del cliente.
+   Il chip di Vuetify ha un'altezza fissa per la size x-small: senza
+   sovrascriverla il secondo rigo (i CAP) trabocca fuori dallo sfondo. */
+.dpc-slot-chip {
+  height: auto !important;
+  min-height: 20px;
+  border-radius: 10px !important;
+}
+
 .dpc-slot-chip :deep(.v-chip__content) {
   display: flex;
   flex-direction: column;
   align-items: center;
   line-height: 1.15;
-  padding: 2px 0;
+  padding: 3px 0;
 }
 
 .dpc-slot-caps {
