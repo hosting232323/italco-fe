@@ -60,16 +60,22 @@
                 class="dpc-calendar-chips"
               >
                 <v-chip
-                  v-for="slot in cell.slots"
-                  :key="`${slot.start}-${slot.end}`"
+                  v-for="(slot, slotIndex) in cell.slots"
+                  :key="`${slot.start}-${slot.end}-${slotIndex}`"
                   size="x-small"
-                  class="mb-1"
+                  class="mb-1 dpc-slot-chip"
                   :variant="isSlotSelected(cell.iso, slot) ? 'flat' : 'outlined'"
                   :color="theme.current.value.primaryColor"
                   :disabled="disabled"
                   @click="selectSlot(cell.iso, slot)"
                 >
-                  {{ slot.start }}-{{ slot.end }}
+                  <span>{{ slot.start }}-{{ slot.end }}</span>
+                  <span
+                    v-if="slot.caps && slot.caps.length"
+                    class="dpc-slot-caps"
+                  >
+                    {{ slot.caps.join(', ') }}
+                  </span>
                 </v-chip>
               </div>
             </div>
@@ -307,5 +313,21 @@ watch(() => props.modelValue, (value) => {
   align-items: center;
   gap: 2px;
   margin-top: 2px;
+}
+
+/* Piu' blocchi di copertura diversi possono coprire la stessa fascia oraria
+   (veicoli diversi): il CAP sotto l'orario e' il dato che li distingue,
+   così la fascia ripetuta non sembra un bug agli occhi del cliente. */
+.dpc-slot-chip :deep(.v-chip__content) {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.15;
+  padding: 2px 0;
+}
+
+.dpc-slot-caps {
+  font-size: 0.6rem;
+  opacity: 0.75;
 }
 </style>
