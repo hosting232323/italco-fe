@@ -9,8 +9,9 @@
 
     <v-card-text>
       <p class="text-medium-emphasis text-caption mb-2">
-        I cerchi rappresentano il centro del CAP coperto, non il perimetro esatto della zona.
-        Passa il mouse su un cerchio per vedere i veicoli e le fasce orarie di quel giorno.
+        Le zone disegnate sono il confine reale del CAP quando disponibile (comuni con un solo CAP: confine ISTAT
+        esatto; città con più CAP: zone sub-comunali ricostruite, accuratezza ~97%). Per un CAP fuori dataset viene
+        mostrato un punto indicativo. Passa il mouse su una zona per vedere i veicoli e le fasce orarie di quel giorno.
       </p>
 
       <div class="day-picker mb-3">
@@ -36,7 +37,7 @@
         v-if="loading"
         class="text-caption text-medium-emphasis mt-2"
       >
-        Localizzazione dei CAP in corso...
+        Caricamento zone in corso...
       </div>
       <div
         v-else-if="dayEntries.length === 0"
@@ -44,6 +45,16 @@
       >
         Nessuna copertura per questo giorno.
       </div>
+
+      <p class="text-caption text-medium-emphasis mt-3 mb-0">
+        Confini CAP: dataset "Zone CAP Sub-comunali" di
+        <a
+          href="https://zornade.com/blog/cap-subcomunali-italia-v2-2026-catasto-download-dataset-gis/"
+          target="_blank"
+          rel="noopener"
+        >Zornade</a>
+        (Catasto + OpenStreetMap + dati comunali, open data).
+      </p>
     </v-card-text>
   </v-card>
 </template>
@@ -77,9 +88,25 @@ const map = ref(null);
 const layers = ref([]);
 const loading = ref(false);
 
-// Stessa istanza self-hosted usata per l'indirizzo ordini/borderò (src/utils/caps.py
-// lato BE, OverStreetMap.vue lato FE): un CAP -> centroide, cache in memoria per non
-// richiamarla ogni volta che si cambia giorno con gli stessi CAP già visti.
+// Zone reali dei CAP (Bari + BAT, le uniche coperte dall'attivita'): caricate una
+// volta sola e condivise tra tutti i mount del componente (calendario <-> mappa).
+let capZonesPromise = null;
+const loadCapZoneByCap = () => {
+  if (!capZonesPromise) {
+    capZonesPromise = fetch('/data/cap-zones-puglia.geojson')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        const byCap = {};
+        for (const feature of data?.features || []) byCap[feature.properties.cap] = feature;
+        return byCap;
+      })
+      .catch(() => ({}));
+  }
+  return capZonesPromise;
+};
+
+// Fallback quando il CAP non e' nel dataset locale (fuori Puglia/BAT): un punto
+// indicativo geocodificato via Nominatim self-hosted, come il resto dell'app.
 const geocodeCache = {};
 
 const searchNominatim = async (query) => {
@@ -111,6 +138,15 @@ const clearLayers = () => {
   layers.value = [];
 };
 
+const tooltipHtml = (cap, capEntries) => {
+  const details = capEntries
+    .slice()
+    .sort((a, b) => a.start_time.localeCompare(b.start_time))
+    .map((entry) => `<div>${coverage.formatSlot(entry)} &middot; ${transportLabel(entry.transport_id)}</div>`)
+    .join('');
+  return `<strong>CAP ${cap}</strong>${details}`;
+};
+
 let updateToken = 0;
 
 const updateMap = async () => {
@@ -118,9 +154,10 @@ const updateMap = async () => {
   const token = ++updateToken;
   loading.value = true;
 
-  // Un blocco copre più CAP e più CAP possono condividere lo stesso blocco: raggruppa
-  // per CAP così ogni zona ha un solo cerchio, con in tooltip tutti i blocchi che la coprono
-  // quel giorno (può essere più di uno, veicoli diversi sulla stessa fascia o fasce diverse).
+  // Un blocco copre piu' CAP e piu' CAP possono condividere lo stesso blocco: raggruppa
+  // per CAP cosi' ogni zona ha una sola forma, con in tooltip tutti i blocchi che la
+  // coprono quel giorno (puo' essere piu' di uno, veicoli diversi sulla stessa fascia o
+  // fasce diverse).
   const entriesByCap = {};
   for (const entry of dayEntries.value) {
     for (const cap of entry.caps || []) {
@@ -130,45 +167,51 @@ const updateMap = async () => {
   }
 
   const caps = Object.keys(entriesByCap);
-  const geocoded = await Promise.all(caps.map((cap) => geocodeCap(cap)));
+  const zoneByCap = await loadCapZoneByCap();
+  const missingCaps = caps.filter((cap) => !zoneByCap[cap]);
+  const geocodedMissing = await Promise.all(missingCaps.map((cap) => geocodeCap(cap)));
+  const geocodedByCap = {};
+  missingCaps.forEach((cap, i) => { geocodedByCap[cap] = geocodedMissing[i]; });
 
   if (token !== updateToken) return;
 
   clearLayers();
 
-  const points = [];
-  caps.forEach((cap, index) => {
-    const position = geocoded[index];
-    if (!position) return;
-
-    points.push(position);
+  const bounds = L.latLngBounds([]);
+  caps.forEach((cap) => {
     const capEntries = entriesByCap[cap];
     const opacity = Math.min(0.15 + capEntries.length * 0.12, 0.6);
-
-    const circle = L.circle([position.lat, position.lng], {
-      radius: 900,
+    const style = {
       color: theme.current.value.primaryColor,
       fillColor: theme.current.value.primaryColor,
       fillOpacity: opacity,
       weight: 2
-    }).addTo(map.value);
+    };
 
-    const detailsHtml = capEntries
-      .slice()
-      .sort((a, b) => a.start_time.localeCompare(b.start_time))
-      .map((entry) => `<div>${coverage.formatSlot(entry)} &middot; ${transportLabel(entry.transport_id)}</div>`)
-      .join('');
+    const zoneFeature = zoneByCap[cap];
+    let shape;
+    if (zoneFeature) {
+      shape = L.geoJSON(zoneFeature, { style });
+    } else {
+      const position = geocodedByCap[cap];
+      if (!position) return;
+      shape = L.circle([position.lat, position.lng], { ...style, radius: 900 });
+    }
+    shape.addTo(map.value);
+    bounds.extend(shape.getBounds());
 
-    circle.bindTooltip(
-      `<strong>CAP ${cap}</strong>${detailsHtml}`,
-      { sticky: true, direction: 'top' }
-    );
-
-    layers.value.push(circle);
+    // bindTooltip su un L.geoJSON (FeatureGroup) non si propaga in modo affidabile
+    // ai layer figli in tutte le versioni di Leaflet: lo lego a ciascun layer.
+    const tooltip = tooltipHtml(cap, capEntries);
+    const tooltipOptions = { sticky: true, direction: 'top' };
+    if (typeof shape.eachLayer === 'function')
+      shape.eachLayer((layer) => layer.bindTooltip(tooltip, tooltipOptions));
+    else
+      shape.bindTooltip(tooltip, tooltipOptions);
+    layers.value.push(shape);
   });
 
-  if (points.length)
-    map.value.fitBounds(L.latLngBounds(points.map((p) => [p.lat, p.lng])), { maxZoom: 12 });
+  if (bounds.isValid()) map.value.fitBounds(bounds, { maxZoom: 13 });
 
   loading.value = false;
 };
