@@ -12,7 +12,35 @@
       :color="theme.current.value.secondaryColor"
     />
     <template v-else>
-      <CoverageCalendar :entries="entries" />
+      <v-btn-toggle
+        v-model="viewMode"
+        class="mb-4"
+        color="primary"
+        mandatory
+        density="comfortable"
+      >
+        <v-btn value="calendar">
+          <v-icon start>
+            mdi-calendar
+          </v-icon>
+          Calendario
+        </v-btn>
+        <v-btn value="map">
+          <v-icon start>
+            mdi-map
+          </v-icon>
+          Mappa
+        </v-btn>
+      </v-btn-toggle>
+
+      <CoverageCalendar
+        v-if="viewMode === 'calendar'"
+        :entries="entries"
+      />
+      <CoverageMap
+        v-else
+        :entries="entries"
+      />
 
       <h1 class="mt-8">
         Blocchi di copertura
@@ -38,12 +66,15 @@
 import CoverageCalendar from '@/components/operator/deliveryCoverage/CoverageCalendar';
 import CoverageEntryForm from '@/components/operator/deliveryCoverage/CoverageEntryForm';
 import CoverageEntryTable from '@/components/operator/deliveryCoverage/CoverageEntryTable';
+import CoverageMap from '@/components/operator/deliveryCoverage/CoverageMap';
 
+import { ref } from 'vue';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { useDeliveryCoverageStore } from '@/stores/deliveryCoverage';
 
 const theme = useTheme();
+const viewMode = ref('calendar');
 
 const store = useDeliveryCoverageStore();
 const { ready, entries, element, entryForm } = storeToRefs(store);
