@@ -244,4 +244,10 @@ watch([dayEntries, () => props.entries], updateMap);
   display: flex;
   flex-wrap: wrap;
 }
+
+/* Leaflet rende le zone (path SVG) focusabili per accessibilita': un click
+   attiva il focus ring nero di default del browser sull'intero bounding box. */
+.coverage-map :deep(.leaflet-interactive:focus) {
+  outline: none;
+}
 </style>
