@@ -89,6 +89,10 @@ const coverageStore = useDeliveryCoverageStore();
 const weekDayOptions = days.weekDays;
 const selectedDay = ref(coverage.weekDayIndex(new Date()));
 
+// Arancione acceso, fisso (non da theme): deve restare ben visibile sia in tema
+// chiaro che scuro e distinguersi sempre dal colore primario usato per le zone CAP.
+const DRAWN_ZONE_COLOR = '#e65100';
+
 const mapContainer = ref(null);
 const map = ref(null);
 const layers = ref([]);
@@ -222,15 +226,17 @@ const updateMap = async () => {
   });
 
   // Blocchi disegnati sulla mappa: un poligono per entry (non raggruppati per CAP,
-  // perché non ne hanno).
+  // perché non ne hanno). Colore fisso e acceso (non theme.secondaryColor, troppo
+  // chiaro in questo tema e quasi invisibile) per distinguerli a colpo d'occhio
+  // dalle zone CAP.
   dayEntries.value
     .filter((entry) => (entry.polygon || []).length >= 3)
     .forEach((entry) => {
       const shape = L.polygon(entry.polygon, {
-        color: theme.current.value.secondaryColor,
-        fillColor: theme.current.value.secondaryColor,
+        color: DRAWN_ZONE_COLOR,
+        fillColor: DRAWN_ZONE_COLOR,
         fillOpacity: 0.35,
-        weight: 2
+        weight: 3
       });
       shape.addTo(map.value);
       bounds.extend(shape.getBounds());
@@ -262,7 +268,7 @@ onMounted(async () => {
   new L.Control.Draw({
     position: 'topright',
     draw: {
-      polygon: { allowIntersection: false, showArea: false, shapeOptions: { color: theme.current.value.secondaryColor } },
+      polygon: { allowIntersection: false, showArea: false, shapeOptions: { color: DRAWN_ZONE_COLOR } },
       polyline: false,
       rectangle: false,
       circle: false,
