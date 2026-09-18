@@ -65,7 +65,21 @@
             />
           </v-col>
         </v-row>
+        <v-alert
+          v-if="element.polygon"
+          type="info"
+          variant="tonal"
+          density="comfortable"
+          class="mb-4"
+        >
+          Zona disegnata sulla mappa ({{ element.polygon.length }} vertici), nessun CAP da selezionare.
+          <a
+            href="#"
+            @click.prevent="element.polygon = null"
+          >Torna alla selezione per CAP</a>
+        </v-alert>
         <v-combobox
+          v-else
           v-model="element.caps"
           label="CAP coperti"
           multiple

@@ -12,6 +12,8 @@
         Le zone disegnate sono il confine reale del CAP quando disponibile (comuni con un solo CAP: confine ISTAT
         esatto; città con più CAP: zone sub-comunali ricostruite, accuratezza ~97%). Per un CAP fuori dataset viene
         mostrato un punto indicativo. Passa il mouse su una zona per vedere i veicoli e le fasce orarie di quel giorno.
+        Usa lo strumento poligono in alto a destra sulla mappa per disegnare un nuovo blocco di copertura per zona
+        invece che per CAP.
       </p>
 
       <div class="day-picker mb-3">
@@ -62,12 +64,15 @@
 <script setup>
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import 'leaflet-draw';
+import 'leaflet-draw/dist/leaflet.draw.css';
 import { computed, nextTick, onMounted, ref, watch } from 'vue';
 import { useTheme } from 'vuetify';
 import days from '@/utils/days';
 import coverage from '@/utils/coverage';
 import storesUtils from '@/utils/stores';
 import { useTransportStore } from '@/stores/transport';
+import { useDeliveryCoverageStore } from '@/stores/deliveryCoverage';
 
 const props = defineProps({
   entries: {
@@ -79,13 +84,19 @@ const props = defineProps({
 const theme = useTheme();
 const transportStore = useTransportStore();
 const transports = storesUtils.getStoreList(transportStore);
+const coverageStore = useDeliveryCoverageStore();
 
 const weekDayOptions = days.weekDays;
 const selectedDay = ref(coverage.weekDayIndex(new Date()));
 
+// Arancione acceso, fisso (non da theme): deve restare ben visibile sia in tema
+// chiaro che scuro e distinguersi sempre dal colore primario usato per le zone CAP.
+const DRAWN_ZONE_COLOR = '#e65100';
+
 const mapContainer = ref(null);
 const map = ref(null);
 const layers = ref([]);
+const drawnLayer = ref(null);
 const loading = ref(false);
 
 // Zone reali dei CAP di tutta la Puglia: caricate una volta sola e condivise tra
@@ -146,6 +157,9 @@ const tooltipHtml = (cap, capEntries) => {
     .join('');
   return `<strong>CAP ${cap}</strong>${details}`;
 };
+
+const polygonTooltipHtml = (entry) =>
+  `<strong>Zona disegnata</strong><div>${coverage.formatSlot(entry)} &middot; ${transportLabel(entry.transport_id)}</div>`;
 
 let updateToken = 0;
 
@@ -211,6 +225,25 @@ const updateMap = async () => {
     layers.value.push(shape);
   });
 
+  // Blocchi disegnati sulla mappa: un poligono per entry (non raggruppati per CAP,
+  // perché non ne hanno). Colore fisso e acceso (non theme.secondaryColor, troppo
+  // chiaro in questo tema e quasi invisibile) per distinguerli a colpo d'occhio
+  // dalle zone CAP.
+  dayEntries.value
+    .filter((entry) => (entry.polygon || []).length >= 3)
+    .forEach((entry) => {
+      const shape = L.polygon(entry.polygon, {
+        color: DRAWN_ZONE_COLOR,
+        fillColor: DRAWN_ZONE_COLOR,
+        fillOpacity: 0.35,
+        weight: 3
+      });
+      shape.addTo(map.value);
+      bounds.extend(shape.getBounds());
+      shape.bindTooltip(polygonTooltipHtml(entry), { sticky: true, direction: 'top' });
+      layers.value.push(shape);
+    });
+
   if (bounds.isValid()) map.value.fitBounds(bounds, { maxZoom: 13 });
 
   loading.value = false;
@@ -226,8 +259,44 @@ onMounted(async () => {
 
   L.control.zoom({ position: 'bottomleft' }).addTo(map.value);
 
+  // Strumento di disegno per creare un blocco di copertura per zona invece che per
+  // CAP: un solo poligono alla volta, sostituito dal form appena disegnato (non
+  // resta come layer permanente, torna a farne parte l'entry salvata dal backend).
+  drawnLayer.value = new L.FeatureGroup();
+  map.value.addLayer(drawnLayer.value);
+
+  new L.Control.Draw({
+    position: 'topright',
+    draw: {
+      polygon: { allowIntersection: false, showArea: false, shapeOptions: { color: DRAWN_ZONE_COLOR } },
+      polyline: false,
+      rectangle: false,
+      circle: false,
+      circlemarker: false,
+      marker: false
+    },
+    edit: false
+  }).addTo(map.value);
+
+  map.value.on(L.Draw.Event.CREATED, (event) => {
+    drawnLayer.value.clearLayers();
+    drawnLayer.value.addLayer(event.layer);
+    const polygon = event.layer.getLatLngs()[0].map((point) => [point.lat, point.lng]);
+    coverageStore.element = { caps: [], polygon };
+    coverageStore.entryForm = true;
+  });
+
   updateMap();
 });
+
+// La zona appena disegnata resta visibile mentre il form è aperto (anteprima), e
+// sparisce alla chiusura: se è stata salvata, updateMap la ridisegna dai dati veri.
+watch(
+  () => coverageStore.entryForm,
+  (open) => {
+    if (!open) drawnLayer.value?.clearLayers();
+  }
+);
 
 watch([dayEntries, () => props.entries], updateMap);
 </script>
