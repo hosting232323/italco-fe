@@ -63,6 +63,15 @@
                   >
                     {{ cap }}
                   </v-chip>
+                  <v-chip
+                    v-if="entry.caps.length === 0 && entry.polygon"
+                    size="x-small"
+                    class="mr-1 mb-1"
+                    variant="outlined"
+                    prepend-icon="mdi-map-marker-radius"
+                  >
+                    Zona su mappa
+                  </v-chip>
                 </div>
               </div>
               <div
