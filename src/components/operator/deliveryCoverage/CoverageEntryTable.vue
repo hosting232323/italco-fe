@@ -24,6 +24,14 @@
       >
         {{ cap }}
       </v-chip>
+      <v-chip
+        v-if="item.caps.length === 0 && item.polygon"
+        size="small"
+        variant="outlined"
+        prepend-icon="mdi-map-marker-radius"
+      >
+        Zona su mappa
+      </v-chip>
     </template>
     <template #[`item.actions`]="{ item }">
       <v-btn
@@ -77,7 +85,8 @@ const editItem = (item) => {
     transport_id: item.transport_id,
     start_time: item.start_time.slice(0, 5),
     end_time: item.end_time.slice(0, 5),
-    caps: [...item.caps]
+    caps: [...item.caps],
+    polygon: item.polygon ? item.polygon.map((point) => [...point]) : null
   };
   entryForm.value = true;
 };

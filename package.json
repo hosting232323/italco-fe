@@ -19,6 +19,7 @@
     "express": "^5.2.1",
     "generic-module": "git+https://github.com/hosting232323/generic-module.git",
     "leaflet": "^1.9.4",
+    "leaflet-draw": "^1.0.4",
     "marked": "^17.0.3",
     "ol": "^10.8.0",
     "pinia": "^3.0.4",
