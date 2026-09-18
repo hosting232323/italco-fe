@@ -72,6 +72,45 @@ describe('DpcCalendarField', () => {
     expect(wrapper.emitted('update:slotEnd').at(-1)).toEqual(['12:00']);
   });
 
+  it('due fasce con lo stesso orario ma veicoli diversi: la selezione evidenzia solo quella cliccata', async () => {
+    const iso = todayIso();
+    const wrapper = mountField({
+      slots: {
+        [iso]: [
+          { start: '09:00', end: '11:30', caps: ['76011'] },
+          { start: '09:00', end: '11:30', caps: ['70056', '70122', '76011'] }
+        ]
+      }
+    });
+
+    await wrapper.findAllComponents({ name: 'VChip' })[1].trigger('click');
+
+    const chips = wrapper.findAllComponents({ name: 'VChip' });
+    expect(chips[0].props('variant')).toBe('outlined');
+    expect(chips[1].props('variant')).toBe('flat');
+  });
+
+  it('riassegnare al componente lo stesso orario appena emesso non fa tornare la selezione sulla prima fascia duplicata', async () => {
+    // Simula il round-trip col genitore: dopo l'emit, OrderDatesForm passa indietro
+    // slotStart/slotEnd come prop via v-model. Senza la guardia sull'indice già
+    // valido, il resync ricadrebbe sempre sulla prima fascia con lo stesso orario.
+    const iso = todayIso();
+    const slots = {
+      [iso]: [
+        { start: '09:00', end: '11:30', caps: ['76011'] },
+        { start: '09:00', end: '11:30', caps: ['70056', '70122', '76011'] }
+      ]
+    };
+    const wrapper = mountField({ slots });
+
+    await wrapper.findAllComponents({ name: 'VChip' })[1].trigger('click');
+    await wrapper.setProps({ slotStart: '09:00', slotEnd: '11:30' });
+
+    const chips = wrapper.findAllComponents({ name: 'VChip' });
+    expect(chips[0].props('variant')).toBe('outlined');
+    expect(chips[1].props('variant')).toBe('flat');
+  });
+
   it('da disabilitato non emette nulla al click', async () => {
     const iso = todayIso();
     const wrapper = mountField({ disabled: true, slots: { [iso]: [{ start: '08:00', end: '12:00' }] } });
