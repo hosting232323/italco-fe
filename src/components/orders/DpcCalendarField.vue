@@ -64,10 +64,10 @@
                   :key="`${slot.start}-${slot.end}-${slotIndex}`"
                   size="x-small"
                   class="mb-1 dpc-slot-chip"
-                  :variant="isSlotSelected(cell.iso, slot) ? 'flat' : 'outlined'"
+                  :variant="isSlotSelected(cell.iso, slotIndex) ? 'flat' : 'outlined'"
                   :color="theme.current.value.primaryColor"
                   :disabled="disabled"
-                  @click="selectSlot(cell.iso, slot)"
+                  @click="selectSlot(cell.iso, slot, slotIndex)"
                 >
                   <span>{{ slot.start }}-{{ slot.end }}</span>
                   <span
@@ -155,6 +155,21 @@ function weekDayIndex(date) {
 const selectedDate = ref(toISODate(props.modelValue));
 const viewMonth = ref(startOfMonth(selectedDate.value ? new Date(selectedDate.value) : new Date()));
 
+// Quale chip esatta è selezionata (indice nell'array del giorno), non solo l'orario:
+// più veicoli possono offrire la stessa identica fascia per lo stesso CAP (vedi
+// dpc-slot-caps), e in quel caso start/end da soli non bastano a distinguerle,
+// altrimenti cliccandone una si illuminerebbero entrambe. Calcolato da slotStart/
+// slotEnd solo quando arrivano da fuori (form pre-compilato in modifica): i click
+// dell'utente aggiornano l'indice direttamente via selectSlot, senza ripassare da qui.
+function resolveSlotIndex(iso, start, end) {
+  if (!iso || !start || !end) return null;
+  const daySlots = props.slots[iso] || [];
+  const index = daySlots.findIndex((slot) => slot.start === start && slot.end === end);
+  return index === -1 ? null : index;
+}
+
+const selectedSlotIndex = ref(resolveSlotIndex(selectedDate.value, props.slotStart, props.slotEnd));
+
 const monthLabel = computed(() =>
   viewMonth.value.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' })
 );
@@ -201,22 +216,24 @@ function selectDate(iso) {
   if (props.disabled || !isDateAllowed(iso)) return;
 
   selectedDate.value = iso;
+  selectedSlotIndex.value = null;
   emits('update:modelValue', iso);
   emits('update:slotStart', null);
   emits('update:slotEnd', null);
 }
 
-function selectSlot(iso, slot) {
+function selectSlot(iso, slot, slotIndex) {
   if (props.disabled || !isDateAllowed(iso)) return;
 
   selectedDate.value = iso;
+  selectedSlotIndex.value = slotIndex;
   emits('update:modelValue', iso);
   emits('update:slotStart', slot.start);
   emits('update:slotEnd', slot.end);
 }
 
-function isSlotSelected(iso, slot) {
-  return iso === selectedDate.value && slot.start === props.slotStart && slot.end === props.slotEnd;
+function isSlotSelected(iso, slotIndex) {
+  return iso === selectedDate.value && slotIndex === selectedSlotIndex.value;
 }
 
 watch(() => props.modelValue, (value) => {
@@ -224,6 +241,22 @@ watch(() => props.modelValue, (value) => {
   if (iso !== selectedDate.value) {
     selectedDate.value = iso;
     if (iso) viewMonth.value = startOfMonth(new Date(iso));
+    // La data è cambiata da fuori (form di modifica caricato con un altro ordine):
+    // l'indice della fascia selezionata va ricalcolato sul nuovo giorno. Un click
+    // dell'utente non passa da qui: selectSlot aggiorna già selectedDate insieme
+    // all'indice, quindi non c'è ambiguità tra le due fonti di cambiamento.
+    selectedSlotIndex.value = resolveSlotIndex(iso, props.slotStart, props.slotEnd);
+  }
+});
+
+// Le fasce arrivano async dal backend dopo il mount (check-constraints): se il
+// form si apre già con una fascia assegnata (modifica ordine) ma le fasce non
+// sono ancora arrivate, va risolto l'indice non appena arrivano. Non scatta sui
+// click dell'utente perché non dipende da selectedDate/slotStart/slotEnd, solo
+// da slots, e comunque non tocca un indice già risolto.
+watch(() => props.slots, () => {
+  if (selectedSlotIndex.value == null) {
+    selectedSlotIndex.value = resolveSlotIndex(selectedDate.value, props.slotStart, props.slotEnd);
   }
 });
 </script>
