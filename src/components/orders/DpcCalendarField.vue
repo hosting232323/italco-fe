@@ -60,22 +60,16 @@
                 class="dpc-calendar-chips"
               >
                 <v-chip
-                  v-for="(slot, slotIndex) in cell.slots"
-                  :key="`${slot.start}-${slot.end}-${slotIndex}`"
+                  v-for="slot in cell.slots"
+                  :key="`${slot.start}-${slot.end}`"
                   size="x-small"
-                  class="mb-1 dpc-slot-chip"
-                  :variant="isSlotSelected(cell.iso, slotIndex) ? 'flat' : 'outlined'"
+                  class="mb-1"
+                  :variant="isSlotSelected(cell.iso, slot) ? 'flat' : 'outlined'"
                   :color="theme.current.value.primaryColor"
                   :disabled="disabled"
-                  @click="selectSlot(cell.iso, slot, slotIndex)"
+                  @click="selectSlot(cell.iso, slot)"
                 >
-                  <span>{{ slot.start }}-{{ slot.end }}</span>
-                  <span
-                    v-if="slot.caps && slot.caps.length"
-                    class="dpc-slot-caps"
-                  >
-                    {{ slot.caps.join(', ') }}
-                  </span>
+                  {{ slot.start }}-{{ slot.end }}
                 </v-chip>
               </div>
             </div>
@@ -155,21 +149,6 @@ function weekDayIndex(date) {
 const selectedDate = ref(toISODate(props.modelValue));
 const viewMonth = ref(startOfMonth(selectedDate.value ? new Date(selectedDate.value) : new Date()));
 
-// Quale chip esatta è selezionata (indice nell'array del giorno), non solo l'orario:
-// più veicoli possono offrire la stessa identica fascia per lo stesso CAP (vedi
-// dpc-slot-caps), e in quel caso start/end da soli non bastano a distinguerle,
-// altrimenti cliccandone una si illuminerebbero entrambe. Calcolato da slotStart/
-// slotEnd solo quando arrivano da fuori (form pre-compilato in modifica): i click
-// dell'utente aggiornano l'indice direttamente via selectSlot, senza ripassare da qui.
-function resolveSlotIndex(iso, start, end) {
-  if (!iso || !start || !end) return null;
-  const daySlots = props.slots[iso] || [];
-  const index = daySlots.findIndex((slot) => slot.start === start && slot.end === end);
-  return index === -1 ? null : index;
-}
-
-const selectedSlotIndex = ref(resolveSlotIndex(selectedDate.value, props.slotStart, props.slotEnd));
-
 const monthLabel = computed(() =>
   viewMonth.value.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' })
 );
@@ -216,24 +195,22 @@ function selectDate(iso) {
   if (props.disabled || !isDateAllowed(iso)) return;
 
   selectedDate.value = iso;
-  selectedSlotIndex.value = null;
   emits('update:modelValue', iso);
   emits('update:slotStart', null);
   emits('update:slotEnd', null);
 }
 
-function selectSlot(iso, slot, slotIndex) {
+function selectSlot(iso, slot) {
   if (props.disabled || !isDateAllowed(iso)) return;
 
   selectedDate.value = iso;
-  selectedSlotIndex.value = slotIndex;
   emits('update:modelValue', iso);
   emits('update:slotStart', slot.start);
   emits('update:slotEnd', slot.end);
 }
 
-function isSlotSelected(iso, slotIndex) {
-  return iso === selectedDate.value && slotIndex === selectedSlotIndex.value;
+function isSlotSelected(iso, slot) {
+  return iso === selectedDate.value && slot.start === props.slotStart && slot.end === props.slotEnd;
 }
 
 watch(() => props.modelValue, (value) => {
@@ -241,22 +218,6 @@ watch(() => props.modelValue, (value) => {
   if (iso !== selectedDate.value) {
     selectedDate.value = iso;
     if (iso) viewMonth.value = startOfMonth(new Date(iso));
-    // La data è cambiata da fuori (form di modifica caricato con un altro ordine):
-    // l'indice della fascia selezionata va ricalcolato sul nuovo giorno. Un click
-    // dell'utente non passa da qui: selectSlot aggiorna già selectedDate insieme
-    // all'indice, quindi non c'è ambiguità tra le due fonti di cambiamento.
-    selectedSlotIndex.value = resolveSlotIndex(iso, props.slotStart, props.slotEnd);
-  }
-});
-
-// Le fasce arrivano async dal backend dopo il mount (check-constraints): se il
-// form si apre già con una fascia assegnata (modifica ordine) ma le fasce non
-// sono ancora arrivate, va risolto l'indice non appena arrivano. Non scatta sui
-// click dell'utente perché non dipende da selectedDate/slotStart/slotEnd, solo
-// da slots, e comunque non tocca un indice già risolto.
-watch(() => props.slots, () => {
-  if (selectedSlotIndex.value == null) {
-    selectedSlotIndex.value = resolveSlotIndex(selectedDate.value, props.slotStart, props.slotEnd);
   }
 });
 </script>
@@ -346,29 +307,5 @@ watch(() => props.slots, () => {
   align-items: center;
   gap: 2px;
   margin-top: 2px;
-}
-
-/* Piu' blocchi di copertura diversi possono coprire la stessa fascia oraria
-   (veicoli diversi): il CAP sotto l'orario e' il dato che li distingue,
-   così la fascia ripetuta non sembra un bug agli occhi del cliente.
-   Il chip di Vuetify ha un'altezza fissa per la size x-small: senza
-   sovrascriverla il secondo rigo (i CAP) trabocca fuori dallo sfondo. */
-.dpc-slot-chip {
-  height: auto !important;
-  min-height: 20px;
-  border-radius: 10px !important;
-}
-
-.dpc-slot-chip :deep(.v-chip__content) {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  line-height: 1.15;
-  padding: 3px 0;
-}
-
-.dpc-slot-caps {
-  font-size: 0.6rem;
-  opacity: 0.75;
 }
 </style>
