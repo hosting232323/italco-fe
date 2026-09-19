@@ -7,7 +7,7 @@
       v-model="selectedId"
       label="Punto Vendita"
       :items="users.filter(user => user.role == 'Customer')"
-      item-title="nickname"
+      :item-title="(user) => user.company_name || user.nickname"
       item-value="id"
       :rules="validation.requiredRules"
     />
@@ -40,7 +40,8 @@ const users = storesUtils.getStoreList(administrationUserStore);
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
 
+  const selectedUser = users.value.find(user => user.id == selectedId.value);
   order.value.user_id = selectedId.value;
-  emits('setSubtitle', `Punto Vendita: ${users.value.find(user => user.id == selectedId.value).nickname}`);
+  emits('setSubtitle', `Punto Vendita: ${selectedUser.company_name || selectedUser.nickname}`);
 };
 </script>

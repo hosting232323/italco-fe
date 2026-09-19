@@ -30,7 +30,7 @@
           { title: 'Prodotto', value: 'product', sortable: false },
           { title: 'Raggruppamento', value: 'product_group.group_code', sortable: false },
           { title: 'Destinatario', value: 'order.addressee', sortable: false },
-          { title: 'Punto Vendita', value: 'user.nickname', sortable: false },
+          { title: 'Punto Vendita', value: 'user.company_name', sortable: false },
           { title: 'Data DTR', value: 'dtr_date', sortable: false },
           { title: 'Data di emissione', value: 'emission_date', sortable: false },
           { title: 'Azioni', key: 'actions', sortable: false }
@@ -57,6 +57,9 @@
           <v-chip :color="orderUtils.RAE_STATUS.find(label => label.value == item.status).color">
             {{ orderUtils.RAE_STATUS.find(label => label.value == item.status).title }}
           </v-chip>
+        </template>
+        <template #[`item.user.company_name`]="{ item }">
+          {{ item.user?.company_name || item.user?.nickname || '' }}
         </template>
         <template #[`item.actions`]="{ item }">
           <v-btn
