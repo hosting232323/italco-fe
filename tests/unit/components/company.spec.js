@@ -212,4 +212,34 @@ describe('CompanyTable', () => {
     // Il form di modifica della company resta chiuso: sono due popup distinti.
     expect(companyStore.activeForm).toBe(false);
   });
+
+  it('mostra l-orario di attivita senza i secondi che arrivano dal backend', () => {
+    const pinia = createTestPinia();
+    const companyStore = useCompanyStore();
+    companyStore.ready = true;
+    companyStore.list = [
+      { id: 7, name: 'Con orario', rae: false, activity_start_time: '08:00:00', activity_end_time: '18:30:00' }
+    ];
+
+    const wrapper = mountComponent(CompanyTable, { pinia, router: createTestRouter() });
+
+    expect(wrapper.text()).toContain('08:00 - 18:30');
+  });
+
+  it('senza orario mostra un trattino', () => {
+    const pinia = createTestPinia();
+    const companyStore = useCompanyStore();
+    companyStore.ready = true;
+    companyStore.list = [
+      { id: 7, name: 'Senza orario', rae: false },
+      // Mezza finestra non e uno stato che il backend accetta, ma se arrivasse
+      // non si mostra un intervallo monco.
+      { id: 8, name: 'Mezza finestra', rae: false, activity_start_time: '08:00:00' }
+    ];
+
+    const wrapper = mountComponent(CompanyTable, { pinia, router: createTestRouter() });
+
+    expect(wrapper.findAll('tbody tr')).toHaveLength(2);
+    expect(wrapper.text()).not.toContain('08:00');
+  });
 });
