@@ -64,7 +64,6 @@
       <SchedulationProposals
         :suggestions="suggestions"
         :new-suggestion-orders="newSuggestionOrders"
-        :available-delivery-users="availableDeliveryUsers"
         :available-transports="availableTransports"
         @update:new-suggestion-orders="newSuggestionOrders = $event"
         @create-suggestion="createSuggestionFromDroppedOrder"
@@ -105,7 +104,6 @@ const suggestions = ref([]);
 const minSizeGroup = ref(9);
 const maxSizeGroup = ref(12);
 const maxDistanceKm = ref(50);
-const deliveryUsers = ref([]);
 const newSuggestionOrders = ref([]);
 const isMobile = mobile.setupMobileUtils();
 const emits = defineEmits(['cancel', 'goToSheduleForm', 'order-form']);
@@ -213,7 +211,6 @@ const syncSuggestionsAfterOrderMove = () => {
 
 const createSuggestion = (orders = []) => {
   const suggestion = {
-    delivery_users: [],
     transports: [],
     schedule_items: [],
     orders: orders.map((order) => normalizeScheduleItem(order, 'Order')),
@@ -275,16 +272,6 @@ const openSchedule = (suggestion) => {
   schedule.value.transport_id = transport?.id ?? null;
   emits('goToSheduleForm');
 };
-
-const availableDeliveryUsers = computed(() => {
-  const assignedIds = new Set(
-    suggestions.value.flatMap(
-      (suggestion) => suggestion.delivery_users?.map((user) => user.id) ?? [],
-    ),
-  );
-
-  return deliveryUsers.value.filter((user) => !assignedIds.has(user.id));
-});
 
 const availableTransports = computed(() => {
   const assignedIds = new Set(

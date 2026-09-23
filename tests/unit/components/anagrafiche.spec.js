@@ -51,7 +51,7 @@ const tables = [
     name: 'TransportTable',
     component: TransportTable,
     useStore: useTransportStore,
-    items: [{ id: 1, name: 'Furgone', plate: 'AA111BB', cap: '70020' }]
+    items: [{ id: 1, name: 'Furgone', plate: 'AA111BB', address: 'Via Deposito 1, Bisceglie', cap: '70020' }]
   },
   {
     name: 'CarrierTable',
@@ -90,7 +90,7 @@ const forms = [
     name: 'TransportForm',
     component: TransportForm,
     useStore: useTransportStore,
-    validElement: { name: 'Furgone', plate: 'AA111BB' },
+    validElement: { name: 'Furgone', plate: 'AA111BB', address: 'Via Deposito 1, Bisceglie', cap: '70020' },
     createTitle: 'Crea Veicolo',
     updateTitle: 'Modifica Veicolo 7'
   },
