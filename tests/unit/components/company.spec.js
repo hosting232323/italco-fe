@@ -84,6 +84,62 @@ describe('CompanyForm', () => {
     expect(options.files).toHaveProperty('logo');
   });
 
+  it('manda gli orari di inizio e fine attivita', async () => {
+    const pinia = createTestPinia();
+    const store = useCompanyStore();
+    store.activeForm = true;
+    store.element = {
+      id: 7,
+      name: 'Attivita',
+      rae: false,
+      activity_start_time: '08:00',
+      activity_end_time: '18:30',
+      ...LEGAL
+    };
+    const wrapper = mountComponent(CompanyForm, { pinia });
+
+    await wrapper.find('form').trigger('submit');
+    await flushPromises();
+
+    const [, , options] = http.uploadRequest.mock.calls.at(-1);
+    expect(options.body).toMatchObject({ activity_start_time: '08:00', activity_end_time: '18:30' });
+  });
+
+  it('manda orari nulli quando non sono compilati', async () => {
+    const pinia = createTestPinia();
+    const store = useCompanyStore();
+    store.activeForm = true;
+    store.element = { id: 7, name: 'Attivita', rae: false, ...LEGAL };
+    const wrapper = mountComponent(CompanyForm, { pinia });
+
+    await wrapper.find('form').trigger('submit');
+    await flushPromises();
+
+    const [, , options] = http.uploadRequest.mock.calls.at(-1);
+    expect(options.body.activity_start_time).toBeNull();
+    expect(options.body.activity_end_time).toBeNull();
+  });
+
+  it('con un orario di inizio pretende una fine successiva', async () => {
+    const pinia = createTestPinia();
+    const store = useCompanyStore();
+    store.activeForm = true;
+    store.element = {
+      id: 7,
+      name: 'Attivita',
+      rae: false,
+      activity_start_time: '18:00',
+      activity_end_time: '08:00',
+      ...LEGAL
+    };
+    const wrapper = mountComponent(CompanyForm, { pinia });
+
+    await wrapper.find('form').trigger('submit');
+    await flushPromises();
+
+    expect(http.uploadRequest).not.toHaveBeenCalled();
+  });
+
   it('blocca la submit se mancano i dati legali obbligatori', async () => {
     const pinia = createTestPinia();
     const store = useCompanyStore();
