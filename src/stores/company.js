@@ -28,6 +28,15 @@ export const useCompanyStore = defineStore('company', {
         city: this.element.city,
       };
     },
+    // Orario di apertura e chiusura dell'attività: facoltativi, ma o entrambi
+    // o nessuno (lo controlla il backend). Si mandano sempre, così svuotarli
+    // dal form li svuota anche a DB.
+    activityHoursBody() {
+      return {
+        activity_start_time: this.element.activity_start_time || null,
+        activity_end_time: this.element.activity_end_time || null,
+      };
+    },
     createElement(func) {
       // uploadRequest anche senza logo: il backend legge sempre il body dal
       // campo 'data' del FormData, e il file (se scelto) viaggia a parte.
@@ -42,6 +51,7 @@ export const useCompanyStore = defineStore('company', {
             admin_nickname: this.element.adminNickname,
             admin_password: this.element.adminPassword,
             ...this.legalBody(),
+            ...this.activityHoursBody(),
           },
           files: { logo: this.element.logo },
           extensions: fileUtils.imageExtensions,
@@ -59,6 +69,7 @@ export const useCompanyStore = defineStore('company', {
             rae: this.element.rae || false,
             automatic_planning: this.element.automatic_planning || false,
             ...this.legalBody(),
+            ...this.activityHoursBody(),
           },
           files: { logo: this.element.logo },
           extensions: fileUtils.imageExtensions,

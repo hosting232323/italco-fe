@@ -33,11 +33,35 @@
             />
           </v-col>
         </v-row>
-        <v-autocomplete
-          v-model="transport.cap"
-          label="Località"
-          :items="addressUtils.getCapItems()"
-        />
+        <!-- La località del veicolo è un indirizzo vero, con lo stesso
+        autocomplete degli altri indirizzi: il cap lo ricava da lì. -->
+        <v-row no-gutters>
+          <v-col
+            cols="12"
+            md="6"
+          >
+            <AddressAutocomplete
+              v-model="transport.address"
+              :api-key="GOOGLE_API_KEY"
+              :formatted="true"
+              :custom-class="isMobile ? '' : 'mr-2'"
+              label="Indirizzo"
+              :rules="validation.requiredRules"
+              @address-components="handleAddressComponents"
+            />
+          </v-col>
+          <v-col
+            cols="12"
+            md="6"
+          >
+            <v-text-field
+              v-model="transport.cap"
+              :class="isMobile ? '' : 'ml-2'"
+              label="Cap"
+              :rules="validation.capRules"
+            />
+          </v-col>
+        </v-row>
         <v-autocomplete
           v-model="selectedUserIds"
           label="Utenti Delivery"
@@ -59,11 +83,12 @@
 
 <script setup>
 import FormButtons from '@/components/FormButtons';
+import { AddressAutocomplete } from 'generic-module';
+import { GOOGLE_API_KEY } from '@/utils/googleMaps';
 
 import { ref, computed, watch } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
-import addressUtils from '@/utils/address';
 import storesUtils from '@/utils/stores';
 import validation from '@/utils/validation';
 import { useTransportStore } from '@/stores/transport';
@@ -91,6 +116,11 @@ const selectableUsers = computed(() => deliveryUsers.value.filter(
 watch(activeForm, (open) => {
   if (open) selectedUserIds.value = [...(transport.value.user_ids || [])];
 }, { immediate: true });
+
+const handleAddressComponents = (components) => {
+  transport.value.address = components.address;
+  transport.value.cap = components.cap;
+};
 
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
