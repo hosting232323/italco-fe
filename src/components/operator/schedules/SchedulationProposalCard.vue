@@ -36,26 +36,8 @@
           @change="emits('orders-changed')"
           @order-form="emits('order-form')"
         />
-        <v-divider />
-        <p class="ml-4 mt-4">
-          Utenti Delivery:
-        </p>
-        <draggable
-          v-model="deliveryUsers"
-          :group="{ name: 'users', pull: false, put: 'users' }"
-          item-key="id"
-          class="draggable-area ml-3 mr-3"
-        >
-          <template #item="{ element }">
-            <v-chip
-              :text="element.nickname"
-              closable
-              class="draggable-chip mr-2 mt-2"
-              @click:close="removeUser(element.id)"
-            />
-          </template>
-        </draggable>
         <v-divider class="mt-4 mb-4" />
+        <!-- Solo il veicolo: gli utenti delivery li porta lui. -->
         <p class="ml-4 mt-4">
           Veicolo:
         </p>
@@ -73,7 +55,7 @@
         >
           <template #item="{ element }">
             <v-chip
-              :text="element.name"
+              :text="transportLabel(element)"
               closable
               class="draggable-chip mr-2 mt-2"
               @click:close="clearTransports"
@@ -111,11 +93,6 @@ const orders = computed({
   set: (value) => emits('update:suggestion', { ...props.suggestion, orders: value })
 });
 
-const deliveryUsers = computed({
-  get: () => props.suggestion.delivery_users,
-  set: (value) => emits('update:suggestion', { ...props.suggestion, delivery_users: value })
-});
-
 const transports = computed({
   get: () => props.suggestion.transports,
   set: (value) => emits('update:suggestion', { ...props.suggestion, transports: value })
@@ -125,8 +102,11 @@ const getScheduleItemsByType = (operationType) => {
   return props.suggestion.schedule_items?.filter(item => item.operation_type === operationType) ?? [];
 };
 
-const removeUser = (userId) => {
-  deliveryUsers.value = deliveryUsers.value.filter(user => user.id !== userId);
+// Sul chip del veicolo si leggono anche i suoi corrieri: sono loro a fare il
+// borderò proposto.
+const transportLabel = (transport) => {
+  const nicknames = (transport.delivery_users || []).map(user => user.nickname).join(', ');
+  return nicknames ? `${transport.name} (${nicknames})` : transport.name;
 };
 
 const clearTransports = () => {
