@@ -38,25 +38,6 @@
       </v-card>
     </v-col>
   </v-row>
-  <template v-if="availableDeliveryUsers.length > 0">
-    <h2 class="mt-5">
-      Utenti disponibili
-    </h2>
-    <draggable
-      :list="availableDeliveryUsers"
-      :group="{ name: 'users', pull: 'clone', put: false }"
-      :clone="cloneUser"
-      item-key="id"
-    >
-      <template #item="{ element }">
-        <v-chip
-          :text="element.nickname"
-          class="draggable-chip ma-1"
-          draggable
-        />
-      </template>
-    </draggable>
-  </template>
   <template v-if="availableTransports.length > 0">
     <h2 class="mt-5">
       Veicoli disponibili
@@ -69,7 +50,7 @@
     >
       <template #item="{ element }">
         <v-chip
-          :text="element.name"
+          :text="transportLabel(element)"
           class="draggable-chip ma-1"
           draggable
         />
@@ -94,10 +75,6 @@ const props = defineProps({
     type: Array,
     required: true
   },
-  availableDeliveryUsers: {
-    type: Array,
-    required: true
-  },
   availableTransports: {
     type: Array,
     required: true
@@ -117,12 +94,14 @@ const newSuggestionOrdersModel = computed({
   set: (value) => emits('update:newSuggestionOrders', value)
 });
 
-const cloneUser = (user) => {
-  return { ...user };
-};
-
 const cloneTransport = (transport) => {
   return { ...transport };
+};
+
+// Come sulla proposta: il veicolo si riconosce anche dai suoi corrieri.
+const transportLabel = (transport) => {
+  const nicknames = (transport.delivery_users || []).map(user => user.nickname).join(', ');
+  return nicknames ? `${transport.name} (${nicknames})` : transport.name;
 };
 </script>
 

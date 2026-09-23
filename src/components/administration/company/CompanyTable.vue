@@ -13,9 +13,13 @@
       { title: 'Nome', value: 'name', sortable: false },
       { title: 'Modulo RAEE', key: 'rae', sortable: false },
       { title: 'Pianificazione automatica', key: 'automatic_planning', sortable: false },
+      { title: 'Orario attività', key: 'activity_hours', sortable: false },
       { title: 'Azioni', key: 'actions', sortable: false }
     ]"
   >
+    <template #[`item.activity_hours`]="{ item }">
+      {{ activityHours(item) }}
+    </template>
     <template #[`item.rae`]="{ item }">
       <v-icon
         :icon="item.rae ? 'mdi-check-circle' : 'mdi-close-circle'"
@@ -83,6 +87,14 @@ const { company: activeCompany } = storeToRefs(useUserStore());
 const companies = storesUtils.getStoreList(companyStore);
 
 const disposalPlaceStore = useCompanyRaeDisposalPlaceStore();
+
+// Gli orari arrivano dal backend come HH:MM:SS: i secondi non dicono niente
+// a chi legge un orario di apertura, e senza i due estremi non c'è finestra
+// da mostrare (il backend li tiene sempre in coppia).
+const activityHours = (item) => {
+  if (!item.activity_start_time || !item.activity_end_time) return '-';
+  return `${item.activity_start_time.slice(0, 5)} - ${item.activity_end_time.slice(0, 5)}`;
+};
 
 const openForm = (item) => {
   company.value = { ...item };
