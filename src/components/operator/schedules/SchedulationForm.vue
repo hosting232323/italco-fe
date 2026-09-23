@@ -64,7 +64,6 @@
       <SchedulationProposals
         :suggestions="suggestions"
         :new-suggestion-orders="newSuggestionOrders"
-        :available-delivery-users="availableDeliveryUsers"
         :available-transports="availableTransports"
         @update:new-suggestion-orders="newSuggestionOrders = $event"
         @create-suggestion="createSuggestionFromDroppedOrder"
@@ -105,7 +104,6 @@ const suggestions = ref([]);
 const minSizeGroup = ref(9);
 const maxSizeGroup = ref(12);
 const maxDistanceKm = ref(50);
-const deliveryUsers = ref([]);
 const newSuggestionOrders = ref([]);
 const isMobile = mobile.setupMobileUtils();
 const emits = defineEmits(['cancel', 'goToSheduleForm', 'order-form']);
@@ -210,7 +208,6 @@ const syncSuggestionsAfterOrderMove = () => {
 
 const createSuggestion = (orders = []) => {
   const suggestion = {
-    delivery_users: [],
     transports: [],
     schedule_items: [],
     orders: orders.map((order) => normalizeScheduleItem(order, 'Order')),
@@ -251,7 +248,6 @@ const submitForm = async () => {
         suggestions.value = data.groups.map(normalizeSuggestion);
         newSuggestionOrders.value = [];
         transports.value = data.transports;
-        deliveryUsers.value = data.delivery_users;
       } else message.value = data.message;
     }
   );
@@ -260,23 +256,12 @@ const submitForm = async () => {
 const openSchedule = (suggestion) => {
   schedule.value.date = work_date.value;
   schedule.value.schedulation = true;
-  schedule.value.users = suggestion.delivery_users;
   schedule.value.schedule_items = suggestion.schedule_items;
   schedule.value.transport_id = suggestion.transports.length
     ? suggestion.transports[0].id
     : null;
   emits('goToSheduleForm');
 };
-
-const availableDeliveryUsers = computed(() => {
-  const assignedIds = new Set(
-    suggestions.value.flatMap(
-      (suggestion) => suggestion.delivery_users?.map((user) => user.id) ?? [],
-    ),
-  );
-
-  return deliveryUsers.value.filter((user) => !assignedIds.has(user.id));
-});
 
 const availableTransports = computed(() => {
   const assignedIds = new Set(
