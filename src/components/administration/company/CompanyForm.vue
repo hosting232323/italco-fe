@@ -107,6 +107,36 @@
           </v-col>
         </v-row>
 
+        <!-- Orario di attività: la finestra in cui l'attività lavora. -->
+        <v-divider class="my-4" />
+        <div class="text-subtitle-1 mb-2">
+          Orario di attività (opzionale)
+        </div>
+        <v-row no-gutters>
+          <v-col
+            cols="12"
+            md="6"
+            class="pr-md-2"
+          >
+            <v-text-field
+              v-model="company.activity_start_time"
+              label="Orario di inizio attività"
+              type="time"
+            />
+          </v-col>
+          <v-col
+            cols="12"
+            md="6"
+          >
+            <v-text-field
+              v-model="company.activity_end_time"
+              label="Orario di fine attività"
+              :rules="company.activity_start_time ? validation.futureTime(company.activity_start_time) : []"
+              type="time"
+            />
+          </v-col>
+        </v-row>
+
         <v-row no-gutters>
           <v-col
             cols="12"

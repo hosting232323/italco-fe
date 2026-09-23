@@ -11,20 +11,11 @@
     :headers="[
       { title: 'ID', value: 'id', sortable: false },
       { title: 'Nickname', value: 'nickname', sortable: false },
-      { title: 'Località', value: 'cap', sortable: false },
-      { title: 'Azioni', key: 'actions', sortable: false }
+      { title: 'Veicolo', value: 'transport', sortable: false }
     ]"
   >
-    <template #[`item.cap`]="{ item }">
-      {{ item.delivery_user_info ? addressUtils.getCityByCap(item.delivery_user_info.cap) : '' }}
-    </template>
-    <template #[`item.actions`]="{ item }">
-      <v-btn
-        icon="mdi-pencil"
-        variant="text"
-        :color="theme.current.value.primaryColor"
-        @click="openForm(item)"
-      />
+    <template #[`item.transport`]="{ item }">
+      {{ transportName(item) }}
     </template>
   </v-data-table>
 </template>
@@ -33,22 +24,22 @@
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import storesUtils from '@/utils/stores';
-import addressUtils from '@/utils/address';
+import { useTransportStore } from '@/stores/transport';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
 const theme = useTheme();
 
+const transportStore = useTransportStore();
 const administrationUserStore = useAdministrationUserStore();
-const { element: user, activeForm, ready } = storeToRefs(administrationUserStore);
+const { ready } = storeToRefs(administrationUserStore);
 const users = storesUtils.getStoreList(administrationUserStore);
+const transports = storesUtils.getStoreList(transportStore);
 
-const openForm = (item) => {
-  user.value = item;
-  activeForm.value = true;
-
-  document.getElementById('delivery-form')?.scrollIntoView({
-    behavior: 'smooth',
-    block: 'start'
-  });
+// L'utente delivery non ha più una località sua: la sua posizione di partenza
+// è quella del veicolo su cui sta, e il veicolo si assegna dal suo form.
+const transportName = (item) => {
+  const transportId = item.delivery_user_info?.transport_id;
+  if (!transportId) return '';
+  return transports.value.find(transport => transport.id == transportId)?.name || '';
 };
 </script>

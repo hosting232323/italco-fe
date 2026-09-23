@@ -12,13 +12,13 @@
       { title: 'ID', value: 'id', sortable: false },
       { title: 'Nome', value: 'name', sortable: false },
       { title: 'Targa', value: 'plate', sortable: false },
-      { title: 'Località', value: 'cap', sortable: false },
+      { title: 'Indirizzo', value: 'address', sortable: false },
       { title: 'Utenti Delivery', value: 'delivery_users', sortable: false },
       { title: 'Azioni', key: 'actions', sortable: false }
     ]"
   >
-    <template #[`item.cap`]="{ item }">
-      {{ addressUtils.getCityByCap(item.cap) }}
+    <template #[`item.address`]="{ item }">
+      {{ item.address }}{{ item.cap ? ` (${item.cap})` : '' }}
     </template>
     <template #[`item.delivery_users`]="{ item }">
       {{ (item.delivery_users || []).map(user => user.nickname).join(', ') }}
@@ -52,7 +52,6 @@ import { reactive } from 'vue';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import storesUtils from '@/utils/stores';
-import addressUtils from '@/utils/address';
 import { useTransportStore } from '@/stores/transport';
 
 const theme = useTheme();
