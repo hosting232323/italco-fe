@@ -13,7 +13,8 @@
         esatto; città con più CAP: zone sub-comunali ricostruite, accuratezza ~97%). Per un CAP fuori dataset viene
         mostrato un punto indicativo. Passa il mouse su una zona per vedere i veicoli e le fasce orarie di quel giorno.
         Usa lo strumento poligono in alto a destra sulla mappa per disegnare un nuovo blocco di copertura per zona
-        invece che per CAP.
+        invece che per CAP. I marker viola sono i punti di ritiro dei clienti della company, validi per tutti i
+        giorni.
       </p>
 
       <div class="day-picker mb-3">
@@ -73,6 +74,7 @@ import coverage from '@/utils/coverage';
 import storesUtils from '@/utils/stores';
 import { useTransportStore } from '@/stores/transport';
 import { useDeliveryCoverageStore } from '@/stores/deliveryCoverage';
+import { useCollectionPointStore } from '@/stores/collectionPoint';
 
 const props = defineProps({
   entries: {
@@ -85,6 +87,8 @@ const theme = useTheme();
 const transportStore = useTransportStore();
 const transports = storesUtils.getStoreList(transportStore);
 const coverageStore = useDeliveryCoverageStore();
+const collectionPointStore = useCollectionPointStore();
+const collectionPoints = storesUtils.getStoreList(collectionPointStore);
 
 const weekDayOptions = days.weekDays;
 const selectedDay = ref(coverage.weekDayIndex(new Date()));
@@ -92,6 +96,19 @@ const selectedDay = ref(coverage.weekDayIndex(new Date()));
 // Arancione acceso, fisso (non da theme): deve restare ben visibile sia in tema
 // chiaro che scuro e distinguersi sempre dal colore primario usato per le zone CAP.
 const DRAWN_ZONE_COLOR = '#e65100';
+
+// Viola fisso, distinto sia dall'arancione delle zone disegnate sia dal colore
+// primario delle zone CAP: i punti di ritiro non sono legati a un giorno, quindi
+// devono restare riconoscibili su qualunque combinazione di colori del tema.
+const COLLECTION_POINT_COLOR = '#6A1B9A';
+const collectionPointIcon = L.divIcon({
+  className: '',
+  html: `<div style="width:26px;height:26px;border-radius:50%;background:${COLLECTION_POINT_COLOR};` +
+    'color:white;border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.5);display:flex;' +
+    'align-items:center;justify-content:center;"><i class="mdi mdi-storefront" style="font-size:15px;"></i></div>',
+  iconSize: [26, 26],
+  iconAnchor: [13, 13]
+});
 
 const mapContainer = ref(null);
 const map = ref(null);
@@ -244,6 +261,23 @@ const updateMap = async () => {
       layers.value.push(shape);
     });
 
+  // Punti di ritiro/vendita dei clienti della company: marker fisso, non legato al
+  // giorno selezionato (a differenza delle zone sopra, un punto di ritiro vale per
+  // tutti i giorni). Chi non ha un indirizzo geocodificabile (lat/lon nulli, vedi
+  // format_collection_point lato backend) resta semplicemente senza marker.
+  collectionPoints.value
+    .filter((point) => point.lat != null && point.lon != null)
+    .forEach((point) => {
+      const marker = L.marker([point.lat, point.lon], { icon: collectionPointIcon });
+      marker.bindTooltip(`<strong>${point.name}</strong><div>${point.address}</div>`, {
+        sticky: true,
+        direction: 'top'
+      });
+      marker.addTo(map.value);
+      bounds.extend(marker.getLatLng());
+      layers.value.push(marker);
+    });
+
   if (bounds.isValid()) map.value.fitBounds(bounds, { maxZoom: 13 });
 
   loading.value = false;
@@ -298,7 +332,7 @@ watch(
   }
 );
 
-watch([dayEntries, () => props.entries], updateMap);
+watch([dayEntries, () => props.entries, collectionPoints], updateMap);
 </script>
 
 <style scoped>
