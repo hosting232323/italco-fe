@@ -90,7 +90,7 @@ describe('user store, stato persistito', () => {
 
     store.$patch({ role: 'Admin', userId: 7, token: 'jwt-nuovo' });
 
-    expect(salvato()).toEqual({ role: 'Admin', userId: 7, company: null });
+    expect(salvato()).toEqual({ role: 'Admin', userId: 7, company: null, automaticPlanning: true });
   });
 });
 
