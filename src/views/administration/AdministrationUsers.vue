@@ -33,7 +33,7 @@ const administrationUserStore = useAdministrationUserStore();
 const { activeForm: userForm, element: user } = storeToRefs(administrationUserStore);
 
 const openUserForm = () => {
-  user.value = {};
+  user.value = { automatic_planning: true };
   userForm.value = true;
 };
 </script>
