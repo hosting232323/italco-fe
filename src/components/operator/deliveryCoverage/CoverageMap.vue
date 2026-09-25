@@ -179,7 +179,6 @@ const polygonTooltipHtml = (entry) =>
   `<strong>Zona disegnata</strong><div>${coverage.formatSlot(entry)} &middot; ${transportLabel(entry.transport_id)}</div>`;
 
 let updateToken = 0;
-let initialBoundsApplied = false;
 let mapResizeObserver = null;
 
 const updateMap = async () => {
@@ -210,7 +209,6 @@ const updateMap = async () => {
 
   clearLayers();
 
-  const bounds = L.latLngBounds([]);
   caps.forEach((cap) => {
     const capEntries = entriesByCap[cap];
     const opacity = Math.min(0.15 + capEntries.length * 0.12, 0.6);
@@ -231,7 +229,6 @@ const updateMap = async () => {
       shape = L.circle([position.lat, position.lng], { ...style, radius: 900 });
     }
     shape.addTo(map.value);
-    bounds.extend(shape.getBounds());
 
     // bindTooltip su un L.geoJSON (FeatureGroup) non si propaga in modo affidabile
     // ai layer figli in tutte le versioni di Leaflet: lo lego a ciascun layer.
@@ -258,7 +255,6 @@ const updateMap = async () => {
         weight: 3
       });
       shape.addTo(map.value);
-      bounds.extend(shape.getBounds());
       shape.bindTooltip(polygonTooltipHtml(entry), { sticky: true, direction: 'top' });
       layers.value.push(shape);
     });
@@ -276,22 +272,16 @@ const updateMap = async () => {
         direction: 'top'
       });
       marker.addTo(map.value);
-      bounds.extend(marker.getLatLng());
       layers.value.push(marker);
     });
-
-  // Adatta l'inquadratura solo al primo caricamento: cambiare giorno aggiorna
-  // le zone, ma non deve annullare pan e zoom scelti dall'utente.
-  if (!initialBoundsApplied && bounds.isValid()) {
-    map.value.fitBounds(bounds, { maxZoom: 13 });
-    initialBoundsApplied = true;
-  }
 
   loading.value = false;
 };
 
 onMounted(async () => {
   await nextTick();
+  // Centro stabile in Puglia: l'inquadratura non dipende dal giorno selezionato
+  // o dalle geometrie caricate e resta sotto il controllo dell'utente.
   map.value = L.map(mapContainer.value, { zoomControl: false }).setView([41.1256, 16.8698], 9);
 
   // Il drawer laterale si espande al passaggio del mouse senza ridimensionare
