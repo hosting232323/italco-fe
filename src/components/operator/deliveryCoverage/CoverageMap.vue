@@ -282,7 +282,12 @@ onMounted(async () => {
   await nextTick();
   // Centro stabile in Puglia: l'inquadratura non dipende dal giorno selezionato
   // o dalle geometrie caricate e resta sotto il controllo dell'utente.
-  map.value = L.map(mapContainer.value, { zoomControl: false }).setView([41.1256, 16.8698], 9);
+  // Il cambio giornata sostituisce i layer; senza la transizione CSS di zoom
+  // evitiamo che Leaflet continui ad aggiornare marker gia' rimossi.
+  map.value = L.map(mapContainer.value, {
+    zoomControl: false,
+    zoomAnimation: false
+  }).setView([41.1256, 16.8698], 9);
 
   // Il drawer laterale si espande al passaggio del mouse senza ridimensionare
   // la finestra: Leaflet non intercetta quel cambio di larghezza da solo.
