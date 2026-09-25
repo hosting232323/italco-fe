@@ -19,18 +19,11 @@
             ref="form"
             @submit.prevent="submitForm"
           >
-            <v-autocomplete
-              :model-value="selectedTransportUserIds"
+            <v-text-field
+              :model-value="selectedTransportUsersLabel"
               label="Utenti del veicolo"
-              :items="selectedTransportUsers"
-              item-title="nickname"
-              item-value="id"
-              multiple
-              readonly
-              chips
-              :error-messages="error"
-              hint="Gli utenti sono associati al veicolo selezionato"
-              persistent-hint
+              disabled
+              hide-details
             />
             <v-row no-gutters>
               <v-col
@@ -156,7 +149,9 @@ const raeDisposalPlaces = storesUtils.getStoreList(raeDisposalPlaceStore);
 const selectedTransportUsers = computed(() =>
   transports.value.find(transport => transport.id == schedule.value.transport_id)?.delivery_users || []
 );
-const selectedTransportUserIds = computed(() => selectedTransportUsers.value.map(user => user.id));
+const selectedTransportUsersLabel = computed(() =>
+  selectedTransportUsers.value.map(user => user.nickname).join(', ') || 'Nessun utente associato'
+);
 
 // Il selettore del luogo di smaltimento compare solo se il borderò raccoglie
 // ordini con prodotti RAE: gli item ordine portano il marcatore rae_product
