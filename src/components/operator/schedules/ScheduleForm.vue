@@ -31,6 +31,7 @@
             <v-text-field
               :model-value="selectedTransportUsersLabel"
               label="Utenti del veicolo"
+              class="mb-5"
               disabled
               hide-details
             />
