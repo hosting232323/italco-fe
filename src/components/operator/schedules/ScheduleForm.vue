@@ -19,26 +19,18 @@
             ref="form"
             @submit.prevent="submitForm"
           >
-            <v-chip
-              v-for="user in schedule.users"
-              :key="user.id"
-              class="mr-2 mb-5"
-              append-icon="mdi-close-circle"
-              @click="removeUser(user.id)"
-            >
-              {{ user.nickname }}
-            </v-chip>
             <v-autocomplete
-              v-model="selectedUser"
-              label="Utenti"
-              :items="users.filter(
-                (u) => u.role === 'Delivery' && (!schedule.users || !schedule.users.some(su => su.nickname === u.nickname))
-              )"
+              :model-value="selectedTransportUserIds"
+              label="Utenti del veicolo"
+              :items="selectedTransportUsers"
               item-title="nickname"
-              append-icon="mdi-plus"
-              return-object
+              item-value="id"
+              multiple
+              readonly
+              chips
               :error-messages="error"
-              @click:append="addUser"
+              hint="Gli utenti sono associati al veicolo selezionato"
+              persistent-hint
             />
             <v-row no-gutters>
               <v-col
@@ -137,7 +129,6 @@ import { useScheduleStore } from '@/stores/schedule';
 import { useTransportStore } from '@/stores/transport';
 import { useRaeProductStore } from '@/stores/raeProduct';
 import { useRaeDisposalPlaceStore } from '@/stores/raeDisposalPlace';
-import { useAdministrationUserStore } from '@/stores/administrationUser';
 
 const { fromSchedulation } = defineProps({
   fromSchedulation: {
@@ -149,7 +140,6 @@ const { fromSchedulation } = defineProps({
 const form = ref(null);
 const error = ref(null);
 const loading = ref(false);
-const selectedUser = ref(null);
 const selectedOrderId = ref(null);
 const isMobile = mobile.setupMobileUtils();
 const emits = defineEmits(['cancel', 'go-back']);
@@ -159,12 +149,14 @@ const scheduleStore = useScheduleStore();
 const transportStore = useTransportStore();
 const raeProductStore = useRaeProductStore();
 const raeDisposalPlaceStore = useRaeDisposalPlaceStore();
-const administrationUserStore = useAdministrationUserStore();
 const { element: schedule } = storeToRefs(scheduleStore);
 const orders = storesUtils.getStoreList(orderStore);
 const transports = storesUtils.getStoreList(transportStore);
-const users = storesUtils.getStoreList(administrationUserStore);
 const raeDisposalPlaces = storesUtils.getStoreList(raeDisposalPlaceStore);
+const selectedTransportUsers = computed(() =>
+  transports.value.find(transport => transport.id == schedule.value.transport_id)?.delivery_users || []
+);
+const selectedTransportUserIds = computed(() => selectedTransportUsers.value.map(user => user.id));
 
 // Il selettore del luogo di smaltimento compare solo se il borderò raccoglie
 // ordini con prodotti RAE: gli item ordine portano il marcatore rae_product
@@ -181,24 +173,6 @@ watch([hasRaeOrders, raeDisposalPlaces], ([hasRae, places]) => {
   if (hasRae && places.length === 1)
     schedule.value.rae_disposal_place_id = places[0].id;
 }, { immediate: true });
-
-const addUser = () => {
-  if (!selectedUser.value) return;
-
-  if (!schedule.value.users)
-    schedule.value.users = [];
-  schedule.value.users.push(selectedUser.value);
-  selectedUser.value = null;
-};
-
-const removeUser = (userId) => {
-  schedule.value.users = schedule.value.users.filter(u => u.id !== userId);
-  if (schedule.value.id) {
-    if (!schedule.value.deleted_users)
-      schedule.value.deleted_users = [];
-    schedule.value.deleted_users.push(userId);
-  }
-};
 
 const addOrder = () => {
   const orderToAdd = orders.value.find(order => order.id === selectedOrderId.value);
@@ -224,8 +198,8 @@ const addOrder = () => {
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
 
-  if (!schedule.value.users || schedule.value.users.length == 0) {
-    error.value = 'Aggiungi prima l\'utente';
+  if (!selectedTransportUsers.value.length) {
+    error.value = 'Il veicolo selezionato non ha utenti delivery associati';
     return;
   }
 
@@ -268,7 +242,7 @@ watch(
   { deep: true }
 );
 
-watch(() => schedule.value.users, () => {
+watch(() => schedule.value.transport_id, () => {
   error.value = null;
 });
 </script>
