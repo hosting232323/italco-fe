@@ -147,12 +147,14 @@ const { element: schedule } = storeToRefs(scheduleStore);
 const orders = storesUtils.getStoreList(orderStore);
 const transports = storesUtils.getStoreList(transportStore);
 const raeDisposalPlaces = storesUtils.getStoreList(raeDisposalPlaceStore);
-const selectedTransportUsers = computed(() =>
-  transports.value.find(transport => transport.id == schedule.value.transport_id)?.delivery_users || []
+const selectedTransport = computed(() =>
+  transports.value.find(transport => transport.id == schedule.value.transport_id)
 );
-const selectedTransportUsersLabel = computed(() =>
-  selectedTransportUsers.value.map(user => user.nickname).join(', ') || 'Nessun utente associato'
-);
+const selectedTransportUsers = computed(() => selectedTransport.value?.delivery_users || []);
+const selectedTransportUsersLabel = computed(() => {
+  if (schedule.value.transport_id == null) return 'Nessun veicolo selezionato';
+  return selectedTransportUsers.value.map(user => user.nickname).join(', ') || 'Nessun utente associato';
+});
 
 // Il selettore del luogo di smaltimento compare solo se il borderò raccoglie
 // ordini con prodotti RAE: gli item ordine portano il marcatore rae_product
