@@ -116,6 +116,9 @@ const layers = ref([]);
 const collectionPointLayers = ref([]);
 const drawnLayer = ref(null);
 const loading = ref(false);
+let mapIsZooming = false;
+let mapIsMoving = false;
+const pendingLayerRenders = new Map();
 
 // Zone reali dei CAP di tutta la Puglia: caricate una volta sola e condivise tra
 // tutti i mount del componente (calendario <-> mappa).
@@ -162,9 +165,33 @@ const transportLabel = (transportId) => {
 
 const dayEntries = computed(() => coverage.entriesForWeekDay(selectedDay.value, props.entries));
 
+const closeLayerTooltips = (layer) => {
+  if (typeof layer.eachLayer === 'function') layer.eachLayer(closeLayerTooltips);
+  layer.closeTooltip?.();
+};
+
+const closeMapTooltips = () => {
+  layers.value.forEach(closeLayerTooltips);
+  collectionPointLayers.value.forEach(closeLayerTooltips);
+  if (drawnLayer.value) closeLayerTooltips(drawnLayer.value);
+};
+
+const flushPendingLayerRender = () => {
+  if (mapIsZooming || mapIsMoving || pendingLayerRenders.size === 0) return;
+  const renders = [...pendingLayerRenders.values()];
+  pendingLayerRenders.clear();
+  renders.forEach((render) => render());
+};
+
+const scheduleLayerRender = (key, render) => {
+  pendingLayerRenders.set(key, render);
+  flushPendingLayerRender();
+};
+
 const clearLayers = () => {
   const detachTooltips = (layer) => {
     if (typeof layer.eachLayer === 'function') layer.eachLayer(detachTooltips);
+    layer.closeTooltip?.();
     layer.unbindTooltip?.();
   };
 
@@ -177,6 +204,7 @@ const clearLayers = () => {
 
 const clearCollectionPointLayers = () => {
   collectionPointLayers.value.forEach((layer) => {
+    layer.closeTooltip?.();
     layer.unbindTooltip?.();
     map.value.removeLayer(layer);
   });
@@ -185,11 +213,13 @@ const clearCollectionPointLayers = () => {
 
 const updateCollectionPointLayers = () => {
   if (!map.value) return;
-  clearCollectionPointLayers();
+  const points = collectionPoints.value
+    .filter((point) => point.lat != null && point.lon != null);
+  scheduleLayerRender('collection-points', () => {
+    if (!map.value) return;
+    clearCollectionPointLayers();
 
-  collectionPoints.value
-    .filter((point) => point.lat != null && point.lon != null)
-    .forEach((point) => {
+    points.forEach((point) => {
       const marker = L.marker([point.lat, point.lon], { icon: collectionPointIcon });
       marker.bindTooltip(`<strong>${point.name}</strong><div>${point.address}</div>`, {
         sticky: true,
@@ -198,6 +228,7 @@ const updateCollectionPointLayers = () => {
       marker.addTo(map.value);
       collectionPointLayers.value.push(marker);
     });
+  });
 };
 
 const tooltipHtml = (cap, capEntries) => {
@@ -218,6 +249,7 @@ let mapResizeObserver = null;
 const updateMap = async () => {
   if (!map.value) return;
   const token = ++updateToken;
+  closeMapTooltips();
   loading.value = true;
 
   // Un blocco copre piu' CAP e piu' CAP possono condividere lo stesso blocco: raggruppa
@@ -241,59 +273,62 @@ const updateMap = async () => {
 
   if (token !== updateToken) return;
 
-  clearLayers();
+  scheduleLayerRender('coverage-zones', () => {
+    if (!map.value || token !== updateToken) return;
+    clearLayers();
 
-  caps.forEach((cap) => {
-    const capEntries = entriesByCap[cap];
-    const opacity = Math.min(0.15 + capEntries.length * 0.12, 0.6);
-    const style = {
-      color: theme.current.value.primaryColor,
-      fillColor: theme.current.value.primaryColor,
-      fillOpacity: opacity,
-      weight: 2
-    };
+    caps.forEach((cap) => {
+      const capEntries = entriesByCap[cap];
+      const opacity = Math.min(0.15 + capEntries.length * 0.12, 0.6);
+      const style = {
+        color: theme.current.value.primaryColor,
+        fillColor: theme.current.value.primaryColor,
+        fillOpacity: opacity,
+        weight: 2
+      };
 
-    const zoneFeature = zoneByCap[cap];
-    let shape;
-    if (zoneFeature) {
-      shape = L.geoJSON(zoneFeature, { style });
-    } else {
-      const position = geocodedByCap[cap];
-      if (!position) return;
-      shape = L.circle([position.lat, position.lng], { ...style, radius: 900 });
-    }
-    shape.addTo(map.value);
-
-    // bindTooltip su un L.geoJSON (FeatureGroup) non si propaga in modo affidabile
-    // ai layer figli in tutte le versioni di Leaflet: lo lego a ciascun layer.
-    const tooltip = tooltipHtml(cap, capEntries);
-    const tooltipOptions = { sticky: true, direction: 'top' };
-    if (typeof shape.eachLayer === 'function')
-      shape.eachLayer((layer) => layer.bindTooltip(tooltip, tooltipOptions));
-    else
-      shape.bindTooltip(tooltip, tooltipOptions);
-    layers.value.push(shape);
-  });
-
-  // Blocchi disegnati sulla mappa: un poligono per entry (non raggruppati per CAP,
-  // perché non ne hanno). Colore fisso e acceso (non theme.secondaryColor, troppo
-  // chiaro in questo tema e quasi invisibile) per distinguerli a colpo d'occhio
-  // dalle zone CAP.
-  dayEntries.value
-    .filter((entry) => (entry.polygon || []).length >= 3)
-    .forEach((entry) => {
-      const shape = L.polygon(entry.polygon, {
-        color: DRAWN_ZONE_COLOR,
-        fillColor: DRAWN_ZONE_COLOR,
-        fillOpacity: 0.35,
-        weight: 3
-      });
+      const zoneFeature = zoneByCap[cap];
+      let shape;
+      if (zoneFeature) {
+        shape = L.geoJSON(zoneFeature, { style });
+      } else {
+        const position = geocodedByCap[cap];
+        if (!position) return;
+        shape = L.circle([position.lat, position.lng], { ...style, radius: 900 });
+      }
       shape.addTo(map.value);
-      shape.bindTooltip(polygonTooltipHtml(entry), { sticky: true, direction: 'top' });
+
+      // bindTooltip su un L.geoJSON (FeatureGroup) non si propaga in modo affidabile
+      // ai layer figli in tutte le versioni di Leaflet: lo lego a ciascun layer.
+      const tooltip = tooltipHtml(cap, capEntries);
+      const tooltipOptions = { sticky: true, direction: 'top' };
+      if (typeof shape.eachLayer === 'function')
+        shape.eachLayer((layer) => layer.bindTooltip(tooltip, tooltipOptions));
+      else
+        shape.bindTooltip(tooltip, tooltipOptions);
       layers.value.push(shape);
     });
 
-  loading.value = false;
+    // Blocchi disegnati sulla mappa: un poligono per entry (non raggruppati per CAP,
+    // perché non ne hanno). Colore fisso e acceso (non theme.secondaryColor, troppo
+    // chiaro in questo tema e quasi invisibile) per distinguerli a colpo d'occhio
+    // dalle zone CAP.
+    dayEntries.value
+      .filter((entry) => (entry.polygon || []).length >= 3)
+      .forEach((entry) => {
+        const shape = L.polygon(entry.polygon, {
+          color: DRAWN_ZONE_COLOR,
+          fillColor: DRAWN_ZONE_COLOR,
+          fillOpacity: 0.35,
+          weight: 3
+        });
+        shape.addTo(map.value);
+        shape.bindTooltip(polygonTooltipHtml(entry), { sticky: true, direction: 'top' });
+        layers.value.push(shape);
+      });
+
+    loading.value = false;
+  });
 };
 
 onMounted(async () => {
@@ -303,6 +338,23 @@ onMounted(async () => {
   map.value = L.map(mapContainer.value, {
     zoomControl: false
   }).setView([41.1256, 16.8698], 9);
+
+  map.value.on('zoomstart', () => {
+    mapIsZooming = true;
+    closeMapTooltips();
+  });
+  map.value.on('zoomend', () => {
+    mapIsZooming = false;
+    flushPendingLayerRender();
+  });
+  map.value.on('movestart', () => {
+    mapIsMoving = true;
+    closeMapTooltips();
+  });
+  map.value.on('moveend', () => {
+    mapIsMoving = false;
+    flushPendingLayerRender();
+  });
 
   // Il drawer laterale si espande al passaggio del mouse senza ridimensionare
   // la finestra: Leaflet non intercetta quel cambio di larghezza da solo.
@@ -349,8 +401,11 @@ onMounted(async () => {
 });
 
 onBeforeUnmount(() => {
+  updateToken++;
+  pendingLayerRenders.clear();
   mapResizeObserver?.disconnect();
   mapResizeObserver = null;
+  closeMapTooltips();
   map.value?.remove();
   map.value = null;
 });
