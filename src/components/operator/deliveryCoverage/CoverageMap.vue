@@ -179,6 +179,7 @@ const polygonTooltipHtml = (entry) =>
   `<strong>Zona disegnata</strong><div>${coverage.formatSlot(entry)} &middot; ${transportLabel(entry.transport_id)}</div>`;
 
 let updateToken = 0;
+let initialBoundsApplied = false;
 
 const updateMap = async () => {
   if (!map.value) return;
@@ -278,7 +279,12 @@ const updateMap = async () => {
       layers.value.push(marker);
     });
 
-  if (bounds.isValid()) map.value.fitBounds(bounds, { maxZoom: 13 });
+  // Adatta l'inquadratura solo al primo caricamento: cambiare giorno aggiorna
+  // le zone, ma non deve annullare pan e zoom scelti dall'utente.
+  if (!initialBoundsApplied && bounds.isValid()) {
+    map.value.fitBounds(bounds, { maxZoom: 13 });
+    initialBoundsApplied = true;
+  }
 
   loading.value = false;
 };
