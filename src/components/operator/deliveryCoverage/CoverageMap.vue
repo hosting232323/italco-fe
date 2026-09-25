@@ -67,7 +67,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw';
 import 'leaflet-draw/dist/leaflet.draw.css';
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue';
 import { useTheme } from 'vuetify';
 import days from '@/utils/days';
 import coverage from '@/utils/coverage';
@@ -111,10 +111,12 @@ const collectionPointIcon = L.divIcon({
 });
 
 const mapContainer = ref(null);
-const map = ref(null);
-const layers = ref([]);
-const collectionPointLayers = ref([]);
-const drawnLayer = ref(null);
+// Le istanze Leaflet non devono passare attraverso i Proxy profondi di Vue:
+// Leaflet rimuove i listener usando l'identita' dell'istanza come context.
+const map = shallowRef(null);
+const layers = [];
+const collectionPointLayers = [];
+const drawnLayer = shallowRef(null);
 const loading = ref(false);
 let mapIsZooming = false;
 let mapIsMoving = false;
@@ -171,8 +173,8 @@ const closeLayerTooltips = (layer) => {
 };
 
 const closeMapTooltips = () => {
-  layers.value.forEach(closeLayerTooltips);
-  collectionPointLayers.value.forEach(closeLayerTooltips);
+  layers.forEach(closeLayerTooltips);
+  collectionPointLayers.forEach(closeLayerTooltips);
   if (drawnLayer.value) closeLayerTooltips(drawnLayer.value);
 };
 
@@ -195,20 +197,20 @@ const clearLayers = () => {
     layer.unbindTooltip?.();
   };
 
-  layers.value.forEach((layer) => {
+  layers.forEach((layer) => {
     detachTooltips(layer);
     map.value.removeLayer(layer);
   });
-  layers.value = [];
+  layers.length = 0;
 };
 
 const clearCollectionPointLayers = () => {
-  collectionPointLayers.value.forEach((layer) => {
+  collectionPointLayers.forEach((layer) => {
     layer.closeTooltip?.();
     layer.unbindTooltip?.();
     map.value.removeLayer(layer);
   });
-  collectionPointLayers.value = [];
+  collectionPointLayers.length = 0;
 };
 
 const updateCollectionPointLayers = () => {
@@ -226,7 +228,7 @@ const updateCollectionPointLayers = () => {
         direction: 'top'
       });
       marker.addTo(map.value);
-      collectionPointLayers.value.push(marker);
+      collectionPointLayers.push(marker);
     });
   });
 };
@@ -306,7 +308,7 @@ const updateMap = async () => {
         shape.eachLayer((layer) => layer.bindTooltip(tooltip, tooltipOptions));
       else
         shape.bindTooltip(tooltip, tooltipOptions);
-      layers.value.push(shape);
+      layers.push(shape);
     });
 
     // Blocchi disegnati sulla mappa: un poligono per entry (non raggruppati per CAP,
@@ -324,7 +326,7 @@ const updateMap = async () => {
         });
         shape.addTo(map.value);
         shape.bindTooltip(polygonTooltipHtml(entry), { sticky: true, direction: 'top' });
-        layers.value.push(shape);
+        layers.push(shape);
       });
 
     loading.value = false;
