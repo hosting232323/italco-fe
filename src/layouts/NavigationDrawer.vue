@@ -43,6 +43,7 @@
         prepend-icon="mdi-text-box-multiple-outline"
       />
       <v-list-item
+        v-if="automaticPlanning"
         to="/delivery-coverage"
         title="Copertura corrieri"
         prepend-icon="mdi-calendar-account"
@@ -149,4 +150,8 @@ const { role, company, effectiveRole } = storeToRefs(userStore);
 // Modulo RAEE dell'attività su cui si sta operando: senza, il blocco di voci
 // RAEE non esiste per nessun ruolo.
 const rae = computed(() => !!company.value?.rae);
+
+// Pianificazione automatica dell'attività: senza, la pagina copertura
+// corrieri non esiste per nessuno (stesso pattern di rae).
+const automaticPlanning = computed(() => !!company.value?.automatic_planning);
 </script>

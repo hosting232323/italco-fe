@@ -26,6 +26,14 @@ export const useAdministrationUserStore = defineStore('administrationUser', {
         callback
       ));
     },
+    updateAutomaticPlanning(id, automaticPlanning, func) {
+      http.makeRequest(
+        `user/${id}`,
+        'PUT',
+        { body: { automatic_planning: automaticPlanning } },
+        func
+      );
+    },
     resetPassword(id, password, func) {
       const body = password ? { password } : {};
       http.makeRequest(`user/${id}/password`, 'POST', { body }, func);

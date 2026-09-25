@@ -17,9 +17,21 @@
           { title: 'ID', value: 'id', sortable: false },
           { title: 'Nickname', value: 'nickname', sortable: false },
           { title: 'Ruolo', value: 'role', sortable: false },
+          ...(automaticPlanning ? [{ title: 'Pianificazione automatica', value: 'automatic_planning', sortable: false }] : []),
           { title: 'Azioni', key: 'actions', sortable: false }
         ]"
       >
+        <template #[`item.automatic_planning`]="{ item }">
+          <v-switch
+            v-if="item.role === 'Customer'"
+            :model-value="item.automatic_planning"
+            :loading="automaticPlanningLoading[item.id]"
+            :color="theme.current.value.primaryColor"
+            hide-details
+            density="compact"
+            @update:model-value="(value) => toggleAutomaticPlanning(item, value)"
+          />
+        </template>
         <template #[`item.actions`]="{ item }">
           <template v-if="item.role !== 'Admin'">
             <v-btn
@@ -135,14 +147,22 @@
 <script setup>
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
-import { ref, reactive  } from 'vue';
+import { ref, reactive, computed } from 'vue';
 import storesUtils from '@/utils/stores';
+import { useUserStore } from '@/stores/user';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
 const element = ref({});
 const theme = useTheme();
 const deleteDialog = ref(false);
 const deleteLoading = reactive({});
+const automaticPlanningLoading = reactive({});
+
+const userStore = useUserStore();
+const { company } = storeToRefs(userStore);
+// La colonna esiste solo se l'attività ha acceso il flag: come per il menù,
+// nasconderla in tabella non basta se il flag su Company è spento.
+const automaticPlanning = computed(() => !!company.value?.automatic_planning);
 
 // Reset password state
 const resetDialog = ref(false);
@@ -184,6 +204,14 @@ const submitReset = () => {
 
 const copyPassword = () => {
   navigator.clipboard.writeText(resetResult.value);
+};
+
+const toggleAutomaticPlanning = (item, value) => {
+  automaticPlanningLoading[item.id] = true;
+  administrationUserStore.updateAutomaticPlanning(item.id, value, (data) => {
+    automaticPlanningLoading[item.id] = false;
+    if (data.status === 'ok') item.automatic_planning = value;
+  });
 };
 
 const deleteItem = (item, force = false) => {
