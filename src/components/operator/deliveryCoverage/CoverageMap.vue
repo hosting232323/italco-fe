@@ -113,6 +113,7 @@ const collectionPointIcon = L.divIcon({
 const mapContainer = ref(null);
 const map = ref(null);
 const layers = ref([]);
+const collectionPointLayers = ref([]);
 const drawnLayer = ref(null);
 const loading = ref(false);
 
@@ -162,8 +163,41 @@ const transportLabel = (transportId) => {
 const dayEntries = computed(() => coverage.entriesForWeekDay(selectedDay.value, props.entries));
 
 const clearLayers = () => {
-  layers.value.forEach((layer) => map.value.removeLayer(layer));
+  const detachTooltips = (layer) => {
+    if (typeof layer.eachLayer === 'function') layer.eachLayer(detachTooltips);
+    layer.unbindTooltip?.();
+  };
+
+  layers.value.forEach((layer) => {
+    detachTooltips(layer);
+    map.value.removeLayer(layer);
+  });
   layers.value = [];
+};
+
+const clearCollectionPointLayers = () => {
+  collectionPointLayers.value.forEach((layer) => {
+    layer.unbindTooltip?.();
+    map.value.removeLayer(layer);
+  });
+  collectionPointLayers.value = [];
+};
+
+const updateCollectionPointLayers = () => {
+  if (!map.value) return;
+  clearCollectionPointLayers();
+
+  collectionPoints.value
+    .filter((point) => point.lat != null && point.lon != null)
+    .forEach((point) => {
+      const marker = L.marker([point.lat, point.lon], { icon: collectionPointIcon });
+      marker.bindTooltip(`<strong>${point.name}</strong><div>${point.address}</div>`, {
+        sticky: true,
+        direction: 'top'
+      });
+      marker.addTo(map.value);
+      collectionPointLayers.value.push(marker);
+    });
 };
 
 const tooltipHtml = (cap, capEntries) => {
@@ -259,22 +293,6 @@ const updateMap = async () => {
       layers.value.push(shape);
     });
 
-  // Punti di ritiro/vendita dei clienti della company: marker fisso, non legato al
-  // giorno selezionato (a differenza delle zone sopra, un punto di ritiro vale per
-  // tutti i giorni). Chi non ha un indirizzo geocodificabile (lat/lon nulli, vedi
-  // format_collection_point lato backend) resta semplicemente senza marker.
-  collectionPoints.value
-    .filter((point) => point.lat != null && point.lon != null)
-    .forEach((point) => {
-      const marker = L.marker([point.lat, point.lon], { icon: collectionPointIcon });
-      marker.bindTooltip(`<strong>${point.name}</strong><div>${point.address}</div>`, {
-        sticky: true,
-        direction: 'top'
-      });
-      marker.addTo(map.value);
-      layers.value.push(marker);
-    });
-
   loading.value = false;
 };
 
@@ -282,11 +300,8 @@ onMounted(async () => {
   await nextTick();
   // Centro stabile in Puglia: l'inquadratura non dipende dal giorno selezionato
   // o dalle geometrie caricate e resta sotto il controllo dell'utente.
-  // Il cambio giornata sostituisce i layer; senza la transizione CSS di zoom
-  // evitiamo che Leaflet continui ad aggiornare marker gia' rimossi.
   map.value = L.map(mapContainer.value, {
-    zoomControl: false,
-    zoomAnimation: false
+    zoomControl: false
   }).setView([41.1256, 16.8698], 9);
 
   // Il drawer laterale si espande al passaggio del mouse senza ridimensionare
@@ -329,6 +344,7 @@ onMounted(async () => {
     coverageStore.entryForm = true;
   });
 
+  updateCollectionPointLayers();
   updateMap();
 });
 
@@ -348,7 +364,8 @@ watch(
   }
 );
 
-watch([dayEntries, () => props.entries, collectionPoints], updateMap);
+watch([dayEntries, () => props.entries], updateMap);
+watch(collectionPoints, updateCollectionPointLayers);
 </script>
 
 <style scoped>
