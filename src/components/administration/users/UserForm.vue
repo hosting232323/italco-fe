@@ -40,6 +40,27 @@
           :items="['Operator', 'Customer', 'Delivery']"
           :rules="validation.requiredRules"
         />
+        <v-row
+          v-if="user.role === 'Customer' && company?.automatic_planning"
+          no-gutters
+        >
+          <v-col cols="12">
+            <label class="mr-2">Pianificazione automatica</label>
+            <v-radio-group
+              v-model="user.automatic_planning"
+              inline
+            >
+              <v-radio
+                label="Sì"
+                :value="true"
+              />
+              <v-radio
+                label="No"
+                :value="false"
+              />
+            </v-radio-group>
+          </v-col>
+        </v-row>
         <FormButtons
           :loading="loading"
           @cancel="activeForm = false"
@@ -105,12 +126,14 @@ import { storeToRefs } from 'pinia';
 import { useTheme } from 'vuetify';
 import storesUtils from '@/utils/stores';
 import validation from '@/utils/validation';
+import { useUserStore } from '@/stores/user';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
 const MAX_USERS = 75;
 
 const form = ref(null);
 const theme = useTheme();
+const { company } = storeToRefs(useUserStore());
 const loading = ref(false);
 const createdDialog = ref(false);
 const createdPassword = ref('');
