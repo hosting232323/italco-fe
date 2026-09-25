@@ -67,7 +67,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw';
 import 'leaflet-draw/dist/leaflet.draw.css';
-import { computed, nextTick, onMounted, ref, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useTheme } from 'vuetify';
 import days from '@/utils/days';
 import coverage from '@/utils/coverage';
@@ -180,6 +180,7 @@ const polygonTooltipHtml = (entry) =>
 
 let updateToken = 0;
 let initialBoundsApplied = false;
+let mapResizeObserver = null;
 
 const updateMap = async () => {
   if (!map.value) return;
@@ -293,6 +294,13 @@ onMounted(async () => {
   await nextTick();
   map.value = L.map(mapContainer.value, { zoomControl: false }).setView([41.1256, 16.8698], 9);
 
+  // Il drawer laterale si espande al passaggio del mouse senza ridimensionare
+  // la finestra: Leaflet non intercetta quel cambio di larghezza da solo.
+  mapResizeObserver = new ResizeObserver(() => {
+    map.value?.invalidateSize({ pan: false, debounceMoveend: true });
+  });
+  mapResizeObserver.observe(mapContainer.value);
+
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap'
   }).addTo(map.value);
@@ -327,6 +335,13 @@ onMounted(async () => {
   });
 
   updateMap();
+});
+
+onBeforeUnmount(() => {
+  mapResizeObserver?.disconnect();
+  mapResizeObserver = null;
+  map.value?.remove();
+  map.value = null;
 });
 
 // La zona appena disegnata resta visibile mentre il form è aperto (anteprima), e
