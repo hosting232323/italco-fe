@@ -31,8 +31,8 @@
             <v-autocomplete
               v-model="selectedUser"
               label="Utenti"
-              :items="users.filter(
-                (u) => u.role === 'Delivery' && (!schedule.users || !schedule.users.some(su => su.nickname === u.nickname))
+              :items="vehicleDeliveryUsers.filter(
+                (u) => !schedule.users || !schedule.users.some(su => su.id === u.id)
               )"
               item-title="nickname"
               append-icon="mdi-plus"
@@ -137,7 +137,6 @@ import { useScheduleStore } from '@/stores/schedule';
 import { useTransportStore } from '@/stores/transport';
 import { useRaeProductStore } from '@/stores/raeProduct';
 import { useRaeDisposalPlaceStore } from '@/stores/raeDisposalPlace';
-import { useAdministrationUserStore } from '@/stores/administrationUser';
 
 const { fromSchedulation } = defineProps({
   fromSchedulation: {
@@ -159,12 +158,14 @@ const scheduleStore = useScheduleStore();
 const transportStore = useTransportStore();
 const raeProductStore = useRaeProductStore();
 const raeDisposalPlaceStore = useRaeDisposalPlaceStore();
-const administrationUserStore = useAdministrationUserStore();
 const { element: schedule } = storeToRefs(scheduleStore);
 const orders = storesUtils.getStoreList(orderStore);
 const transports = storesUtils.getStoreList(transportStore);
-const users = storesUtils.getStoreList(administrationUserStore);
 const raeDisposalPlaces = storesUtils.getStoreList(raeDisposalPlaceStore);
+const vehicleDeliveryUsers = computed(() => {
+  const transport = transports.value.find((item) => item.id === schedule.value.transport_id);
+  return transport?.delivery_users || [];
+});
 
 // Il selettore del luogo di smaltimento compare solo se il borderò raccoglie
 // ordini con prodotti RAE: gli item ordine portano il marcatore rae_product
