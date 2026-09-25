@@ -11,18 +11,85 @@
     @submit.prevent="submitForm"
   >
     Seleziona le date per l'ordine:
+    <template v-if="showAutomaticDpc">
+      <v-row
+        no-gutters
+        class="mt-2"
+      >
+        <v-col
+          cols="12"
+          :md="role == 'Customer' ? 12 : 6"
+        >
+          <DateField
+            v-model="order.drc"
+            label="Data Richiesta dal Cliente"
+            :class-style="isMobile || role == 'Customer' ? '' : 'mr-2'"
+            :rules="validation.requiredRules"
+            :allowed-dates="nextTwoMonths"
+            :disabled="role == 'Operator' && order.id"
+            :clearable="false"
+          />
+        </v-col>
+        <v-col
+          v-if="role != 'Customer'"
+          cols="12"
+          md="6"
+        >
+          <DateField
+            v-model="order.booking_date"
+            label="Data Consegna"
+            :rules="[]"
+            :allowed-dates="['all']"
+            :class-style="isMobile ? '' : 'ml-2'"
+            :clearable="false"
+          />
+        </v-col>
+      </v-row>
+      <v-row
+        no-gutters
+        class="mt-4"
+      >
+        <v-col cols="12">
+          <DpcCalendarField
+            v-model="order.dpc"
+            v-model:slot-start="order.delivery_slot_start"
+            v-model:slot-end="order.delivery_slot_end"
+            label="Data Prevista dal Cliente"
+            :allowed-dates="allowedDpcDates"
+            :slots="dpcSlots"
+            :rules="validation.requiredRules"
+            :disabled="role == 'Operator' && order.id"
+          />
+        </v-col>
+      </v-row>
+    </template>
     <v-row
+      v-else
       no-gutters
       class="mt-2"
     >
       <v-col
         cols="12"
-        :md="role == 'Customer' ? 12 : 6"
+        :md="role == 'Customer' ? 6 : 4"
+      >
+        <DateField
+          v-model="order.dpc"
+          label="Data Prevista dal Cliente"
+          :class-style="isMobile ? '' : 'ml-2 mr-2'"
+          :allowed-dates="allowedDpcDates"
+          :rules="validation.requiredRules"
+          :disabled="role == 'Operator' && order.id"
+          :clearable="false"
+        />
+      </v-col>
+      <v-col
+        cols="12"
+        :md="role == 'Customer' ? 6 : 4"
       >
         <DateField
           v-model="order.drc"
           label="Data Richiesta dal Cliente"
-          :class-style="isMobile || role == 'Customer' ? '' : 'mr-2'"
+          :class-style="isMobile ? '' : 'ml-2 mr-2'"
           :rules="validation.requiredRules"
           :allowed-dates="nextTwoMonths"
           :disabled="role == 'Operator' && order.id"
@@ -32,7 +99,7 @@
       <v-col
         v-if="role != 'Customer'"
         cols="12"
-        md="6"
+        md="4"
       >
         <DateField
           v-model="order.booking_date"
@@ -40,33 +107,6 @@
           :rules="[]"
           :allowed-dates="['all']"
           :class-style="isMobile ? '' : 'ml-2'"
-          :clearable="false"
-        />
-      </v-col>
-    </v-row>
-    <v-row
-      no-gutters
-      class="mt-4"
-    >
-      <v-col cols="12">
-        <DpcCalendarField
-          v-if="showAutomaticDpc"
-          v-model="order.dpc"
-          v-model:slot-start="order.delivery_slot_start"
-          v-model:slot-end="order.delivery_slot_end"
-          label="Data Prevista dal Cliente"
-          :allowed-dates="allowedDpcDates"
-          :slots="dpcSlots"
-          :rules="validation.requiredRules"
-          :disabled="role == 'Operator' && order.id"
-        />
-        <DateField
-          v-else
-          v-model="order.dpc"
-          label="Data Prevista dal Cliente"
-          :allowed-dates="allowedDpcDates"
-          :rules="validation.requiredRules"
-          :disabled="role == 'Operator' && order.id"
           :clearable="false"
         />
       </v-col>
