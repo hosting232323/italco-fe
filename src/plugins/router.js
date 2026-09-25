@@ -150,6 +150,10 @@ const RAE_ROUTES = [
   'Centri di raccolta Raee'
 ];
 
+// Rotte della pianificazione automatica: esistono solo per le attività che
+// l'hanno accesa (stesso motivo di RAE_ROUTES).
+const AUTOMATIC_PLANNING_ROUTES = ['Copertura corrieri'];
+
 
 router.beforeEach((to) => {
   const userStore = useUserStore();
@@ -171,6 +175,9 @@ router.beforeEach((to) => {
   // Togliere le voci dal menù non basta: l'URL resta digitabile e i preferiti
   // pure. Chi ci arriva con il modulo spento torna alla dashboard.
   if (RAE_ROUTES.includes(to.name) && !company?.rae)
+    return { name: 'Dashboard' };
+
+  if (AUTOMATIC_PLANNING_ROUTES.includes(to.name) && !company?.automatic_planning)
     return { name: 'Dashboard' };
 });
 

@@ -23,7 +23,7 @@ const hostname = import.meta.env.VITE_HOSTNAME;
 const theme = useTheme();
 const router = useRouter();
 const userStore = useUserStore();
-const { role, userId, token, company } = storeToRefs(userStore);
+const { role, userId, token, company, automaticPlanning } = storeToRefs(userStore);
 
 const goToDashboard = (data) => {
   // Il logout svuota gia' gli store, ma non e' l'unica strada per arrivare qui
@@ -42,6 +42,7 @@ const goToDashboard = (data) => {
   userId.value = data.user_id;
   token.value = data.access_token;
   company.value = data.company;
+  automaticPlanning.value = data.automatic_planning;
   // Il super admin arriva senza company: prima sceglie, poi entra.
   if (data.role == 'Super Admin')
     router.push('companies');
