@@ -122,7 +122,6 @@ import { ref, computed } from 'vue';
 import http from '@/utils/http';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
-import { encodeId } from '@/utils/hashids';
 import rae from '@/utils/rae';
 import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
@@ -181,11 +180,16 @@ const exportPdf = (item) => {
 };
 
 const copyOrderLink = (id) => {
-  const url = `${window.location.origin}/order/${encodeId(id)}`;
-  navigator.clipboard.writeText(url).then(() => {
-    alert('Link ordine copiato negli appunti:\n' + url);
-  }).catch(() => {
-    alert('Errore nel copiare il link');
+  http.makeRequest(`order/${id}/tracking-link`, 'POST', {}, (data) => {
+    if (data.status !== 'ok' || !data.url) {
+      alert('Errore nella creazione del link ordine');
+      return;
+    }
+    navigator.clipboard.writeText(data.url).then(() => {
+      alert('Link ordine copiato negli appunti:\n' + data.url);
+    }).catch(() => {
+      alert('Errore nel copiare il link');
+    });
   });
 };
 

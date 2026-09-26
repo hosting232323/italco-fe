@@ -12,10 +12,9 @@ const routes = [
         component: () => import('@/views/LoginPage.vue')
       },
       {
-        path: 'order/:orderId',
+        path: 'order/track',
         name: 'OrderStatus',
         component: () => import('@/views/OrderStatus.vue'),
-        props: true
       },
       {
         path: 'privacy',
