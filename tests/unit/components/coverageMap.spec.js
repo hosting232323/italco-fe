@@ -5,6 +5,7 @@ import { isProxy } from 'vue';
 import CoverageMap from '@/components/operator/deliveryCoverage/CoverageMap.vue';
 import { useTransportStore } from '@/stores/transport';
 import { useCollectionPointStore } from '@/stores/collectionPoint';
+import { useAdministrationUserStore } from '@/stores/administrationUser';
 import { createTestPinia, mountComponent } from '../../helpers/mount';
 
 
@@ -98,7 +99,7 @@ const MOLFETTA = { id: 2, name: 'Deposito Molfetta', address: 'Via Roma 5, Molfe
 const SENZA_COORDINATE = { id: 3, name: 'Indirizzo introvabile', address: 'Via Sconosciuta 9', lat: null, lon: null };
 
 
-const mountMap = async (collectionPoints, entries = []) => {
+const mountMap = async (collectionPoints, entries = [], users = []) => {
   const pinia = createTestPinia();
   const transportStore = useTransportStore();
   transportStore.ready = true;
@@ -106,6 +107,9 @@ const mountMap = async (collectionPoints, entries = []) => {
   const collectionPointStore = useCollectionPointStore();
   collectionPointStore.ready = true;
   collectionPointStore.list = collectionPoints;
+  const administrationUserStore = useAdministrationUserStore();
+  administrationUserStore.ready = true;
+  administrationUserStore.list = users;
 
   const wrapper = mountComponent(CoverageMap, { pinia, props: { entries } });
   await flushPromises();
@@ -164,6 +168,16 @@ describe('CoverageMap: punti di ritiro', () => {
     expect(leaflet.created).toHaveLength(0);
     expect(leaflet.map.fitBounds).not.toHaveBeenCalled();
     expect(leaflet.map.setView).toHaveBeenCalledWith([41.1256, 16.8698], 9);
+  });
+
+  it('mostra ID, nome e ragione sociale per i punti senza coordinate', async () => {
+    const point = { ...SENZA_COORDINATE, user_id: 17 };
+    const { wrapper } = await mountMap([point], [], [{
+      id: 17,
+      customer_user_info: { company_name: 'Acme S.r.l.' }
+    }]);
+
+    expect(wrapper.text()).toContain('ID 3 — Indirizzo introvabile — Acme S.r.l.');
   });
 
   it('con dei marker mantiene il centro e lo zoom indipendenti dai punti', async () => {
