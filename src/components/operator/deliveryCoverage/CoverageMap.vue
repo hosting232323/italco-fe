@@ -50,7 +50,7 @@
         {{ collectionPointsWithoutCoordinates.length === 1
           ? 'punto di ritiro non visualizzato perché il suo indirizzo non è valido:'
           : 'punti di ritiro non visualizzati perché i loro indirizzi non sono validi:' }}
-        {{ collectionPointsWithoutCoordinates.map((point) => point.name?.trim() || `Punto ID ${point.id}`).join(', ') }}
+        {{ collectionPointsWithoutCoordinates.map(describeUnlocatedPoint).join('; ') }}
       </div>
 
       <p class="text-caption text-medium-emphasis mt-3 mb-0">
@@ -96,6 +96,11 @@ const collectionPoints = storesUtils.getStoreList(collectionPointStore);
 const collectionPointsWithoutCoordinates = computed(() => collectionPoints.value.filter(
   (point) => point.lat == null || point.lon == null
 ));
+const describeUnlocatedPoint = (point) => {
+  const name = point.name?.trim() || 'Punto di ritiro';
+  const address = [point.address, point.cap].filter(Boolean).join(', ');
+  return `${name} (ID ${point.id})${address ? ` — ${address}` : ''}`;
+};
 
 const weekDayOptions = days.weekDays;
 const selectedDay = ref(coverage.weekDayIndex(new Date()));
