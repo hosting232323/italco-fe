@@ -139,18 +139,9 @@ import http from '@/utils/http';
 import mobile from '@/utils/mobile';
 import { ref, onMounted } from 'vue';
 import orderUtils from '@/utils/order';
-import { decodeId } from '@/utils/hashids';
-
-const props = defineProps({ 
-  orderId: {
-    type: String,
-    required: true
-  }
-});
 
 const order = ref({});
 const show = ref(false);
-const orderIdNumeric = ref(null);
 const isMobile = mobile.setupMobileUtils();
 
 const isStepDelivered = (index) => {
@@ -160,16 +151,14 @@ const isStepDelivered = (index) => {
 };
 
 onMounted(() => {
-  const decoded = decodeId(props.orderId);
-  if (decoded != null) {
-    orderIdNumeric.value = decoded;
-    http.makeRequest(`order/${orderIdNumeric.value}`, 'GET', { session: false }, (data) => {
-      if (data.status === 'ok') {
-        order.value = data.order;
-        show.value = true;
-      }
-    });
-  }
+  const token = window.location.hash.slice(1);
+  if (!token) return;
+  http.makeRequest('order/public', 'POST', { body: { token }, session: false }, (data) => {
+    if (data.status === 'ok') {
+      order.value = data.order;
+      show.value = true;
+    }
+  });
 });
 </script>
 
