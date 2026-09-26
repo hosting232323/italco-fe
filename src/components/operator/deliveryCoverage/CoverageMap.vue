@@ -43,10 +43,14 @@
         Caricamento zone in corso...
       </div>
       <div
-        v-else-if="dayEntries.length === 0"
+        v-else-if="collectionPointsWithoutCoordinates.length"
         class="text-caption text-medium-emphasis mt-2"
       >
-        Nessuna copertura per questo giorno.
+        {{ collectionPointsWithoutCoordinates.length }}
+        {{ collectionPointsWithoutCoordinates.length === 1
+          ? 'punto di ritiro non visualizzato perché il suo indirizzo non è valido:'
+          : 'punti di ritiro non visualizzati perché i loro indirizzi non sono validi:' }}
+        {{ collectionPointsWithoutCoordinates.map(describeUnlocatedPoint).join('; ') }}
       </div>
 
       <p class="text-caption text-medium-emphasis mt-3 mb-0">
@@ -75,6 +79,7 @@ import storesUtils from '@/utils/stores';
 import { useTransportStore } from '@/stores/transport';
 import { useDeliveryCoverageStore } from '@/stores/deliveryCoverage';
 import { useCollectionPointStore } from '@/stores/collectionPoint';
+import { useAdministrationUserStore } from '@/stores/administrationUser';
 
 const props = defineProps({
   entries: {
@@ -89,6 +94,16 @@ const transports = storesUtils.getStoreList(transportStore);
 const coverageStore = useDeliveryCoverageStore();
 const collectionPointStore = useCollectionPointStore();
 const collectionPoints = storesUtils.getStoreList(collectionPointStore);
+const administrationUserStore = useAdministrationUserStore();
+const users = storesUtils.getStoreList(administrationUserStore);
+const collectionPointsWithoutCoordinates = computed(() => collectionPoints.value.filter(
+  (point) => point.lat == null || point.lon == null
+));
+const describeUnlocatedPoint = (point) => {
+  const companyName = users.value.find((user) => user.id === point.user_id)
+    ?.customer_user_info?.company_name?.trim();
+  return [`ID ${point.id}`, point.name?.trim(), companyName].filter(Boolean).join(' — ');
+};
 
 const weekDayOptions = days.weekDays;
 const selectedDay = ref(coverage.weekDayIndex(new Date()));
