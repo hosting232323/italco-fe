@@ -102,7 +102,7 @@ const collectionPointsWithoutCoordinates = computed(() => collectionPoints.value
 const describeUnlocatedPoint = (point) => {
   const companyName = users.value.find((user) => user.id === point.user_id)
     ?.customer_user_info?.company_name?.trim();
-  return `${companyName || 'Ragione sociale non disponibile'} (ID ${point.id})`;
+  return [`ID ${point.id}`, point.name?.trim(), companyName].filter(Boolean).join(' — ');
 };
 
 const weekDayOptions = days.weekDays;
