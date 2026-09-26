@@ -79,6 +79,7 @@ import storesUtils from '@/utils/stores';
 import { useTransportStore } from '@/stores/transport';
 import { useDeliveryCoverageStore } from '@/stores/deliveryCoverage';
 import { useCollectionPointStore } from '@/stores/collectionPoint';
+import { useAdministrationUserStore } from '@/stores/administrationUser';
 
 const props = defineProps({
   entries: {
@@ -93,13 +94,15 @@ const transports = storesUtils.getStoreList(transportStore);
 const coverageStore = useDeliveryCoverageStore();
 const collectionPointStore = useCollectionPointStore();
 const collectionPoints = storesUtils.getStoreList(collectionPointStore);
+const administrationUserStore = useAdministrationUserStore();
+const users = storesUtils.getStoreList(administrationUserStore);
 const collectionPointsWithoutCoordinates = computed(() => collectionPoints.value.filter(
   (point) => point.lat == null || point.lon == null
 ));
 const describeUnlocatedPoint = (point) => {
-  const name = point.name?.trim() || 'Punto di ritiro';
-  const address = [point.address, point.cap].filter(Boolean).join(', ');
-  return `${name} (ID ${point.id})${address ? ` — ${address}` : ''}`;
+  const companyName = users.value.find((user) => user.id === point.user_id)
+    ?.customer_user_info?.company_name?.trim();
+  return `${companyName || 'Ragione sociale non disponibile'} (ID ${point.id})`;
 };
 
 const weekDayOptions = days.weekDays;
