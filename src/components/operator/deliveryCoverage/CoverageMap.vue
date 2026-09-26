@@ -43,10 +43,14 @@
         Caricamento zone in corso...
       </div>
       <div
-        v-else-if="dayEntries.length === 0"
+        v-else-if="collectionPointsWithoutCoordinates.length"
         class="text-caption text-medium-emphasis mt-2"
       >
-        Nessuna copertura per questo giorno.
+        {{ collectionPointsWithoutCoordinates.length }}
+        {{ collectionPointsWithoutCoordinates.length === 1
+          ? 'punto di ritiro non visualizzato perché il suo indirizzo non è valido:'
+          : 'punti di ritiro non visualizzati perché i loro indirizzi non sono validi:' }}
+        {{ collectionPointsWithoutCoordinates.map((point) => point.name?.trim() || `Punto ID ${point.id}`).join(', ') }}
       </div>
 
       <p class="text-caption text-medium-emphasis mt-3 mb-0">
@@ -89,6 +93,9 @@ const transports = storesUtils.getStoreList(transportStore);
 const coverageStore = useDeliveryCoverageStore();
 const collectionPointStore = useCollectionPointStore();
 const collectionPoints = storesUtils.getStoreList(collectionPointStore);
+const collectionPointsWithoutCoordinates = computed(() => collectionPoints.value.filter(
+  (point) => point.lat == null || point.lon == null
+));
 
 const weekDayOptions = days.weekDays;
 const selectedDay = ref(coverage.weekDayIndex(new Date()));
