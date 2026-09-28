@@ -198,12 +198,13 @@ const exportPdf = (item) => {
 
 const copyOrderLink = (id) => {
   http.makeRequest(`order/${id}/tracking-link`, 'POST', {}, (data) => {
-    if (data.status !== 'ok' || !data.url) {
+    if (data.status !== 'ok' || !data.token) {
       alert('Errore nella creazione del link ordine');
       return;
     }
-    navigator.clipboard.writeText(data.url).then(() => {
-      alert('Link ordine copiato negli appunti:\n' + data.url);
+    const url = `${window.location.origin}/order/track#${encodeURIComponent(data.token)}`;
+    navigator.clipboard.writeText(url).then(() => {
+      alert('Link ordine copiato negli appunti:\n' + url);
     }).catch(() => {
       alert('Errore nel copiare il link');
     });
