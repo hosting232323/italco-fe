@@ -38,8 +38,6 @@
           type="number"
           min="0"
           suffix="min"
-          hint="0 = non impostata"
-          persistent-hint
           :rules="activityUtils.durationRules"
         />
         <v-textarea
