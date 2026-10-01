@@ -47,33 +47,13 @@
           auto-grow
           class="mt-4"
         />
-        <v-row no-gutters>
-          <v-col
-            cols="12"
-            md="8"
-          >
-            <AddressAutocomplete
-              v-model="address"
-              :api-key="GOOGLE_API_KEY"
-              :formatted="true"
-              :custom-class="isMobile ? '' : 'mr-2'"
-              label="Luogo (opzionale)"
-              :rules="addressRules"
-              @address-components="handleAddressComponents"
-            />
-          </v-col>
-          <v-col
-            cols="12"
-            md="4"
-          >
-            <v-text-field
-              v-model="cap"
-              :class="isMobile ? '' : 'ml-2'"
-              label="CAP"
-              :rules="capRules"
-            />
-          </v-col>
-        </v-row>
+        <AddressAutocomplete
+          v-model="address"
+          :api-key="GOOGLE_API_KEY"
+          :formatted="true"
+          label="Indirizzo (opzionale)"
+          @address-components="handleAddressComponents"
+        />
         <FormButtons
           submit-text="Salva"
           @cancel="emits('close-form')"
@@ -88,8 +68,7 @@ import FormButtons from '@/components/FormButtons';
 import { AddressAutocomplete } from 'generic-module';
 import { GOOGLE_API_KEY } from '@/utils/googleMaps';
 
-import { ref } from 'vue';
-import mobile from '@/utils/mobile';
+import { ref, watch } from 'vue';
 import activityUtils from '@/utils/activity';
 import validation from '@/utils/validation';
 
@@ -102,7 +81,6 @@ const { activity } = defineProps({
 });
 
 const form = ref(null);
-const isMobile = mobile.setupMobileUtils();
 const emits = defineEmits(['save', 'close-form']);
 
 const title = ref(activity?.title || '');
@@ -111,18 +89,13 @@ const address = ref(activity?.address || '');
 const cap = ref(activity?.cap || '');
 const durationMinutes = ref(activity?.duration_minutes || 0);
 
-// Indirizzo e CAP vanno insieme (la mappa geocodifica da entrambi): il CAP è
-// obbligatorio solo quando c'è un indirizzo, e viceversa.
-const capRules = [
-  (value) => {
-    if (!value) return !address.value || 'Inserisci il CAP';
-    return value.length === 5 || 'Il CAP deve essere di 5 caratteri';
-  }
-];
-
-const addressRules = [
-  (value) => !!value || !cap.value || 'Inserisci l\'indirizzo'
-];
+// Il CAP non si compila: lo ricava l'autocomplete dall'indirizzo scelto e serve
+// alla mappa come ripiego. Se l'indirizzo viene riscritto a mano il CAP salvato
+// non vale più e si scarta.
+let selectedAddress = address.value;
+watch(address, (value) => {
+  if (value !== selectedAddress) cap.value = '';
+});
 
 // Il chip selezionato riempie il campo dei minuti; con "mandatory" il gruppo
 // non si deseleziona da solo, quindi un valore libero lo ignora.
@@ -131,6 +104,7 @@ const selectPreset = (value) => {
 };
 
 const handleAddressComponents = (components) => {
+  selectedAddress = components.address;
   address.value = components.address;
   cap.value = components.cap;
 };

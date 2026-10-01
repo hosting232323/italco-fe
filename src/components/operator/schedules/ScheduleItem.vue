@@ -48,7 +48,7 @@
         v-if="!isActivity || element.address"
         style="font-size: smaller; padding-right: 5px;"
       >
-        {{ element.address }}, {{ element.cap }}
+        {{ [element.address, element.cap].filter(Boolean).join(', ') }}
         <v-icon
           v-if="invalidAddress && !isActivity"
           icon="mdi-pencil"
