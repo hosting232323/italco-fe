@@ -45,7 +45,6 @@
           label="Note (opzionale)"
           rows="2"
           auto-grow
-          class="mt-4"
         />
         <AddressAutocomplete
           v-model="address"
