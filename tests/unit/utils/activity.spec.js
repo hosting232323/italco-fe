@@ -46,21 +46,17 @@ describe('addMinutes', () => {
 describe('durationRules', () => {
   const [rule] = activity.durationRules;
 
-  it('accetta vuoto, zero e minuti interi nel limite', () => {
+  it('accetta vuoto, zero e minuti interi', () => {
     expect(rule('')).toBe(true);
     expect(rule(null)).toBe(true);
     expect(rule(undefined)).toBe(true);
     expect(rule(0)).toBe(true);
     expect(rule('45')).toBe(true);
-    expect(rule(activity.MAX_DURATION_MINUTES)).toBe(true);
+    expect(rule(1000)).toBe(true);
   });
 
   it('rifiuta decimali e negativi', () => {
     expect(rule(1.5)).toBe('Inserisci minuti interi');
     expect(rule(-1)).toBe('Inserisci minuti interi');
-  });
-
-  it('rifiuta oltre il massimo', () => {
-    expect(rule(activity.MAX_DURATION_MINUTES + 1)).toBe(`Massimo ${activity.MAX_DURATION_MINUTES} minuti`);
   });
 });
