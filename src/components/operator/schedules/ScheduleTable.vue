@@ -22,9 +22,16 @@
         v-for="scheduleItem in item.schedule_items.sort((a, b) => a.index - b.index)"
         :key="scheduleItem.index"
       >
-        {{ scheduleItem.operation_type == 'Order' ? 'Ordine' : 'Punto di ritiro' }}
-        ID: <b>{{ scheduleItem.operation_type == 'Order' ? scheduleItem.order_id : scheduleItem.collection_point_id }}</b>
-        Indirizzo: <b>{{ scheduleItem.address }}</b>
+        <template v-if="scheduleItem.operation_type == 'Activity'">
+          Attività: <b>{{ scheduleItem.title }}</b>
+          <span v-if="scheduleItem.duration_minutes"> ({{ activityUtils.formatDuration(scheduleItem.duration_minutes) }})</span>
+          <span v-if="scheduleItem.address"> Indirizzo: <b>{{ scheduleItem.address }}</b></span>
+        </template>
+        <template v-else>
+          {{ scheduleItem.operation_type == 'Order' ? 'Ordine' : 'Punto di ritiro' }}
+          ID: <b>{{ scheduleItem.operation_type == 'Order' ? scheduleItem.order_id : scheduleItem.collection_point_id }}</b>
+          Indirizzo: <b>{{ scheduleItem.address }}</b>
+        </template>
       </div>
     </template>
     <template #[`item.users`]="{ item }">
@@ -77,6 +84,7 @@ import http from '@/utils/http';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import storesUtils from '@/utils/stores';
+import activityUtils from '@/utils/activity';
 import { useOrderStore } from '@/stores/order';
 import { useScheduleStore } from '@/stores/schedule';
 import { useRaeProductStore } from '@/stores/raeProduct';

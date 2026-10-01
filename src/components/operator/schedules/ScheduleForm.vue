@@ -92,6 +92,23 @@
               :rules="validation.requiredRules"
               :disabled="raeDisposalPlaces.length == 1"
             />
+            <v-btn
+              variant="text"
+              prepend-icon="mdi-plus"
+              class="mb-2"
+              @click="activityFormFlag = true"
+            >
+              Aggiungi attività
+            </v-btn>
+            <v-dialog
+              v-model="activityFormFlag"
+              max-width="600"
+            >
+              <ActivityForm
+                @save="addActivity"
+                @close-form="activityFormFlag = false"
+              />
+            </v-dialog>
             <draggable
               v-model="schedule.schedule_items"
               item-key="id"
@@ -125,6 +142,7 @@
 import FormButtons from '@/components/FormButtons';
 import OverStreetMap from '@/components/OverStreetMap';
 import ScheduleItem from '@/components/operator/schedules/ScheduleItem';
+import ActivityForm from '@/components/operator/schedules/ScheduleActivityForm';
 
 import { ref, computed, watch } from 'vue';
 import mobile from '@/utils/mobile';
@@ -151,6 +169,7 @@ const error = ref(null);
 const loading = ref(false);
 const selectedUser = ref(null);
 const selectedOrderId = ref(null);
+const activityFormFlag = ref(false);
 const isMobile = mobile.setupMobileUtils();
 const emits = defineEmits(['cancel', 'go-back']);
 
@@ -219,6 +238,17 @@ const addOrder = () => {
     orderToAdd, 'Order', schedule.value.schedule_items.length
   ));
   selectedOrderId.value = null;
+};
+
+const addActivity = (activity) => {
+  schedule.value.schedule_items.push({
+    ...activity,
+    operation_type: 'Activity',
+    start_time_slot: '',
+    end_time_slot: '',
+    index: schedule.value.schedule_items.length
+  });
+  activityFormFlag.value = false;
 };
 
 const submitForm = async () => {
