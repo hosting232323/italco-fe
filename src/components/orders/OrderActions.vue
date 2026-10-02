@@ -97,6 +97,17 @@
               @click="openExternalLink(item.external_link)"
             />
           </v-col>
+          <v-col cols="3">
+            <v-btn
+              v-if="isSuperAdmin"
+              icon="mdi-swap-horizontal"
+              variant="text"
+              :color="theme.current.value.primaryColor"
+              title="Sposta in un'altra company"
+              v-bind="activatorProps"
+              @click="openPopUp(item, 'company')"
+            />
+          </v-col>
         </v-row>
       </template>
     </template>
@@ -110,12 +121,18 @@
         :order="order"
         @cancel="isActive.value = false"
       />
+      <MoveOrderCompany
+        v-else-if="popUpType == 'company'"
+        :order="order"
+        @cancel="isActive.value = false"
+      />
     </template>
   </v-dialog>
 </template>
 
 <script setup>
 import ChangeOrderUser from '@/components/orders/ChangeOrderUser';
+import MoveOrderCompany from '@/components/orders/MoveOrderCompany';
 import OrderDeliverySummary from '@/components/orders/OrderDeliverySummary';
 
 import { ref, computed } from 'vue';
@@ -146,6 +163,9 @@ const userStore = useUserStore();
 const orderStore = useOrderStore();
 // effectiveRole: il super admin in una company agisce con i permessi di un admin.
 const { effectiveRole: role, company } = storeToRefs(userStore);
+// Il passaggio di company è solo del super admin: il ruolo grezzo, non quello
+// effettivo, che dentro una company lo fa passare per admin.
+const isSuperAdmin = computed(() => userStore.role == 'Super Admin');
 const raeProductStore = useRaeProductStore();
 
 // Un'attività può spegnere il modulo dopo averlo usato: gli ordini con ritiro
