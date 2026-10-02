@@ -99,7 +99,7 @@
           </v-col>
           <v-col cols="3">
             <v-btn
-              v-if="isSuperAdmin"
+              v-if="isSuperAdmin && ['Acquired', 'Booked'].includes(item.status)"
               icon="mdi-swap-horizontal"
               variant="text"
               :color="theme.current.value.primaryColor"
