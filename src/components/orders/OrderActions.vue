@@ -99,7 +99,7 @@
           </v-col>
           <v-col cols="3">
             <v-btn
-              v-if="isSuperAdmin && ['Acquired', 'Booked'].includes(item.status)"
+              v-if="role == 'Admin' && ['Acquired', 'Booked'].includes(item.status)"
               icon="mdi-swap-horizontal"
               variant="text"
               :color="theme.current.value.primaryColor"
@@ -163,9 +163,6 @@ const userStore = useUserStore();
 const orderStore = useOrderStore();
 // effectiveRole: il super admin in una company agisce con i permessi di un admin.
 const { effectiveRole: role, company } = storeToRefs(userStore);
-// Il passaggio di company è solo del super admin: il ruolo grezzo, non quello
-// effettivo, che dentro una company lo fa passare per admin.
-const isSuperAdmin = computed(() => userStore.role == 'Super Admin');
 const raeProductStore = useRaeProductStore();
 
 // Un'attività può spegnere il modulo dopo averlo usato: gli ordini con ritiro

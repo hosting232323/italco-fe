@@ -112,14 +112,11 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import http from '@/utils/http';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
-import storesUtils from '@/utils/stores';
-import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
-import { useCompanyStore } from '@/stores/company';
 
 const { order } = defineProps({
   order: {
@@ -137,15 +134,21 @@ const loading = ref(false);
 const previewing = ref(false);
 const emits = defineEmits(['cancel']);
 
-const userStore = useUserStore();
+const companies = ref([]);
 const orderStore = useOrderStore();
-const companyStore = useCompanyStore();
 const { ready } = storeToRefs(orderStore);
-const allCompanies = storesUtils.getStoreList(companyStore);
-
-// L'ordine si sposta fuori dalla company su cui si sta operando, non dentro di essa.
-const companies = computed(() => allCompanies.value.filter(company => company.id != userStore.company?.id));
 const canMove = computed(() => !!plan.value && !plan.value.errors.length && !!plan.value.target_user);
+
+// Il backend elenca già solo le altre company: l'ordine si sposta fuori da quella
+// su cui si sta operando. Non si usa lo store delle company, riservato al super admin.
+onMounted(() => {
+  http.makeRequest('order/company-targets', 'GET', {}, function (data) {
+    if (data.status == 'ok')
+      companies.value = data.companies;
+    else
+      message.value = data.message;
+  });
+});
 
 // Le risposte dell'anteprima possono arrivare fuori ordine: conta solo l'ultima richiesta.
 let previewRequest = 0;
