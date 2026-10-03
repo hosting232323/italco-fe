@@ -22,9 +22,10 @@ deps_check:
     # dipendenze git (qui generic-module e' git+ssh): va riabilitato esplicitamente.
     - npm install -g npm@latest
     - npm ci --allow-git=all --prefer-offline 2>/dev/null || npm ci --allow-git=all
-    - npm audit --audit-level=high || AUDIT_EXIT=$?
-    - npm audit --audit-level=high --json > npm-audit-report.json || true
-    - exit ${AUDIT_EXIT:-0}
+    - npm audit --audit-level=high || true
+    - npm audit --json > npm-audit-report.json || true
+    # l'esito esclude le advisory accettate (elenco in audit-gate.mjs)
+    - node gitlab/audit-gate.mjs
   artifacts:
     when: always
     expire_in: 30 days

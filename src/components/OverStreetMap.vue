@@ -20,7 +20,13 @@
       "
     >
       <div>🚗 Distanza: {{ distanceKm }} km</div>
-      <div>🕒 Tempo: {{ durationMin }} min</div>
+      <div>🕒 Tempo: {{ totalMin }} min</div>
+      <div
+        v-if="activityMinutes"
+        style="font-weight: normal; font-size: 12px;"
+      >
+        di cui {{ activityMinutes }} min di attività
+      </div>
     </div>
 
     <div
@@ -55,7 +61,7 @@
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { storeToRefs } from 'pinia';
-import { onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useScheduleStore } from '@/stores/schedule';
 
 const loading = ref(true);
@@ -71,6 +77,13 @@ const osmUrl = ref('');
 
 const scheduleStore = useScheduleStore();
 const { element: schedule, geocodeResults } = storeToRefs(scheduleStore);
+
+// Le attività senza indirizzo non entrano nel percorso, ma il loro tempo conta
+// comunque: al tempo di guida si somma la durata di tutte le attività.
+const activityMinutes = computed(() => (schedule.value.schedule_items || [])
+  .filter(item => item.operation_type === 'Activity')
+  .reduce((total, item) => total + (Number(item.duration_minutes) || 0), 0));
+const totalMin = computed(() => Number(durationMin.value) + activityMinutes.value);
 
 const searchNominatim = async (query) => {
   try {
@@ -124,7 +137,13 @@ const geocode = async (item) => {
 };
 
 const drawRoute = async (coords) => {
-  if (coords.length < 2) return;
+  if (coords.length < 2) {
+    distanceKm.value = 0;
+    durationMin.value = 0;
+    if (routeLine.value) map.value.removeLayer(routeLine.value);
+    routeLine.value = null;
+    return;
+  }
 
   const coordStr = coords.map(c => `${c.lng},${c.lat}`).join(';');
 
@@ -186,11 +205,9 @@ const updateMap = async () => {
       markers.value.push(marker);
     });
 
-    if (locations.value.length) {
-      const bounds = L.latLngBounds(locations.value.map(p => [p.lat, p.lng]));
-      map.value.fitBounds(bounds);
-      await drawRoute(locations.value);
-    }
+    if (locations.value.length)
+      map.value.fitBounds(L.latLngBounds(locations.value.map(p => [p.lat, p.lng])));
+    await drawRoute(locations.value);
   } finally {
     if (token === updateToken) loading.value = false;
   }

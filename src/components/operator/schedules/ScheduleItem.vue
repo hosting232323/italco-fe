@@ -12,15 +12,45 @@
       </div>
     </v-col>
     <v-col cols="4">
-      <p>
+      <p v-if="isActivity">
+        {{ element.index + 1 }}: Attività - {{ element.title }}
+        <span v-if="element.duration_minutes">({{ activityUtils.formatDuration(element.duration_minutes) }})</span>
+        <v-icon
+          icon="mdi-pencil"
+          size="x-small"
+          style="cursor: pointer;"
+          title="Modifica attività"
+          @click="activityFormFlag = true"
+        />
+        <v-dialog
+          v-model="activityFormFlag"
+          max-width="600"
+        >
+          <ActivityForm
+            :activity="element"
+            @save="saveActivity"
+            @close-form="activityFormFlag = false"
+          />
+        </v-dialog>
+      </p>
+      <p v-else>
         {{ element.index + 1 }}:
         {{ element.operation_type == 'Order' ? 'Ordine' : 'Punto di ritiro' }}
         ID {{ element.operation_type == 'Order' ? element.order_id : element.collection_point_id }}
       </p>
-      <div style="font-size: smaller; padding-right: 5px;">
-        {{ element.address }}, {{ element.cap }}
+      <div
+        v-if="isActivity && element.note"
+        style="font-size: smaller; padding-right: 5px;"
+      >
+        {{ element.note }}
+      </div>
+      <div
+        v-if="!isActivity || element.address"
+        style="font-size: smaller; padding-right: 5px;"
+      >
+        {{ [element.address, element.cap].filter(Boolean).join(', ') }}
         <v-icon
-          v-if="invalidAddress"
+          v-if="invalidAddress && !isActivity"
           icon="mdi-pencil"
           size="x-small"
           color="#C62828"
@@ -63,6 +93,13 @@
     </v-col>
     <v-col cols="1">
       <v-btn
+        v-if="isActivity"
+        variant="text"
+        icon="mdi-delete"
+        :color="theme.current.value.primaryColor"
+        @click="removeActivity"
+      />
+      <v-btn
         v-if="element.operation_type === 'Order' &&
           !orderUtils.isTerminatedOrder(element) &&
           schedule.schedule_items.filter(item => item.operation_type == 'Order').length > 1"
@@ -77,12 +114,14 @@
 
 <script setup>
 import AddressForm from '@/components/operator/schedules/ScheduleItemAddressForm';
+import ActivityForm from '@/components/operator/schedules/ScheduleActivityForm';
 
 import { computed, ref } from 'vue';
 import { useTheme } from 'vuetify';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import orderUtils from '@/utils/order';
+import activityUtils from '@/utils/activity';
 import validation from '@/utils/validation';
 import { useScheduleStore } from '@/stores/schedule';
 
@@ -96,10 +135,12 @@ const { index } = defineProps({
 const theme = useTheme();
 const isMobile = mobile.setupMobileUtils();
 const addressFormFlag = ref(false);
+const activityFormFlag = ref(false);
 
 const scheduleStore = useScheduleStore();
 const { element: schedule, geocodeResults } = storeToRefs(scheduleStore);
 const element = computed(() => schedule.value.schedule_items.find(item => item.index === index));
+const isActivity = computed(() => element.value?.operation_type === 'Activity');
 
 // La mappa ripiega sul CAP (pallino rosso) quando l'indirizzo non viene
 // riconosciuto: in quel caso si offre la correzione.
@@ -112,8 +153,20 @@ const invalidAddress = computed(() => {
 
 if (!element.value?.id) {
   element.value.start_time_slot = '08:00';
-  element.value.end_time_slot = '09:00';
+  // Un'attività con durata nota propone la fine; con durata 0 resta la fascia di un'ora.
+  element.value.end_time_slot = isActivity.value && element.value.duration_minutes
+    ? activityUtils.addMinutes('08:00', element.value.duration_minutes)
+    : '09:00';
 }
+
+const saveActivity = (activity) => {
+  Object.assign(element.value, activity);
+  activityFormFlag.value = false;
+};
+
+const removeActivity = () => {
+  schedule.value.schedule_items = schedule.value.schedule_items.filter(item => item.index !== index);
+};
 
 const removeOrder = (order) => {
   const remainingItems = schedule.value.schedule_items.filter(
@@ -136,7 +189,7 @@ const removeOrder = (order) => {
     else if (item.operation_type === 'CollectionPoint')
       return usedCollectionPointIds.has(item.collection_point_id);
     else
-      return false;
+      return item.operation_type === 'Activity';
   });
 };
 </script>
