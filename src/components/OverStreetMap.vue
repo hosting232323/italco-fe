@@ -173,6 +173,32 @@ const drawRoute = async (coords) => {
   routeLine.value = L.geoJSON(route.geometry).addTo(map.value);
 };
 
+// Prodotti del borderò da ritirare a un punto di ritiro, divisi tra già ritirati e
+// ancora da ritirare. Si ricavano dalle tappe-ordine: è lì che il prodotto dice
+// da quale punto di ritiro parte.
+const collectionPointProducts = (item) => {
+  const pending = [];
+  let total = 0;
+
+  (schedule.value.schedule_items || [])
+    .filter(other => other.operation_type === 'Order')
+    .forEach(order => Object.entries(order.products || {}).forEach(([name, product]) => {
+      if (product.collection_point?.id !== item.collection_point_id) return;
+      total++;
+      if (!product.collected) pending.push(name);
+    }));
+
+  return { total, pending };
+};
+
+// Un punto di ritiro con tutti i prodotti già ritirati non serve più al giro.
+const isFullyCollected = (item) => {
+  if (item.operation_type !== 'CollectionPoint') return false;
+  const { total, pending } = collectionPointProducts(item);
+
+  return total > 0 && pending.length === 0;
+};
+
 let updateToken = 0;
 
 const updateMap = async () => {
@@ -181,11 +207,14 @@ const updateMap = async () => {
   loading.value = true;
 
   try {
+    const items = schedule.value.schedule_items.filter(item => !isFullyCollected(item));
     const results = await Promise.all(
-      schedule.value.schedule_items.map(async (item) => {
+      items.map(async (item) => {
         if (!item.address && !item.cap) return null;
 
-        return await geocode(item);
+        const coords = await geocode(item);
+
+        return coords && { ...coords, missing: missingProducts(item) };
       })
     );
 
@@ -199,7 +228,7 @@ const updateMap = async () => {
     locations.value.forEach((pos, i) => {
       const marker = L.marker(
         [pos.lat, pos.lng],
-        { icon: numberedIcon(pos.precision, i + 1) }
+        { icon: numberedIcon(pos.precision, i + 1, pos.missing) }
       ).addTo(map.value);
 
       markers.value.push(marker);
@@ -219,13 +248,33 @@ const precisionColors = {
   cap: { background: '#C62828', color: 'white' }
 };
 
-const numberedIcon = (precision, number) => {
+// Elenco dei prodotti ancora da ritirare, solo per i punti di ritiro di cui una
+// parte è già stata ritirata: se manca tutto non c'è niente da segnalare.
+const missingProducts = (item) => {
+  if (item.operation_type !== 'CollectionPoint') return [];
+  const { total, pending } = collectionPointProducts(item);
+
+  return pending.length < total ? pending : [];
+};
+
+const escapeHtml = (text) => String(text)
+  .replace(/&/g, '&amp;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;');
+
+const numberedIcon = (precision, number, missing = []) => {
   const { background, color } = precisionColors[precision];
+  const info = missing.length
+    ? '<div style="position:absolute;left:32px;top:2px;white-space:nowrap;background:white;color:#212121;' +
+      'border:1px solid #F9A825;border-radius:4px;padding:1px 6px;font-size:11px;font-weight:normal;' +
+      `box-shadow:0 1px 3px rgba(0,0,0,0.4);">Da ritirare: ${escapeHtml(missing.join(', '))}</div>`
+    : '';
   return L.divIcon({
     className: '',
-    html: `<div style="width:28px;height:28px;border-radius:50%;background:${background};color:${color};` +
+    html: '<div style="position:relative;">' +
+      `<div style="width:28px;height:28px;border-radius:50%;background:${background};color:${color};` +
       'border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.5);display:flex;align-items:center;' +
-      `justify-content:center;font-weight:bold;font-size:13px;">${number}</div>`,
+      `justify-content:center;font-weight:bold;font-size:13px;">${number}</div>${info}</div>`,
     iconSize: [28, 28],
     iconAnchor: [14, 14]
   });
@@ -262,7 +311,11 @@ onMounted(() => {
 });
 
 watch(
-  () => (schedule.value.schedule_items || []).map(item => `${item.address}|${item.cap}`).join(';'),
+  () => (schedule.value.schedule_items || []).map(item => [
+    item.address,
+    item.cap,
+    item.operation_type === 'CollectionPoint' ? collectionPointProducts(item).pending.join(',') : ''
+  ].join('|')).join(';'),
   updateMap
 );
 </script>
