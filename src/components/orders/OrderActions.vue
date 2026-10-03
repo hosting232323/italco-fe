@@ -97,6 +97,17 @@
               @click="openExternalLink(item.external_link)"
             />
           </v-col>
+          <v-col cols="3">
+            <v-btn
+              v-if="role == 'Admin' && ['Acquired', 'Booked'].includes(item.status)"
+              icon="mdi-swap-horizontal"
+              variant="text"
+              :color="theme.current.value.primaryColor"
+              title="Sposta in un'altra company"
+              v-bind="activatorProps"
+              @click="openPopUp(item, 'company')"
+            />
+          </v-col>
         </v-row>
       </template>
     </template>
@@ -110,12 +121,18 @@
         :order="order"
         @cancel="isActive.value = false"
       />
+      <MoveOrderCompany
+        v-else-if="popUpType == 'company'"
+        :order="order"
+        @cancel="isActive.value = false"
+      />
     </template>
   </v-dialog>
 </template>
 
 <script setup>
 import ChangeOrderUser from '@/components/orders/ChangeOrderUser';
+import MoveOrderCompany from '@/components/orders/MoveOrderCompany';
 import OrderDeliverySummary from '@/components/orders/OrderDeliverySummary';
 
 import { ref, computed } from 'vue';
