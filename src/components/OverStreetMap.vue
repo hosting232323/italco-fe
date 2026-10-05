@@ -110,7 +110,17 @@ const simplifyAddress = (address) => address
   .filter(Boolean)
   .join(', ');
 
+// Posizione salvata sulla tappa (scelta da Google o indicata sulla mappa nella
+// correzione indirizzo): e' la stessa che usa il backend, niente geocoding.
+const storedPosition = (item) => {
+  const [lat, lng] = item.operation_type === 'Order' ? [item.address_lat, item.address_lon] : [item.lat, item.lon];
+  return lat != null && lng != null ? { lat: +lat, lng: +lng, precision: 'full' } : null;
+};
+
 const geocode = async (item) => {
+  const stored = storedPosition(item);
+  if (stored) return stored;
+
   const cacheKey = `${item.address}|${item.cap}`;
   if (cacheKey in geocodeResults.value) return geocodeResults.value[cacheKey];
 
@@ -262,7 +272,9 @@ onMounted(() => {
 });
 
 watch(
-  () => (schedule.value.schedule_items || []).map(item => `${item.address}|${item.cap}`).join(';'),
+  () => (schedule.value.schedule_items || [])
+    .map(item => `${item.address}|${item.cap}|${JSON.stringify(storedPosition(item))}`)
+    .join(';'),
   updateMap
 );
 </script>
