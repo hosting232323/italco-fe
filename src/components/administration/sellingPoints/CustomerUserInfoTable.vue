@@ -18,7 +18,7 @@
       { title: 'Ragione Sociale', value: 'company_name', sortable: false },
       { title: 'Email', value: 'email', sortable: false },
       { title: 'Codice Distribuzione RAEE', value: 'rae_code', sortable: false },
-      { title: 'Azioni', key: 'actions', sortable: false }
+      { title: 'Azioni', key: 'actions', sortable: false, minWidth: '140px' }
     ]"
   >
     <template #[`item.import_code`]="{ item }">
@@ -43,12 +43,24 @@
       {{ item.customer_user_info?.rae_code }}
     </template>
     <template #[`item.actions`]="{ item }">
-      <v-btn
-        icon="mdi-pencil"
-        variant="text"
-        :color="theme.current.value.primaryColor"
-        @click="openForm(item)"
-      />
+      <v-row no-gutters>
+        <v-col cols="6">
+          <v-btn
+            icon="mdi-pencil"
+            variant="text"
+            :color="theme.current.value.primaryColor"
+            @click="openForm(item)"
+          />
+        </v-col>
+        <v-col cols="6">
+          <v-btn
+            icon="mdi-map-marker-multiple"
+            variant="text"
+            :color="theme.current.value.primaryColor"
+            @click="emit('open-collection-points', item)"
+          />
+        </v-col>
+      </v-row>
     </template>
   </v-data-table>
 </template>
@@ -59,6 +71,7 @@ import { storeToRefs } from 'pinia';
 import storesUtils from '@/utils/stores';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
+const emit = defineEmits(['open-collection-points']);
 const theme = useTheme();
 
 const administrationUserStore = useAdministrationUserStore();
