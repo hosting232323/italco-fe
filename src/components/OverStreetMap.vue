@@ -212,9 +212,7 @@ const updateMap = async () => {
       items.map(async (item) => {
         if (!item.address && !item.cap) return null;
 
-        const coords = await geocode(item);
-
-        return coords && { ...coords, missing: missingProducts(item) };
+        return await geocode(item);
       })
     );
 
@@ -228,7 +226,7 @@ const updateMap = async () => {
     locations.value.forEach((pos, i) => {
       const marker = L.marker(
         [pos.lat, pos.lng],
-        { icon: numberedIcon(pos.precision, i + 1, pos.missing) }
+        { icon: numberedIcon(pos.precision, i + 1) }
       ).addTo(map.value);
 
       markers.value.push(marker);
@@ -248,33 +246,13 @@ const precisionColors = {
   cap: { background: '#C62828', color: 'white' }
 };
 
-// Elenco dei prodotti ancora da ritirare, solo per i punti di ritiro di cui una
-// parte è già stata ritirata: se manca tutto non c'è niente da segnalare.
-const missingProducts = (item) => {
-  if (item.operation_type !== 'CollectionPoint') return [];
-  const { total, pending } = collectionPointProducts(item);
-
-  return pending.length < total ? pending : [];
-};
-
-const escapeHtml = (text) => String(text)
-  .replace(/&/g, '&amp;')
-  .replace(/</g, '&lt;')
-  .replace(/>/g, '&gt;');
-
-const numberedIcon = (precision, number, missing = []) => {
+const numberedIcon = (precision, number) => {
   const { background, color } = precisionColors[precision];
-  const info = missing.length
-    ? '<div style="position:absolute;left:32px;top:2px;white-space:nowrap;background:white;color:#212121;' +
-      'border:1px solid #F9A825;border-radius:4px;padding:1px 6px;font-size:11px;font-weight:normal;' +
-      `box-shadow:0 1px 3px rgba(0,0,0,0.4);">Da ritirare: ${escapeHtml(missing.join(', '))}</div>`
-    : '';
   return L.divIcon({
     className: '',
-    html: '<div style="position:relative;">' +
-      `<div style="width:28px;height:28px;border-radius:50%;background:${background};color:${color};` +
+    html: `<div style="width:28px;height:28px;border-radius:50%;background:${background};color:${color};` +
       'border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.5);display:flex;align-items:center;' +
-      `justify-content:center;font-weight:bold;font-size:13px;">${number}</div>${info}</div>`,
+      `justify-content:center;font-weight:bold;font-size:13px;">${number}</div>`,
     iconSize: [28, 28],
     iconAnchor: [14, 14]
   });
