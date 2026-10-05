@@ -40,7 +40,7 @@
         <h1 id="customer-user-form">
           Dati Punti Vendita
         </h1><hr>
-        <CustomerUserInfoTable />
+        <CustomerUserInfoTable @open-collection-points="openCollectionPoints" />
       </v-container>
     </template>
     <template #default>
@@ -73,6 +73,15 @@
   >
     <CustomerUserInfoForm />
   </v-dialog>
+  <v-dialog
+    v-model="collectionPointsPopUp"
+    max-width="1500"
+  >
+    <CustomerCollectionPointsPopUp
+      v-if="collectionPointsCustomer"
+      :customer="collectionPointsCustomer"
+    />
+  </v-dialog>
 </template>
 
 <script setup>
@@ -87,6 +96,7 @@ import GeographicZoneTable from '@/components/administration/sellingPoints/Geogr
 import GeographicCodePopUp from '@/components/administration/sellingPoints/GeographicCodePopUp';
 import CustomerUserInfoForm from '@/components/administration/sellingPoints/CustomerUserInfoForm';
 import CustomerUserInfoTable from '@/components/administration/sellingPoints/CustomerUserInfoTable';
+import CustomerCollectionPointsPopUp from '@/components/administration/sellingPoints/CustomerCollectionPointsPopUp';
 
 import { ref } from 'vue';
 import { storeToRefs } from 'pinia';
@@ -94,8 +104,11 @@ import { useCustomerRuleStore } from '@/stores/customerRule';
 import { useCustomerGroupStore } from '@/stores/customerGroup';
 import { useGeographicZoneStore } from '@/stores/geographicZone';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
+import { useCollectionPointStore } from '@/stores/collectionPoint';
 
 const popUp = ref(false);
+const collectionPointsPopUp = ref(false);
+const collectionPointsCustomer = ref(null);
 const popUpType = ref('');
 const customerRuleStore = useCustomerRuleStore();
 const customerGroupStore = useCustomerGroupStore();
@@ -113,6 +126,14 @@ const openPopUp = (item, type) => {
     customerGroup.value = item;
   else if(['constraint', 'geographicCode'].includes(type))
     geographicZone.value = item;
+};
+
+const openCollectionPoints = (customer) => {
+  const collectionPointStore = useCollectionPointStore();
+  collectionPointStore.customerId = customer.id;
+  collectionPointStore.ready = false;
+  collectionPointsCustomer.value = customer;
+  collectionPointsPopUp.value = true;
 };
 
 const openCustomerGroupForm = () => {

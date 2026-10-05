@@ -7,7 +7,8 @@ export const useCollectionPointStore = defineStore('collectionPoint', {
     list: [],
     element: {},
     ready: false,
-    activeForm: false
+    activeForm: false,
+    customerId: null
   }),
   actions: {
     createElement(func) {
@@ -30,7 +31,7 @@ export const useCollectionPointStore = defineStore('collectionPoint', {
       storesUtils.refreshList(this, (callback) => http.makeRequest(
         'collection-point',
         'GET',
-        {},
+        { params: this.customerId ? { user_id: this.customerId } : {} },
         callback
       ));
     },
