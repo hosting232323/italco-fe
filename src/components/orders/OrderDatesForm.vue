@@ -188,6 +188,8 @@ if (role.value == 'Customer' && useAutomaticDpc.value)
     body: {
       cap: order.value.cap,
       address: order.value.address,
+      address_lat: order.value.address_lat,
+      address_lon: order.value.address_lon,
       services_id: getServicesIds(),
       products: order.value.products,
       order_id: order.value.id,
