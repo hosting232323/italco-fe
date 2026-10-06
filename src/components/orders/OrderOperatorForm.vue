@@ -31,6 +31,7 @@
         label="Indirizzo"
         :rules="validation.requiredRules"
         @address-components="handleAddressComponents"
+        @coordinates="handleCoordinates"
         @update:is-valid="orderStore.addressValid = $event"
       />
     </v-col>
@@ -153,5 +154,13 @@ watch(
 const handleAddressComponents = (components) => {
   order.value.address = components.address;
   order.value.cap = components.cap;
+};
+
+// La posizione esatta del posto scelto da Google viaggia con l'ordine: il
+// backend non deve rigeocodificare l'indirizzo con Nominatim, che spesso la
+// stessa via la chiama in un altro modo. null quando il testo e' ritoccato a mano.
+const handleCoordinates = (coordinates) => {
+  order.value.address_lat = coordinates?.lat ?? null;
+  order.value.address_lon = coordinates?.lng ?? null;
 };
 </script>
