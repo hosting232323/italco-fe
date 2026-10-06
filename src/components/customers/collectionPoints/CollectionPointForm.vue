@@ -27,6 +27,7 @@
               label="Indirizzo"
               :rules="validation.requiredRules"
               @address-components="handleAddressComponents"
+              @coordinates="handleCoordinates"
             />
           </v-col>
           <v-col
@@ -111,5 +112,11 @@ const callback = (data) => {
 const handleAddressComponents = (components) => {
   collectionPoint.value.address = components.address;
   collectionPoint.value.cap = components.cap;
+};
+
+// Senza posizione (testo ritoccato a mano) il backend geocodifica l'indirizzo.
+const handleCoordinates = (coordinates) => {
+  collectionPoint.value.lat = coordinates?.lat ?? null;
+  collectionPoint.value.lon = coordinates?.lng ?? null;
 };
 </script>
