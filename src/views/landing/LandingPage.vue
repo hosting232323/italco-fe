@@ -505,6 +505,13 @@
       </h2>
       <p>Indica la tua azienda e come ricontattarti. Organizzeremo una demo per mostrarti HUBSTRA e approfondire le tue esigenze.</p>
       <form id="demo-form">
+        <input
+          name="sito_web"
+          class="sr-only"
+          tabindex="-1"
+          autocomplete="off"
+          aria-hidden="true"
+        >
         <div class="form-grid">
           <label>Nome e cognome *<input
             name="nome"
@@ -592,13 +599,13 @@
           type="submit"
           class="button"
         >
-          Prepara richiesta
+          Invia richiesta
         </button>
         <p
           id="form-note"
           class="form-note"
         >
-          Anteprima del modulo: scarichi la richiesta sul tuo dispositivo. Nessun dato viene inviato.
+          La richiesta viene inviata al nostro team, che ti ricontatterà per organizzare la demo.
         </p>
         <p
           id="form-status"
@@ -636,14 +643,14 @@
       <p>Il titolare del trattamento è <strong data-legal="company">[Ragione sociale del titolare da inserire]</strong>, con sede in <span data-legal="address">[Sede legale da inserire]</span>, P. IVA <span data-legal="vat">[Partita IVA del titolare da inserire]</span>. Per richieste relative ai dati personali: <span data-legal="privacyEmail">[Email privacy da inserire]</span>.</p>
       <h3>2. Quali dati vengono raccolti</h3>
       <p>Il modulo demo richiede nome del referente, ragione sociale, email aziendale e numero di cellulare. Puoi aggiungere volontariamente partita IVA, indirizzo aziendale, città, CAP, tipo di attività e un messaggio. Non inserire nel messaggio dati relativi alla salute o altre informazioni particolarmente delicate.</p>
-      <p>Nell’anteprima attuale, i dati sono elaborati soltanto nel browser per creare un file scaricabile: il modulo non li invia a un server e non li salva in cookie o archivi del browser. Se viene configurato l’invio via email, i dati saranno trasmessi solo dopo la conferma nel programma email dell’utente. L’eventuale invio diretto al server richiede l’attivazione e la verifica del relativo servizio.</p>
+      <p>Quando invii il modulo, i dati vengono trasmessi al nostro server, conservati in archivio e inoltrati via email alle persone incaricate di gestire le richieste. Il modulo non li salva in cookie o archivi del browser.</p>
       <h3>3. Perché vengono utilizzati e su quale base</h3>
-      <p>Quando il canale di invio sarà attivato, i dati ricevuti saranno usati per rispondere alla richiesta, ricontattarti via email o telefono, organizzare e presentare la demo e svolgere le attività precontrattuali da te richieste. La base giuridica è l’art. 6, par. 1, lett. b) del GDPR, quando applicabile. Per il referente che agisce per conto di una società, la base è il legittimo interesse del titolare a gestire le richieste professionali ricevute, ai sensi dell’art. 6, par. 1, lett. f).</p>
+      <p>I dati ricevuti saranno usati per rispondere alla richiesta, ricontattarti via email o telefono, organizzare e presentare la demo e svolgere le attività precontrattuali da te richieste. La base giuridica è l’art. 6, par. 1, lett. b) del GDPR, quando applicabile. Per il referente che agisce per conto di una società, la base è il legittimo interesse del titolare a gestire le richieste professionali ricevute, ai sensi dell’art. 6, par. 1, lett. f).</p>
       <p>La richiesta demo non comporta iscrizione a newsletter né invio di campagne promozionali non richieste. Non vengono adottate decisioni automatizzate o attività di profilazione tramite questo modulo.</p>
       <h3>4. Dati necessari e facoltativi</h3>
       <p>I campi contrassegnati con * permettono di identificare la richiesta e ricontattarti. Senza questi dati non è possibile completare il modulo. Partita IVA, indirizzo e altri dettagli aziendali sono facoltativi: puoi richiedere la demo anche senza compilarli.</p>
       <h3>5. Chi può accedere ai dati</h3>
-      <p>Una volta attivato l’invio, potranno accedere ai dati le persone autorizzate a gestire le demo e i fornitori necessari per hosting, posta elettronica e gestione delle richieste, nominati responsabili del trattamento ove richiesto. I dati non saranno diffusi pubblicamente.</p>
+      <p>Potranno accedere ai dati le persone autorizzate a gestire le demo e i fornitori necessari per hosting, posta elettronica e gestione delle richieste, nominati responsabili del trattamento ove richiesto. I dati non saranno diffusi pubblicamente.</p>
       <p>
         <strong>Fornitori e localizzazione del trattamento:</strong> [Da completare dopo la scelta di hosting e servizio email]. Se il servizio prevede trasferimenti fuori dallo Spazio economico europeo, questa informativa dovrà indicare i paesi interessati e le garanzie applicabili ai sensi degli artt. 44–49 GDPR, prima dell’attivazione.
       </p>
@@ -684,7 +691,7 @@
       <h3>Quali cookie usa questa pagina?</h3>
       <p>Questa versione non imposta cookie e non utilizza localStorage o sessionStorage. Non contiene strumenti pubblicitari, pixel di tracciamento, analytics, video incorporati o font caricati da fornitori esterni. Menu, carosello e animazioni funzionano senza salvare identificatori sul dispositivo.</p>
       <h3>Il modulo demo salva i miei dati?</h3>
-      <p>No. Nell’anteprima, i dati restano nella pagina durante la compilazione e possono essere scaricati in un file su richiesta dell’utente. Non vengono salvati in cookie né trasmessi dal modulo. Chiudere la pagina elimina lo stato del modulo, ferma restando l’eventuale conservazione da parte del browser tramite le sue funzioni di compilazione automatica e dei file scaricati dall’utente.</p>
+      <p>Il modulo non salva i dati in cookie o archivi del browser: i dati che compili vengono trasmessi solo quando invii la richiesta, per essere gestiti come descritto nell’informativa privacy. Chiudere la pagina senza inviare elimina quanto scritto, ferma restando l’eventuale compilazione automatica del browser.</p>
       <h3>Perché non compare un banner di consenso?</h3>
       <p>La pagina non installa strumenti di tracciamento per cui raccogliere un consenso. Per i soli cookie strettamente tecnici non è richiesto un consenso preventivo; se verranno aggiunti strumenti che lo richiedono, dovranno restare bloccati fino alla scelta dell’utente, con possibilità di rifiutare e revocare il consenso.</p>
       <h3>Cosa cambia quando il sito viene pubblicato?</h3>
@@ -874,33 +881,36 @@ const setup = (el) => {
     $$('.reveal').forEach((item) => item.classList.add('visible'));
   }
 
-  // Modulo demo.
-  if (HUBSTRA_CONFIG.demoEmail) {
-    $('submit-demo').textContent = 'Apri richiesta via email';
-    $('form-note').textContent = 'La richiesta si apre nel tuo programma email: potrai controllarla e inviarla.';
-  }
+  // Modulo demo: l'invio passa dal backend, che lo gira via email a chi gestisce le richieste.
+  const form = $('demo-form');
+  const submit = $('submit-demo');
+  const status = $('form-status');
 
-  $('demo-form').addEventListener('submit', (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const f = new FormData(e.currentTarget);
-    const text = `Richiesta demo HUBSTRA\n\nNome: ${f.get('nome')}\nEmail aziendale: ${f.get('email')}\nCellulare: ${f.get('cellulare')}\nRagione sociale: ${f.get('azienda')}\nPartita IVA: ${f.get('partita_iva') || 'Non indicata'}\nIndirizzo: ${f.get('indirizzo') || 'Non indicato'}\nCittà: ${f.get('citta') || 'Non indicata'}\nCAP: ${f.get('cap') || 'Non indicato'}\nAttività: ${f.get('attivita')}\n\nMessaggio:\n${f.get('messaggio') || 'Vorrei conoscere HUBSTRA e le sue funzionalità.'}`;
-    const status = $('form-status');
+    const body = Object.fromEntries(new FormData(form));
 
-    if (HUBSTRA_CONFIG.demoEmail) {
-      location.href = 'mailto:' + encodeURIComponent(HUBSTRA_CONFIG.demoEmail) + '?subject=' + encodeURIComponent('Richiesta demo HUBSTRA — ' + f.get('azienda')) + '&body=' + encodeURIComponent(text);
-      status.textContent = 'Richiesta preparata nel tuo programma email. Conferma l’invio da lì.';
-      return;
+    submit.disabled = true;
+    status.textContent = 'Invio in corso…';
+    try {
+      const response = await fetch(`${import.meta.env.VITE_HOSTNAME}demo-request`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const data = await response.json().catch(() => ({}));
+      // Il successo si conferma solo dopo la risposta del server.
+      if (response.ok && data.status === 'ok') {
+        form.reset();
+        status.textContent = 'Richiesta inviata. Ti ricontatteremo al più presto per organizzare la demo.';
+      } else {
+        status.textContent = data.message || 'Invio non riuscito, riprova più tardi.';
+      }
+    } catch {
+      status.textContent = 'Impossibile inviare la richiesta: controlla la connessione e riprova.';
+    } finally {
+      submit.disabled = false;
     }
-
-    const url = URL.createObjectURL(new Blob([text], { type: 'text/plain;charset=utf-8' }));
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'Richiesta_demo_HUBSTRA.txt';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-    status.textContent = 'Richiesta preparata e scaricata. Non è stata inviata: il recapito per le demo deve ancora essere collegato.';
   });
 };
 </script>
