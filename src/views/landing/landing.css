@@ -1319,3 +1319,31 @@ body.landing-lock {
 }
 
 
+
+/* Barra di scorrimento dentro il riquadro: scorre il contenuto interno e il
+   dialog resta un rettangolo pieno con gli angoli arrotondati. */
+.landing .demo-dialog,.landing .legal-dialog {
+  padding:0;
+  overflow:hidden
+}
+.landing .dialog-scroll {
+  max-height:calc(90dvh - 24px);
+  overflow-y:auto;
+  margin:12px 8px 12px 0;
+  scrollbar-width:thin;
+  scrollbar-color:#cfc9e2 transparent
+}
+.landing .demo-dialog .dialog-scroll {
+  padding:33px 37px 33px 45px
+}
+.landing .legal-dialog .dialog-scroll {
+  padding:34px 38px 34px 46px
+}
+@media(max-width:650px) {
+  .landing .demo-dialog .dialog-scroll {
+    padding:28px 17px 28px 25px
+  }
+  .landing .legal-dialog .dialog-scroll {
+    padding:30px 17px 30px 25px
+  }
+}

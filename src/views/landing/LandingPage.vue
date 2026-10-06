@@ -496,123 +496,125 @@
       >
         ×
       </button>
-      <p class="kicker">
-        Richiedi una demo di HUBSTRA.
-      </p>
-      <h2 id="demo-title">
-        Partiamo dalle<br>
-        <em class="serif">tue consegne.</em>
-      </h2>
-      <p>Indica la tua azienda e come ricontattarti. Organizzeremo una demo per mostrarti HUBSTRA e approfondire le tue esigenze.</p>
-      <form id="demo-form">
-        <input
-          name="sito_web"
-          class="sr-only"
-          tabindex="-1"
-          autocomplete="off"
-          aria-hidden="true"
-        >
-        <div class="form-grid">
-          <label>Nome e cognome *<input
-            name="nome"
-            autocomplete="name"
-            required
-            maxlength="100"
+      <div class="dialog-scroll">
+        <p class="kicker">
+          Richiedi una demo di HUBSTRA.
+        </p>
+        <h2 id="demo-title">
+          Partiamo dalle<br>
+          <em class="serif">tue consegne.</em>
+        </h2>
+        <p>Indica la tua azienda e come ricontattarti. Organizzeremo una demo per mostrarti HUBSTRA e approfondire le tue esigenze.</p>
+        <form id="demo-form">
+          <input
+            name="sito_web"
+            class="sr-only"
+            tabindex="-1"
+            autocomplete="off"
+            aria-hidden="true"
           >
-          </label>
-          <label>Ragione sociale *<input
-            name="azienda"
-            autocomplete="organization"
-            required
-            maxlength="150"
-          >
-          </label>
-          <label>Email aziendale *<input
-            type="email"
-            name="email"
-            autocomplete="email"
-            required
-            maxlength="150"
-          >
-          </label>
-          <label>Numero di cellulare *<input
-            type="tel"
-            name="cellulare"
-            autocomplete="tel"
-            required
-            maxlength="30"
-            minlength="6"
-            placeholder="Es. +39 333 1234567"
-          >
-          </label>
-          <label>Partita IVA
-            <input
-              name="partita_iva"
-              maxlength="30"
-              placeholder="Es. IT12345678901"
-            >
-          </label>
-          <label>La tua attività<select name="attivita">
-            <option>Trasportatore / logistica</option>
-            <option>Punto vendita / retail</option>
-            <option>Altro</option>
-          </select>
-          </label>
-          <label class="full">Indirizzo aziendale
-            <input
-              name="indirizzo"
-              autocomplete="street-address"
-              maxlength="200"
-              placeholder="Via e numero civico"
-            >
-          </label>
-          <label>Città
-            <input
-              name="citta"
-              autocomplete="address-level2"
+          <div class="form-grid">
+            <label>Nome e cognome *<input
+              name="nome"
+              autocomplete="name"
+              required
               maxlength="100"
             >
-          </label>
-          <label>CAP
-            <input
-              name="cap"
-              autocomplete="postal-code"
-              maxlength="12"
+            </label>
+            <label>Ragione sociale *<input
+              name="azienda"
+              autocomplete="organization"
+              required
+              maxlength="150"
             >
-          </label>
-          <label class="full">Di cosa hai bisogno?
-            <textarea
-              name="messaggio"
-              maxlength="2000"
-              placeholder="Consegne, RAEE, SMS, utenti, proforma…"
-            />
-          </label>
-        </div>
-        <p class="privacy-short">
-          Useremo i recapiti per rispondere alla tua richiesta e organizzare la demo. Non ti iscrivi a newsletter. Leggi l’<a
-            href="#privacy"
-            data-policy="privacy"
-          >informativa privacy</a>. I campi con * sono necessari per ricontattarti; gli altri sono facoltativi.
-        </p>
-        <button
-          id="submit-demo"
-          type="submit"
-          class="button"
-        >
-          Invia richiesta
-        </button>
-        <p
-          id="form-note"
-          class="form-note"
-        >
-          La richiesta viene inviata al nostro team, che ti ricontatterà per organizzare la demo.
-        </p>
-        <p
-          id="form-status"
-          class="status"
-          role="status"
-        />
-      </form>
+            </label>
+            <label>Email aziendale *<input
+              type="email"
+              name="email"
+              autocomplete="email"
+              required
+              maxlength="150"
+            >
+            </label>
+            <label>Numero di cellulare *<input
+              type="tel"
+              name="cellulare"
+              autocomplete="tel"
+              required
+              maxlength="30"
+              minlength="6"
+              placeholder="Es. +39 333 1234567"
+            >
+            </label>
+            <label>Partita IVA
+              <input
+                name="partita_iva"
+                maxlength="30"
+                placeholder="Es. IT12345678901"
+              >
+            </label>
+            <label>La tua attività<select name="attivita">
+              <option>Trasportatore / logistica</option>
+              <option>Punto vendita / retail</option>
+              <option>Altro</option>
+            </select>
+            </label>
+            <label class="full">Indirizzo aziendale
+              <input
+                name="indirizzo"
+                autocomplete="street-address"
+                maxlength="200"
+                placeholder="Via e numero civico"
+              >
+            </label>
+            <label>Città
+              <input
+                name="citta"
+                autocomplete="address-level2"
+                maxlength="100"
+              >
+            </label>
+            <label>CAP
+              <input
+                name="cap"
+                autocomplete="postal-code"
+                maxlength="12"
+              >
+            </label>
+            <label class="full">Di cosa hai bisogno?
+              <textarea
+                name="messaggio"
+                maxlength="2000"
+                placeholder="Consegne, RAEE, SMS, utenti, proforma…"
+              />
+            </label>
+          </div>
+          <p class="privacy-short">
+            Useremo i recapiti per rispondere alla tua richiesta e organizzare la demo. Non ti iscrivi a newsletter. Leggi l’<a
+              href="#privacy"
+              data-policy="privacy"
+            >informativa privacy</a>. I campi con * sono necessari per ricontattarti; gli altri sono facoltativi.
+          </p>
+          <button
+            id="submit-demo"
+            type="submit"
+            class="button"
+          >
+            Invia richiesta
+          </button>
+          <p
+            id="form-note"
+            class="form-note"
+          >
+            La richiesta viene inviata al nostro team, che ti ricontatterà per organizzare la demo.
+          </p>
+          <p
+            id="form-status"
+            class="status"
+            role="status"
+          />
+        </form>
+      </div>
     </dialog>
 
     <dialog
@@ -627,45 +629,47 @@
       >
         ×
       </button>
-      <p class="kicker">
-        I tuoi dati, con chiarezza.
-      </p>
-      <h2 id="privacy-title">
-        Informativa privacy
-      </h2>
-      <p class="legal-draft">
-        Bozza da completare prima della pubblicazione: devono essere confermati titolare, recapito privacy, fornitori, trasferimenti e tempi di conservazione.
-      </p>
-      <p class="legal-date">
-        Aggiornamento: 3 ottobre 2026 · Informativa ai sensi dell’art. 13 del Regolamento (UE) 2016/679.
-      </p>
-      <h3>1. Chi tratta i dati</h3>
-      <p>Il titolare del trattamento è <strong>Italco.mi Logistribuzioni srls</strong>, con sede in Via Emanuele Filiberto Duca 24/A, 72023 Mesagne (BR), P. IVA IT02735550747. Per richieste relative ai dati personali: <a href="mailto:italco.misrls@pec.it">italco.misrls@pec.it</a>.</p>
-      <h3>2. Quali dati vengono raccolti</h3>
-      <p>Il modulo demo richiede nome del referente, ragione sociale, email aziendale e numero di cellulare. Puoi aggiungere volontariamente partita IVA, indirizzo aziendale, città, CAP, tipo di attività e un messaggio. Non inserire nel messaggio dati relativi alla salute o altre informazioni particolarmente delicate.</p>
-      <p>Quando invii il modulo, i dati vengono trasmessi al nostro server, conservati in archivio e inoltrati via email alle persone incaricate di gestire le richieste. Il modulo non li salva in cookie o archivi del browser.</p>
-      <h3>3. Perché vengono utilizzati e su quale base</h3>
-      <p>I dati ricevuti saranno usati per rispondere alla richiesta, ricontattarti via email o telefono, organizzare e presentare la demo e svolgere le attività precontrattuali da te richieste. La base giuridica è l’art. 6, par. 1, lett. b) del GDPR, quando applicabile. Per il referente che agisce per conto di una società, la base è il legittimo interesse del titolare a gestire le richieste professionali ricevute, ai sensi dell’art. 6, par. 1, lett. f).</p>
-      <p>La richiesta demo non comporta iscrizione a newsletter né invio di campagne promozionali non richieste. Non vengono adottate decisioni automatizzate o attività di profilazione tramite questo modulo.</p>
-      <h3>4. Dati necessari e facoltativi</h3>
-      <p>I campi contrassegnati con * permettono di identificare la richiesta e ricontattarti. Senza questi dati non è possibile completare il modulo. Partita IVA, indirizzo e altri dettagli aziendali sono facoltativi: puoi richiedere la demo anche senza compilarli.</p>
-      <h3>5. Chi può accedere ai dati</h3>
-      <p>Potranno accedere ai dati le persone autorizzate a gestire le demo e i fornitori necessari per hosting, posta elettronica e gestione delle richieste, nominati responsabili del trattamento ove richiesto. I dati non saranno diffusi pubblicamente.</p>
-      <p>
-        <strong>Fornitori e localizzazione del trattamento:</strong> [Da completare dopo la scelta di hosting e servizio email]. Se il servizio prevede trasferimenti fuori dallo Spazio economico europeo, questa informativa dovrà indicare i paesi interessati e le garanzie applicabili ai sensi degli artt. 44–49 GDPR, prima dell’attivazione.
-      </p>
-      <h3>6. Per quanto tempo vengono conservati</h3>
-      <p>I dati delle richieste ricevute saranno conservati per il tempo necessario a gestire la demo e l’eventuale seguito precontrattuale. <strong>Termine o criterio operativo di cancellazione:</strong> [Da definire e confermare dal titolare prima dell’attivazione]. In caso di instaurazione di un rapporto contrattuale, saranno fornite le informazioni sul relativo trattamento e sui termini di conservazione.</p>
-      <h3>7. I tuoi diritti</h3>
-      <p>
-        Nei casi e nei limiti previsti dal GDPR, puoi chiedere accesso ai dati, rettifica, cancellazione, limitazione del trattamento e portabilità, nonché opporti al trattamento fondato sul legittimo interesse. Le richieste possono essere inviate al recapito privacy del titolare indicato sopra. Puoi presentare reclamo al <a
-          href="https://www.garanteprivacy.it"
-          target="_blank"
-          rel="noopener noreferrer"
-        >Garante per la protezione dei dati personali</a>.
-      </p>
-      <h3>8. Dati di navigazione e aggiornamenti</h3>
-      <p>Il codice della pagina non integra strumenti di analisi, pubblicità o tracciamento. Dopo la pubblicazione, l’hosting potrà trattare dati tecnici come indirizzo IP, data e ora della richiesta e informazioni sul browser. Finalità, base giuridica e conservazione degli eventuali log dovranno essere specificate dopo la scelta del fornitore. L’informativa verrà aggiornata in caso di modifiche ai servizi utilizzati.</p>
+      <div class="dialog-scroll">
+        <p class="kicker">
+          I tuoi dati, con chiarezza.
+        </p>
+        <h2 id="privacy-title">
+          Informativa privacy
+        </h2>
+        <p class="legal-draft">
+          Bozza da completare prima della pubblicazione: devono essere confermati titolare, recapito privacy, fornitori, trasferimenti e tempi di conservazione.
+        </p>
+        <p class="legal-date">
+          Aggiornamento: 3 ottobre 2026 · Informativa ai sensi dell’art. 13 del Regolamento (UE) 2016/679.
+        </p>
+        <h3>1. Chi tratta i dati</h3>
+        <p>Il titolare del trattamento è <strong>Italco.mi Logistribuzioni srls</strong>, con sede in Via Emanuele Filiberto Duca 24/A, 72023 Mesagne (BR), P. IVA IT02735550747. Per richieste relative ai dati personali: <a href="mailto:italco.misrls@pec.it">italco.misrls@pec.it</a>.</p>
+        <h3>2. Quali dati vengono raccolti</h3>
+        <p>Il modulo demo richiede nome del referente, ragione sociale, email aziendale e numero di cellulare. Puoi aggiungere volontariamente partita IVA, indirizzo aziendale, città, CAP, tipo di attività e un messaggio. Non inserire nel messaggio dati relativi alla salute o altre informazioni particolarmente delicate.</p>
+        <p>Quando invii il modulo, i dati vengono trasmessi al nostro server, conservati in archivio e inoltrati via email alle persone incaricate di gestire le richieste. Il modulo non li salva in cookie o archivi del browser.</p>
+        <h3>3. Perché vengono utilizzati e su quale base</h3>
+        <p>I dati ricevuti saranno usati per rispondere alla richiesta, ricontattarti via email o telefono, organizzare e presentare la demo e svolgere le attività precontrattuali da te richieste. La base giuridica è l’art. 6, par. 1, lett. b) del GDPR, quando applicabile. Per il referente che agisce per conto di una società, la base è il legittimo interesse del titolare a gestire le richieste professionali ricevute, ai sensi dell’art. 6, par. 1, lett. f).</p>
+        <p>La richiesta demo non comporta iscrizione a newsletter né invio di campagne promozionali non richieste. Non vengono adottate decisioni automatizzate o attività di profilazione tramite questo modulo.</p>
+        <h3>4. Dati necessari e facoltativi</h3>
+        <p>I campi contrassegnati con * permettono di identificare la richiesta e ricontattarti. Senza questi dati non è possibile completare il modulo. Partita IVA, indirizzo e altri dettagli aziendali sono facoltativi: puoi richiedere la demo anche senza compilarli.</p>
+        <h3>5. Chi può accedere ai dati</h3>
+        <p>Potranno accedere ai dati le persone autorizzate a gestire le demo e i fornitori necessari per hosting, posta elettronica e gestione delle richieste, nominati responsabili del trattamento ove richiesto. I dati non saranno diffusi pubblicamente.</p>
+        <p>
+          <strong>Fornitori e localizzazione del trattamento:</strong> [Da completare dopo la scelta di hosting e servizio email]. Se il servizio prevede trasferimenti fuori dallo Spazio economico europeo, questa informativa dovrà indicare i paesi interessati e le garanzie applicabili ai sensi degli artt. 44–49 GDPR, prima dell’attivazione.
+        </p>
+        <h3>6. Per quanto tempo vengono conservati</h3>
+        <p>I dati delle richieste ricevute saranno conservati per il tempo necessario a gestire la demo e l’eventuale seguito precontrattuale. <strong>Termine o criterio operativo di cancellazione:</strong> [Da definire e confermare dal titolare prima dell’attivazione]. In caso di instaurazione di un rapporto contrattuale, saranno fornite le informazioni sul relativo trattamento e sui termini di conservazione.</p>
+        <h3>7. I tuoi diritti</h3>
+        <p>
+          Nei casi e nei limiti previsti dal GDPR, puoi chiedere accesso ai dati, rettifica, cancellazione, limitazione del trattamento e portabilità, nonché opporti al trattamento fondato sul legittimo interesse. Le richieste possono essere inviate al recapito privacy del titolare indicato sopra. Puoi presentare reclamo al <a
+            href="https://www.garanteprivacy.it"
+            target="_blank"
+            rel="noopener noreferrer"
+          >Garante per la protezione dei dati personali</a>.
+        </p>
+        <h3>8. Dati di navigazione e aggiornamenti</h3>
+        <p>Il codice della pagina non integra strumenti di analisi, pubblicità o tracciamento. Dopo la pubblicazione, l’hosting potrà trattare dati tecnici come indirizzo IP, data e ora della richiesta e informazioni sul browser. Finalità, base giuridica e conservazione degli eventuali log dovranno essere specificate dopo la scelta del fornitore. L’informativa verrà aggiornata in caso di modifiche ai servizi utilizzati.</p>
+      </div>
     </dialog>
     <dialog
       id="cookie"
@@ -679,34 +683,36 @@
       >
         ×
       </button>
-      <p class="kicker">
-        Navigazione senza tracciamento.
-      </p>
-      <h2 id="cookie-title">
-        Informativa cookie
-      </h2>
-      <p class="legal-date">
-        Aggiornamento: 3 ottobre 2026 · Riferita al codice di questa versione del sito.
-      </p>
-      <h3>Quali cookie usa questa pagina?</h3>
-      <p>Questa versione non imposta cookie e non utilizza localStorage o sessionStorage. Non contiene strumenti pubblicitari, pixel di tracciamento, analytics, video incorporati o font caricati da fornitori esterni. Menu, carosello e animazioni funzionano senza salvare identificatori sul dispositivo.</p>
-      <h3>Il modulo demo salva i miei dati?</h3>
-      <p>Il modulo non salva i dati in cookie o archivi del browser: i dati che compili vengono trasmessi solo quando invii la richiesta, per essere gestiti come descritto nell’informativa privacy. Chiudere la pagina senza inviare elimina quanto scritto, ferma restando l’eventuale compilazione automatica del browser.</p>
-      <h3>Perché non compare un banner di consenso?</h3>
-      <p>La pagina non installa strumenti di tracciamento per cui raccogliere un consenso. Per i soli cookie strettamente tecnici non è richiesto un consenso preventivo; se verranno aggiunti strumenti che lo richiedono, dovranno restare bloccati fino alla scelta dell’utente, con possibilità di rifiutare e revocare il consenso.</p>
-      <h3>Cosa cambia quando il sito viene pubblicato?</h3>
-      <p>Prima della pubblicazione occorre verificare anche il comportamento dell’hosting e dei servizi eventualmente collegati. Se questi aggiungono cookie o altri identificatori, l’informativa deve indicarne nome, finalità, fornitore e durata. Gli eventuali strumenti non necessari devono essere gestiti con un meccanismo di consenso coerente con le loro caratteristiche.</p>
-      <h3>Come gestire i cookie del browser</h3>
-      <p>
-        Puoi controllare ed eliminare i cookie nelle impostazioni del tuo browser. Per i dati personali e i recapiti del titolare consulta l’<a
-          href="#privacy"
-          data-policy="privacy"
-        >informativa privacy</a>. Le fonti di riferimento sono le <a
-          href="https://www.garanteprivacy.it/home/docweb/-/docweb-display/docweb/9677876"
-          target="_blank"
-          rel="noopener noreferrer"
-        >Linee guida del Garante su cookie e strumenti di tracciamento</a>.
-      </p>
+      <div class="dialog-scroll">
+        <p class="kicker">
+          Navigazione senza tracciamento.
+        </p>
+        <h2 id="cookie-title">
+          Informativa cookie
+        </h2>
+        <p class="legal-date">
+          Aggiornamento: 3 ottobre 2026 · Riferita al codice di questa versione del sito.
+        </p>
+        <h3>Quali cookie usa questa pagina?</h3>
+        <p>Questa versione non imposta cookie e non utilizza localStorage o sessionStorage. Non contiene strumenti pubblicitari, pixel di tracciamento, analytics, video incorporati o font caricati da fornitori esterni. Menu, carosello e animazioni funzionano senza salvare identificatori sul dispositivo.</p>
+        <h3>Il modulo demo salva i miei dati?</h3>
+        <p>Il modulo non salva i dati in cookie o archivi del browser: i dati che compili vengono trasmessi solo quando invii la richiesta, per essere gestiti come descritto nell’informativa privacy. Chiudere la pagina senza inviare elimina quanto scritto, ferma restando l’eventuale compilazione automatica del browser.</p>
+        <h3>Perché non compare un banner di consenso?</h3>
+        <p>La pagina non installa strumenti di tracciamento per cui raccogliere un consenso. Per i soli cookie strettamente tecnici non è richiesto un consenso preventivo; se verranno aggiunti strumenti che lo richiedono, dovranno restare bloccati fino alla scelta dell’utente, con possibilità di rifiutare e revocare il consenso.</p>
+        <h3>Cosa cambia quando il sito viene pubblicato?</h3>
+        <p>Prima della pubblicazione occorre verificare anche il comportamento dell’hosting e dei servizi eventualmente collegati. Se questi aggiungono cookie o altri identificatori, l’informativa deve indicarne nome, finalità, fornitore e durata. Gli eventuali strumenti non necessari devono essere gestiti con un meccanismo di consenso coerente con le loro caratteristiche.</p>
+        <h3>Come gestire i cookie del browser</h3>
+        <p>
+          Puoi controllare ed eliminare i cookie nelle impostazioni del tuo browser. Per i dati personali e i recapiti del titolare consulta l’<a
+            href="#privacy"
+            data-policy="privacy"
+          >informativa privacy</a>. Le fonti di riferimento sono le <a
+            href="https://www.garanteprivacy.it/home/docweb/-/docweb-display/docweb/9677876"
+            target="_blank"
+            rel="noopener noreferrer"
+          >Linee guida del Garante su cookie e strumenti di tracciamento</a>.
+        </p>
+      </div>
     </dialog>
 
     <dialog
