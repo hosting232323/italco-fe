@@ -48,3 +48,36 @@ const links = [
   { href: '#domande', label: 'Domande frequenti' }
 ];
 </script>
+
+<style scoped>
+.menu-dialog {
+  width: 650px;
+  padding: 50px;
+}
+.menu-links {
+  display: grid;
+  gap: 12px;
+  margin: 28px 0;
+}
+.menu-links a {
+  font-size: 38px;
+  font-weight: 500;
+  letter-spacing: -1.6px;
+  padding: 8px 0;
+}
+.menu-links a:hover {
+  color: var(--blue);
+}
+.menu-dialog p {
+  font-size: 14px;
+  color: var(--muted);
+}
+@media (max-width: 650px) {
+  .menu-dialog {
+    padding: 40px 28px;
+  }
+  .menu-links a {
+    font-size: 30px;
+  }
+}
+</style>

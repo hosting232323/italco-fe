@@ -54,3 +54,54 @@ const faq = [
   }
 ];
 </script>
+
+<style scoped>
+.faq-section {
+  padding: 70px 0 110px;
+}
+.faq {
+  max-width: 800px;
+  margin: 50px auto 0;
+}
+details {
+  border-bottom: 1px solid #d4d1dd;
+}
+summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 25px 38px 25px 0;
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: -.5px;
+  position: relative;
+}
+summary::-webkit-details-marker {
+  display: none;
+}
+summary:after {
+  content: '+';
+  position: absolute;
+  right: 3px;
+  top: 23px;
+  font-size: 24px;
+  color: #847a9d;
+  font-weight: 300;
+}
+details[open] summary:after {
+  content: '−';
+}
+@media (max-width: 650px) {
+  .faq-section {
+    padding: 50px 0;
+  }
+  .faq {
+    margin-top: 28px;
+  }
+  summary {
+    font-size: 17px;
+    line-height: 1.5;
+    padding-top: 22px;
+    padding-bottom: 22px;
+  }
+}
+</style>

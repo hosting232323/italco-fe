@@ -44,3 +44,48 @@ const steps = [
   }
 ];
 </script>
+
+<style scoped>
+.workflow {
+  padding: 65px 0 110px;
+}
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 40px;
+  margin-top: 55px;
+}
+.step {
+  border-top: 1px solid #ccc5e1;
+  padding-top: 22px;
+}
+.step span {
+  font-size: 13px;
+  color: var(--blue);
+}
+.step h3 {
+  font-size: 22px;
+  letter-spacing: -.7px;
+  margin: 26px 0 14px;
+  font-weight: 500;
+}
+.step p {
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--muted);
+  margin: 0;
+}
+@media (max-width: 650px) {
+  .workflow {
+    padding: 45px 0 60px;
+  }
+  .steps {
+    grid-template-columns: 1fr;
+    gap: 30px;
+    margin-top: 35px;
+  }
+  .step h3 {
+    margin-top: 17px;
+  }
+}
+</style>

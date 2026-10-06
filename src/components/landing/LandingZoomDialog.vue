@@ -27,3 +27,38 @@ defineProps({
 });
 const emit = defineEmits(['update:modelValue']);
 </script>
+
+<style scoped>
+.zoom-dialog {
+  width: min(1500px,96vw);
+  max-height: 94dvh;
+  padding: 50px 20px 20px;
+  background: #fafafa;
+}
+.zoom-dialog h2 {
+  font-size: 20px;
+  margin: 0 40px 20px 0;
+  font-weight: 500;
+}
+.zoom-dialog img {
+  width: 100%;
+  height: auto;
+  max-height: calc(94dvh - 140px);
+  object-fit: contain;
+  display: block;
+  background: #eeeefe;
+}
+.zoom-dialog p {
+  font-size: 12px;
+  color: #777;
+  margin: 15px 0 0;
+}
+@media (max-width: 650px) {
+  .zoom-dialog {
+    padding: 50px 12px 18px;
+  }
+  .zoom-dialog h2 {
+    font-size: 17px;
+  }
+}
+</style>

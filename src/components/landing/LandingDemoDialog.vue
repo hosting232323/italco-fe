@@ -170,3 +170,102 @@ const submit = async () => {
   }
 };
 </script>
+
+<style scoped>
+.demo-dialog {
+  width: 620px;
+  padding: 45px;
+}
+.demo-dialog h2 {
+  font-size: 38px;
+  font-weight: 500;
+  letter-spacing: -1.8px;
+  margin: 5px 0 15px;
+}
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin: 27px 0 20px;
+}
+label {
+  display: grid;
+  gap: 9px;
+  font-size: 14px;
+  color: #514a61;
+}
+.full {
+  grid-column: 1/-1;
+}
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 13px;
+  border: 1px solid #d9d4e5;
+  background: white;
+  color: #191322;
+  border-radius: 8px;
+  min-width: 0;
+}
+textarea {
+  resize: vertical;
+  min-height: 90px;
+}
+.form-note {
+  font-size: 12px!important;
+  line-height: 1.6;
+  color: #7b738d!important;
+}
+.status {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--blue);
+  margin-top: 18px;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border: 0;
+}
+@media (max-width: 650px) {
+  .demo-dialog {
+    padding: 40px 25px;
+    max-height: 90dvh;
+    overflow: auto;
+  }
+  .demo-dialog h2 {
+    font-size: 32px;
+  }
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .form-grid .full {
+    grid-column: auto;
+  }
+}
+.privacy-short {
+  font-size: 13px;
+  line-height: 1.7;
+  color: #625b70;
+}
+.demo-dialog {
+  max-height: 90dvh;
+  overflow: auto;
+}
+.demo-dialog .dialog-scroll {
+  padding: 33px 37px 33px 45px;
+}
+@media (max-width: 650px) {
+  .demo-dialog .dialog-scroll {
+    padding: 28px 17px 28px 25px;
+  }
+}
+</style>

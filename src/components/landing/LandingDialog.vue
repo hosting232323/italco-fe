@@ -44,3 +44,18 @@ const onBackdropClick = (e) => {
     dialog.value.close();
 };
 </script>
+
+<style scoped>
+.dialog-close {
+  position: absolute;
+  right: 22px;
+  top: 20px;
+  border: 0;
+  background: #eeebf7;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  font-size: 22px;
+  color: #493c6c;
+}
+</style>
