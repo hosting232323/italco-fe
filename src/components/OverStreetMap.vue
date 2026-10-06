@@ -173,6 +173,32 @@ const drawRoute = async (coords) => {
   routeLine.value = L.geoJSON(route.geometry).addTo(map.value);
 };
 
+// Prodotti del borderò da ritirare a un punto di ritiro, divisi tra già ritirati e
+// ancora da ritirare. Si ricavano dalle tappe-ordine: è lì che il prodotto dice
+// da quale punto di ritiro parte.
+const collectionPointProducts = (item) => {
+  const pending = [];
+  let total = 0;
+
+  (schedule.value.schedule_items || [])
+    .filter(other => other.operation_type === 'Order')
+    .forEach(order => Object.entries(order.products || {}).forEach(([name, product]) => {
+      if (product.collection_point?.id !== item.collection_point_id) return;
+      total++;
+      if (!product.collected) pending.push(name);
+    }));
+
+  return { total, pending };
+};
+
+// Un punto di ritiro con tutti i prodotti già ritirati non serve più al giro.
+const isFullyCollected = (item) => {
+  if (item.operation_type !== 'CollectionPoint') return false;
+  const { total, pending } = collectionPointProducts(item);
+
+  return total > 0 && pending.length === 0;
+};
+
 let updateToken = 0;
 
 const updateMap = async () => {
@@ -181,8 +207,9 @@ const updateMap = async () => {
   loading.value = true;
 
   try {
+    const items = schedule.value.schedule_items.filter(item => !isFullyCollected(item));
     const results = await Promise.all(
-      schedule.value.schedule_items.map(async (item) => {
+      items.map(async (item) => {
         if (!item.address && !item.cap) return null;
 
         return await geocode(item);
@@ -262,7 +289,11 @@ onMounted(() => {
 });
 
 watch(
-  () => (schedule.value.schedule_items || []).map(item => `${item.address}|${item.cap}`).join(';'),
+  () => (schedule.value.schedule_items || []).map(item => [
+    item.address,
+    item.cap,
+    item.operation_type === 'CollectionPoint' ? collectionPointProducts(item).pending.join(',') : ''
+  ].join('|')).join(';'),
   updateMap
 );
 </script>
