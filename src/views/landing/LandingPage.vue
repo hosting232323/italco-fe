@@ -545,7 +545,7 @@
             placeholder="Es. +39 333 1234567"
           >
           </label>
-          <label>Partita IVA <span class="field-optional">Facoltativa</span>
+          <label>Partita IVA
             <input
               name="partita_iva"
               maxlength="30"
@@ -558,7 +558,7 @@
             <option>Altro</option>
           </select>
           </label>
-          <label class="full">Indirizzo aziendale <span class="field-optional">Facoltativo</span>
+          <label class="full">Indirizzo aziendale
             <input
               name="indirizzo"
               autocomplete="street-address"
@@ -566,21 +566,21 @@
               placeholder="Via e numero civico"
             >
           </label>
-          <label>Città <span class="field-optional">Facoltativa</span>
+          <label>Città
             <input
               name="citta"
               autocomplete="address-level2"
               maxlength="100"
             >
           </label>
-          <label>CAP <span class="field-optional">Facoltativo</span>
+          <label>CAP
             <input
               name="cap"
               autocomplete="postal-code"
               maxlength="12"
             >
           </label>
-          <label class="full">Di cosa hai bisogno? <span class="field-optional">Facoltativo</span>
+          <label class="full">Di cosa hai bisogno?
             <textarea
               name="messaggio"
               maxlength="2000"
@@ -640,7 +640,7 @@
         Aggiornamento: 3 ottobre 2026 · Informativa ai sensi dell’art. 13 del Regolamento (UE) 2016/679.
       </p>
       <h3>1. Chi tratta i dati</h3>
-      <p>Il titolare del trattamento è <strong data-legal="company">[Ragione sociale del titolare da inserire]</strong>, con sede in <span data-legal="address">[Sede legale da inserire]</span>, P. IVA <span data-legal="vat">[Partita IVA del titolare da inserire]</span>. Per richieste relative ai dati personali: <span data-legal="privacyEmail">[Email privacy da inserire]</span>.</p>
+      <p>Il titolare del trattamento è <strong>Italco.mi Logistribuzioni srls</strong>, con sede in Via Emanuele Filiberto Duca 24/A, 72023 Mesagne (BR), P. IVA IT02735550747. Per richieste relative ai dati personali: <a href="mailto:italco.misrls@pec.it">italco.misrls@pec.it</a>.</p>
       <h3>2. Quali dati vengono raccolti</h3>
       <p>Il modulo demo richiede nome del referente, ragione sociale, email aziendale e numero di cellulare. Puoi aggiungere volontariamente partita IVA, indirizzo aziendale, città, CAP, tipo di attività e un messaggio. Non inserire nel messaggio dati relativi alla salute o altre informazioni particolarmente delicate.</p>
       <p>Quando invii il modulo, i dati vengono trasmessi al nostro server, conservati in archivio e inoltrati via email alle persone incaricate di gestire le richieste. Il modulo non li salva in cookie o archivi del browser.</p>
@@ -735,7 +735,6 @@
 
 <script setup>
 import { onBeforeUnmount, onMounted, ref } from 'vue';
-import { HUBSTRA_CONFIG } from '@/views/landing/config';
 import '@/views/landing/landing.css';
 
 const root = ref(null);
@@ -760,13 +759,6 @@ const setup = (el) => {
   const $ = (id) => el.querySelector('#' + id);
   const $$ = (selector) => [...el.querySelectorAll(selector)];
   const lock = (on) => document.body.classList.toggle('landing-lock', on);
-
-  // Prima dell'attivazione, completare l'informativa con fornitori, log, trasferimenti e conservazione effettivi.
-  for (const item of $$('[data-legal]')) {
-    const value = HUBSTRA_CONFIG.legal[item.dataset.legal];
-    if (value)
-      item.textContent = value;
-  }
 
   const menu = $('menu');
   const demo = $('demo-dialog');
@@ -802,12 +794,7 @@ const setup = (el) => {
   $('open-menu').addEventListener('click', () => openDialog(menu));
   $$('[data-close]').forEach((b) => b.addEventListener('click', () => b.closest('dialog').close()));
   menu.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => menu.close()));
-  $$('[data-demo]').forEach((b) => b.addEventListener('click', () => {
-    if (HUBSTRA_CONFIG.bookingUrl)
-      window.location.assign(HUBSTRA_CONFIG.bookingUrl);
-    else
-      openDialog(demo);
-  }));
+  $$('[data-demo]').forEach((b) => b.addEventListener('click', () => openDialog(demo)));
 
   // Carosello delle schermate.
   const screens = $$('.screen');

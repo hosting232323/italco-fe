@@ -645,6 +645,7 @@ body.landing-lock {
   transform:none
 }
 .landing dialog {
+  margin:auto;
   border:0;
   color:var(--ink);
   padding:0;
@@ -1158,10 +1159,6 @@ body.landing-lock {
   font-size:13px;
   line-height:1.7;
   color:#625b70
-}
-.landing .field-optional {
-  font-size:12px;
-  color:#898092
 }
 .landing .demo-dialog {
   max-height:90dvh;
