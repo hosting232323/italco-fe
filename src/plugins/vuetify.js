@@ -12,7 +12,8 @@ export default createVuetify({
       light: {
         primary: '#2100df',
         primaryColor: '#2100df',
-        secondaryColor: '#ecebff'
+        secondaryColor: '#ffffff',
+        pageColor: '#fafafa'
       }
     }
   }
