@@ -139,8 +139,8 @@ import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useDashboardStore } from '@/stores/dashboard';
 
-const PRIMARY = '#354c7c';
-const PALETTE = ['#354c7c', '#46639e', '#6b83b8', '#9daccd', '#26375a', '#5a7bb5', '#c0cae0', '#8aa0c8'];
+const PRIMARY = '#2100df';
+const PALETTE = ['#2100df', '#4a30f0', '#7a68f5', '#a99ff9', '#16009c', '#5e4ae8', '#cdc7fc', '#9084f2'];
 
 const dashboardStore = useDashboardStore();
 const { analytics } = storeToRefs(dashboardStore);
