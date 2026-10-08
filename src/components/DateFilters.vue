@@ -89,8 +89,13 @@ const previousDateType = ref(filtersSetting.value.dateType);
 const dateFilterTypes = role.value != 'Customer' || element != 'Order'
   ? filterTypes
   : Object.fromEntries(Object.entries(filterTypes).filter(
-    ([key]) => ['drc', 'dpc', 'created_at'].includes(key)
+    ([key]) => ['booking_date', 'drc', 'dpc', 'created_at'].includes(key)
   ));
+
+// Lo store parte da work_date, che al cliente non è concesso: ripiego sul primo tipo valido.
+if (!dateFilterTypes[filtersSetting.value.dateType])
+  filtersSetting.value.dateType = Object.keys(dateFilterTypes)[0];
+previousDateType.value = filtersSetting.value.dateType;
 
 const formatFilters = () => {
   if (!filters.value[`${dateFilterTypes[filtersSetting.value.dateType].entity}.${filtersSetting.value.dateType}`])

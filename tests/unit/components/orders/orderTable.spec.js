@@ -76,3 +76,21 @@ describe('OrderTable, permessi del super admin', () => {
     expect(wrapper.text()).toContain('Crea Borderò');
   });
 });
+
+
+describe('OrderTable, colonna prezzo', () => {
+  const headerTitles = (wrapper) => wrapper.findAllComponents({ name: 'VDataTable' })[0]
+    .props('headers').map(header => header.title);
+
+  it.each(['Admin', 'Customer'])('mostra il prezzo al ruolo %s', (role) => {
+    useUserStore().role = role;
+
+    expect(headerTitles(mountTable())).toContain('Prezzo');
+  });
+
+  it('non mostra il prezzo all'operatore', () => {
+    useUserStore().role = 'Operator';
+
+    expect(headerTitles(mountTable())).not.toContain('Prezzo');
+  });
+});
