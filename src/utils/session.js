@@ -132,7 +132,7 @@ const session = {
   onStorage,
   watchOtherTabs,
   reload: () => window.location.reload(),
-  goToLogin: () => window.location.assign('/')
+  goToLogin: () => window.location.assign('/login')
 };
 
 

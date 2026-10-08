@@ -78,7 +78,7 @@ describe('logout', () => {
 
     await logoutModule.logout(router);
 
-    expect(router.push).toHaveBeenCalledWith('/');
+    expect(router.push).toHaveBeenCalledWith('/login');
   });
 
   it('si disconnette lo stesso se la revoca solleva subito', async () => {
@@ -87,14 +87,14 @@ describe('logout', () => {
 
     await logoutModule.logout(router);
 
-    expect(router.push).toHaveBeenCalledWith('/');
+    expect(router.push).toHaveBeenCalledWith('/login');
   });
 
-  it('riporta alla pagina iniziale', async () => {
+  it('riporta alla pagina di login', async () => {
     const router = { push: vi.fn() };
 
     await logoutModule.logout(router);
 
-    expect(router.push).toHaveBeenCalledWith('/');
+    expect(router.push).toHaveBeenCalledWith('/login');
   });
 });

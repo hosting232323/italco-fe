@@ -34,7 +34,7 @@ const logout = async (router) => {
     await revokeSession();
   } finally {
     resetStores();
-    router.push('/');
+    router.push('/login');
   }
 };
 

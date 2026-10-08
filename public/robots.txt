@@ -1,9 +1,8 @@
 User-agent: *
 
-# Questo dominio ospita l'applicativo Ares Logistics, non un sito vetrina:
-# la radice e' la pagina di login e tutto il resto sta dietro autenticazione.
-# Non c'e' contenuto pubblico da indicizzare, e /order/<id> mostra i dati di
-# una singola spedizione.
+# La radice e' la landing pubblica; l'accesso e' su /login e tutto il resto
+# sta dietro autenticazione. /order/<id> mostra i dati di una singola
+# spedizione e non va indicizzato.
 Disallow: /order
 Disallow: /dashboard
 Disallow: /orders
