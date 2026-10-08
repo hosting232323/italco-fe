@@ -154,7 +154,7 @@ const getHeaders = () => {
     { title: 'Data Consegna', value: 'booking_date', sortable: false },
     { title: 'Data Creazione', value: 'created_at', sortable: false }
   );
-  if (role.value == 'Admin')
+  if (role.value == 'Admin' || role.value == 'Customer')
     headers.push({ title: 'Prezzo', value: 'price', sortable: false });
   headers.push({ title: 'Azioni', key: 'actions', sortable: false });
   return headers;
