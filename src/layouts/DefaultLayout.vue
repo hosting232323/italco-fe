@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <NavigationDrawer />
-    <v-main :style="{ backgroundColor: theme.current.value.secondaryColor }">
+    <v-main :style="{ backgroundColor: theme.current.value.pageColor }">
       <router-view />
       <!-- <ChattyBot
         :hostname="http.hostname"

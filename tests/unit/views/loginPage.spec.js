@@ -20,7 +20,7 @@ vi.mock('generic-module', () => ({
 
 const page = { render: () => h('div') };
 const routes = [
-  { path: '/', name: 'Login', component: page },
+  { path: '/login', name: 'Login', component: page },
   { path: '/dashboard', name: 'Dashboard', component: page },
   { path: '/orders', name: 'Ordini', component: page },
   { path: '/companies', name: 'Company', component: page },
