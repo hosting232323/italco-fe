@@ -88,7 +88,7 @@ describe('OrderTable, colonna prezzo', () => {
     expect(headerTitles(mountTable())).toContain('Prezzo');
   });
 
-  it('non mostra il prezzo all'operatore', () => {
+  it('non mostra il prezzo all\'operatore', () => {
     useUserStore().role = 'Operator';
 
     expect(headerTitles(mountTable())).not.toContain('Prezzo');
