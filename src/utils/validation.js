@@ -32,12 +32,12 @@ const requiredRules = [
   }
 ];
 
-const emailRules = requiredRules.concat([
+const optionalEmailRules = [
   (value) => {
-    if (/.+@.+\..+/.test(value)) return true;
+    if (!value || /.+@.+\..+/.test(value)) return true;
     return 'E-mail non valida';
   }
-]);
+];
 
 const arrayRules = [
   (value) => {
@@ -110,7 +110,7 @@ export default {
   nonNegativeIntegerRules,
   requiredRulesWithZero,
   requiredRules,
-  emailRules,
+  optionalEmailRules,
   arrayRules,
   capRules,
   phoneRules,

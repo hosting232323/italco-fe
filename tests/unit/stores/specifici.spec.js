@@ -49,14 +49,24 @@ describe('administrationUser store', () => {
     // Sotto HTTPS la password viaggia già dentro un canale cifrato, e l'unico
     // punto dove va protetta è il database: lì ci pensa scrypt lato backend.
     const store = useAdministrationUserStore();
-    store.element = { email: 'mario', password: 'segreta', role: 'Customer' };
+    store.element = { nickname: 'mario', password: 'segreta', role: 'Customer' };
 
     store.createElement(vi.fn());
 
     const [url, method, payload] = lastRequest();
     expect([url, method]).toEqual(['user', 'POST']);
-    expect(payload.body.email).toBe('mario');
+    expect(payload.body.nickname).toBe('mario');
     expect(payload.body.password).toBe('segreta');
+  });
+
+  it('aggiorna un utente con una PUT', () => {
+    const store = useAdministrationUserStore();
+
+    store.updateUser(9, { email: 'a@b.it' }, vi.fn());
+
+    const [url, method, payload] = lastRequest();
+    expect([url, method]).toEqual(['user/9', 'PUT']);
+    expect(payload.body).toEqual({ email: 'a@b.it' });
   });
 
   it('cancella senza forzare per default', () => {
@@ -83,7 +93,7 @@ describe('company store', () => {
     const store = useCompanyStore();
     store.element = {
       name: 'Ares Lecce',
-      adminEmail: 'admin-lecce',
+      adminNickname: 'admin-lecce',
       adminPassword: 'segreta',
       legal_name: 'Ares Lecce SRL',
       address: 'Via Lecce 1',
@@ -98,7 +108,7 @@ describe('company store', () => {
     expect(options.body).toMatchObject({
       rae: false,
       name: 'Ares Lecce',
-      admin_email: 'admin-lecce',
+      admin_nickname: 'admin-lecce',
       admin_password: 'segreta',
       legal_name: 'Ares Lecce SRL',
       tax_code: null

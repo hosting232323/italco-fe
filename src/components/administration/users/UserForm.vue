@@ -1,11 +1,11 @@
 <template>
   <v-card
     v-if="activeForm"
-    :title="user.id ? `Modifica Utente ${user.id}` : 'Crea Utente'"
-    :subtitle="user.id ? '' : `Utenti disponibili: ${MAX_USERS - users.length}`"
+    title="Crea Utente"
+    :subtitle="`Utenti disponibili: ${MAX_USERS - users.length}`"
     class="mt-10 mb-5"
   >
-    <v-card-text v-if="user.id || MAX_USERS - users.length > 0">
+    <v-card-text v-if="MAX_USERS - users.length > 0">
       <v-form
         ref="form"
         @submit.prevent="submitForm"
@@ -16,10 +16,10 @@
             md="6"
           >
             <v-text-field
-              v-model="user.email"
+              v-model="user.nickname"
               :class="isMobile ? '' : 'mr-2'"
-              label="Email"
-              :rules="validation.emailRules"
+              label="Nickname"
+              :rules="validation.requiredRules"
             />
           </v-col>
           <v-col
@@ -29,13 +29,17 @@
             <v-text-field
               v-model="user.password"
               :class="isMobile ? '' : 'ml-2'"
-              :label="user.id ? 'Nuova password (lascia vuoto per non modificarla)' : 'Password'"
-              :rules="user.id ? [] : validation.requiredRules"
+              label="Password"
+              :rules="validation.requiredRules"
             />
           </v-col>
         </v-row>
+        <v-text-field
+          v-model="user.email"
+          label="Email (facoltativa)"
+          :rules="validation.optionalEmailRules"
+        />
         <v-select
-          v-if="!user.id"
           v-model="user.role"
           label="Ruolo"
           :items="['Operator', 'Customer', 'Delivery']"
@@ -115,7 +119,7 @@ const theme = useTheme();
 const loading = ref(false);
 const createdDialog = ref(false);
 const createdPassword = ref('');
-// Messaggio di errore del backend (es. email già in uso): senza questo
+// Messaggio di errore del backend (es. nickname già in uso): senza questo
 // l'esito 'ko' resterebbe muto e il form sembrerebbe non rispondere.
 const message = ref('');
 const isMobile = mobile.setupMobileUtils();
@@ -137,31 +141,18 @@ const submitForm = async () => {
 
   message.value = '';
   loading.value = true;
-  if (user.value.id) {
-    administrationUserStore.updateElement(function (data) {
-      loading.value = false;
-      if (data.status == 'ok') {
-        user.value = {};
-        administrationUserStore.initList();
-        activeForm.value = false;
-      } else {
-        message.value = data.message || 'Errore durante la modifica dell\'utente';
-      }
-    });
-  } else {
-    administrationUserStore.createElement(function (data) {
-      loading.value = false;
-      if (data.status == 'ok') {
-        createdPassword.value = data.password;
-        createdDialog.value = true;
-        user.value = {};
-        administrationUserStore.initList();
-        activeForm.value = false;
-      } else {
-        message.value = data.message || 'Errore durante la creazione dell\'utente';
-      }
-    });
-  }
+  administrationUserStore.createElement(function (data) {
+    loading.value = false;
+    if (data.status == 'ok') {
+      createdPassword.value = data.password;
+      createdDialog.value = true;
+      user.value = {};
+      administrationUserStore.initList();
+      activeForm.value = false;
+    } else {
+      message.value = data.message || 'Errore durante la creazione dell\'utente';
+    }
+  });
 };
 </script>
 

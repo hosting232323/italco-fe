@@ -16,7 +16,7 @@
             v-model="filters['User.id']"
             label="Utente"
             :items="users"
-            item-title="email"
+            item-title="nickname"
             item-value="id"
             clearable
           />

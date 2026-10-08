@@ -14,7 +14,7 @@
         v-model="userId"
         label="Punto vendita di destinazione"
         :items="plan.target_users"
-        item-title="email"
+        item-title="nickname"
         item-value="id"
         :disabled="loading"
       />
@@ -26,9 +26,9 @@
       />
       <template v-else-if="plan">
         <p v-if="plan.source_user">
-          Punto vendita: <b>{{ plan.source_user.email }}</b>
+          Punto vendita: <b>{{ plan.source_user.nickname }}</b>
           <template v-if="plan.target_user">
-            → <b>{{ plan.target_user.email }}</b>
+            → <b>{{ plan.target_user.nickname }}</b>
           </template>
           <br>
           <span style="font-size: smaller;">Ragione Sociale: {{ plan.source_user.company_name || '-' }}</span>

@@ -18,17 +18,6 @@ export const useAdministrationUserStore = defineStore('administrationUser', {
         func
       );
     },
-    updateElement(func) {
-      const body = { email: this.element.email };
-      if (this.element.password) body.password = this.element.password;
-
-      http.makeRequest(
-        `user/${this.element.id}`,
-        'PUT',
-        { body },
-        func
-      );
-    },
     initList() {
       storesUtils.refreshList(this, (callback) => http.makeRequest(
         'user',
@@ -36,6 +25,13 @@ export const useAdministrationUserStore = defineStore('administrationUser', {
         {},
         callback
       ));
+    },
+    updateUser(id, body, func) {
+      http.makeRequest(`user/${id}`, 'PUT', { body }, func);
+    },
+    resetPassword(id, password, func) {
+      const body = password ? { password } : {};
+      http.makeRequest(`user/${id}/password`, 'POST', { body }, func);
     },
     deleteElement(force, element, func) {
       const args = {};

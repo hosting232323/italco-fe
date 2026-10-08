@@ -50,7 +50,7 @@
     >
       <template #item="{ element }">
         <v-chip
-          :text="element.email"
+          :text="element.nickname"
           class="draggable-chip ma-1"
           draggable
         />

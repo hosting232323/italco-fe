@@ -48,7 +48,7 @@
         >
           <template #item="{ element }">
             <v-chip
-              :text="element.email"
+              :text="element.nickname"
               closable
               class="draggable-chip mr-2 mt-2"
               @click:close="removeUser(element.id)"
