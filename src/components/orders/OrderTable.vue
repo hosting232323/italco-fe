@@ -63,6 +63,9 @@
             <Action :item="item" />
           </div>
         </template>
+        <template #[`item.user.company_name`]="{ item }">
+          {{ item.user?.company_name || item.user?.nickname || '' }}
+        </template>
         <template #[`item.created_at`]="{ item }">
           {{ createdAt(item.created_at) }}
         </template>
@@ -147,7 +150,7 @@ const getHeaders = () => {
     { title: 'Recapito', value: 'addressee_contact', sortable: false }
   ];
   if (role.value != 'Customer')
-    headers.push({ title: 'Punto Vendita', value: 'user.nickname', sortable: false });
+    headers.push({ title: 'Punto Vendita', value: 'user.company_name', sortable: false });
   headers.push(
     { title: 'D.P.C.', value: 'dpc', sortable: false },
     { title: 'D.R.C.', value: 'drc', sortable: false },
