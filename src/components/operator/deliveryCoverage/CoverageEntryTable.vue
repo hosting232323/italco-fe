@@ -6,6 +6,7 @@
       { title: 'Veicolo', value: 'transport_name', sortable: false },
       { title: 'Fascia oraria', value: 'slot', sortable: false },
       { title: 'CAP', value: 'caps', sortable: false },
+      { title: 'Precarichi', value: 'accepts_preloads', sortable: false },
       { title: 'Azioni', key: 'actions', sortable: false }
     ]"
   >
@@ -32,15 +33,9 @@
       >
         Zona su mappa
       </v-chip>
-      <v-chip
-        v-if="item.accepts_preloads"
-        size="small"
-        color="primary"
-        variant="tonal"
-        prepend-icon="mdi-package-up"
-      >
-        Precarichi
-      </v-chip>
+    </template>
+    <template #[`item.accepts_preloads`]="{ item }">
+      {{ item.accepts_preloads ? 'Sì' : 'No' }}
     </template>
     <template #[`item.actions`]="{ item }">
       <v-btn
