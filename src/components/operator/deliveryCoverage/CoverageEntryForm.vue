@@ -89,6 +89,14 @@
           persistent-hint
           :rules="validation.arrayRules"
         />
+        <v-switch
+          v-model="element.accepts_preloads"
+          label="Accetta precarichi"
+          hint="Gli ordini di quest'area hanno come fasce solo quelle dei giorni in cui il veicolo passa già dagli stessi punti di ritiro"
+          persistent-hint
+          color="primary"
+          class="mt-2"
+        />
         <FormButtons
           :loading="loading"
           @cancel="entryForm = false"

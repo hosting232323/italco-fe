@@ -32,6 +32,15 @@
       >
         Zona su mappa
       </v-chip>
+      <v-chip
+        v-if="item.accepts_preloads"
+        size="small"
+        color="primary"
+        variant="tonal"
+        prepend-icon="mdi-package-up"
+      >
+        Precarichi
+      </v-chip>
     </template>
     <template #[`item.actions`]="{ item }">
       <v-btn
@@ -86,6 +95,7 @@ const editItem = (item) => {
     start_time: item.start_time.slice(0, 5),
     end_time: item.end_time.slice(0, 5),
     caps: [...item.caps],
+    accepts_preloads: !!item.accepts_preloads,
     polygon: item.polygon ? item.polygon.map((point) => [...point]) : null
   };
   entryForm.value = true;
