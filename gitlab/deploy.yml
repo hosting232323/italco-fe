@@ -7,13 +7,7 @@
     - |
       set -eu
 
-      if [ "$CI_JOB_NAME" = "deploy_test" ]; then
-        CONTAINER_ACTIVE="${PROJECT_NAME}-test"
-        CONTAINER_NEXT="${PROJECT_NAME}-test-next"
-        FIRST_PORT="${PORT_TEST%%-*}"
-        SECOND_PORT="${PORT_TEST#*-}"
-        IMAGE_TAG="test-$CI_COMMIT_SHA"
-      elif [ "$CI_JOB_NAME" = "deploy_demo" ]; then
+      if [ "$CI_JOB_NAME" = "deploy_demo" ]; then
         # Ambiente demo per i lavori lunghi (es. pianificazione automatica).
         # Come test/prod: porta pubblicata, il routing di demo.ares-logistics.it
         # verso :3010 (e /api verso Traefik) e' configurato una volta sull'host.
@@ -68,17 +62,10 @@
   after_script:
     - docker logout "$CI_REGISTRY" || true
 
-deploy_test:
-  extends: .deploy
-  needs:
-    - build_test
-  when: manual
-
-# Ambiente demo per i lavori lunghi (es. pianificazione automatica): stessa
-# meccanica di deploy_test (container attivo/next, porta pubblicata) ma su porte
-# fisse 3010/3011. Il routing di demo.ares-logistics.it -> :3010 per la SPA e di
-# demo.ares-logistics.it/api -> Traefik per il backend va configurato una volta
-# sull'host, come gia' fatto per test.
+# Ambiente demo per i lavori lunghi (es. pianificazione automatica): container
+# attivo/next con porta pubblicata, su porte fisse 3010/3011. Il routing di
+# demo.ares-logistics.it -> :3010 per la SPA e di demo.ares-logistics.it/api ->
+# Traefik per il backend va configurato una volta sull'host.
 deploy_demo:
   extends: .deploy
   needs:
