@@ -46,6 +46,21 @@
         </v-col>
       </v-row>
       <v-row
+        v-if="role == 'Customer'"
+        no-gutters
+        class="mt-2"
+      >
+        <v-col cols="12">
+          <v-switch
+            v-model="order.preloaded"
+            label="Ordine precaricato"
+            hint="Nelle aree che accettano precarichi mostra anche i giorni in cui il corriere ha già ritirato dagli stessi punti il giorno prima"
+            persistent-hint
+            color="primary"
+          />
+        </v-col>
+      </v-row>
+      <v-row
         no-gutters
         class="mt-4"
       >
@@ -123,7 +138,7 @@ import DateField from '@/components/DateField';
 import FormButtons from '@/components/FormButtons';
 import DpcCalendarField from '@/components/orders/DpcCalendarField';
 
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import days from '@/utils/days';
 import http from '@/utils/http';
 import mobile from '@/utils/mobile';
@@ -183,7 +198,7 @@ const getServicesIds = () => {
   return [...new Set(ids)];
 };
 
-if (role.value == 'Customer' && useAutomaticDpc.value)
+const loadAllowedDates = () => {
   http.makeRequest('check-constraints', 'POST', {
     body: {
       cap: order.value.cap,
@@ -193,6 +208,7 @@ if (role.value == 'Customer' && useAutomaticDpc.value)
       services_id: getServicesIds(),
       products: order.value.products,
       order_id: order.value.id,
+      preloaded: !!order.value.preloaded,
     }
   }, (data) => {
     if (data.status === 'ok') {
@@ -202,9 +218,22 @@ if (role.value == 'Customer' && useAutomaticDpc.value)
       allowedDpcDates.value = [];
       dpcSlots.value = {};
     }
+    // La data già scelta che non è più disponibile (es. dopo aver cambiato
+    // "precaricato") si azzera.
+    if (order.value.dpc && !allowedDpcDates.value.includes(order.value.dpc)) {
+      order.value.dpc = null;
+      order.value.delivery_slot_start = null;
+      order.value.delivery_slot_end = null;
+    }
     loadingDates.value = false;
   });
-else {
+};
+
+if (role.value == 'Customer' && useAutomaticDpc.value) {
+  loadAllowedDates();
+  // Cambiare "precaricato" cambia i giorni offerti: si rileggono.
+  watch(() => order.value.preloaded, loadAllowedDates);
+} else {
   allowedDpcDates.value = nextTwoMonths;
   loadingDates.value = false;
 }
