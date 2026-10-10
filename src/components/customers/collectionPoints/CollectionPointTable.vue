@@ -14,11 +14,15 @@
       { title: 'Indirizzo', value: 'address', sortable: false },
       { title: 'Cap', value: 'cap', sortable: false },
       { title: 'Orari', value: 'opening_closing', sortable: false },
+      { title: 'Precarico', value: 'preloaded', sortable: false },
       { title: 'Azioni', key: 'actions', sortable: false },
     ]"
   >
     <template #[`item.opening_closing`]="{ item }">
       {{ formatTime(item.opening_time) }} - {{ formatTime(item.closing_time) }}
+    </template>
+    <template #[`item.preloaded`]="{ item }">
+      {{ item.preloaded ? 'Sì' : 'No' }}
     </template>
     <template #[`item.actions`]="{ item }">
       <v-row no-gutters>

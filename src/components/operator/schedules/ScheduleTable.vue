@@ -30,6 +30,12 @@
         <template v-else>
           {{ scheduleItem.operation_type == 'Order' ? 'Ordine' : 'Punto di ritiro' }}
           ID: <b>{{ scheduleItem.operation_type == 'Order' ? scheduleItem.order_id : scheduleItem.collection_point_id }}</b>
+          <v-icon
+            v-if="scheduleItem.has_preload"
+            icon="mdi-package-up"
+            size="x-small"
+            title="Include un precarico da ritirare per il giorno dopo"
+          />
           Indirizzo: <b>{{ scheduleItem.address }}</b>
         </template>
       </div>
