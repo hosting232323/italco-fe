@@ -37,6 +37,12 @@
         {{ element.index + 1 }}:
         {{ element.operation_type == 'Order' ? 'Ordine' : 'Punto di ritiro' }}
         ID {{ element.operation_type == 'Order' ? element.order_id : element.collection_point_id }}
+        <v-icon
+          v-if="element.has_preload"
+          icon="mdi-package-up"
+          size="x-small"
+          title="Oltre ai prodotti di questo borderò c'è anche un precarico da ritirare per il giorno dopo"
+        />
       </p>
       <div
         v-if="isActivity && element.note"
@@ -187,7 +193,8 @@ const removeOrder = (order) => {
     if (item.operation_type === 'Order')
       return true;
     else if (item.operation_type === 'CollectionPoint')
-      return usedCollectionPointIds.has(item.collection_point_id);
+      // Un punto con un precarico resta anche se nessun ordine del borderò lo usa più.
+      return item.has_preload || usedCollectionPointIds.has(item.collection_point_id);
     else
       return item.operation_type === 'Activity';
   });
