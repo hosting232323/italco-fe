@@ -1,115 +1,91 @@
 <template>
   <v-dialog max-width="1500">
     <template #activator="{ props: activatorProps }">
-      <v-row no-gutters>
-        <v-col cols="3">
+      <div class="d-flex flex-wrap align-center">
+        <v-btn
+          icon="mdi-pencil"
+          variant="text"
+          :color="theme.current.value.primaryColor"
+          @click="openForm(item)"
+        />
+        <v-btn
+          variant="text"
+          icon="mdi-file-export"
+          :loading="loadingExport"
+          :color="theme.current.value.primaryColor"
+          @click="exportPdf(item)"
+        />
+        <v-btn
+          icon="mdi-truck-delivery"
+          variant="text"
+          :color="theme.current.value.primaryColor"
+          v-bind="activatorProps"
+          @click="openPopUp(item, 'delivery')"
+        />
+        <v-btn
+          icon="mdi-link-variant"
+          variant="text"
+          :color="theme.current.value.primaryColor"
+          title="Copia link ordine"
+          @click="copyOrderLink(item.id)"
+        />
+        <template v-if="role != 'Customer'">
           <v-btn
-            icon="mdi-pencil"
+            icon="mdi-account"
             variant="text"
             :color="theme.current.value.primaryColor"
-            @click="openForm(item)"
-          />
-        </v-col>
-        <v-col cols="3">
-          <v-btn
-            variant="text"
-            icon="mdi-file-export"
-            :loading="loadingExport"
-            :color="theme.current.value.primaryColor"
-            @click="exportPdf(item)"
-          />
-        </v-col>
-        <v-col cols="3">
-          <v-btn
-            icon="mdi-truck-delivery"
-            variant="text"
-            :color="theme.current.value.primaryColor"
+            title="Cambia punto vendita"
             v-bind="activatorProps"
-            @click="openPopUp(item, 'delivery')"
+            @click="openPopUp(item, 'customer')"
           />
-        </v-col>
-        <v-col cols="3">
           <v-btn
-            icon="mdi-link-variant"
+            v-if="role == 'Admin'"
+            icon="mdi-delete"
+            :loading="loadingDelete"
             variant="text"
             :color="theme.current.value.primaryColor"
-            title="Copia link ordine"
-            @click="copyOrderLink(item.id)"
+            title="Elimina ordine"
+            @click="deleteOrder(item)"
           />
-        </v-col>
-      </v-row>
-      <template v-if="role != 'Customer'">
-        <v-row no-gutters>
-          <v-col cols="3">
-            <v-btn
-              icon="mdi-account"
-              variant="text"
-              :color="theme.current.value.primaryColor"
-              title="Cambia punto vendita"
-              v-bind="activatorProps"
-              @click="openPopUp(item, 'customer')"
-            />
-          </v-col>
-          <v-col cols="3">
-            <v-btn
-              v-if="role == 'Admin'"
-              icon="mdi-delete"
-              :loading="loadingDelete"
-              variant="text"
-              :color="theme.current.value.primaryColor"
-              title="Elimina ordine"
-              @click="deleteOrder(item)"
-            />
-          </v-col>
-          <v-col cols="3">
-            <v-btn
-              v-if="item.status == 'To Reschedule' &&
-                Object.values(item.products).every(
-                  product => !product.rae_product || !product.rae_product.status.includes(['Emitted', 'Generated'])
-                )"
-              icon="mdi-content-copy"
-              variant="text"
-              :color="theme.current.value.primaryColor"
-              title="Clona ordine"
-              @click="copyOrder(item)"
-            />
-          </v-col>
-          <v-col cols="3">
-            <v-btn
-              v-if="raeEnabled && Object.values(item.products).some(product => product.rae_product) && !['Acquired', 'Booked'].includes(item.status)"
-              icon="mdi-human-dolly"
-              variant="text"
-              :loading="raeLoading"
-              :color="theme.current.value.primaryColor"
-              title="Esportazione Raee"
-              @click="raeExport(item)"
-            />
-          </v-col>
-        </v-row>
-        <v-row no-gutters>
-          <v-col cols="3">
-            <v-btn
-              v-if="item.external_link"
-              icon="mdi-exit-to-app"
-              variant="text"
-              :color="theme.current.value.primaryColor"
-              title="Chudi ordine in piattaforma Euronics"
-              @click="openExternalLink(item.external_link)"
-            />
-          </v-col>
-          <v-col cols="3">
-            <v-btn
-              v-if="role == 'Admin' && ['Acquired', 'Booked'].includes(item.status)"
-              icon="mdi-swap-horizontal"
-              variant="text"
-              :color="theme.current.value.primaryColor"
-              title="Sposta in un'altra company"
-              v-bind="activatorProps"
-              @click="openPopUp(item, 'company')"
-            />
-          </v-col>
-        </v-row>
-      </template>
+          <v-btn
+            v-if="item.status == 'To Reschedule' &&
+              Object.values(item.products).every(
+                product => !product.rae_product || !product.rae_product.status.includes(['Emitted', 'Generated'])
+              )"
+            icon="mdi-content-copy"
+            variant="text"
+            :color="theme.current.value.primaryColor"
+            title="Clona ordine"
+            @click="copyOrder(item)"
+          />
+          <v-btn
+            v-if="raeEnabled && Object.values(item.products).some(product => product.rae_product) && !['Acquired', 'Booked'].includes(item.status)"
+            icon="mdi-human-dolly"
+            variant="text"
+            :loading="raeLoading"
+            :color="theme.current.value.primaryColor"
+            title="Esportazione Raee"
+            @click="raeExport(item)"
+          />
+          <v-btn
+            v-if="item.external_link"
+            icon="mdi-exit-to-app"
+            variant="text"
+            :color="theme.current.value.primaryColor"
+            title="Chudi ordine in piattaforma Euronics"
+            @click="openExternalLink(item.external_link)"
+          />
+          <v-btn
+            v-if="role == 'Admin' && ['Acquired', 'Booked'].includes(item.status)"
+            icon="mdi-swap-horizontal"
+            variant="text"
+            :color="theme.current.value.primaryColor"
+            title="Sposta in un'altra company"
+            v-bind="activatorProps"
+            @click="openPopUp(item, 'company')"
+          />
+        </template>
+      </div>
     </template>
     <template #default="{ isActive }">
       <OrderDeliverySummary

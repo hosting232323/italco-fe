@@ -4,7 +4,7 @@
     max-width="1500"
   >
     <template #activator>
-      <v-container>
+      <v-container class="orders-page">
         <h1>
           Ordini
           <v-btn
@@ -51,3 +51,16 @@ const openForm = () => {
   activeForm.value = true;
 };
 </script>
+
+<style scoped>
+/* Da desktop la pagina occupa la viewport: titolo, filtri e comandi restano
+   fermi e scorre solo la tabella (vedi OrderTable). */
+@media (min-width: 960px) {
+  .orders-page {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow-y: auto;
+  }
+}
+</style>
