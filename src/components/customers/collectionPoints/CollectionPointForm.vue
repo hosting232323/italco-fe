@@ -64,6 +64,13 @@
             />
           </v-col>
         </v-row>
+        <v-switch
+          v-model="collectionPoint.preloaded"
+          label="Precarico"
+          hint="Nelle aree che accettano precarichi i prodotti di questo punto si ritirano il giorno prima della consegna"
+          persistent-hint
+          color="primary"
+        />
         <FormButtons
           :loading="loading"
           @cancel="activeForm = false"
