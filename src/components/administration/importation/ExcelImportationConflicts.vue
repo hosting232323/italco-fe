@@ -91,9 +91,9 @@
             </v-col>
             <v-col cols="6">
               <v-select
-                v-model="selectedAresServices[order['Rif. Com'] + productName]"
+                v-model="selectedHubstraServices[order['Rif. Com'] + productName]"
                 :items="getServiceUser()"
-                label="Servizi da Ares"
+                label="Servizi da Hubstra"
                 item-title="name"
                 item-value="id"
                 :rules="getRules(order, productName)"
@@ -102,7 +102,7 @@
                 <template #item="{ props }">
                   <v-list-item
                     v-bind="props"
-                    @click="selectService(order, productName, 'ares')"
+                    @click="selectService(order, productName, 'hubstra')"
                   />
                 </template>
               </v-select>
@@ -162,7 +162,7 @@ const serviceNames = ref({});
 const orderStore = useOrderStore();
 const activeNewProductForm = ref({});
 const selectedFileServices = ref({});
-const selectedAresServices = ref({});
+const selectedHubstraServices = ref({});
 const serviceStore = useServiceStore();
 const emits = defineEmits(['cancel', 'deleteOrder']);
 
@@ -214,14 +214,14 @@ const submitConflictsForm = async () => {
 
 const selectService = (order, productName, type) => {
   const refId = order['Rif. Com'] + productName;
-  const serviceId = type == 'file' ? selectedFileServices.value[refId] : selectedAresServices.value[refId];
+  const serviceId = type == 'file' ? selectedFileServices.value[refId] : selectedHubstraServices.value[refId];
   order.products[productName].services.push(serviceId);
 
   if (!serviceNames.value[serviceId])
     serviceNames.value[serviceId] = services.value.find(service => service.users.find(user => user.id == serviceId)).name;
 
-  if (type == 'ares')
-    selectedAresServices.value[refId] = null;
+  if (type == 'hubstra')
+    selectedHubstraServices.value[refId] = null;
   else {
     selectedFileServices.value[refId] = null;
     order.services.splice(order.services.findIndex(service => service.id === serviceId), 1);
