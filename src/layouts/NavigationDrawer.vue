@@ -11,7 +11,7 @@
       class="mt-2 header-item"
     >
       <template #title>
-        <span class="font-weight-bold text-truncate d-block">Ares Logistics</span>
+        <span class="font-weight-bold text-truncate d-block">Hubstra</span>
       </template>
       <template #subtitle>
         <div class="text-truncate">

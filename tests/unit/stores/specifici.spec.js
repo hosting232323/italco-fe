@@ -82,10 +82,10 @@ describe('company store', () => {
   it('invia la password admin raw al backend che la hasha', () => {
     const store = useCompanyStore();
     store.element = {
-      name: 'Ares Lecce',
+      name: 'Hubstra Lecce',
       adminNickname: 'admin-lecce',
       adminPassword: 'segreta',
-      legal_name: 'Ares Lecce SRL',
+      legal_name: 'Hubstra Lecce SRL',
       address: 'Via Lecce 1',
       city: 'Lecce'
     };
@@ -97,10 +97,10 @@ describe('company store', () => {
     expect([url, method]).toEqual(['company', 'POST']);
     expect(options.body).toMatchObject({
       rae: false,
-      name: 'Ares Lecce',
+      name: 'Hubstra Lecce',
       admin_nickname: 'admin-lecce',
       admin_password: 'segreta',
-      legal_name: 'Ares Lecce SRL',
+      legal_name: 'Hubstra Lecce SRL',
       tax_code: null
     });
     expect(options.files).toHaveProperty('logo');
@@ -110,7 +110,7 @@ describe('company store', () => {
     const userStore = useUserStore();
     const orderStore = useOrderStore();
     const callback = vi.fn();
-    const response = { status: 'ok', company: { id: 4, name: 'Ares Bari' } };
+    const response = { status: 'ok', company: { id: 4, name: 'Hubstra Bari' } };
     orderStore.ready = true;
     orderStore.list = [{ id: 9 }];
 
