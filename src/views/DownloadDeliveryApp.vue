@@ -8,10 +8,10 @@
       max-width="96"
       class="mb-6 rounded-login-logo"
     />
-    <h1>App Ares Delivery</h1>
+    <h1>App Hubstra Delivery</h1>
     <p class="mt-2 mb-8">
       Gli utenti Delivery non accedono più dal gestionale: il giro consegne si gestisce
-      dall'app mobile Ares Delivery. L'accesso va attivato dal tuo responsabile prima di
+      dall'app mobile Hubstra Delivery. L'accesso va attivato dal tuo responsabile prima di
       poter installare l'app.
     </p>
 
@@ -68,7 +68,7 @@
       <ol class="pl-4 mb-4">
         <li>Il tuo responsabile ti invita come tester: ricevi una mail da Apple</li>
         <li>Apri quella mail e accetta l'invito a TestFlight</li>
-        <li>Da TestFlight installi l'app Ares Delivery</li>
+        <li>Da TestFlight installi l'app Hubstra Delivery</li>
       </ol>
       <p class="text-body-2 mb-3">
         Non hai ancora ricevuto l'invito? Contatta il tuo responsabile: l'accesso all'app

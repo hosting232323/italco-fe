@@ -5,7 +5,7 @@
   >
     <v-img
       src="/ares-app-icon.png"
-      alt="Logo Ares Logistics"
+      alt="Logo Hubstra"
       class="ml-4 mr-2 rounded-lg"
       height="36"
       max-width="36"
@@ -14,7 +14,7 @@
     />
     <v-app-bar-title>
       <b>
-        Ares Logistics
+        Hubstra
       </b>
     </v-app-bar-title>
   </v-app-bar>
