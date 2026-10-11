@@ -69,8 +69,8 @@
       </li>
     </ul>
     <br>
-    <h3>3. App mobile Ares Delivery e geolocalizzazione degli utenti delivery</h3>
-    <p>Gli utenti delivery (corrieri) utilizzano l’app mobile <strong>Ares Delivery</strong>, disponibile per iOS e Android, per gestire il giro consegne. Oltre ai dati indicati al punto 2, l’app tratta i seguenti dati raccolti direttamente dal dispositivo, previo consenso ai relativi permessi di sistema:</p>
+    <h3>3. App mobile Hubstra Delivery e geolocalizzazione degli utenti delivery</h3>
+    <p>Gli utenti delivery (corrieri) utilizzano l’app mobile <strong>Hubstra Delivery</strong>, disponibile per iOS e Android, per gestire il giro consegne. Oltre ai dati indicati al punto 2, l’app tratta i seguenti dati raccolti direttamente dal dispositivo, previo consenso ai relativi permessi di sistema:</p>
     <ul style="margin-left:20px;">
       <li><strong>Posizione geografica precisa</strong> (latitudine e longitudine) del dispositivo in uso</li>
       <li><strong>Fotografie</strong> acquisite tramite la fotocamera o selezionate dalla galleria, a documentazione della consegna</li>
