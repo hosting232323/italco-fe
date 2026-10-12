@@ -24,7 +24,7 @@ build_demo:
     - >
       docker build --provenance=false --sbom=false
       --build-arg VITE_GOOGLE_API_KEY="$VITE_GOOGLE_API_KEY_TEST"
-      --build-arg VITE_HOSTNAME="https://demo.ares-logistics.it/api/"
+      --build-arg VITE_HOSTNAME="https://demo.hubstra.it/api/"
       -t "$CI_REGISTRY_IMAGE:demo-$CI_COMMIT_SHA"
       -t "$CI_REGISTRY_IMAGE:demo-$CI_COMMIT_REF_SLUG" .
     - docker push "$CI_REGISTRY_IMAGE:demo-$CI_COMMIT_SHA"
