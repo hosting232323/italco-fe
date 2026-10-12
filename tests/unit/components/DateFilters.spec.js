@@ -100,17 +100,18 @@ describe('DateFilters', () => {
     const wrapper = mountFilters();
 
     const tipi = typeSelect(wrapper).props('items').map(({ value }) => value);
-    expect(tipi).toEqual(['dpc', 'drc', 'created_at']);
+    expect(tipi).toEqual(['booking_date', 'dpc', 'drc', 'created_at']);
   });
 
-  it('il cliente non riesce ad aprire i filtri appena caricata la pagina', () => {
-    // BUG: il tipo di data di partenza e' work_date (primo di
-    // ORDER_DATE_FILTER_TYPES), che pero' per il ruolo Customer viene filtrato
-    // via: dateFilterTypes[dateType] e' undefined e il componente esplode in
-    // setup. Succede a ogni cliente, perche' filtersSetting non e' persistito.
+  it('il cliente parte da un tipo di data a lui consentito', () => {
+    // Lo store parte da work_date, che al cliente non e' concesso.
     useUserStore().role = 'Customer';
 
-    expect(() => mountFilters()).toThrow(TypeError);
+    const wrapper = mountFilters();
+
+    expect(useOrderStore().filtersSetting.dateType).toBe('booking_date');
+    expect(useOrderStore().filters['Order.booking_date']).toEqual([null, null]);
+    expect(typeSelect(wrapper).props('items')).toHaveLength(4);
   });
 
   it('agli operatori mostra tutti i tipi di data', () => {

@@ -76,8 +76,8 @@
           />
         </v-form>
         <v-btn
-          v-if="role == 'Admin' && !panel && filters['CustomerUser.id'] && filters['Order.booking_date']
-            && filters['Order.booking_date'][0] && filters['Order.booking_date'][1]"
+          v-if="(role == 'Admin' || role == 'Customer') && !panel && (role == 'Customer' || filters['CustomerUser.id'])
+            && filters['Order.booking_date'] && filters['Order.booking_date'][0] && filters['Order.booking_date'][1]"
           class="mt-2 mb-2"
           block
           text="Esporta Fatturazione"
