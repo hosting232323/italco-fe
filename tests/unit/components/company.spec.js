@@ -173,6 +173,10 @@ describe('CompanyForm', () => {
     expect(img.exists()).toBe(true);
     expect(img.props('src')).toBe('https://api.test/company/logo/3.png?token=fake&v=01%2F01%2F2026%2010%3A00');
     expect(wrapper.text()).toContain('Logo attuale');
+
+    // In jsdom l'immagine non carica mai: VImg continua a ripollare con un
+    // timer che scatta dopo il teardown dell'ambiente (window is not defined).
+    wrapper.unmount();
   });
 
   it('mostra il messaggio di errore del backend quando la creazione fallisce', async () => {
