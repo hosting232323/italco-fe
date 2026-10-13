@@ -74,15 +74,14 @@
           <template #bottom>
             <div class="orders-table-bottom">
               <div
-                v-if="selectedCount"
+                v-if="selectedOrder"
                 class="orders-selection-bar"
                 :style="{ background: theme.current.value.primaryColor }"
               >
                 <span class="font-weight-medium mx-2">
-                  {{ selectedCount }} {{ selectedCount == 1 ? 'selezionato' : 'selezionati' }}
+                  1 selezionato
                 </span>
                 <OrderActions
-                  v-if="selectedOrder"
                   :key="selectedOrder.id"
                   :item="selectedOrder"
                 />
