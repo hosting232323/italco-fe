@@ -210,7 +210,9 @@ function selectSlot(iso, slot) {
 }
 
 function isSlotSelected(iso, slot) {
-  return iso === selectedDate.value && slot.start === props.slotStart && slot.end === props.slotEnd;
+  // Un ordine salvato porta la fascia come HH:MM:SS, il check-constraints come HH:MM.
+  const hhmm = (value) => (value ? String(value).slice(0, 5) : value);
+  return iso === selectedDate.value && slot.start === hhmm(props.slotStart) && slot.end === hhmm(props.slotEnd);
 }
 
 watch(() => props.modelValue, (value) => {
