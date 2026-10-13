@@ -71,28 +71,33 @@
           <template #[`item.created_at`]="{ item }">
             {{ createdAt(item.created_at) }}
           </template>
+          <template #bottom>
+            <div class="orders-table-bottom">
+              <div
+                v-if="selectedCount"
+                class="orders-selection-bar"
+                :style="{ background: theme.current.value.primaryColor }"
+              >
+                <span class="font-weight-medium mx-2">
+                  {{ selectedCount }} {{ selectedCount == 1 ? 'selezionato' : 'selezionati' }}
+                </span>
+                <OrderActions
+                  v-if="selectedOrder"
+                  :key="selectedOrder.id"
+                  :item="selectedOrder"
+                />
+                <v-btn
+                  icon="mdi-close"
+                  variant="text"
+                  title="Deseleziona tutto"
+                  @click="schedule.orders = []"
+                />
+              </div>
+              <v-spacer />
+              <v-data-table-footer />
+            </div>
+          </template>
         </v-data-table>
-        <v-slide-y-reverse-transition>
-          <div
-            v-if="selectedCount"
-            class="orders-selection-bar"
-          >
-            <span class="font-weight-medium mx-2">
-              {{ selectedCount }} {{ selectedCount == 1 ? 'selezionato' : 'selezionati' }}
-            </span>
-            <OrderActions
-              v-if="selectedOrder"
-              :key="selectedOrder.id"
-              :item="selectedOrder"
-            />
-            <v-btn
-              icon="mdi-close"
-              variant="text"
-              title="Deseleziona tutto"
-              @click="schedule.orders = []"
-            />
-          </div>
-        </v-slide-y-reverse-transition>
       </div>
     </template>
     <template #default>
@@ -273,28 +278,22 @@ const openStatusesPopup = (item) => {
   flex: 0 0 auto;
 }
 
-.orders-table-area {
-  position: relative;
+/* Footer: barra azioni a sinistra con una selezione, paginazione a destra. */
+.orders-table-bottom {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 4px 8px;
 }
 
-/* Barra flottante: compare sopra la paginazione solo con una selezione. */
 .orders-selection-bar {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 72px;
-  margin: 0 auto;
-  width: fit-content;
-  z-index: 5;
   display: flex;
-  align-items: center;
-  max-width: 95%;
-  padding: 4px 12px;
   flex-wrap: wrap;
-  border-radius: 16px;
-  background: #1f1f3d;
+  align-items: center;
+  min-width: 0;
+  padding: 2px 12px;
+  border-radius: 8px;
   color: #fff;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
 }
 
 .orders-selection-bar :deep(.v-btn) {
