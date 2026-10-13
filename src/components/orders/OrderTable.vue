@@ -34,76 +34,6 @@
           :items-per-page="25"
           :items-per-page-options="[10, 25, 50, 100]"
         >
-          <template #headers="{ columns, allSelected, someSelected, selectAll }">
-            <tr v-if="selectedCount">
-              <th
-                :colspan="columns.length"
-                class="orders-selection-header"
-              >
-                <div class="d-flex flex-wrap align-center">
-                  <v-checkbox-btn
-                    :model-value="allSelected"
-                    :indeterminate="someSelected && !allSelected"
-                    @update:model-value="selectAll"
-                  />
-                  <span class="font-weight-medium mr-4">
-                    {{ selectedCount }} {{ selectedCount == 1 ? 'selezionato' : 'selezionati' }}
-                  </span>
-                  <template v-if="['Admin', 'Operator'].includes(role)">
-                    <v-btn
-                      text="Crea Borderò"
-                      :color="theme.current.value.primaryColor"
-                      prepend-icon="mdi-text-box-plus-outline"
-                      @click="openFormPopUp()"
-                    />
-                    <v-btn
-                      text="Esporta"
-                      :color="theme.current.value.primaryColor"
-                      variant="outlined"
-                      prepend-icon="mdi-microsoft-excel"
-                      :loading="downloadingExcel"
-                      class="ml-2"
-                      @click="downloadExcel()"
-                    />
-                  </template>
-                  <v-divider
-                    v-if="selectedOrder"
-                    vertical
-                    class="mx-3"
-                  />
-                  <OrderActions
-                    v-if="selectedOrder"
-                    :key="selectedOrder.id"
-                    :item="selectedOrder"
-                  />
-                  <v-spacer />
-                  <v-btn
-                    icon="mdi-close"
-                    variant="text"
-                    title="Deseleziona tutto"
-                    @click="schedule.orders = []"
-                  />
-                </div>
-              </th>
-            </tr>
-            <tr v-else>
-              <th
-                v-for="column in columns"
-                :key="column.key"
-                class="text-left"
-              >
-                <v-checkbox-btn
-                  v-if="column.key == 'data-table-select'"
-                  :model-value="allSelected"
-                  :indeterminate="someSelected && !allSelected"
-                  @update:model-value="selectAll"
-                />
-                <template v-else>
-                  {{ column.title }}
-                </template>
-              </th>
-            </tr>
-          </template>
           <template #[`item.info`]="{ item }">
             <OrderInfoRow
               :item="item"
@@ -126,6 +56,47 @@
             {{ createdAt(item.created_at) }}
           </template>
         </v-data-table>
+        <v-slide-y-reverse-transition>
+          <div
+            v-if="selectedCount"
+            class="orders-selection-bar"
+          >
+            <span class="font-weight-medium mx-2">
+              {{ selectedCount }} {{ selectedCount == 1 ? 'selezionato' : 'selezionati' }}
+            </span>
+            <template v-if="['Admin', 'Operator'].includes(role)">
+              <v-btn
+                text="Crea Borderò"
+                variant="text"
+                prepend-icon="mdi-text-box-plus-outline"
+                @click="openFormPopUp()"
+              />
+              <v-btn
+                text="Esporta"
+                variant="text"
+                prepend-icon="mdi-microsoft-excel"
+                :loading="downloadingExcel"
+                @click="downloadExcel()"
+              />
+            </template>
+            <v-divider
+              v-if="selectedOrder"
+              vertical
+              class="mx-2"
+            />
+            <OrderActions
+              v-if="selectedOrder"
+              :key="selectedOrder.id"
+              :item="selectedOrder"
+            />
+            <v-btn
+              icon="mdi-close"
+              variant="text"
+              title="Deseleziona tutto"
+              @click="schedule.orders = []"
+            />
+          </div>
+        </v-slide-y-reverse-transition>
       </div>
     </template>
     <template #default>
@@ -306,9 +277,31 @@ const openStatusesPopup = (item) => {
   flex: 0 0 auto;
 }
 
-/* Con una selezione l'header colonne diventa la barra azioni: la tabella non si sposta. */
-.orders-selection-header {
-  background: #e9e6fb !important;
+.orders-table-area {
+  position: relative;
+}
+
+/* Barra flottante: compare sopra la paginazione solo con una selezione. */
+.orders-selection-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 72px;
+  margin: 0 auto;
+  width: fit-content;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  max-width: 95%;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #1f1f3d;
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.orders-selection-bar :deep(.v-btn) {
+  color: #fff !important;
 }
 
 @media (min-width: 960px) {
