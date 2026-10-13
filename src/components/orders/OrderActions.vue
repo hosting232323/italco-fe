@@ -5,12 +5,14 @@
         <v-btn
           icon="mdi-pencil"
           variant="text"
+          title="Modifica ordine"
           :color="theme.current.value.primaryColor"
           @click="openForm(item)"
         />
         <v-btn
           variant="text"
           icon="mdi-file-export"
+          title="Esporta PDF ordine"
           :loading="loadingExport"
           :color="theme.current.value.primaryColor"
           @click="exportPdf(item)"
@@ -18,6 +20,7 @@
         <v-btn
           icon="mdi-truck-delivery"
           variant="text"
+          title="Riepilogo consegna"
           :color="theme.current.value.primaryColor"
           v-bind="activatorProps"
           @click="openPopUp(item, 'delivery')"

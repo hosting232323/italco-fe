@@ -13,27 +13,6 @@
           prepend-icon="mdi-calendar-arrow-right"
           @click="openSchedulationPopUp()"
         />
-        <template v-if="['Admin', 'Operator'].includes(role) && schedule.orders?.length">
-          <v-btn
-            text="Crea Borderò"
-            :color="theme.current.value.primaryColor"
-            prepend-icon="mdi-text-box-plus-outline"
-            @click="openFormPopUp()"
-          />
-          <v-btn
-            text="Esporta"
-            :color="theme.current.value.primaryColor"
-            prepend-icon="mdi-microsoft-excel"
-            :loading="downloadingExcel"
-            class="ml-2"
-            @click="downloadExcel()"
-          />
-        </template>
-        <OrderActions
-          v-if="selectedOrder"
-          :key="selectedOrder.id"
-          :item="selectedOrder"
-        />
       </div>
       <v-skeleton-loader
         v-if="!ready"
@@ -55,6 +34,76 @@
           :items-per-page="25"
           :items-per-page-options="[10, 25, 50, 100]"
         >
+          <template #headers="{ columns, allSelected, someSelected, selectAll }">
+            <tr v-if="selectedCount">
+              <th
+                :colspan="columns.length"
+                class="orders-selection-header"
+              >
+                <div class="d-flex flex-wrap align-center">
+                  <v-checkbox-btn
+                    :model-value="allSelected"
+                    :indeterminate="someSelected && !allSelected"
+                    @update:model-value="selectAll"
+                  />
+                  <span class="font-weight-medium mr-4">
+                    {{ selectedCount }} {{ selectedCount == 1 ? 'selezionato' : 'selezionati' }}
+                  </span>
+                  <template v-if="['Admin', 'Operator'].includes(role)">
+                    <v-btn
+                      text="Crea Borderò"
+                      :color="theme.current.value.primaryColor"
+                      prepend-icon="mdi-text-box-plus-outline"
+                      @click="openFormPopUp()"
+                    />
+                    <v-btn
+                      text="Esporta"
+                      :color="theme.current.value.primaryColor"
+                      variant="outlined"
+                      prepend-icon="mdi-microsoft-excel"
+                      :loading="downloadingExcel"
+                      class="ml-2"
+                      @click="downloadExcel()"
+                    />
+                  </template>
+                  <v-divider
+                    v-if="selectedOrder"
+                    vertical
+                    class="mx-3"
+                  />
+                  <OrderActions
+                    v-if="selectedOrder"
+                    :key="selectedOrder.id"
+                    :item="selectedOrder"
+                  />
+                  <v-spacer />
+                  <v-btn
+                    icon="mdi-close"
+                    variant="text"
+                    title="Deseleziona tutto"
+                    @click="schedule.orders = []"
+                  />
+                </div>
+              </th>
+            </tr>
+            <tr v-else>
+              <th
+                v-for="column in columns"
+                :key="column.key"
+                class="text-left"
+              >
+                <v-checkbox-btn
+                  v-if="column.key == 'data-table-select'"
+                  :model-value="allSelected"
+                  :indeterminate="someSelected && !allSelected"
+                  @update:model-value="selectAll"
+                />
+                <template v-else>
+                  {{ column.title }}
+                </template>
+              </th>
+            </tr>
+          </template>
           <template #[`item.info`]="{ item }">
             <OrderInfoRow
               :item="item"
@@ -170,6 +219,8 @@ const getHeaders = () => {
   return headers;
 };
 
+const selectedCount = computed(() => schedule.value.orders?.length || 0);
+
 // I comandi del singolo ordine compaiono solo con una riga selezionata.
 const selectedOrder = computed(() => {
   const selected = schedule.value.orders;
@@ -253,6 +304,11 @@ const openStatusesPopup = (item) => {
   flex-wrap: wrap;
   align-items: center;
   flex: 0 0 auto;
+}
+
+/* Con una selezione l'header colonne diventa la barra azioni: la tabella non si sposta. */
+.orders-selection-header {
+  background: #e9e6fb !important;
 }
 
 @media (min-width: 960px) {
