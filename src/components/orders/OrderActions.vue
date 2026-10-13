@@ -5,6 +5,7 @@
         <v-btn
           prepend-icon="mdi-pencil"
           text="Modifica"
+          title="Modifica ordine"
           variant="text"
           :color="theme.current.value.primaryColor"
           @click="openForm(item)"
@@ -13,6 +14,7 @@
           variant="text"
           prepend-icon="mdi-file-export"
           text="PDF ordine"
+          title="Esporta l'ordine in PDF"
           :loading="loadingExport"
           :color="theme.current.value.primaryColor"
           @click="exportPdf(item)"
@@ -20,6 +22,7 @@
         <v-btn
           prepend-icon="mdi-truck-delivery"
           text="Consegna"
+          title="Riepilogo della consegna"
           variant="text"
           :color="theme.current.value.primaryColor"
           v-bind="activatorProps"
@@ -28,6 +31,7 @@
         <v-btn
           prepend-icon="mdi-link-variant"
           text="Link ordine"
+          title="Copia link di tracking dell'ordine"
           variant="text"
           :color="theme.current.value.primaryColor"
           @click="copyOrderLink(item.id)"
@@ -36,19 +40,11 @@
           <v-btn
             prepend-icon="mdi-account"
             text="Punto vendita"
+            title="Cambia punto vendita"
             variant="text"
             :color="theme.current.value.primaryColor"
             v-bind="activatorProps"
             @click="openPopUp(item, 'customer')"
-          />
-          <v-btn
-            v-if="role == 'Admin'"
-            prepend-icon="mdi-delete"
-            text="Elimina"
-            :loading="loadingDelete"
-            variant="text"
-            :color="theme.current.value.primaryColor"
-            @click="deleteOrder(item)"
           />
           <v-btn
             v-if="item.status == 'To Reschedule' &&
@@ -57,6 +53,7 @@
               )"
             prepend-icon="mdi-content-copy"
             text="Clona"
+            title="Clona ordine"
             variant="text"
             :color="theme.current.value.primaryColor"
             @click="copyOrder(item)"
@@ -65,6 +62,7 @@
             v-if="raeEnabled && Object.values(item.products).some(product => product.rae_product) && !['Acquired', 'Booked'].includes(item.status)"
             prepend-icon="mdi-human-dolly"
             text="RAEE"
+            title="Esportazione RAEE"
             variant="text"
             :loading="raeLoading"
             :color="theme.current.value.primaryColor"
@@ -74,6 +72,7 @@
             v-if="item.external_link"
             prepend-icon="mdi-exit-to-app"
             text="Euronics"
+            title="Chiudi ordine in piattaforma Euronics"
             variant="text"
             :color="theme.current.value.primaryColor"
             @click="openExternalLink(item.external_link)"
@@ -82,10 +81,21 @@
             v-if="role == 'Admin' && ['Acquired', 'Booked'].includes(item.status)"
             prepend-icon="mdi-swap-horizontal"
             text="Sposta company"
+            title="Sposta in un'altra company"
             variant="text"
             :color="theme.current.value.primaryColor"
             v-bind="activatorProps"
             @click="openPopUp(item, 'company')"
+          />
+          <v-btn
+            v-if="role == 'Admin'"
+            prepend-icon="mdi-delete"
+            text="Elimina"
+            title="Elimina ordine"
+            :loading="loadingDelete"
+            variant="text"
+            :color="theme.current.value.primaryColor"
+            @click="deleteOrder(item)"
           />
         </template>
       </div>
