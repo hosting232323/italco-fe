@@ -65,6 +65,7 @@
           </v-col>
         </v-row>
         <v-switch
+          v-if="isAdmin"
           v-model="collectionPoint.preloaded"
           label="Precarico"
           hint="Nelle aree che accettano precarichi i prodotti di questo punto si ritirano il giorno prima della consegna"
@@ -85,17 +86,21 @@ import FormButtons from '@/components/FormButtons';
 import { AddressAutocomplete } from 'generic-module';
 import { GOOGLE_API_KEY } from '@/utils/googleMaps';
 
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import validation from '@/utils/validation';
 import { useCollectionPointStore } from '@/stores/collectionPoint';
+import { useUserStore } from '@/stores/user';
 
 const form = ref(null);
 const loading = ref(false);
 const isMobile = mobile.setupMobileUtils();
 const collectionPointStore = useCollectionPointStore();
 const { element: collectionPoint, activeForm } = storeToRefs(collectionPointStore);
+// Il precarico cambia la pianificazione dei veicoli: lo imposta solo l'admin.
+const { effectiveRole } = storeToRefs(useUserStore());
+const isAdmin = computed(() => effectiveRole.value == 'Admin');
 
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;

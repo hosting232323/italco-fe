@@ -76,7 +76,7 @@
           v-model="order.dpc"
           label="Data Prevista dal Cliente"
           :class-style="isMobile ? '' : 'ml-2 mr-2'"
-          :allowed-dates="allowedDpcDates"
+          :allowed-dates="manualDpcDates"
           :rules="validation.requiredRules"
           :disabled="role == 'Operator' && order.id"
           :clearable="false"
@@ -138,6 +138,7 @@ const loading = ref(false);
 const loadingDates = ref(true);
 const allowedDpcDates = ref([]);
 const dpcSlots = ref({});
+const outOfCoverage = ref(false);
 const userStore = useUserStore();
 const orderStore = useOrderStore();
 const administrationUserStore = useAdministrationUserStore();
@@ -198,12 +199,15 @@ const loadAllowedDates = () => {
     if (data.status === 'ok') {
       allowedDpcDates.value = data.dates;
       dpcSlots.value = data.slots || {};
+      outOfCoverage.value = data.covered === false;
     } else {
       allowedDpcDates.value = [];
       dpcSlots.value = {};
+      outOfCoverage.value = true;
     }
-    // La data già scelta che non è più disponibile si azzera.
-    if (order.value.dpc && !allowedDpcDates.value.includes(order.value.dpc)) {
+    // La data già scelta che non è più disponibile si azzera (fuori copertura la
+    // data e' libera: vale quella scelta a mano).
+    if (!outOfCoverage.value && order.value.dpc && !allowedDpcDates.value.includes(order.value.dpc)) {
       order.value.dpc = null;
       order.value.delivery_slot_start = null;
       order.value.delivery_slot_end = null;
@@ -223,9 +227,11 @@ if (role.value == 'Customer' && useAutomaticDpc.value) {
 // scelto è fuori da ogni zona di copertura corrieri. Per il cliente questo si
 // vede dal check-constraints appena fatto (nessuna data disponibile): se
 // mostrassimo comunque il calendario resterebbe vuoto e bloccherebbe l'ordine.
-const showAutomaticDpc = computed(
-  () => useAutomaticDpc.value && (role.value !== 'Customer' || allowedDpcDates.value.length > 0)
-);
+const showAutomaticDpc = computed(() => useAutomaticDpc.value && !(role.value === 'Customer' && outOfCoverage.value));
+
+// Fuori copertura il calendario manuale ammette ogni giorno; con le fasce
+// esaurite (indirizzo coperto, nessuna data) resta vuoto: non c'e' da scegliere.
+const manualDpcDates = computed(() => (outOfCoverage.value ? nextTwoMonths : allowedDpcDates.value));
 
 const goBack = () => {
   if (order.value.schedulation)
