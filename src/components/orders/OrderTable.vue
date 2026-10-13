@@ -13,6 +13,49 @@
           prepend-icon="mdi-calendar-arrow-right"
           @click="openSchedulationPopUp()"
         />
+        <v-menu
+          v-if="selectedCount"
+          eager
+        >
+          <template #activator="{ props: menuProps }">
+            <v-btn
+              v-bind="menuProps"
+              :text="`Azioni (${selectedCount})`"
+              :color="theme.current.value.primaryColor"
+              variant="outlined"
+              prepend-icon="mdi-checkbox-multiple-marked-outline"
+              append-icon="mdi-menu-down"
+            />
+          </template>
+          <v-list min-width="260">
+            <template v-if="['Admin', 'Operator'].includes(role)">
+              <v-list-item
+                title="Crea Borderò"
+                prepend-icon="mdi-text-box-plus-outline"
+                @click="openFormPopUp()"
+              />
+              <v-list-item
+                title="Esporta"
+                prepend-icon="mdi-microsoft-excel"
+                :disabled="downloadingExcel"
+                @click="downloadExcel()"
+              />
+            </template>
+            <v-divider v-if="selectedOrder" />
+            <OrderActions
+              v-if="selectedOrder"
+              :key="selectedOrder.id"
+              :item="selectedOrder"
+              labeled
+            />
+            <v-divider />
+            <v-list-item
+              title="Deseleziona tutto"
+              prepend-icon="mdi-close"
+              @click="schedule.orders = []"
+            />
+          </v-list>
+        </v-menu>
       </div>
       <v-skeleton-loader
         v-if="!ready"
@@ -56,47 +99,6 @@
             {{ createdAt(item.created_at) }}
           </template>
         </v-data-table>
-        <v-slide-y-reverse-transition>
-          <div
-            v-if="selectedCount"
-            class="orders-selection-bar"
-          >
-            <span class="font-weight-medium mx-2">
-              {{ selectedCount }} {{ selectedCount == 1 ? 'selezionato' : 'selezionati' }}
-            </span>
-            <template v-if="['Admin', 'Operator'].includes(role)">
-              <v-btn
-                text="Crea Borderò"
-                variant="text"
-                prepend-icon="mdi-text-box-plus-outline"
-                @click="openFormPopUp()"
-              />
-              <v-btn
-                text="Esporta"
-                variant="text"
-                prepend-icon="mdi-microsoft-excel"
-                :loading="downloadingExcel"
-                @click="downloadExcel()"
-              />
-            </template>
-            <v-divider
-              v-if="selectedOrder"
-              vertical
-              class="mx-2"
-            />
-            <OrderActions
-              v-if="selectedOrder"
-              :key="selectedOrder.id"
-              :item="selectedOrder"
-            />
-            <v-btn
-              icon="mdi-close"
-              variant="text"
-              title="Deseleziona tutto"
-              @click="schedule.orders = []"
-            />
-          </div>
-        </v-slide-y-reverse-transition>
       </div>
     </template>
     <template #default>
@@ -275,33 +277,6 @@ const openStatusesPopup = (item) => {
   flex-wrap: wrap;
   align-items: center;
   flex: 0 0 auto;
-}
-
-.orders-table-area {
-  position: relative;
-}
-
-/* Barra flottante: compare sopra la paginazione solo con una selezione. */
-.orders-selection-bar {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 72px;
-  margin: 0 auto;
-  width: fit-content;
-  z-index: 5;
-  display: flex;
-  align-items: center;
-  max-width: 95%;
-  padding: 4px 8px;
-  border-radius: 999px;
-  background: #1f1f3d;
-  color: #fff;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-}
-
-.orders-selection-bar :deep(.v-btn) {
-  color: #fff !important;
 }
 
 @media (min-width: 960px) {

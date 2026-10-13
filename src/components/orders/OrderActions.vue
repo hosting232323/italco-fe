@@ -1,53 +1,39 @@
 <template>
   <v-dialog max-width="1500">
     <template #activator="{ props: activatorProps }">
-      <div class="d-flex flex-wrap align-center">
+      <div :class="labeled ? 'd-flex flex-column' : 'd-flex flex-wrap align-center'">
         <v-btn
-          icon="mdi-pencil"
-          variant="text"
-          title="Modifica ordine"
+          v-bind="btnProps('mdi-pencil', 'Modifica ordine')"
           :color="theme.current.value.primaryColor"
           @click="openForm(item)"
         />
         <v-btn
-          variant="text"
-          icon="mdi-file-export"
-          title="Esporta PDF ordine"
+          v-bind="btnProps('mdi-file-export', 'Esporta PDF ordine')"
           :loading="loadingExport"
           :color="theme.current.value.primaryColor"
           @click="exportPdf(item)"
         />
         <v-btn
-          icon="mdi-truck-delivery"
-          variant="text"
-          title="Riepilogo consegna"
           :color="theme.current.value.primaryColor"
-          v-bind="activatorProps"
+          v-bind="{ ...activatorProps, ...btnProps('mdi-truck-delivery', 'Riepilogo consegna') }"
           @click="openPopUp(item, 'delivery')"
         />
         <v-btn
-          icon="mdi-link-variant"
-          variant="text"
+          v-bind="btnProps('mdi-link-variant', 'Copia link ordine')"
           :color="theme.current.value.primaryColor"
-          title="Copia link ordine"
           @click="copyOrderLink(item.id)"
         />
         <template v-if="role != 'Customer'">
           <v-btn
-            icon="mdi-account"
-            variant="text"
             :color="theme.current.value.primaryColor"
-            title="Cambia punto vendita"
-            v-bind="activatorProps"
+            v-bind="{ ...activatorProps, ...btnProps('mdi-account', 'Cambia punto vendita') }"
             @click="openPopUp(item, 'customer')"
           />
           <v-btn
             v-if="role == 'Admin'"
-            icon="mdi-delete"
+            v-bind="btnProps('mdi-delete', 'Elimina ordine')"
             :loading="loadingDelete"
-            variant="text"
             :color="theme.current.value.primaryColor"
-            title="Elimina ordine"
             @click="deleteOrder(item)"
           />
           <v-btn
@@ -55,36 +41,27 @@
               Object.values(item.products).every(
                 product => !product.rae_product || !product.rae_product.status.includes(['Emitted', 'Generated'])
               )"
-            icon="mdi-content-copy"
-            variant="text"
+            v-bind="btnProps('mdi-content-copy', 'Clona ordine')"
             :color="theme.current.value.primaryColor"
-            title="Clona ordine"
             @click="copyOrder(item)"
           />
           <v-btn
             v-if="raeEnabled && Object.values(item.products).some(product => product.rae_product) && !['Acquired', 'Booked'].includes(item.status)"
-            icon="mdi-human-dolly"
-            variant="text"
+            v-bind="btnProps('mdi-human-dolly', 'Esportazione Raee')"
             :loading="raeLoading"
             :color="theme.current.value.primaryColor"
-            title="Esportazione Raee"
             @click="raeExport(item)"
           />
           <v-btn
             v-if="item.external_link"
-            icon="mdi-exit-to-app"
-            variant="text"
+            v-bind="btnProps('mdi-exit-to-app', 'Chudi ordine in piattaforma Euronics')"
             :color="theme.current.value.primaryColor"
-            title="Chudi ordine in piattaforma Euronics"
             @click="openExternalLink(item.external_link)"
           />
           <v-btn
             v-if="role == 'Admin' && ['Acquired', 'Booked'].includes(item.status)"
-            icon="mdi-swap-horizontal"
-            variant="text"
             :color="theme.current.value.primaryColor"
-            title="Sposta in un'altra company"
-            v-bind="activatorProps"
+            v-bind="{ ...activatorProps, ...btnProps('mdi-swap-horizontal', 'Sposta in un\'altra company') }"
             @click="openPopUp(item, 'company')"
           />
         </template>
@@ -123,12 +100,21 @@ import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
 import { useRaeProductStore } from '@/stores/raeProduct';
 
-const { item } = defineProps({
+const { item, labeled } = defineProps({
   item: {
     type: Object,
     required: true
+  },
+  // Voci a parole (per il menu a tendina) al posto delle sole icone.
+  labeled: {
+    type: Boolean,
+    default: false
   }
 });
+
+const btnProps = (icon, title) => labeled
+  ? { prependIcon: icon, text: title, variant: 'text', block: true, class: 'justify-start' }
+  : { icon, title, variant: 'text' };
 
 const order = ref({});
 const theme = useTheme();
