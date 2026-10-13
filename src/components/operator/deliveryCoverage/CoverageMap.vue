@@ -146,7 +146,12 @@ const loadCapZoneByCap = () => {
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         const byCap = {};
-        for (const feature of data?.features || []) byCap[feature.properties.cap] = feature;
+        // Un CAP puo' avere piu' poligoni (uno per comune): si tengono tutti.
+        for (const feature of data?.features || []) {
+          const cap = feature.properties.cap;
+          if (!byCap[cap]) byCap[cap] = { type: 'FeatureCollection', features: [] };
+          byCap[cap].features.push(feature);
+        }
         return byCap;
       })
       .catch(() => ({}));
