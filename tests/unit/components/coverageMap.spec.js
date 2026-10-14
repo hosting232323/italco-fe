@@ -68,6 +68,11 @@ const leaflet = vi.hoisted(() => {
         marker.tooltipOptions = tooltipOptions;
         return marker;
       });
+      marker.handlers = {};
+      marker.on = vi.fn((event, callback) => {
+        marker.handlers[event] = callback;
+        return marker;
+      });
       marker.addTo = vi.fn(() => {
         marker.added = true;
         map.addLayer(marker);
@@ -153,6 +158,23 @@ describe('CoverageMap: punti di ritiro', () => {
     const [marker] = liveMarkers();
     expect(marker.options.icon.html).toContain('#6A1B9A');
     expect(marker.options.icon.html).toContain('mdi-storefront');
+  });
+
+  it('usa l-icona arancione con camion per i punti che accettano il precarico', async () => {
+    await mountMap([{ ...BARI, preloaded: true }]);
+
+    const [marker] = liveMarkers();
+    expect(marker.options.icon.html).toContain('#ef6c00');
+    expect(marker.options.icon.html).toContain('mdi-truck-fast');
+    expect(marker.tooltip).toContain('Precarico: sì');
+  });
+
+  it('emette il punto quando si clicca il marker', async () => {
+    const { wrapper } = await mountMap([BARI]);
+
+    liveMarkers()[0].handlers.click();
+
+    expect(wrapper.emitted('collection-point-click')[0][0]).toMatchObject({ id: BARI.id });
   });
 
   it('salta i punti senza coordinate e tiene quelli che le hanno', async () => {
