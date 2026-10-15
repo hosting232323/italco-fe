@@ -36,6 +36,17 @@ describe('nonNegativeIntegerRules', () => {
 });
 
 
+describe('optionalEmailRules', () => {
+  it.each(['', null, undefined, 'a@b.it'])('accetta %s', (value) => {
+    expect(check(value, validation.optionalEmailRules)).toBe(true);
+  });
+
+  it('rifiuta un valore che non è una mail', () => {
+    expect(check('LEGA', validation.optionalEmailRules)).toBe('E-mail non valida');
+  });
+});
+
+
 describe('requiredRules', () => {
   it('accetta un valore valorizzato', () => {
     expect(check('Mario', validation.requiredRules)).toBe(true);
