@@ -42,12 +42,18 @@
         title="Borderò"
         prepend-icon="mdi-text-box-multiple-outline"
       />
+      <v-divider class="my-2" />
       <v-list-item
-        v-if="automaticPlanning"
-        to="/delivery-coverage"
-        title="Copertura corrieri"
-        prepend-icon="mdi-calendar-account"
+        to="/planning/constraints"
+        title="Vincoli"
+        prepend-icon="mdi-tune-variant"
       />
+      <v-list-item
+        to="/planning/automatic"
+        title="Pianificazione"
+        prepend-icon="mdi-map-marker-radius"
+      />
+      <v-divider class="my-2" />
       <template v-if="effectiveRole == 'Admin'">
         <v-list-item
           to="/services"
@@ -151,8 +157,4 @@ const { role, company, effectiveRole } = storeToRefs(userStore);
 // Modulo RAEE dell'attività su cui si sta operando: senza, il blocco di voci
 // RAEE non esiste per nessun ruolo.
 const rae = computed(() => !!company.value?.rae);
-
-// Pianificazione automatica dell'attività: senza, la pagina copertura
-// corrieri non esiste per nessuno (stesso pattern di rae).
-const automaticPlanning = computed(() => !!company.value?.automatic_planning);
 </script>
