@@ -164,8 +164,14 @@ router.beforeEach((to) => {
 
   // Il super admin non possiede dati propri: finché non sceglie una company
   // non c'è niente da mostrargli, e ogni altra rotta lo riporta alla scelta.
-  if (role == 'Super Admin' && !company && to.name != 'Company' && !PUBLIC_ROUTES.includes(to.name))
+  // I log non appartengono a nessuna company, quindi restano raggiungibili.
+  if (role == 'Super Admin' && !company && !['Company', 'Log'].includes(to.name) && !PUBLIC_ROUTES.includes(to.name))
     return { name: 'Company' };
+
+  // I log contengono le richieste di tutte le company: l'URL digitato da un
+  // admin di company riporta alla dashboard, il backend risponderebbe 403.
+  if (to.name == 'Log' && role != 'Super Admin')
+    return { name: 'Dashboard' };
 
   // Togliere le voci dal menù non basta: l'URL resta digitabile e i preferiti
   // pure. Chi ci arriva con il modulo spento torna alla dashboard.

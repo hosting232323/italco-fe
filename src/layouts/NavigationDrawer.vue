@@ -63,11 +63,6 @@
           title="Utenti"
           prepend-icon="mdi-account-group"
         />
-        <v-list-item
-          to="/log"
-          title="Log"
-          prepend-icon="mdi-math-log"
-        />
       </template>
       <template v-if="rae">
         <v-divider class="my-2" />
@@ -115,6 +110,12 @@
         to="/companies"
         title="Company"
         prepend-icon="mdi-factory"
+      />
+      <!-- I log sono di tutta la piattaforma: solo il super admin, anche senza company scelta. -->
+      <v-list-item
+        to="/log"
+        title="Log"
+        prepend-icon="mdi-math-log"
       />
     </template>
     <v-divider class="my-2" />
