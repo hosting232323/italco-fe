@@ -10,6 +10,7 @@
         :headers="[
           { title: 'ID', value: 'id', sortable: false },
           { title: 'Nickname', value: 'nickname', sortable: false },
+          { title: 'Email', value: 'email', sortable: false },
           { title: 'Ruolo', value: 'role', sortable: false },
           ...(automaticPlanning ? [{ title: 'Pianificazione automatica', value: 'automatic_planning', sortable: false }] : [])
         ]"
@@ -28,6 +29,12 @@
         </template>
         <template #actions="{ item }">
           <template v-if="item.role !== 'Admin'">
+            <v-btn
+              prepend-icon="mdi-email-edit"
+              text="Email"
+              variant="text"
+              @click="openEmailDialog(item)"
+            />
             <v-btn
               prepend-icon="mdi-lock-reset"
               text="Reimposta password"
@@ -74,6 +81,52 @@
         </v-card-actions>
       </v-card>
     </template>
+  </v-dialog>
+
+  <!-- Dialog Modifica Email -->
+  <v-dialog
+    v-model="emailDialog"
+    max-width="500"
+    persistent
+  >
+    <v-card title="Modifica email">
+      <v-card-subtitle>{{ emailTarget?.nickname }}</v-card-subtitle>
+      <v-card-text>
+        <v-form
+          ref="emailForm"
+          @submit.prevent="submitEmail"
+        >
+          <v-text-field
+            v-model="emailInput"
+            label="Email"
+            :rules="validation.optionalEmailRules"
+          />
+        </v-form>
+        <v-alert
+          v-if="emailError"
+          type="error"
+          variant="tonal"
+          density="compact"
+        >
+          {{ emailError }}
+        </v-alert>
+      </v-card-text>
+      <v-card-actions>
+        <v-btn
+          text="Annulla"
+          :color="theme.current.value.primaryColor"
+          @click="emailDialog = false"
+        />
+        <v-spacer />
+        <v-btn
+          text="Salva"
+          variant="elevated"
+          :color="theme.current.value.primaryColor"
+          :loading="emailLoading"
+          @click="submitEmail"
+        />
+      </v-card-actions>
+    </v-card>
   </v-dialog>
 
   <!-- Dialog Reimposta Password -->
@@ -146,6 +199,7 @@ import { storeToRefs } from 'pinia';
 import { ref, reactive, computed } from 'vue';
 import storesUtils from '@/utils/stores';
 import { useUserStore } from '@/stores/user';
+import validation from '@/utils/validation';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
 const element = ref({});
@@ -160,6 +214,14 @@ const { company } = storeToRefs(userStore);
 // nasconderla in tabella non basta se il flag su Company è spento.
 const automaticPlanning = computed(() => !!company.value?.automatic_planning);
 
+// Modifica email state
+const emailDialog = ref(false);
+const emailTarget = ref(null);
+const emailInput = ref('');
+const emailError = ref('');
+const emailLoading = ref(false);
+const emailForm = ref(null);
+
 // Reset password state
 const resetDialog = ref(false);
 const resetTarget = ref(null);
@@ -171,6 +233,30 @@ const showResetInput = ref(false);
 const administrationUserStore = useAdministrationUserStore();
 const { ready } = storeToRefs(administrationUserStore);
 const users = storesUtils.getStoreList(administrationUserStore);
+
+const openEmailDialog = (item) => {
+  emailTarget.value = item;
+  emailInput.value = item.email || '';
+  emailError.value = '';
+  emailLoading.value = false;
+  emailDialog.value = true;
+};
+
+const submitEmail = async () => {
+  const { valid } = await emailForm.value.validate();
+  if (!valid) return;
+  emailLoading.value = true;
+  emailError.value = '';
+  administrationUserStore.updateUser(emailTarget.value.id, { email: emailInput.value }, (data) => {
+    emailLoading.value = false;
+    if (data.status == 'ok') {
+      emailDialog.value = false;
+      administrationUserStore.initList();
+    } else {
+      emailError.value = data.message || 'Errore durante la modifica della email';
+    }
+  });
+};
 
 const openResetDialog = (item) => {
   resetTarget.value = item;

@@ -5,6 +5,7 @@
     :headers="[
       { title: 'ID', value: 'id', sortable: false },
       { title: 'Nickname', value: 'nickname', sortable: false },
+      { title: 'Nome Punto Vendita', value: 'name', sortable: false },
       { title: 'Codice Importazioni', value: 'import_code', sortable: false },
       { title: 'Città', value: 'city', sortable: false },
       { title: 'Indirizzo', value: 'address', sortable: false },
@@ -14,6 +15,9 @@
       { title: 'Codice Distribuzione RAEE', value: 'rae_code', sortable: false }
     ]"
   >
+    <template #[`item.name`]="{ item }">
+      {{ item.customer_user_info?.name }}
+    </template>
     <template #[`item.import_code`]="{ item }">
       {{ item.customer_user_info?.import_code }}
     </template>
