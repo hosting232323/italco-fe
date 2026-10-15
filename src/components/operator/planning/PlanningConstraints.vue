@@ -14,8 +14,9 @@
           <v-icon
             v-bind="props"
             icon="mdi-information-outline"
-            size="small"
-            class="ml-1"
+            size="x-small"
+            color="grey"
+            class="ml-1 align-baseline"
           />
         </template>
         Numero massimo di ordini per giorno della settimana in ogni area. Se per un'area non è configurato nulla, i punti vendita non potranno effettuare ordini per i clienti di quella zona.
@@ -28,8 +29,8 @@
         @click="openGeographicZoneForm"
       />
     </h2><hr>
-    Attenzione: Se non vengono configurate regole per una certa area geografica,
-    i punti vendita non potranno effettuare ordini per i clienti di quella zona.
+    <span class="text-medium-emphasis">Attenzione: Se non vengono configurate regole per una certa area geografica,
+      i punti vendita non potranno effettuare ordini per i clienti di quella zona.</span>
     <GeographicZoneTable @open-pop-up="openPopUp" />
 
     <h2 class="mt-8">
@@ -42,8 +43,9 @@
           <v-icon
             v-bind="props"
             icon="mdi-information-outline"
-            size="small"
-            class="ml-1"
+            size="x-small"
+            color="grey"
+            class="ml-1 align-baseline"
           />
         </template>
         Numero massimo di ordini al giorno che ogni punto vendita può inserire, per giorno della settimana.
@@ -68,8 +70,9 @@
           <v-icon
             v-bind="props"
             icon="mdi-information-outline"
-            size="small"
-            class="ml-1"
+            size="x-small"
+            color="grey"
+            class="ml-1 align-baseline"
           />
         </template>
         Massimo di servizi giornalieri per tipologia: raggiunto il limite il giorno non è più selezionabile. Si modifica dalla pagina Servizi.
