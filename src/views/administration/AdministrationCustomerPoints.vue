@@ -14,7 +14,6 @@
             @click="openCustomerGroupForm"
           />
         </h1><hr>
-        <CustomerGroupForm />
         <CustomerGroupTable @open-pop-up="openPopUp" />
         <h1>
           Gestione Aree Geografiche
@@ -27,7 +26,6 @@
         </h1><hr>
         Attenzione: Se non vengono configurate regole per una certa area geografica,
         i punti vendita non potranno effettuare ordini per i clienti di quella zona.
-        <GeographicZoneForm />
         <GeographicZoneTable @open-pop-up="openPopUp" />
         <h1>
           Gestione Regole Punti Vendita
@@ -38,13 +36,11 @@
             @click="openCustomerRuleForm"
           />
         </h1><hr>
-        <CustomerRuleForm />
         <CustomerRuleTable />
         <h1 id="customer-user-form">
           Dati Punti Vendita
         </h1><hr>
-        <CustomerUserInfoForm />
-        <CustomerUserInfoTable />
+        <CustomerUserInfoTable @open-collection-points="openCollectionPoints" />
       </v-container>
     </template>
     <template #default>
@@ -52,6 +48,39 @@
       <ConstraintPopUp v-if="popUpType == 'constraint'" />
       <GeographicCodePopUp v-if="popUpType == 'geographicCode'" />
     </template>
+  </v-dialog>
+  <v-dialog
+    v-model="customerGroupForm"
+    max-width="1500"
+  >
+    <CustomerGroupForm />
+  </v-dialog>
+  <v-dialog
+    v-model="geographicZoneForm"
+    max-width="1500"
+  >
+    <GeographicZoneForm />
+  </v-dialog>
+  <v-dialog
+    v-model="customerRuleForm"
+    max-width="1500"
+  >
+    <CustomerRuleForm />
+  </v-dialog>
+  <v-dialog
+    v-model="customerUserInfoForm"
+    max-width="1500"
+  >
+    <CustomerUserInfoForm />
+  </v-dialog>
+  <v-dialog
+    v-model="collectionPointsPopUp"
+    max-width="1500"
+  >
+    <CustomerCollectionPointsPopUp
+      v-if="collectionPointsCustomer"
+      :customer="collectionPointsCustomer"
+    />
   </v-dialog>
 </template>
 
@@ -67,21 +96,28 @@ import GeographicZoneTable from '@/components/administration/sellingPoints/Geogr
 import GeographicCodePopUp from '@/components/administration/sellingPoints/GeographicCodePopUp';
 import CustomerUserInfoForm from '@/components/administration/sellingPoints/CustomerUserInfoForm';
 import CustomerUserInfoTable from '@/components/administration/sellingPoints/CustomerUserInfoTable';
+import CustomerCollectionPointsPopUp from '@/components/administration/sellingPoints/CustomerCollectionPointsPopUp';
 
 import { ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useCustomerRuleStore } from '@/stores/customerRule';
 import { useCustomerGroupStore } from '@/stores/customerGroup';
 import { useGeographicZoneStore } from '@/stores/geographicZone';
+import { useAdministrationUserStore } from '@/stores/administrationUser';
+import { useCollectionPointStore } from '@/stores/collectionPoint';
 
 const popUp = ref(false);
+const collectionPointsPopUp = ref(false);
+const collectionPointsCustomer = ref(null);
 const popUpType = ref('');
 const customerRuleStore = useCustomerRuleStore();
 const customerGroupStore = useCustomerGroupStore();
 const geographicZoneStore = useGeographicZoneStore();
+const administrationUserStore = useAdministrationUserStore();
 const { activeForm: customerRuleForm, element: customerRule } = storeToRefs(customerRuleStore);
 const { activeForm: customerGroupForm, element: customerGroup } = storeToRefs(customerGroupStore);
 const { activeForm: geographicZoneForm, element: geographicZone } = storeToRefs(geographicZoneStore);
+const { activeForm: customerUserInfoForm } = storeToRefs(administrationUserStore);
 
 const openPopUp = (item, type) => {
   popUp.value = true;
@@ -90,6 +126,14 @@ const openPopUp = (item, type) => {
     customerGroup.value = item;
   else if(['constraint', 'geographicCode'].includes(type))
     geographicZone.value = item;
+};
+
+const openCollectionPoints = (customer) => {
+  const collectionPointStore = useCollectionPointStore();
+  collectionPointStore.customerId = customer.id;
+  collectionPointStore.ready = false;
+  collectionPointsCustomer.value = customer;
+  collectionPointsPopUp.value = true;
 };
 
 const openCustomerGroupForm = () => {

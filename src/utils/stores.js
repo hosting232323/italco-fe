@@ -1,10 +1,32 @@
 import { storeToRefs } from 'pinia';
 
 
-const getStoreList = (store, router) => {
+const getStoreList = (store) => {
   const { list, ready } = storeToRefs(store);
-  if (!ready.value) store.initList(router);
+  if (!ready.value) store.initList();
   return list;
+};
+
+
+const _listGuards = new Map();
+
+
+const refreshList = (store, doSend, debounce = 50) => {
+  let guard = _listGuards.get(store.$id);
+  if (!guard) {
+    guard = { seq: 0, timer: null };
+    _listGuards.set(store.$id, guard);
+  }
+
+  clearTimeout(guard.timer);
+  guard.timer = setTimeout(() => {
+    const token = ++guard.seq;
+    doSend((data) => {
+      if (token !== guard.seq) return;
+
+      store.setList(data);
+    });
+  }, debounce);
 };
 
 
@@ -80,9 +102,13 @@ const RAE_PRODUCT_DATE_FILTER_TYPES = {
     label: 'Data di Creazione',
     entity: 'RaeProduct'
   },
-  date: {
-    label: 'Data del Borderò',
-    entity: 'Schedule'
+  dtr_date: {
+    label: 'Data DTR',
+    entity: 'RaeProduct'
+  },
+  emission_date: {
+    label: 'Data di Emissione',
+    entity: 'RaeProduct'
   }
 };
 
@@ -97,7 +123,7 @@ const formatFilters = (filters, dateFilterType) => {
       else return filters[key];
     })
     .map(key => {
-      let value = null;
+      let value;
       if (!formattedKeys.includes(key))
         value = filters[key];
       else if (!filters[key][1])
@@ -116,6 +142,7 @@ const formatFilters = (filters, dateFilterType) => {
 
 export default {
   getStoreList,
+  refreshList,
   exclude_keys,
   formatFilters,
   ORDER_DATE_FILTER_TYPES,

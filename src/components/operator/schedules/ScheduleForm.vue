@@ -79,6 +79,36 @@
               dense
               @click="addOrder"
             />
+            <!-- Il luogo di smaltimento del borderò: si sceglie qui una volta
+            sola quando ci sono ordini con prodotti RAE, e lo smaltimento lo
+            eredita da qui invece di richiederlo. -->
+            <v-autocomplete
+              v-if="hasRaeOrders"
+              v-model="schedule.rae_disposal_place_id"
+              label="Luogo di smaltimento"
+              :items="raeDisposalPlaces"
+              item-title="name"
+              item-value="id"
+              :rules="validation.requiredRules"
+              :disabled="raeDisposalPlaces.length == 1"
+            />
+            <v-btn
+              variant="text"
+              prepend-icon="mdi-plus"
+              class="mb-2"
+              @click="activityFormFlag = true"
+            >
+              Aggiungi attività
+            </v-btn>
+            <v-dialog
+              v-model="activityFormFlag"
+              max-width="600"
+            >
+              <ActivityForm
+                @save="addActivity"
+                @close-form="activityFormFlag = false"
+              />
+            </v-dialog>
             <draggable
               v-model="schedule.schedule_items"
               item-key="id"
@@ -86,10 +116,7 @@
               handle=".drag-handle"
             >
               <template #item="{ element }">
-                <ScheduleItem
-                  :index="element.index"
-                  :not-found-addresses="notFoundAddresses"
-                />
+                <ScheduleItem :index="element.index" />
               </template>
             </draggable>
             <FormButtons
@@ -103,10 +130,7 @@
           md="5"
         >
           <div style="height: 100%; border-radius: 12px; overflow: hidden;">
-            <OverStreetMap
-              v-if="schedule.schedule_items && schedule.schedule_items.length > 0"
-              @not-found-addresses="handleNotFound"
-            />
+            <OverStreetMap v-if="schedule.schedule_items && schedule.schedule_items.length > 0" />
           </div>
         </v-col>
       </v-row>
@@ -118,20 +142,22 @@
 import FormButtons from '@/components/FormButtons';
 import OverStreetMap from '@/components/OverStreetMap';
 import ScheduleItem from '@/components/operator/schedules/ScheduleItem';
+import ActivityForm from '@/components/operator/schedules/ScheduleActivityForm';
 
-import { ref, watch } from 'vue';
+import { ref, computed, watch } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import draggable from 'vuedraggable';
-import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import validation from '@/utils/validation';
 import { useOrderStore } from '@/stores/order';
 import { useScheduleStore } from '@/stores/schedule';
 import { useTransportStore } from '@/stores/transport';
+import { useRaeProductStore } from '@/stores/raeProduct';
+import { useRaeDisposalPlaceStore } from '@/stores/raeDisposalPlace';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
-const fromSchedulation = defineProps({
+const { fromSchedulation } = defineProps({
   fromSchedulation: {
     type: Boolean,
     default: false
@@ -140,26 +166,40 @@ const fromSchedulation = defineProps({
 
 const form = ref(null);
 const error = ref(null);
-const router = useRouter();
 const loading = ref(false);
 const selectedUser = ref(null);
-const notFoundAddresses = ref([]);
 const selectedOrderId = ref(null);
+const activityFormFlag = ref(false);
 const isMobile = mobile.setupMobileUtils();
 const emits = defineEmits(['cancel', 'go-back']);
 
 const orderStore = useOrderStore();
 const scheduleStore = useScheduleStore();
 const transportStore = useTransportStore();
+const raeProductStore = useRaeProductStore();
+const raeDisposalPlaceStore = useRaeDisposalPlaceStore();
 const administrationUserStore = useAdministrationUserStore();
 const { element: schedule } = storeToRefs(scheduleStore);
-const orders = storesUtils.getStoreList(orderStore, router);
-const transports = storesUtils.getStoreList(transportStore, router);
-const users = storesUtils.getStoreList(administrationUserStore, router);
+const orders = storesUtils.getStoreList(orderStore);
+const transports = storesUtils.getStoreList(transportStore);
+const users = storesUtils.getStoreList(administrationUserStore);
+const raeDisposalPlaces = storesUtils.getStoreList(raeDisposalPlaceStore);
 
-const handleNotFound = (addresses) => {
-  notFoundAddresses.value = addresses;
-};
+// Il selettore del luogo di smaltimento compare solo se il borderò raccoglie
+// ordini con prodotti RAE: gli item ordine portano il marcatore rae_product
+// sui prodotti, sia in creazione (store ordini) sia in modifica (borderò).
+const hasRaeOrders = computed(() => (schedule.value.schedule_items || []).some(
+  item => item.operation_type === 'Order' &&
+    Object.values(item.products || {}).some(product => product.rae_product)
+));
+
+// Con un solo luogo di smaltimento non ha senso farlo scegliere: si preseleziona
+// e il campo resta disabilitato (sopra). Con più luoghi il campo parte vuoto e
+// la scelta è dell'operatore.
+watch([hasRaeOrders, raeDisposalPlaces], ([hasRae, places]) => {
+  if (hasRae && places.length === 1)
+    schedule.value.rae_disposal_place_id = places[0].id;
+}, { immediate: true });
 
 const addUser = () => {
   if (!selectedUser.value) return;
@@ -200,6 +240,17 @@ const addOrder = () => {
   selectedOrderId.value = null;
 };
 
+const addActivity = (activity) => {
+  schedule.value.schedule_items.push({
+    ...activity,
+    operation_type: 'Activity',
+    start_time_slot: '',
+    end_time_slot: '',
+    index: schedule.value.schedule_items.length
+  });
+  activityFormFlag.value = false;
+};
+
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
 
@@ -210,20 +261,21 @@ const submitForm = async () => {
 
   loading.value = true;
   if (schedule.value.id)
-    scheduleStore.updateElement(router, callback);
+    scheduleStore.updateElement(callback);
   else
-    scheduleStore.createElement(router, callback);
+    scheduleStore.createElement(callback);
 };
 
 const callback = (data) => {
   loading.value = false;
   if (data.status == 'ok') {
-    orderStore.initList(router);
-    scheduleStore.initList(router);
+    orderStore.initList();
+    scheduleStore.initList();
+    raeProductStore.initList();
     schedule.value = {};
     emits('cancel');
   } else 
-    error.value = data.error;
+    error.value = data.message;
 };
 
 const createScheduleItem = (element, type, index = undefined) => {

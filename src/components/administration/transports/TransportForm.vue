@@ -53,14 +53,12 @@ import FormButtons from '@/components/FormButtons';
 import { ref } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import addressUtils from '@/utils/address';
 import validation from '@/utils/validation';
 import { useTransportStore } from '@/stores/transport';
 
 const form = ref(null);
 const loading = ref(false);
-const router = useRouter();
 const isMobile = mobile.setupMobileUtils();
 
 const transportStore = useTransportStore();
@@ -71,16 +69,16 @@ const submitForm = async () => {
 
   loading.value = true;
   if (transport.value.id)
-    transportStore.updateElement(router, callback);
+    transportStore.updateElement(callback);
   else
-    transportStore.createElement(router, callback);
+    transportStore.createElement(callback);
 };
 
 const callback = (data) => {
   loading.value = false;
   if (data.status == 'ok') {
     transport.value = {};
-    transportStore.initList(router);
+    transportStore.initList();
     activeForm.value = false;
   }
 };

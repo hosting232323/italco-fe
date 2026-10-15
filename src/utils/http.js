@@ -1,113 +1,55 @@
-/* eslint-disable no-console */
-
 import { storeToRefs } from 'pinia';
-import logoutModule from '@/utils/logout';
+import { createHttpClient } from 'generic-module';
+import router from '@/plugins/router';
+import session from '@/utils/session';
 import { useUserStore } from '@/stores/user';
 
 
 const hostname = import.meta.env.VITE_HOSTNAME;
-const fileContentTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
 
 
-const postRequest = async (endpoint, body, func, method = 'POST', router = undefined) => {
-  fetch(`${hostname}${endpoint}`, {
-    method: method,
-    headers: await createHeader(router),
-    body: JSON.stringify(body)
-  }).then(response => {
-    if (!response.ok)
-      throw new Error(`Errore nella risposta del server: ${response.status} - ${response.statusText}`);
-
-    const contentType = response.headers.get('content-type');
-    if (contentType && fileContentTypes.some(type => contentType.includes(type)))
-      return response.blob();
-    else
-      return response.json();
-  }).then(data => {
-    sessionHandler(data, func, router);
-  }).catch(error => {
-    console.error('Errore nella richiesta:', error);
-  });
-};
-
-
-const formDataRequest = async (endpoint, data, func, method = 'POST', router = undefined) => {
-  const formData = new FormData();
-  Object.keys(data).forEach(key => formData.append(key, data[key]));
-
-  fetch(`${hostname}${endpoint}`, {
-    method: method,
-    headers: await createHeader(router, true),
-    body: formData
-  }).then(response => {
-    if (!response.ok)
-      throw new Error(`Errore nella risposta del server: ${response.status} - ${response.statusText}`);
-    return response.json();
-  }).then(data => {
-    sessionHandler(data, func, router);
-  }).catch(error => {
-    console.error('Errore nella richiesta:', error);
-  });
-};
-
-
-const getRequest = async (endpoint, params, func, method = 'GET', router = undefined) => {
-  const url = new URL(`${hostname}${endpoint}`);
-  Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
-
-  fetch(url, {
-    method: method,
-    headers: await createHeader(router)
-  }).then(response => {
-    if (!response.ok)
-      throw new Error(`Errore nella risposta del server: ${response.status} - ${response.statusText}`);
-
-    const contentType = response.headers.get('content-type');
-    if (contentType && contentType.includes('application/pdf'))
-      return response.blob();
-    else
-      return response.json();
-  }).then(data => {
-    sessionHandler(data, func, router);
-  }).catch(error => {
-    console.error('Errore nella richiesta:', error);
-  });
-};
-
-
-const createHeader = async (router, file = false) => {
-  let headers = {};
-  if (file)
-    headers['Accept'] = '*/*';
-  else
-    headers['Content-Type'] = 'application/json';
-  if (router)
-    headers['Authorization'] = getToken().value;
-  return headers;
-};
-
-
-const getToken = () => {
+const getTokenRef = () => {
   const userStore = useUserStore();
   const { token } = storeToRefs(userStore);
   return token;
 };
 
-const sessionHandler = (data, func, router) => {
-  if (data.status == 'session') {
-    alert(data.error);
-    logoutModule.logout(router);
-  } else {
-    if (data.new_token)
-      getToken().value = data.new_token;
-    func(data);
+const client = createHttpClient({
+  hostname,
+  authHeader: 'Authorization',
+  router,
+  refreshEndpoint: 'user/refresh',
+  getToken: () => getTokenRef().value,
+  setToken: (newToken) => {
+    // Durante un cambio sessione lo store utente non si tocca (vedi session.js):
+    // la richiesta ripetuta parte col token scaduto e il backend la rifiuta.
+    if (session.isSwitching())
+      return;
+    // Il cookie di refresh e' del browser, non della scheda: dopo un login con
+    // un altro utente altrove, il rinnovo restituisce il token di quell'utente
+    // e il client ripeterebbe la richiesta a suo nome con i dati di questa pagina.
+    if (session.belongsToAnotherUser(newToken)) {
+      session.handleSessionSwitch();
+      return;
+    }
+    getTokenRef().value = newToken;
+  },
+  onSessionExpired: (data) => {
+    // Chiusura locale: niente revoca sul server. Il cookie e' condiviso da tutte
+    // le schede e potrebbe gia' essere di una sessione aperta altrove.
+    session.expireLocally(data.message);
   }
+});
+
+const withSessionToken = (url) => {
+  if (!url) return url;
+  const separator = url.includes('?') ? '&' : '?';
+  return `${url}${separator}token=${encodeURIComponent(getTokenRef().value)}`;
 };
 
 
 export default {
-  postRequest,
-  getRequest,
-  formDataRequest,
-  hostname
+  ...client,
+  hostname,
+  withSessionToken
 };

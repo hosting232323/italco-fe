@@ -16,33 +16,22 @@
       <p v-if="order.customer_note">
         Note Punto Vendita: {{ order.customer_note }}
       </p>
+      <div v-if="order.motivation">
+        <p class="text-h6">
+          Motivazione
+        </p>
+        <p style="white-space: pre-line;">
+          {{ order.motivation }}
+        </p>
+      </div>
+      <div v-else>
+        Nessuna motivazione presente.
+      </div>
       <v-skeleton-loader
         v-if="loadingPhoto"
         type="image"
       />
       <div v-else>
-        <div v-if="motivations && motivations.length">
-          <p class="text-h6">
-            Motivazioni
-          </p>
-          <v-list dense>
-            <v-list-item
-              v-for="motivation in motivations"
-              :key="motivation.id"
-              :title="motivation.text"
-            >
-              <v-list-item-subtitle>
-                Stato: {{ orderUtils.LABELS.find(label => label.value == motivation.status).title }} |
-                <span v-if="motivation.delay">Ritardo |</span>
-                <span v-if="motivation.anomaly">Anomalia |</span>
-                Creata: {{ motivation.created_at }}
-              </v-list-item-subtitle>
-            </v-list-item>
-          </v-list>
-        </div>
-        <div v-else>
-          Nessuna motivazione presente.
-        </div>
         <div v-if="photos && photos.length">
           <div
             v-for="photo in photos"
@@ -53,7 +42,7 @@
               type="image" 
             />
             <v-img
-              :src="photo"
+              :src="http.withSessionToken(photo)"
               max-width="1500"
               max-height="1000"
               class="mt-4"
@@ -72,8 +61,6 @@
 <script setup>
 import http from '@/utils/http';
 import { reactive, ref } from 'vue';
-import { useRouter } from 'vue-router';
-import orderUtils from '@/utils/order';
 
 const { order } = defineProps({
   order: {
@@ -83,14 +70,11 @@ const { order } = defineProps({
 });
 
 const photos = ref([]);
-const router = useRouter();
-const motivations = ref([]);
 const loadingPhoto = ref(true);
 const imageLoading = reactive({});
 
-http.getRequest(`order/delivery-details/${order.id}`, {}, function (data) {
+http.makeRequest(`order/delivery-details/${order.id}`, 'GET', {}, function (data) {
   photos.value = data.photos;
-  motivations.value = data.motivations;
   loadingPhoto.value = false;
-}, 'GET', router);
+});
 </script>

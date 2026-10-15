@@ -165,9 +165,24 @@ const TYPES = [
   }
 ];
 
+const raeGrouping = [
+  'R1', 'R2', 'R3', 'R4'
+];
+
+const isTerminatedOrder = (order) => {
+  return new Set([
+    'Delivered',
+    'Not Delivered',
+    'To Reschedule',
+    'Rescheduled'
+  ]).has(order.status);
+};
+
 export default {
   LABELS,
   EXTERNAL_LABELS,
   TYPES,
-  RAE_STATUS
+  RAE_STATUS,
+  isTerminatedOrder,
+  raeGrouping
 };

@@ -37,19 +37,20 @@ import OrderOperatorForm from '@/components/orders/OrderOperatorForm';
 
 import { ref } from 'vue';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
+import { useRaeProductStore } from '@/stores/raeProduct';
 
 const form = ref(null);
 const activeTab = ref(0);
 const errorMsg = ref('');
-const router = useRouter();
 const loading = ref(false);
 
 const userStore = useUserStore();
 const orderStore = useOrderStore();
-const { role } = storeToRefs(userStore);
+// effectiveRole: il super admin in una company segue lo stesso flusso di un admin.
+const { effectiveRole: role } = storeToRefs(userStore);
+const raeProductStore = useRaeProductStore();
 const { element: order, activeForm } = storeToRefs(orderStore);
 
 const exitFunction = () => {
@@ -64,6 +65,11 @@ const submitForm = async () => {
   errorMsg.value = '';
   if (!(await form.value.validate()).valid) return;
 
+  if (!orderStore.addressValid) {
+    alert('Indirizzo non valido: selezionane uno dai suggerimenti.');
+    return;
+  }
+
   if (!order.value.products || Object.keys(order.value.products).length === 0) {
     errorMsg.value = 'Devi aggiungere almeno un prodotto o servizio all\'ordine.';
     return;
@@ -74,9 +80,9 @@ const submitForm = async () => {
   else {
     loading.value = true;
     if (order.value.photos && order.value.photos.length > 0)
-      orderStore.updateElementWithFormData(router, callback);
+      orderStore.updateElementWithFormData(callback);
     else
-      orderStore.updateElement(router, callback);
+      orderStore.updateElement(callback);
   }
 };
 
@@ -84,7 +90,8 @@ const callback = (data) => {
   loading.value = false;
   if (data.status === 'ok') {
     order.value = {};
-    orderStore.initList(router);
+    orderStore.initList();
+    raeProductStore.initList();
     activeForm.value = false;
   }
 };

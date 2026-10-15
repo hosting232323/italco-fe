@@ -2,10 +2,10 @@
   <v-container>
     <h1>Informativa sulla Privacy</h1>
     <p>ai sensi degli artt. 13 e 14 del Regolamento UE 2016/679 (GDPR)</p>
-    <p><i>Data di ultima modifica: 16/12/2025</i></p>
+    <p><i>Data di ultima modifica: 25/08/2026</i></p>
     <br>
     <h3>1. Titolare del trattamento</h3>
-    <p>Il Titolare del trattamento dei dati personali è Italco.mi Logistribuzioni srls, con sede legale in Via Emanuele Filiberto Duca 24/A, Mesagne BR 72023, P. IVA IT02735550747, contattabile all’indirizzo email italco.misrls@pec.it.</p>
+    <p>Il Titolare del trattamento dei dati personali è Giovanni Colasanto, con sede legale in Via Andrea Doria 15, Molfetta BA 70056, P. IVA IT09007480727, contattabile all’indirizzo email giovanni.colasanto@pec.it.</p>
     <br>
     <h3>2. Tipologie di dati trattati</h3>
     <p>La piattaforma tratta le seguenti categorie di dati personali:</p>
@@ -69,7 +69,22 @@
       </li>
     </ul>
     <br>
-    <h3>3. Finalità del trattamento</h3>
+    <h3>3. App mobile Hubstra Delivery e geolocalizzazione degli utenti delivery</h3>
+    <p>Gli utenti delivery (corrieri) utilizzano l’app mobile <strong>Hubstra Delivery</strong>, disponibile per iOS e Android, per gestire il giro consegne. Oltre ai dati indicati al punto 2, l’app tratta i seguenti dati raccolti direttamente dal dispositivo, previo consenso ai relativi permessi di sistema:</p>
+    <ul style="margin-left:20px;">
+      <li><strong>Posizione geografica precisa</strong> (latitudine e longitudine) del dispositivo in uso</li>
+      <li><strong>Fotografie</strong> acquisite tramite la fotocamera o selezionate dalla galleria, a documentazione della consegna</li>
+      <li><strong>Firma grafometrica del destinatario</strong>, acquisita sullo schermo del dispositivo</li>
+    </ul>
+    <br>
+    <p><strong>Quando viene rilevata la posizione.</strong> La rilevazione è avviata dall’utente delivery tramite il comando <em>“Inizia giornata”</em> e interrotta tramite il comando <em>“Finisci giornata”</em>. All’interno di tale intervallo la posizione è rilevata in modo continuativo e trasmessa al gestionale, <strong>anche quando l’app è in secondo piano o lo schermo è bloccato</strong>. Al di fuori di tale intervallo l’app non rileva né trasmette alcun dato di posizione.</p>
+    <p><strong>Trasparenza della rilevazione.</strong> Per tutta la durata della rilevazione il dispositivo segnala che la localizzazione è attiva: su Android tramite una notifica persistente, su iOS tramite l’indicatore di sistema. L’utente delivery può interrompere la rilevazione in qualsiasi momento terminando la giornata dall’app, oppure revocare i permessi di posizione, fotocamera e galleria dalle impostazioni del dispositivo; in tal caso le funzioni che dipendono da tali permessi non saranno disponibili.</p>
+    <p><strong>Finalità.</strong> Coordinamento e ottimizzazione dei giri di consegna, aggiornamento dello stato degli ordini, tracciabilità delle attività di consegna e sicurezza dell’operatore durante il servizio.</p>
+    <p><strong>Base giuridica.</strong> Esecuzione del rapporto contrattuale (art. 6.1.b GDPR) e legittimo interesse del Titolare all’organizzazione e alla sicurezza del servizio logistico (art. 6.1.f GDPR). Il trattamento è effettuato nel rispetto dell’art. 4 della L. 300/1970 (Statuto dei lavoratori), <strong>[DA COMPLETARE: previo accordo sindacale stipulato in data __ / previa autorizzazione dell’Ispettorato Territoriale del Lavoro n. __ del __]</strong>.</p>
+    <p><strong>Conservazione dei dati di posizione.</strong> <strong>[DA COMPLETARE: indicare il periodo di conservazione dei dati di geolocalizzazione, che deve essere limitato a quanto strettamente necessario alle finalità sopra indicate]</strong>. Decorso tale termine i dati sono cancellati o resi anonimi.</p>
+    <p><strong>Limiti di utilizzo.</strong> I dati di geolocalizzazione non sono utilizzati per finalità di controllo a distanza dell’attività lavorativa del singolo, né per valutazioni automatizzate o processi decisionali automatizzati sui lavoratori. L’accesso ai dati è limitato al personale autorizzato per le sole finalità organizzative sopra indicate.</p>
+    <br>
+    <h3>4. Finalità del trattamento</h3>
     <p>I dati personali sono trattati per le seguenti finalità:</p>
     <ul style="margin-left:20px;">
       <li>Gestione e organizzazione degli ordini di elettrodomestici e altri articoli</li>
@@ -81,7 +96,7 @@
       <li>Sicurezza e corretto funzionamento della piattaforma</li>
     </ul>
     <br>
-    <h3>4. Base giuridica del trattamento</h3>
+    <h3>5. Base giuridica del trattamento</h3>
     <p>Il trattamento dei dati si basa sulle seguenti basi giuridiche:</p>
     <ul style="margin-left:20px;">
       <li>Esecuzione di un contratto o di misure precontrattuali (art. 6.1.b GDPR)</li>
@@ -90,10 +105,10 @@
       <li>Consenso dell’interessato, ove richiesto (art. 6.1.a GDPR)</li>
     </ul>
     <br>
-    <h3>5. Modalità di trattamento</h3>
+    <h3>6. Modalità di trattamento</h3>
     <p>Il trattamento dei dati avviene mediante strumenti informatici e telematici, nel rispetto dei principi di liceità, correttezza, trasparenza, minimizzazione dei dati e sicurezza. Sono adottate misure tecniche e organizzative adeguate per prevenire accessi non autorizzati, perdita o divulgazione dei dati personali.</p>
     <br>
-    <h3>6. Destinatari dei dati</h3>
+    <h3>7. Destinatari dei dati</h3>
     <p>I dati personali possono essere comunicati a:</p>
     <ul style="margin-left:20px;">
       <li>Fornitori che utilizzano la piattaforma</li>
@@ -104,19 +119,45 @@
     </ul>
     <p>I soggetti terzi operano come Responsabili del trattamento o Titolari autonomi, ove applicabile.</p>
     <br>
-    <h3>7. Trasferimento dei dati extra UE</h3>
+    <h3>8. Trasferimento dei dati extra UE</h3>
     <p>Qualora i dati personali siano trasferiti verso Paesi al di fuori dell’Unione Europea, il trasferimento avverrà nel rispetto degli artt. 44 e seguenti del GDPR, mediante l’adozione di garanzie adeguate, quali Clausole Contrattuali Standard.</p>
     <br>
-    <h3>8. Periodo di conservazione</h3>
+    <h3>9. Periodo di conservazione</h3>
     <p>I dati personali sono conservati per il tempo strettamente necessario al perseguimento delle finalità indicate e, successivamente, per il periodo previsto dalla normativa vigente in materia civilistica e fiscale.</p>
     <br>
-    <h3>9. Diritti degli interessati</h3>
+    <h3>10. Diritti degli interessati</h3>
     <p>Gli interessati possono esercitare in qualsiasi momento i diritti previsti dagli artt. 15–22 del GDPR, tra cui accesso ai dati, rettifica o aggiornamento, cancellazione, limitazione del trattamento, portabilità dei dati e opposizione. Le richieste possono essere inviate al Titolare ai recapiti indicati al punto 1.</p>
     <br>
-    <h3>10. Reclamo all’Autorità di controllo</h3>
+    <h3>11. Reclamo all’Autorità di controllo</h3>
     <p>Gli interessati che ritengano che il trattamento dei dati personali avvenga in violazione della normativa vigente hanno il diritto di proporre reclamo al Garante per la Protezione dei Dati Personali o ad altra autorità di controllo competente ai sensi del GDPR.</p>
     <br>
-    <h3>11. Modifiche alla presente informativa</h3>
+    <h3>11. Cookie e strumenti di archiviazione</h3>
+    <p>La piattaforma utilizza esclusivamente cookie tecnici e strumenti di archiviazione necessari al suo funzionamento. Non sono utilizzati cookie di profilazione, cookie analitici o cookie di terze parti, e non viene effettuato alcun tracciamento della navigazione. Per questo motivo, ai sensi dell’art. 122, comma 1, del D.Lgs. 196/2003, non è richiesto il consenso preventivo dell’utente e non viene mostrato alcun banner.</p>
+    <ul style="margin-left:20px;">
+      <li>
+        <strong>Cookie tecnici (di sessione)</strong>
+        <ul style="margin-left:20px;">
+          <li><strong>Nome:</strong> refresh_token</li>
+          <li><strong>Titolare:</strong> prima parte (dominio della piattaforma)</li>
+          <li><strong>Finalità:</strong> mantenere l’utente autenticato tra una visita e l’altra, consentendo di rinnovare le credenziali di accesso senza richiedere nuovamente email e password</li>
+          <li><strong>Durata:</strong> 30 giorni, rinnovati a ogni utilizzo; il cookie viene eliminato al logout</li>
+          <li><strong>Caratteristiche:</strong> non accessibile da codice JavaScript (HttpOnly), trasmesso solo su connessione cifrata (Secure) e non inviato a siti terzi (SameSite)</li>
+        </ul>
+      </li>
+      <li>
+        <strong>Archiviazione locale nel browser (localStorage)</strong>
+        <ul style="margin-left:20px;">
+          <li><strong>Chiave:</strong> user</li>
+          <li><strong>Finalità:</strong> conservare le informazioni necessarie a ricostruire l’interfaccia dopo un aggiornamento della pagina</li>
+          <li><strong>Dati conservati:</strong> ruolo dell’utente, identificativo dell’utente e azienda selezionata</li>
+          <li><strong>Durata:</strong> fino al logout, che ne determina la cancellazione, o fino alla rimozione manuale dei dati del browser</li>
+        </ul>
+      </li>
+    </ul>
+    <p>Le credenziali di accesso vere e proprie non vengono mai salvate nel browser: sono conservate nella sola memoria volatile della pagina e vengono perse alla sua chiusura.</p>
+    <p>L’utente può in qualsiasi momento bloccare o cancellare i cookie tramite le impostazioni del proprio browser. Trattandosi di cookie tecnici indispensabili, il loro blocco impedisce l’accesso alla piattaforma e il mantenimento della sessione di lavoro.</p>
+    <br>
+    <h3>12. Modifiche alla presente informativa</h3>
     <p>Il Titolare si riserva il diritto di modificare la presente Informativa sulla Privacy in qualsiasi momento. Le modifiche saranno pubblicate sulla piattaforma e, ove necessario, comunicate agli utenti tramite i canali appropriati.</p>
   </v-container>
 </template>

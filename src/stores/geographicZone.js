@@ -1,5 +1,6 @@
 import http from '@/utils/http';
 import { defineStore } from 'pinia';
+import storesUtils from '@/utils/stores';
 
 export const useGeographicZoneStore = defineStore('geographicZone', {
   state: () => ({
@@ -9,52 +10,47 @@ export const useGeographicZoneStore = defineStore('geographicZone', {
     activeForm: false
   }),
   actions: {
-    createElement(router, func) {
-      http.postRequest(
+    createElement(func) {
+      http.makeRequest(
         'geographic-zone',
-        this.element,
-        func,
         'POST',
-        router
+        { body: this.element },
+        func
       );
     },
-    initList(router) {
-      http.getRequest(
+    initList() {
+      storesUtils.refreshList(this, (callback) => http.makeRequest(
         'geographic-zone',
-        {},
-        this.setList,
         'GET',
-        router
-      );
-    },
-    deleteElement(element, router, func) {
-      http.getRequest(
-        `geographic-zone/${element.id}`,
         {},
-        func,
+        callback
+      ));
+    },
+    deleteElement(element, func) {
+      http.makeRequest(
+        `geographic-zone/${element.id}`,
         'DELETE',
-        router
+        {},
+        func
       );
     },
-    createEntity(data, entity, router, func) {
-      http.postRequest(
+    createEntity(data, entity, func) {
+      http.makeRequest(
         `geographic-zone/${entity}`,
-        {
+        'POST',
+        { body: {
           ...data,
           zone_id: this.element.id
-        },
-        func,
-        'POST',
-        router
+        } },
+        func
       );
     },
-    deleteEntity(data, entity, router, func) {
-      http.getRequest(
+    deleteEntity(data, entity, func) {
+      http.makeRequest(
         `geographic-zone/${entity}/${data.id}`,
-        {},
-        func,
         'DELETE',
-        router
+        {},
+        func
       );
     },
     setList(data) {

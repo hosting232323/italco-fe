@@ -1,6 +1,7 @@
 import http from '@/utils/http';
 import { defineStore } from 'pinia';
 import storesUtils from '@/utils/stores';
+import rae from '@/utils/rae';
 
 export const useRaeProductGroupStore = defineStore('raeProductGroup', {
   state: () => ({
@@ -10,40 +11,44 @@ export const useRaeProductGroupStore = defineStore('raeProductGroup', {
     activeForm: false
   }),
   actions: {
-    createElement(router, func) {
-      http.postRequest(
+    createElement(func) {
+      http.makeRequest(
         'rae/product-group',
-        this.element,
-        func,
         'POST',
-        router
+        { body: this.element },
+        func
       );
     },
-    updateElement(router, func) {
-      http.postRequest(
+    updateElement(func) {
+      http.makeRequest(
         `rae/product-group/${this.element.id}`,
-        storesUtils.exclude_keys(this.element, ['created_at', 'updated_at']),
-        func,
         'PUT',
-        router
+        { body: storesUtils.exclude_keys(this.element, ['created_at', 'updated_at']) },
+        func
       );
     },
-    initList(router) {
-      http.getRequest(
+    initList() {
+      // Attività senza modulo RAEE: nessuna lista da chiedere, ma ready va
+      // messo lo stesso o getStoreList continuerebbe a richiamare initList.
+      if (!rae.isEnabled()) {
+        this.list = [];
+        this.ready = true;
+        return;
+      }
+
+      storesUtils.refreshList(this, (callback) => http.makeRequest(
         'rae/product-group',
-        {},
-        this.setList,
         'GET',
-        router
-      );
-    },
-    deleteElement(element, router, func) {
-      http.getRequest(
-        `rae/product-group/${element.id}`,
         {},
-        func,
+        callback
+      ));
+    },
+    deleteElement(element, func) {
+      http.makeRequest(
+        `rae/product-group/${element.id}`,
         'DELETE',
-        router
+        {},
+        func
       );
     },
     setList(data) {

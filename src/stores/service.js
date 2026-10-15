@@ -12,70 +12,63 @@ export const useServiceStore = defineStore('service', {
     activePopUpForm: false
   }),
   actions: {
-    createElement(router, func) {
-      http.postRequest(
+    createElement(func) {
+      http.makeRequest(
         'service',
-        this.element,
-        func,
         'POST',
-        router
+        { body: this.element },
+        func
       );
     },
-    updateElement(router, func) {
-      http.postRequest(
+    updateElement(func) {
+      http.makeRequest(
         `service/${this.element.id}`,
-        storesUtils.exclude_keys(this.element, ['created_at', 'updated_at', 'users']),
-        func,
         'PUT',
-        router
+        { body: storesUtils.exclude_keys(this.element, ['created_at', 'updated_at', 'users']) },
+        func
       );
     },
-    initList(router) {
-      http.getRequest(
+    initList() {
+      storesUtils.refreshList(this, (callback) => http.makeRequest(
         'service',
-        {},
-        this.setList,
         'GET',
-        router
-      );
-    },
-    deleteElement(element, router, func) {
-      http.getRequest(
-        `service/${element.id}`,
         {},
-        func,
+        callback
+      ));
+    },
+    deleteElement(element, func) {
+      http.makeRequest(
+        `service/${element.id}`,
         'DELETE',
-        router
+        {},
+        func
       );
     },
-    createServiceUserRelationships(object, router, func) {
-      http.postRequest(
+    createServiceUserRelationships(object, func) {
+      http.makeRequest(
         'service/customer',
-        {
+        'POST',
+        { body: {
           ...object,
           service_id: this.element.id
-        },
-        func,
-        'POST',
-        router
+        } },
+        func
       );
     },
-    updateServiceUserRelationships(object, router, func) {
-      http.postRequest(
+    updateServiceUserRelationships(object, func) {
+      http.makeRequest(
         `service/customer/${object.id}`,
-        storesUtils.exclude_keys(object, ['created_at', 'updated_at']),
-        func,
         'PUT',
-        router
+        { body: storesUtils.exclude_keys(object, ['created_at', 'updated_at']) },
+        func
       );
     },
-    deleteServiceUserRelationships(object, router, func) {
-      http.getRequest(
+    deleteServiceUserRelationships(object, func) {
+      http.makeRequest(
         `service/customer/${object.id}`,
-        {},
-        func,
         'DELETE',
-        router
+        {},
+        func
       );
     },
     setList(data) {

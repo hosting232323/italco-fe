@@ -1,10 +1,21 @@
 import http from '@/utils/http';
 import { defineStore } from 'pinia';
+import { fileUtils } from 'generic-module';
 import storesUtils from '@/utils/stores';
 
 const EXCLUDED_KEYS = [
   'created_at', 'updated_at', 'delivery_group', 'services', 'user', 'dates_form', 'schedulation'
 ];
+
+const NUMERIC_KEYS = ['floor', 'mark'];
+
+const formatBody = (element, excludedKeys) => {
+  const body = storesUtils.exclude_keys(element, excludedKeys);
+  NUMERIC_KEYS.forEach((key) => {
+    if (body[key] === '') body[key] = null;
+  });
+  return body;
+};
 
 export const useOrderStore = defineStore('order', {
   state: () => ({
@@ -13,60 +24,55 @@ export const useOrderStore = defineStore('order', {
     filters: {},
     ready: false,
     activeForm: false,
+    addressValid: false,
     filtersSetting: {
       doubleDates: false,
       dateType: Object.keys(storesUtils.ORDER_DATE_FILTER_TYPES)[0]
     }
   }),
   actions: {
-    createElement(router, func) {
-      http.postRequest(
+    createElement(func) {
+      http.makeRequest(
         'order',
-        storesUtils.exclude_keys(this.element, EXCLUDED_KEYS),
-        func,
         'POST',
-        router
+        { body: formatBody(this.element, EXCLUDED_KEYS) },
+        func
       );
     },
-    updateElement(router, func) {
-      http.postRequest(
+    updateElement(func) {
+      http.makeRequest(
         `order/${this.element.id}`,
-        storesUtils.exclude_keys(this.element, EXCLUDED_KEYS),
-        func,
         'PUT',
-        router
+        { body: formatBody(this.element, EXCLUDED_KEYS) },
+        func
       );
     },
-    updateElementWithFormData(router, func) {
-      const content = {
-        data: JSON.stringify(storesUtils.exclude_keys(this.element, EXCLUDED_KEYS.concat(['photo'])))
-      };
-
-      if (this.element.photos)
-        this.element.photos.forEach(element => content[element.name] = element);
-      if (this.element.signature)
-        content.signature = this.element.signature; 
-
-      http.formDataRequest(
+    updateElementWithFormData(func) {
+      http.uploadRequest(
         `order/${this.element.id}`,
-        content,
-        func,
         'PUT',
-        router
+        {
+          body: formatBody(this.element, EXCLUDED_KEYS.concat(['photo', 'photos', 'signature'])),
+          files: {
+            photos: this.element.photos,
+            signature: this.element.signature
+          },
+          extensions: fileUtils.imageExtensions
+        },
+        func
       );
     },
-    initList(router) {
-      http.postRequest(
+    initList() {
+      storesUtils.refreshList(this, (callback) => http.makeRequest(
         'order/filter',
-        {filters: storesUtils.formatFilters(
+        'POST',
+        { body: { filters: storesUtils.formatFilters(
           this.filters,
           storesUtils.ORDER_DATE_FILTER_TYPES,
           'Order'
-        )},
-        this.setList,
-        'POST',
-        router
-      );
+        ) } },
+        callback
+      ));
     },
     setList(data) {
       this.list = data.orders;

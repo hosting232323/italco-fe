@@ -9,9 +9,14 @@
         @click="openUserForm"
       />
     </h1><hr>
-    <UserForm />
     <UserTable />
   </v-container>
+  <v-dialog
+    v-model="userForm"
+    max-width="1500"
+  >
+    <UserForm />
+  </v-dialog>
 </template>
 
 <script setup>

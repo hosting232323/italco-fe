@@ -4,8 +4,27 @@ const positiveNumberRules = [
     if (!isNaN(value) && Number(value) >= 0) return true;
     return 'Deve essere un numero positivo';
   }
-]
-;
+];
+
+const nonNegativeIntegerRules = [
+  (value) => {
+    if (value === null || value === undefined || value === '') return true;
+    if (Number.isInteger(Number(value)) && Number(value) >= 0) return true;
+    return 'Deve essere un numero intero maggiore o uguale a zero';
+  }
+];
+
+const requiredRulesWithZero = [
+  (value) => {
+    if (value) return true;
+    if (
+      value !== null && value !== undefined && value !== '' &&
+      !isNaN(value) && Number(value) >= 0
+    ) return true;
+    return 'Campo obbligatorio';
+  }
+];
+
 const requiredRules = [
   (value) => {
     if (value) return true;
@@ -81,6 +100,8 @@ const maxGroupSizeRule = (minElement) => [
 
 export default {
   positiveNumberRules,
+  nonNegativeIntegerRules,
+  requiredRulesWithZero,
   requiredRules,
   arrayRules,
   capRules,

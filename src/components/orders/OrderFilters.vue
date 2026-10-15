@@ -76,9 +76,9 @@
           />
         </v-form>
         <v-btn
-          v-if="role == 'Admin' && !panel && filters['CustomerUser.id'] && filters['Order.dpc']
-            && filters['Order.dpc'][0] && filters['Order.dpc'][1]"
-          class="mt-2"
+          v-if="(role == 'Admin' || role == 'Customer') && !panel && (role == 'Customer' || filters['CustomerUser.id'])
+            && filters['Order.booking_date'] && filters['Order.booking_date'][0] && filters['Order.booking_date'][1]"
+          class="mt-2 mb-2"
           block
           text="Esporta Fatturazione"
           prepend-icon="mdi-file-pdf-box"
@@ -101,7 +101,6 @@ import http from '@/utils/http';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import mobile from '@/utils/mobile';
-import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
@@ -111,7 +110,6 @@ import { useCollectionPointStore } from '@/stores/collectionPoint';
 const form = ref(null);
 const panel = ref(null);
 const theme = useTheme();
-const router = useRouter();
 const loading = ref(false);
 const isMobile = mobile.setupMobileUtils();
 
@@ -119,42 +117,36 @@ const userStore = useUserStore();
 const orderStore = useOrderStore();
 const serviceStore = useServiceStore();
 const collectionPointStore = useCollectionPointStore();
-const { role } = storeToRefs(userStore);
+// effectiveRole: il super admin in una company vede l'export fatturazione come un admin.
+const { effectiveRole: role } = storeToRefs(userStore);
 const { filters, ready } = storeToRefs(orderStore);
-const services = storesUtils.getStoreList(serviceStore, router);
-const collectionPoints = storesUtils.getStoreList(collectionPointStore, router);
+const services = storesUtils.getStoreList(serviceStore);
+const collectionPoints = storesUtils.getStoreList(collectionPointStore);
 
 const filterOrder = async () => {
   if (!(await form.value.validate()).valid) return;
 
   ready.value = false;
-  orderStore.initList(router);
+  orderStore.initList();
   panel.value = null;
 };
 
 const exportInvoice = async () => {
   loading.value = true;
 
-  http.postRequest('export/invoice', {
-    filters: storesUtils.formatFilters(
-      filters.value,
-      storesUtils.ORDER_DATE_FILTER_TYPES,
-      'Order'
-    )
-  }, function (data) {
-    loading.value = false;
-    panel.value = null;
-    if (data.status == 'ko')
-      alert(data.error);
-    else {
-      const blob = new Blob([data], { type: 'application/pdf' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `ordini_${filters.value['Order.dpc'][0]}_${filters.value['Order.dpc'][1]}.pdf`;
-      a.click();
-      window.URL.revokeObjectURL(url);
-    }
-  }, 'POST', router);
+  http.downloadRequest(
+    'export/invoice',
+    'POST',
+    {
+      body: {
+        filters: storesUtils.formatFilters(
+          filters.value,
+          storesUtils.ORDER_DATE_FILTER_TYPES,
+          'Order'
+        )
+      }
+    },
+    () => loading.value = false
+  );
 };
 </script>

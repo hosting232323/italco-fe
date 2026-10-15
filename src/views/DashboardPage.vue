@@ -1,66 +1,47 @@
 <template>
-  <v-dialog
-    v-model="activeForm"
-    max-width="1500"
-  >
-    <template #activator>
-      <v-container>
-        <h1>
-          Dashboard
-          <v-btn
-            v-if="role && role != 'Delivery'"
-            icon="mdi-plus"
-            style="float: right;"
-            variant="text"
-            @click="openForm"
-          />
-          <v-btn
-            v-else-if="role && role == 'Delivery'"
-            icon="mdi-logout"
-            style="float: right;"
-            variant="text"
-            @click="logoutModule.logout(router)"
-          />
-          <ExcelImportation v-if="role == 'Admin'" />
-          <PdfImportation v-if="role == 'Admin'" />
-        </h1><hr>
-        <template v-if="role && role != 'Delivery'">
-          <OrdersFilters />
-          <OrderTable />
-        </template>
-        <DeliveryDashboard v-else-if="role == 'Delivery'" />
-      </v-container>
+  <v-container>
+    <h1>Dashboard</h1><hr>
+    <DashboardFilters class="mt-6 mb-2" />
+    <div
+      v-if="!ready"
+      class="d-flex justify-center py-10"
+    >
+      <v-progress-circular
+        indeterminate
+        :color="theme.current.value.primaryColor"
+      />
+    </div>
+    <template v-else>
+      <DashboardKpis />
+      <DashboardCharts />
     </template>
-    <template #default>
-      <OrderForm />
-    </template>
-  </v-dialog>
+  </v-container>
 </template>
 
 <script setup>
-import OrderTable from '@/components/orders/OrderTable';
-import OrderForm from '@/components/orders/OrderFormCard';
-import OrdersFilters from '@/components/orders/OrderFilters';
-import DeliveryDashboard from '@/components/delivery/DeliveryDashboard';
-import PdfImportation from '@/components/administration/importation/PdfImportation';
-import ExcelImportation from '@/components/administration/importation/ExcelImportation';
+import DashboardKpis from '@/components/dashboard/DashboardKpis';
+import DashboardCharts from '@/components/dashboard/DashboardCharts';
+import DashboardFilters from '@/components/dashboard/DashboardFilters';
 
+import { onMounted } from 'vue';
+import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
-import logoutModule from '@/utils/logout';
-import { useUserStore } from '@/stores/user';
-import { useOrderStore } from '@/stores/order';
+import { useDashboardStore } from '@/stores/dashboard';
 
-const router = useRouter();
-const userStore = useUserStore();
-const orderStore = useOrderStore();
-const { role, userId } = storeToRefs(userStore);
-const { element: order, activeForm } = storeToRefs(orderStore);
+const theme = useTheme();
+const dashboardStore = useDashboardStore();
+const { filters, ready } = storeToRefs(dashboardStore);
 
-const openForm = () => {
-  order.value = {};
-  if (role.value == 'Customer')
-    order.value.user_id = userId.value;
-  activeForm.value = true;
-};
+const toIsoDate = (date) => date.toISOString().slice(0, 10);
+
+onMounted(() => {
+  if (!ready.value) {
+    const end = new Date();
+    const start = new Date();
+    start.setDate(start.getDate() - 30);
+    filters.value.start = toIsoDate(start);
+    filters.value.end = toIsoDate(end);
+    dashboardStore.load();
+  }
+});
 </script>

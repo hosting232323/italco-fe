@@ -1,25 +1,35 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import { useUserStore } from '@/stores/user';
 
 const routes = [
+  {
+    path: '/',
+    name: 'Landing',
+    component: () => import('@/views/landing/LandingPage.vue')
+  },
   {
     path: '/',
     component: () => import('@/layouts/LoginLayout.vue'),
     children: [
       {
-        path: '',
+        path: 'login',
         name: 'Login',
         component: () => import('@/views/LoginPage.vue')
       },
       {
-        path: 'order/:orderId',
+        path: 'order/track',
         name: 'OrderStatus',
         component: () => import('@/views/OrderStatus.vue'),
-        props: true
       },
       {
         path: 'privacy',
         name: 'Privacy Policy',
         component: () => import('@/views/PrivacyPolicy.vue')
+      },
+      {
+        path: 'download-app',
+        name: 'Download App',
+        component: () => import('@/views/DownloadDeliveryApp.vue')
       },
       {
         path: '/:pathMatch(.*)*',
@@ -36,6 +46,11 @@ const routes = [
         path: 'dashboard',
         name: 'Dashboard',
         component: () => import('@/views/DashboardPage.vue')
+      },
+      {
+        path: 'orders',
+        name: 'Ordini',
+        component: () => import('@/views/OrdersPage.vue')
       },
       {
         path: 'services',
@@ -75,12 +90,32 @@ const routes = [
       {
         path: 'rae-dashboard',
         name: 'Ritiri Raee',
-        component: () => import('@/views/administration/RaeDashboard.vue')
+        component: () => import('@/views/operator/RaeDashboard.vue')
       },
       {
         path: 'rae-product-groups',
         name: 'Raggruppamenti Raee',
         component: () => import('@/views/administration/RaeProductGroups.vue')
+      },
+      {
+        path: 'rae-carrier',
+        name: 'Trasportatori Raee',
+        component: () => import('@/views/administration/RaeCarrier.vue')
+      },
+      {
+        path: 'rae-collection-center',
+        name: 'Centri di raccolta Raee',
+        component: () => import('@/views/administration/RaeCollectionCenter.vue')
+      },
+      {
+        path: 'rae-disposal',
+        name: 'Smaltimenti Raee',
+        component: () => import('@/views/operator/RaeDisposal.vue')
+      },
+      {
+        path: 'companies',
+        name: 'Company',
+        component: () => import('@/views/administration/AdministrationCompanies.vue')
       }
     ]
   }
@@ -101,5 +136,48 @@ const router = createRouter({
       return { left: 0, top: 0 };
   }
 });
+
+// Rotte raggiungibili senza sessione: fuori dal perimetro della guard.
+const PUBLIC_ROUTES = ['Landing', 'Login', 'Privacy Policy', 'Download App', 'OrderStatus', 'NotFound'];
+
+// Rotte del modulo RAEE: esistono solo per le attività che lo hanno acceso.
+const RAE_ROUTES = [
+  'Ritiri Raee',
+  'Smaltimenti Raee',
+  'Raggruppamenti Raee',
+  'Trasportatori Raee',
+  'Centri di raccolta Raee'
+];
+
+
+router.beforeEach((to) => {
+  const userStore = useUserStore();
+  const { role, company } = userStore;
+
+  // Sessioni Delivery aperte da prima della rimozione della UI web: la
+  // company web non offre più nulla per questo ruolo, quindi si chiude la
+  // sessione e si manda alla stessa pagina del login.
+  if (role == 'Delivery' && !PUBLIC_ROUTES.includes(to.name)) {
+    userStore.$reset();
+    return { name: 'Download App' };
+  }
+
+  // Il super admin non possiede dati propri: finché non sceglie una company
+  // non c'è niente da mostrargli, e ogni altra rotta lo riporta alla scelta.
+  // I log non appartengono a nessuna company, quindi restano raggiungibili.
+  if (role == 'Super Admin' && !company && !['Company', 'Log'].includes(to.name) && !PUBLIC_ROUTES.includes(to.name))
+    return { name: 'Company' };
+
+  // I log contengono le richieste di tutte le company: l'URL digitato da un
+  // admin di company riporta alla dashboard, il backend risponderebbe 403.
+  if (to.name == 'Log' && role != 'Super Admin')
+    return { name: 'Dashboard' };
+
+  // Togliere le voci dal menù non basta: l'URL resta digitabile e i preferiti
+  // pure. Chi ci arriva con il modulo spento torna alla dashboard.
+  if (RAE_ROUTES.includes(to.name) && !company?.rae)
+    return { name: 'Dashboard' };
+});
+
 
 export default router;
