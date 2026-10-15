@@ -93,7 +93,7 @@ const routes = [
       },
       {
         path: 'planning/automatic',
-        name: 'Pianificazione automatica',
+        name: 'Pianificazione',
         component: () => import('@/views/operator/PlanningAutomatic.vue')
       },
       {

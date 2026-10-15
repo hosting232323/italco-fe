@@ -50,7 +50,7 @@
       />
       <v-list-item
         to="/planning/automatic"
-        title="Pianificazione automatica"
+        title="Pianificazione"
         prepend-icon="mdi-map-marker-radius"
       />
       <v-divider class="my-2" />

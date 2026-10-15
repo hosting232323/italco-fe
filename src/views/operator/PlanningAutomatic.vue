@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <h1>Pianificazione automatica</h1><hr>
+    <h1>Pianificazione</h1><hr>
     <PlanningCoverage v-if="automaticPlanning" />
     <PlanningAutomaticTeaser v-else />
   </v-container>
