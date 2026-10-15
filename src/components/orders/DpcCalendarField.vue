@@ -71,13 +71,17 @@
                 >
                   {{ slot.start }}-{{ slot.end }}
                 </v-chip>
-                <div
+                <template
                   v-for="slot in cell.slots"
                   :key="`fill-${slot.start}-${slot.end}`"
-                  class="dpc-calendar-fill"
                 >
-                  {{ slotFillText(slot) }}
-                </div>
+                  <div
+                    v-if="slot.booked !== undefined"
+                    class="dpc-calendar-fill"
+                  >
+                    {{ slotFillText(slot) }}
+                  </div>
+                </template>
               </div>
             </div>
           </div>
