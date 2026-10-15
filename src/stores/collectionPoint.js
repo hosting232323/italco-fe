@@ -27,6 +27,31 @@ export const useCollectionPointStore = defineStore('collectionPoint', {
         func
       );
     },
+    // Aree di precarico del punto (solo admin): per CAP e/o poligono [lat, lon].
+    createPreloadArea(pointId, area, func) {
+      http.makeRequest(
+        `collection-point/${pointId}/preload-area`,
+        'POST',
+        { body: { name: area.name, caps: area.caps, polygon: area.polygon } },
+        func
+      );
+    },
+    updatePreloadArea(areaId, area, func) {
+      http.makeRequest(
+        `collection-point/preload-area/${areaId}`,
+        'PUT',
+        { body: { name: area.name, caps: area.caps, polygon: area.polygon } },
+        func
+      );
+    },
+    deletePreloadArea(areaId, func) {
+      http.makeRequest(
+        `collection-point/preload-area/${areaId}`,
+        'DELETE',
+        {},
+        func
+      );
+    },
     initList() {
       storesUtils.refreshList(this, (callback) => http.makeRequest(
         'collection-point',

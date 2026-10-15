@@ -40,8 +40,22 @@
       <CoverageMap
         v-else
         :entries="entries"
-        @collection-point-click="openPreloadDialog"
-      />
+        :preload-areas="preloadPoint?.preload_areas || []"
+        :drawing-preload-area="drawingPreloadArea"
+        @collection-point-click="openPreloadCard"
+        @preload-polygon-drawn="draftPolygon = $event"
+      >
+        <template #overlay>
+          <CollectionPointPreloadCard
+            :point="preloadPoint"
+            :is-admin="isAdmin"
+            :drawing="drawingPreloadArea"
+            :draft-polygon="draftPolygon"
+            @update:drawing="setDrawing"
+            @close="closePreloadCard"
+          />
+        </template>
+      </CoverageMap>
 
       <h2 class="mt-8">
         Blocchi di copertura
@@ -61,56 +75,6 @@
   >
     <CoverageEntryForm />
   </v-dialog>
-  <v-dialog
-    v-model="preloadDialog"
-    max-width="520"
-  >
-    <v-card
-      v-if="preloadPoint"
-      :title="preloadPoint.name"
-      :subtitle="preloadPoint.address"
-    >
-      <v-card-text>
-        <v-switch
-          v-model="preloadValue"
-          :disabled="!isAdmin || preloadLoading"
-          :loading="preloadLoading"
-          label="Precarico"
-          color="primary"
-          hide-details
-          @update:model-value="savePreload"
-        />
-        <p class="text-medium-emphasis mt-3 mb-0">
-          Con il precarico attivo, nelle aree che lo accettano i prodotti di questo punto si ritirano il giorno
-          prima della consegna.
-        </p>
-        <v-alert
-          v-if="!isAdmin"
-          type="info"
-          variant="tonal"
-          density="compact"
-          class="mt-3"
-        >
-          Il precarico può essere modificato solo da un amministratore.
-        </v-alert>
-        <v-alert
-          v-if="preloadError"
-          type="error"
-          variant="tonal"
-          density="compact"
-          class="mt-3"
-        >
-          {{ preloadError }}
-        </v-alert>
-      </v-card-text>
-      <v-card-actions>
-        <v-spacer />
-        <v-btn @click="preloadDialog = false">
-          Chiudi
-        </v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
 </template>
 
 <script setup>
@@ -118,6 +82,7 @@ import CoverageCalendar from '@/components/operator/deliveryCoverage/CoverageCal
 import CoverageEntryForm from '@/components/operator/deliveryCoverage/CoverageEntryForm';
 import CoverageEntryTable from '@/components/operator/deliveryCoverage/CoverageEntryTable';
 import CoverageMap from '@/components/operator/deliveryCoverage/CoverageMap';
+import CollectionPointPreloadCard from '@/components/operator/deliveryCoverage/CollectionPointPreloadCard';
 
 import { computed, ref } from 'vue';
 import { useTheme } from 'vuetify';
@@ -152,34 +117,26 @@ const openEntryForm = () => {
   entryForm.value = true;
 };
 
-const preloadDialog = ref(false);
-const preloadPoint = ref(null);
-const preloadValue = ref(false);
-const preloadLoading = ref(false);
-const preloadError = ref('');
+// La card legge il punto dallo store, cosi' dopo un salvataggio mostra i dati aggiornati.
+const preloadPointId = ref(null);
+const preloadPoint = computed(
+  () => collectionPointStore.list.find((point) => point.id === preloadPointId.value) || null
+);
+const drawingPreloadArea = ref(false);
+const draftPolygon = ref(null);
 
-const openPreloadDialog = (point) => {
-  preloadPoint.value = point;
-  preloadValue.value = !!point.preloaded;
-  preloadError.value = '';
-  preloadDialog.value = true;
+const openPreloadCard = (point) => {
+  preloadPointId.value = point.id;
+  setDrawing(false);
 };
 
-const savePreload = (value) => {
-  preloadLoading.value = true;
-  preloadError.value = '';
-  collectionPointStore.element = { ...preloadPoint.value, preloaded: !!value };
-  collectionPointStore.updateElement((data) => {
-    preloadLoading.value = false;
-    if (data.status == 'ok') {
-      preloadPoint.value = { ...preloadPoint.value, preloaded: !!value };
-      collectionPointStore.initList();
-      return;
-    }
-    // Il backend rifiuta lo spegnimento con ordini precaricati in sospeso: lo
-    // switch torna sul valore salvato e il motivo resta leggibile.
-    preloadValue.value = !value;
-    preloadError.value = data.message || 'Impossibile salvare il precarico';
-  });
+const closePreloadCard = () => {
+  preloadPointId.value = null;
+  setDrawing(false);
+};
+
+const setDrawing = (value) => {
+  drawingPreloadArea.value = value;
+  draftPolygon.value = null;
 };
 </script>
