@@ -51,18 +51,18 @@
         variant="text"
         :color="theme.current.value.primaryColor"
       />
-      <v-btn
+      <v-icon
         v-if="item.preloaded"
         title="Ordine precaricato: ritiro il giorno prima della consegna"
         icon="mdi-package-up"
-        variant="text"
+        class="mx-2"
         :color="theme.current.value.primaryColor"
       />
-      <v-btn
+      <v-icon
         v-if="item.out_of_zone"
         title="Fuori zona: indirizzo non coperto da nessun corriere"
         icon="mdi-map-marker-off-outline"
-        variant="text"
+        class="mx-2"
         :color="theme.current.value.primaryColor"
       />
       <v-btn
