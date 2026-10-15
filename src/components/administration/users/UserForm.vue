@@ -34,6 +34,11 @@
             />
           </v-col>
         </v-row>
+        <v-text-field
+          v-model="user.email"
+          label="Email (facoltativa)"
+          :rules="validation.optionalEmailRules"
+        />
         <v-select
           v-model="user.role"
           label="Ruolo"
