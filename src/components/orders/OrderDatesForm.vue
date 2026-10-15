@@ -57,6 +57,7 @@
             label="Data Prevista dal Cliente"
             :allowed-dates="allowedDpcDates"
             :slots="dpcSlots"
+            :blocked-days="blockedDays"
             :rules="validation.requiredRules"
             :disabled="role == 'Operator' && order.id"
           />
@@ -138,6 +139,7 @@ const loading = ref(false);
 const loadingDates = ref(true);
 const allowedDpcDates = ref([]);
 const dpcSlots = ref({});
+const blockedDays = ref([]);
 const outOfCoverage = ref(false);
 const userStore = useUserStore();
 const orderStore = useOrderStore();
@@ -199,10 +201,12 @@ const loadAllowedDates = () => {
     if (data.status === 'ok') {
       allowedDpcDates.value = data.dates;
       dpcSlots.value = data.slots || {};
+      blockedDays.value = data.blocked || [];
       outOfCoverage.value = data.covered === false;
     } else {
       allowedDpcDates.value = [];
       dpcSlots.value = {};
+      blockedDays.value = [];
       outOfCoverage.value = true;
     }
     // La data già scelta che non è più disponibile si azzera (fuori copertura la

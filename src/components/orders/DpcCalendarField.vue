@@ -71,9 +71,30 @@
                 >
                   {{ slot.start }}-{{ slot.end }}
                 </v-chip>
+                <div
+                  v-for="slot in cell.slots"
+                  :key="`fill-${slot.start}-${slot.end}`"
+                  class="dpc-calendar-fill"
+                >
+                  {{ slotFillText(slot) }}
+                </div>
               </div>
             </div>
           </div>
+        </div>
+      </div>
+      <div
+        v-if="blockedDays.length"
+        class="dpc-blocked mt-2"
+      >
+        <b>Giorni non disponibili</b>
+        <div
+          v-for="group in blockedDays"
+          :key="group.reason"
+          class="dpc-blocked-group"
+        >
+          <span class="dpc-blocked-reason">{{ group.reason }}:</span>
+          {{ group.dates.map(formatBlockedDate).join(', ') }}
         </div>
       </div>
     </div>
@@ -112,6 +133,10 @@ const props = defineProps({
   rules: {
     type: Array,
     required: true
+  },
+  blockedDays: {
+    type: Array,
+    default: () => []
   },
   classStyle: {
     type: String,
@@ -182,6 +207,19 @@ const formattedValue = computed(() => {
   if (slotsForDate.length > 0 && (!props.slotStart || !props.slotEnd)) return '';
   return selectedDate.value;
 });
+
+// Riempimento della fascia: gli ordini gia' presi e quanti sono del punto vendita.
+function slotFillText(slot) {
+  const booked = slot.booked ?? 0;
+  const own = slot.own_booked ?? 0;
+  const word = booked === 1 ? 'ordine' : 'ordini';
+  return own > 0 ? `${booked} ${word} (${own} tuoi)` : `${booked} ${word}`;
+}
+
+function formatBlockedDate(iso) {
+  const date = new Date(iso);
+  return date.toLocaleDateString('it-IT', { weekday: 'short', day: '2-digit', month: '2-digit' });
+}
 
 function shiftMonth(delta) {
   viewMonth.value = new Date(viewMonth.value.getFullYear(), viewMonth.value.getMonth() + delta, 1);
@@ -301,6 +339,23 @@ watch(() => props.modelValue, (value) => {
 .dpc-calendar-day--selected {
   background: rgb(var(--v-theme-primary));
   color: rgb(var(--v-theme-on-primary));
+}
+
+.dpc-calendar-fill {
+  font-size: 0.65rem;
+  opacity: 0.65;
+  text-align: center;
+  line-height: 1.1;
+}
+
+.dpc-blocked {
+  font-size: 0.8rem;
+  max-height: 140px;
+  overflow-y: auto;
+}
+
+.dpc-blocked-reason {
+  font-weight: 600;
 }
 
 .dpc-calendar-chips {
