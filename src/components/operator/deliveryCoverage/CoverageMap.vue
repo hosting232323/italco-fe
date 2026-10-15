@@ -13,8 +13,9 @@
         esatto; città con più CAP: zone sub-comunali ricostruite, accuratezza ~97%). Per un CAP fuori dataset viene
         mostrato un punto indicativo. Passa il mouse su una zona per vedere i veicoli e le fasce orarie di quel giorno.
         Usa lo strumento poligono in alto a destra sulla mappa per disegnare un nuovo blocco di copertura per zona
-        invece che per CAP. I marker viola sono i punti di ritiro dei clienti della company, validi per tutti i
-        giorni.
+        invece che per CAP. I marker sono i punti di ritiro dei clienti della company, validi per tutti i
+        giorni: viola = ritiro normale, arancione con camion = accetta il precarico. Clicca un marker per
+        attivare o disattivare il precarico.
       </p>
 
       <div class="day-picker mb-3">
@@ -87,6 +88,7 @@ const props = defineProps({
     required: true
   }
 });
+const emits = defineEmits(['collection-point-click']);
 
 const theme = useTheme();
 const transportStore = useTransportStore();
@@ -121,6 +123,18 @@ const collectionPointIcon = L.divIcon({
   html: `<div style="width:26px;height:26px;border-radius:50%;background:${COLLECTION_POINT_COLOR};` +
     'color:white;border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.5);display:flex;' +
     'align-items:center;justify-content:center;"><i class="mdi mdi-storefront" style="font-size:15px;"></i></div>',
+  iconSize: [26, 26],
+  iconAnchor: [13, 13]
+});
+
+// Punto che accetta il precarico: stessa forma ma colore e icona diversi, cosi' si
+// distingue a colpo d'occhio senza aprire il tooltip.
+const PRELOADED_POINT_COLOR = '#ef6c00';
+const preloadedCollectionPointIcon = L.divIcon({
+  className: '',
+  html: `<div style="width:26px;height:26px;border-radius:50%;background:${PRELOADED_POINT_COLOR};` +
+    'color:white;border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.5);display:flex;' +
+    'align-items:center;justify-content:center;"><i class="mdi mdi-truck-fast" style="font-size:15px;"></i></div>',
   iconSize: [26, 26],
   iconAnchor: [13, 13]
 });
@@ -242,11 +256,15 @@ const updateCollectionPointLayers = () => {
     clearCollectionPointLayers();
 
     points.forEach((point) => {
-      const marker = L.marker([point.lat, point.lon], { icon: collectionPointIcon });
-      marker.bindTooltip(`<strong>${point.name}</strong><div>${point.address}</div>`, {
-        sticky: true,
-        direction: 'top'
+      const marker = L.marker([point.lat, point.lon], {
+        icon: point.preloaded ? preloadedCollectionPointIcon : collectionPointIcon
       });
+      marker.bindTooltip(
+        `<strong>${point.name}</strong><div>${point.address}</div>` +
+        `<div>Precarico: ${point.preloaded ? 'sì' : 'no'}</div>`,
+        { sticky: true, direction: 'top' }
+      );
+      marker.on('click', () => emits('collection-point-click', point));
       marker.addTo(map.value);
       collectionPointLayers.push(marker);
     });

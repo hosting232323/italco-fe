@@ -1,5 +1,5 @@
 <template>
-  <v-card title="Pianificazione Automatica">
+  <v-card title="Proposte Borderò">
     <v-card-text>
       <v-form
         ref="dpcForm"
@@ -14,7 +14,7 @@
         <v-row no-gutters>
           <v-col
             cols="12"
-            md="4"
+            md="3"
           >
             <v-text-field
               v-model="minSizeGroup"
@@ -26,7 +26,7 @@
           </v-col>
           <v-col
             cols="12"
-            md="4"
+            md="3"
           >
             <v-text-field
               v-model="maxSizeGroup"
@@ -38,12 +38,25 @@
           </v-col>
           <v-col
             cols="12"
-            md="4"
+            md="3"
           >
             <v-text-field
               v-model="maxDistanceKm"
               type="number"
               label="Massima distanza (KM)"
+              :class="isMobile ? '' : 'mx-2'"
+            />
+          </v-col>
+          <v-col
+            cols="12"
+            md="3"
+          >
+            <v-text-field
+              :model-value="MAX_PROFESSIONAL_ORDERS"
+              label="Servizi professionali per borderò"
+              hint="Limite fisso del motore di raggruppamento"
+              persistent-hint
+              readonly
               :class="isMobile ? '' : 'ml-2'"
             />
           </v-col>
@@ -94,6 +107,9 @@ const props = defineProps({
     default: null
   }
 });
+
+// Limite fisso del motore di raggruppamento (MAX_PROFESSIONAL_ORDERS): non è salvato per company.
+const MAX_PROFESSIONAL_ORDERS = 2;
 
 const message = ref('');
 const dpcForm = ref(null);
