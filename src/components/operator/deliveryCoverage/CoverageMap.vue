@@ -15,7 +15,7 @@
         Usa lo strumento poligono in alto a destra sulla mappa per disegnare un nuovo blocco di copertura per zona
         invece che per CAP. I marker sono i punti di ritiro dei clienti della company, validi per tutti i
         giorni: viola = ritiro normale, arancione con camion = accetta il precarico. Clicca un marker per
-        attivare o disattivare il precarico.
+        aprire la scheda del punto: attivare o disattivare il precarico e gestirne le aree.
       </p>
 
       <div class="day-picker mb-3">
@@ -32,10 +32,15 @@
         </v-chip>
       </div>
 
-      <div
-        ref="mapContainer"
-        class="coverage-map"
-      />
+      <div class="coverage-map-wrapper">
+        <div
+          ref="mapContainer"
+          class="coverage-map"
+        />
+        <div class="coverage-map-overlay">
+          <slot name="overlay" />
+        </div>
+      </div>
 
       <div
         v-if="loading"
@@ -86,9 +91,20 @@ const props = defineProps({
   entries: {
     type: Array,
     required: true
+  },
+  // Aree di precarico del punto selezionato: evidenziate sulla mappa.
+  preloadAreas: {
+    type: Array,
+    default: () => []
+  },
+  // Con true il poligono disegnato non crea un blocco di copertura ma un'area di
+  // precarico: lo riceve chi ascolta `preload-polygon-drawn`.
+  drawingPreloadArea: {
+    type: Boolean,
+    default: false
   }
 });
-const emits = defineEmits(['collection-point-click']);
+const emits = defineEmits(['collection-point-click', 'preload-polygon-drawn']);
 
 const theme = useTheme();
 const transportStore = useTransportStore();
@@ -146,6 +162,10 @@ const map = shallowRef(null);
 const layers = [];
 const collectionPointLayers = [];
 const drawnLayer = shallowRef(null);
+const preloadAreaLayers = [];
+
+// Verde fisso: distinto da viola (punti), arancione (zone disegnate) e dal primario (CAP).
+const PRELOAD_AREA_COLOR = '#2e7d32';
 const loading = ref(false);
 let mapIsZooming = false;
 let mapIsMoving = false;
@@ -432,11 +452,16 @@ onMounted(async () => {
     drawnLayer.value.clearLayers();
     drawnLayer.value.addLayer(event.layer);
     const polygon = event.layer.getLatLngs()[0].map((point) => [point.lat, point.lng]);
+    if (props.drawingPreloadArea) {
+      emits('preload-polygon-drawn', polygon);
+      return;
+    }
     coverageStore.element = { caps: [], polygon };
     coverageStore.entryForm = true;
   });
 
   updateCollectionPointLayers();
+  updatePreloadAreaLayers();
   updateMap();
 });
 
@@ -459,11 +484,56 @@ watch(
   }
 );
 
+const clearPreloadAreaLayers = () => {
+  preloadAreaLayers.forEach((layer) => map.value?.removeLayer(layer));
+  preloadAreaLayers.length = 0;
+};
+
+const updatePreloadAreaLayers = async () => {
+  if (!map.value) return;
+  const areas = props.preloadAreas;
+  const zoneByCap = areas.some((area) => area.caps?.length) ? await loadCapZoneByCap() : {};
+  if (!map.value) return;
+  clearPreloadAreaLayers();
+  // L'anteprima del poligono appena disegnato lascia il posto all'area salvata.
+  drawnLayer.value?.clearLayers();
+  const style = { color: PRELOAD_AREA_COLOR, fillColor: PRELOAD_AREA_COLOR, fillOpacity: 0.3, weight: 3 };
+  areas.forEach((area) => {
+    if ((area.polygon || []).length >= 3) {
+      const shape = L.polygon(area.polygon, style).addTo(map.value);
+      preloadAreaLayers.push(shape);
+    }
+    (area.caps || []).forEach((cap) => {
+      if (!zoneByCap[cap]) return;
+      preloadAreaLayers.push(L.geoJSON(zoneByCap[cap], { style }).addTo(map.value));
+    });
+  });
+};
+
 watch([dayEntries, () => props.entries], updateMap);
+watch(() => props.preloadAreas, updatePreloadAreaLayers, { deep: true });
 watch(collectionPoints, updateCollectionPointLayers);
 </script>
 
 <style scoped>
+.coverage-map-wrapper {
+  position: relative;
+}
+
+/* Lo strato sopra la mappa non intercetta i click: solo la card al suo interno. */
+.coverage-map-overlay {
+  position: absolute;
+  inset: 12px;
+  z-index: 1000;
+  pointer-events: none;
+  display: flex;
+  align-items: flex-start;
+}
+
+.coverage-map-overlay > :deep(*) {
+  pointer-events: auto;
+}
+
 .coverage-map {
   width: 100%;
   height: 480px;
