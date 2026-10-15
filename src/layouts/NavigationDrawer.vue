@@ -43,17 +43,6 @@
         prepend-icon="mdi-text-box-multiple-outline"
       />
       <v-divider class="my-2" />
-      <v-list-item
-        to="/planning/constraints"
-        title="Vincoli"
-        prepend-icon="mdi-tune-variant"
-      />
-      <v-list-item
-        to="/planning/automatic"
-        title="Pianificazione"
-        prepend-icon="mdi-map-marker-radius"
-      />
-      <v-divider class="my-2" />
       <template v-if="effectiveRole == 'Admin'">
         <v-list-item
           to="/services"
@@ -76,6 +65,17 @@
           prepend-icon="mdi-account-group"
         />
       </template>
+      <v-divider class="my-2" />
+      <v-list-item
+        to="/planning/constraints"
+        title="Vincoli"
+        prepend-icon="mdi-tune-variant"
+      />
+      <v-list-item
+        to="/planning/automatic"
+        title="Pianificazione"
+        prepend-icon="mdi-map-marker-radius"
+      />
       <template v-if="rae">
         <v-divider class="my-2" />
         <v-list-item
