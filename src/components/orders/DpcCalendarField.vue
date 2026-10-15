@@ -76,6 +76,40 @@
           </div>
         </div>
       </div>
+      <div
+        v-if="partialDays.length"
+        class="dpc-blocked mt-2"
+      >
+        <b>Fasce non disponibili</b>
+        <div
+          v-for="day in partialDays"
+          :key="day.iso"
+          class="dpc-blocked-group"
+        >
+          <span class="dpc-blocked-reason">{{ formatBlockedDate(day.iso) }}</span>
+          · selezionabili: {{ day.available }}
+          <div
+            v-for="note in day.blocked"
+            :key="note.start"
+          >
+            bloccata {{ note.start }}-{{ note.end }}: {{ note.reason }}
+          </div>
+        </div>
+      </div>
+      <div
+        v-if="blockedDays.length"
+        class="dpc-blocked mt-2"
+      >
+        <b>Giorni non disponibili</b>
+        <div
+          v-for="group in blockedDays"
+          :key="group.reason"
+          class="dpc-blocked-group"
+        >
+          <span class="dpc-blocked-reason">{{ group.reason }}:</span>
+          {{ group.dates.map(formatBlockedDate).join(', ') }}
+        </div>
+      </div>
     </div>
   </v-input>
 </template>
@@ -112,6 +146,14 @@ const props = defineProps({
   rules: {
     type: Array,
     required: true
+  },
+  blockedDays: {
+    type: Array,
+    default: () => []
+  },
+  slotNotes: {
+    type: Object,
+    default: () => ({})
   },
   classStyle: {
     type: String,
@@ -182,6 +224,24 @@ const formattedValue = computed(() => {
   if (slotsForDate.length > 0 && (!props.slotStart || !props.slotEnd)) return '';
   return selectedDate.value;
 });
+
+// Giorni selezionabili con qualche fascia bloccata: quali si possono scegliere
+// e perche' le altre no.
+const partialDays = computed(() =>
+  Object.keys(props.slotNotes)
+    .sort()
+    .filter((iso) => props.slots[iso]?.length)
+    .map((iso) => ({
+      iso,
+      available: props.slots[iso].map((slot) => `${slot.start}-${slot.end}`).join(', '),
+      blocked: props.slotNotes[iso]
+    }))
+);
+
+function formatBlockedDate(iso) {
+  const date = new Date(iso);
+  return date.toLocaleDateString('it-IT', { weekday: 'short', day: '2-digit', month: '2-digit' });
+}
 
 function shiftMonth(delta) {
   viewMonth.value = new Date(viewMonth.value.getFullYear(), viewMonth.value.getMonth() + delta, 1);
@@ -301,6 +361,16 @@ watch(() => props.modelValue, (value) => {
 .dpc-calendar-day--selected {
   background: rgb(var(--v-theme-primary));
   color: rgb(var(--v-theme-on-primary));
+}
+
+.dpc-blocked {
+  font-size: 0.8rem;
+  max-height: 140px;
+  overflow-y: auto;
+}
+
+.dpc-blocked-reason {
+  font-weight: 600;
 }
 
 .dpc-calendar-chips {
