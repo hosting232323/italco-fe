@@ -9,10 +9,28 @@
         ref="form"
         @submit.prevent="submitForm"
       >
-        <v-text-field
-          v-model="data.import_code"
-          label="Codice Importazioni"
-        />
+        <v-row no-gutters>
+          <v-col
+            cols="12"
+            md="6"
+          >
+            <v-text-field
+              v-model="data.name"
+              label="Nome Punto Vendita"
+              :class="isMobile ? '' : 'mr-2'"
+            />
+          </v-col>
+          <v-col
+            cols="12"
+            md="6"
+          >
+            <v-text-field
+              v-model="data.import_code"
+              label="Codice Importazioni"
+              :class="isMobile ? '' : 'ml-2'"
+            />
+          </v-col>
+        </v-row>
         <v-row no-gutters>
           <v-col
             cols="12"

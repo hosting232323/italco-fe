@@ -7,7 +7,7 @@
       v-model="selectedId"
       label="Punto Vendita"
       :items="users.filter(user => user.role == 'Customer')"
-      :item-title="(user) => user.company_name || user.nickname"
+      :item-title="customer.customerName"
       item-value="id"
       :rules="validation.requiredRules"
     />
@@ -19,6 +19,7 @@
 </template>
 
 <script setup>
+import customer from '@/utils/customer';
 import FormButtons from '@/components/FormButtons';
 
 import { ref } from 'vue';
@@ -42,6 +43,6 @@ const submitForm = async () => {
 
   const selectedUser = users.value.find(user => user.id == selectedId.value);
   order.value.user_id = selectedId.value;
-  emits('setSubtitle', `Punto Vendita: ${selectedUser.company_name || selectedUser.nickname}`);
+  emits('setSubtitle', `Punto Vendita: ${selectedUser.company_name || customer.customerName(selectedUser)}`);
 };
 </script>

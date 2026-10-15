@@ -59,6 +59,16 @@ describe('administrationUser store', () => {
     expect(payload.body.password).toBe('segreta');
   });
 
+  it('aggiorna un utente con una PUT', () => {
+    const store = useAdministrationUserStore();
+
+    store.updateUser(9, { email: 'a@b.it' }, vi.fn());
+
+    const [url, method, payload] = lastRequest();
+    expect([url, method]).toEqual(['user/9', 'PUT']);
+    expect(payload.body).toEqual({ email: 'a@b.it' });
+  });
+
   it('cancella senza forzare per default', () => {
     const store = useAdministrationUserStore();
 
