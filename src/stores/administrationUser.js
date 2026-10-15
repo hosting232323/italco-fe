@@ -34,6 +34,9 @@ export const useAdministrationUserStore = defineStore('administrationUser', {
         func
       );
     },
+    updateUser(id, body, func) {
+      http.makeRequest(`user/${id}`, 'PUT', { body }, func);
+    },
     resetPassword(id, password, func) {
       const body = password ? { password } : {};
       http.makeRequest(`user/${id}/password`, 'POST', { body }, func);
