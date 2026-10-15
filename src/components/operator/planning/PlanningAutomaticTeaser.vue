@@ -50,7 +50,7 @@
       variant="tonal"
       icon="mdi-rocket-launch-outline"
     >
-      Vuoi attivarla? Contatta il tuo referente Hubstra: i vincoli configurati nella scheda accanto
+      Vuoi attivarla? Contatta il tuo referente Hubstra: i vincoli configurati nella pagina Vincoli
       alimenteranno subito le proposte.
     </v-alert>
   </div>

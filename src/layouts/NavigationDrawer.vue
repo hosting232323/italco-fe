@@ -42,11 +42,18 @@
         title="Borderò"
         prepend-icon="mdi-text-box-multiple-outline"
       />
+      <v-divider class="my-2" />
       <v-list-item
-        to="/planning"
-        title="Pianificazione"
-        prepend-icon="mdi-calendar-account"
+        to="/planning/constraints"
+        title="Vincoli"
+        prepend-icon="mdi-tune-variant"
       />
+      <v-list-item
+        to="/planning/automatic"
+        title="Pianificazione automatica"
+        prepend-icon="mdi-map-marker-radius"
+      />
+      <v-divider class="my-2" />
       <template v-if="effectiveRole == 'Admin'">
         <v-list-item
           to="/services"

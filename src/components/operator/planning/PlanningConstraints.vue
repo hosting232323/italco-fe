@@ -1,12 +1,25 @@
 <template>
   <div>
     <p class="text-medium-emphasis my-3">
-      Tutti i vincoli che regolano quando e quanto si può ordinare e come vengono composti i borderò, in un
-      unico posto.
+      Tutti i vincoli che regolano quando e quanto si può ordinare, in un unico posto.
     </p>
 
     <h2>
       Limiti per area geografica
+      <v-tooltip
+        location="bottom"
+        max-width="400"
+      >
+        <template #activator="{ props }">
+          <v-icon
+            v-bind="props"
+            icon="mdi-information-outline"
+            size="small"
+            class="ml-1"
+          />
+        </template>
+        Numero massimo di ordini per giorno della settimana in ogni area. Se per un'area non è configurato nulla, i punti vendita non potranno effettuare ordini per i clienti di quella zona.
+      </v-tooltip>
       <v-btn
         v-if="isAdmin"
         icon="mdi-plus"
@@ -15,14 +28,26 @@
         @click="openGeographicZoneForm"
       />
     </h2><hr>
-    <p class="text-medium-emphasis my-3">
-      Numero massimo di ordini per giorno della settimana in ogni area. Se per un'area non è configurato nulla,
-      i punti vendita non potranno effettuare ordini per i clienti di quella zona.
-    </p>
+    Attenzione: Se non vengono configurate regole per una certa area geografica,
+    i punti vendita non potranno effettuare ordini per i clienti di quella zona.
     <GeographicZoneTable @open-pop-up="openPopUp" />
 
     <h2 class="mt-8">
       Limiti per punto vendita
+      <v-tooltip
+        location="bottom"
+        max-width="400"
+      >
+        <template #activator="{ props }">
+          <v-icon
+            v-bind="props"
+            icon="mdi-information-outline"
+            size="small"
+            class="ml-1"
+          />
+        </template>
+        Numero massimo di ordini al giorno che ogni punto vendita può inserire, per giorno della settimana.
+      </v-tooltip>
       <v-btn
         v-if="isAdmin"
         icon="mdi-plus"
@@ -31,13 +56,24 @@
         @click="openCustomerRuleForm"
       />
     </h2><hr>
-    <p class="text-medium-emphasis my-3">
-      Numero massimo di ordini al giorno che ogni punto vendita può inserire, per giorno della settimana.
-    </p>
     <CustomerRuleTable />
 
     <h2 class="mt-8">
       Limiti per servizio
+      <v-tooltip
+        location="bottom"
+        max-width="400"
+      >
+        <template #activator="{ props }">
+          <v-icon
+            v-bind="props"
+            icon="mdi-information-outline"
+            size="small"
+            class="ml-1"
+          />
+        </template>
+        Massimo di servizi giornalieri per tipologia: raggiunto il limite il giorno non è più selezionabile. Si modifica dalla pagina Servizi.
+      </v-tooltip>
       <v-btn
         icon="mdi-open-in-new"
         style="float: right;"
@@ -45,10 +81,6 @@
         to="/services"
       />
     </h2><hr>
-    <p class="text-medium-emphasis my-3">
-      Massimo di servizi giornalieri per tipologia: raggiunto il limite il giorno non è più selezionabile. Si
-      modifica dalla pagina Servizi.
-    </p>
     <v-data-table
       :items="services"
       :headers="[
@@ -65,32 +97,6 @@
         {{ item.professional ? 'Sì' : 'No' }}
       </template>
     </v-data-table>
-
-    <h2 class="mt-8">
-      Parametri di composizione dei borderò
-    </h2><hr>
-    <v-row class="my-2">
-      <v-col
-        v-for="parameter in groupingParameters"
-        :key="parameter.title"
-        cols="12"
-        md="3"
-      >
-        <v-card variant="tonal">
-          <v-card-text>
-            <div class="text-h5">
-              {{ parameter.value }}
-            </div>
-            <div class="font-weight-bold">
-              {{ parameter.title }}
-            </div>
-            <div class="text-caption text-medium-emphasis">
-              {{ parameter.description }}
-            </div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
   </div>
 
   <v-dialog
@@ -146,15 +152,6 @@ const customerRuleStore = useCustomerRuleStore();
 const geographicZoneStore = useGeographicZoneStore();
 const { activeForm: customerRuleForm, element: customerRule } = storeToRefs(customerRuleStore);
 const { activeForm: geographicZoneForm, element: geographicZone } = storeToRefs(geographicZoneStore);
-
-// Valori predefiniti del form di pianificazione nel borderò e limite fisso del
-// motore di raggruppamento (MAX_PROFESSIONAL_ORDERS): non sono salvati per company.
-const groupingParameters = [
-  { title: 'Ordini minimi per borderò', value: 9, description: 'Impostabile a ogni pianificazione' },
-  { title: 'Ordini massimi per borderò', value: 12, description: 'Impostabile a ogni pianificazione' },
-  { title: 'Distanza massima (km)', value: 50, description: 'Per unire gruppi piccoli, impostabile a ogni pianificazione' },
-  { title: 'Servizi professionali per borderò', value: 2, description: 'Limite fisso del motore di raggruppamento' }
-];
 
 const openPopUp = (item, type) => {
   geographicZone.value = item;

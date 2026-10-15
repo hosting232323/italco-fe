@@ -84,13 +84,22 @@ const routes = [
       },
       {
         path: 'planning',
-        name: 'Pianificazione',
-        component: () => import('@/views/operator/PlanningPage.vue')
+        redirect: '/planning/constraints'
       },
       {
-        // Vecchio indirizzo della copertura corrieri, ora dentro la pagina Pianificazione.
+        path: 'planning/constraints',
+        name: 'Vincoli',
+        component: () => import('@/views/operator/PlanningConstraints.vue')
+      },
+      {
+        path: 'planning/automatic',
+        name: 'Pianificazione automatica',
+        component: () => import('@/views/operator/PlanningAutomatic.vue')
+      },
+      {
+        // Vecchio indirizzo della copertura corrieri, ora nella pagina Pianificazione automatica.
         path: 'delivery-coverage',
-        redirect: '/planning'
+        redirect: '/planning/automatic'
       },
       {
         path: 'collection-points',
