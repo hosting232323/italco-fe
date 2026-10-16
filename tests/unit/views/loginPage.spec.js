@@ -48,6 +48,14 @@ const login = async (data) => {
 
 
 describe('LoginPage', () => {
+  it('chiede il nome utente, non la mail', () => {
+    const wrapper = mountComponent(LoginPage, { pinia: createTestPinia(), router: createTestRouter(routes) });
+
+    const props = wrapper.findComponent({ name: 'AuthManager' }).attributes();
+    expect(props['identifier-label']).toBe('Nome utente');
+    expect(props['identifier-type']).toBe('text');
+  });
+
   it('svuota i dati dell-attivita- precedente prima di caricare il nuovo utente', async () => {
     await login({ role: 'Admin', user_id: '70', access_token: 'jwt', company: { id: 2 } });
 
