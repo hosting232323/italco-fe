@@ -51,6 +51,7 @@
           <v-btn
             icon="mdi-pencil"
             variant="text"
+            :loading="!!editLoading[item.id]"
             :color="theme.current.value.primaryColor"
             @click="editElement(item)"
           />
@@ -90,6 +91,7 @@ import { useScheduleStore } from '@/stores/schedule';
 import { useRaeProductStore } from '@/stores/raeProduct';
 
 const theme = useTheme();
+const editLoading = reactive({});
 const deleteLoading = reactive({});
 const exportLoading = reactive({});
 const emits = defineEmits(['open-dialog']);
@@ -100,9 +102,21 @@ const raeProductStore = useRaeProductStore();
 const { ready, element: schedule } = storeToRefs(scheduleStore);
 const schedules = storesUtils.getStoreList(scheduleStore);
 
+// Il borderò si ricarica dal server: la riga della lista può essere vecchia
+// e salvarla toglierebbe le modifiche fatte nel frattempo da altri.
 const editElement = (item) => {
-  schedule.value = item;
-  emits('open-dialog');
+  editLoading[item.id] = true;
+
+  http.makeRequest('schedule/filter', 'POST', {
+    body: { filters: [{ model: 'Schedule', field: 'id', value: item.id }] }
+  }, function (data) {
+    editLoading[item.id] = false;
+    if (data.status == 'ok' && data.schedules && data.schedules.length > 0) {
+      schedule.value = data.schedules[0];
+      emits('open-dialog');
+    } else
+      alert(data.message || 'Borderò non trovato, ricarica la pagina');
+  });
 };
 
 const deleteItem = (item) => {
