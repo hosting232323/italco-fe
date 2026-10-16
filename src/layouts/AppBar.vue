@@ -4,19 +4,13 @@
     :elevation="2"
   >
     <v-img
-      src="/ares-app-icon.png"
+      src="/hubstra-wordmark.png"
       alt="Logo Hubstra"
-      class="ml-4 mr-2 rounded-lg"
-      height="36"
-      max-width="36"
-      width="36"
-      cover
+      class="ml-4"
+      height="32"
+      max-width="185"
+      position="left center"
     />
-    <v-app-bar-title>
-      <b>
-        Hubstra
-      </b>
-    </v-app-bar-title>
   </v-app-bar>
 </template>
 
