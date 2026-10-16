@@ -6,6 +6,8 @@
     :secondary-color="theme.current.value.primaryColor"
     :sign-up="false"
     :hostname="hostname"
+    identifier-label="Nome utente"
+    identifier-type="text"
     @call-back="goToDashboard"
   />
 </template>

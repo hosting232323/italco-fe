@@ -168,6 +168,11 @@ router.beforeEach((to) => {
   if (role == 'Super Admin' && !company && !['Company', 'Log'].includes(to.name) && !PUBLIC_ROUTES.includes(to.name))
     return { name: 'Company' };
 
+  // La dashboard e' degli admin e degli operatori: il backend risponde 403 ai
+  // clienti, che ci arrivano da un preferito. La loro pagina iniziale e' Ordini.
+  if (to.name == 'Dashboard' && role == 'Customer')
+    return { name: 'Ordini' };
+
   // I log contengono le richieste di tutte le company: l'URL digitato da un
   // admin di company riporta alla dashboard, il backend risponderebbe 403.
   if (to.name == 'Log' && role != 'Super Admin')

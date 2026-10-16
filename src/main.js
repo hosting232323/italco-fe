@@ -9,4 +9,5 @@ registerPlugins(app);
 // Login o logout in un'altra scheda: questa non deve restare sui dati di prima.
 session.watchOtherTabs();
 
-app.mount('#app');
+// Prima il token, poi le pagine: vedi restoreAccessToken.
+session.restoreAccessToken().finally(() => app.mount('#app'));

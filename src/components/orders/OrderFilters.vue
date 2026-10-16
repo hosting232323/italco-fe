@@ -132,6 +132,10 @@ const filterOrder = async () => {
 };
 
 const exportInvoice = async () => {
+  // Il pulsante e' fuori dal form e resta visibile col pannello chiuso (anche
+  // dopo Annulla): senza questo controllo partono intervalli con le date al contrario.
+  if (!(await form.value.validate()).valid) return;
+
   loading.value = true;
 
   http.downloadRequest(

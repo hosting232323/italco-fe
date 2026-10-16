@@ -302,4 +302,55 @@ describe('session', () => {
       expect(session.reload).toHaveBeenCalledTimes(1);
     });
   });
+
+  describe('restoreAccessToken', () => {
+    const answer = (body, ok = true) => vi.spyOn(globalThis, 'fetch')
+      .mockResolvedValue({ ok, json: async () => body });
+
+    it('rinnova il token prima del mount con utente e senza token', async () => {
+      const userStore = useUserStore();
+      userStore.$patch({ role: 'Customer', userId: 7, token: '' });
+      const fetchSpy = answer({ status: 'ok', access_token: jwt({ sub: '7' }) });
+
+      await session.restoreAccessToken();
+
+      expect(fetchSpy.mock.calls[0][0]).toMatch(/user\/refresh$/);
+      expect(fetchSpy.mock.calls[0][1].credentials).toBe('include');
+      expect(userStore.token).toBe(jwt({ sub: '7' }));
+    });
+
+    it('non chiama il backend senza utente o con il token gia presente', async () => {
+      const fetchSpy = answer({ status: 'ok', access_token: 'x' });
+      await session.restoreAccessToken();
+      loggedAs(7);
+      await session.restoreAccessToken();
+
+      expect(fetchSpy).not.toHaveBeenCalled();
+    });
+
+    it('lascia lo store invariato se il rinnovo fallisce', async () => {
+      const userStore = useUserStore();
+      userStore.$patch({ role: 'Customer', userId: 7, token: '' });
+
+      answer(null, false);
+      await session.restoreAccessToken();
+      answer({ status: 'session' });
+      await session.restoreAccessToken();
+      vi.spyOn(globalThis, 'fetch').mockRejectedValue(new Error('rete'));
+      await session.restoreAccessToken();
+
+      expect(userStore.token).toBe('');
+    });
+
+    it('non adotta il token di un altro utente: riallinea la scheda', async () => {
+      const userStore = useUserStore();
+      userStore.$patch({ role: 'Customer', userId: 7, token: '' });
+      vi.spyOn(globalThis, 'alert').mockImplementation(() => {});
+      answer({ status: 'ok', access_token: jwt({ sub: '99' }) });
+
+      await session.restoreAccessToken();
+
+      expect(userStore.token).toBe('');
+    });
+  });
 });

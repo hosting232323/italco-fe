@@ -122,8 +122,38 @@ const watchOtherTabs = (target = window) => {
   return () => target.removeEventListener('storage', onStorage);
 };
 
+// L'access token vive solo in memoria: dopo un reload lo store ha ruolo e id ma
+// non il token. Le pagine caricano i dati appena montate, e ogni richiesta
+// partirebbe senza token ("Token assente"), per essere poi ripetuta dopo il
+// rinnovo. Rinnovandolo prima del mount le richieste partono una volta sola.
+// Se il rinnovo non riesce non si fa nulla: ci pensa il client alla prima
+// richiesta, come prima.
+const restoreAccessToken = async () => {
+  const userStore = useUserStore();
+  if (!hasUser(userStore.userId) || userStore.token)
+    return;
+
+  try {
+    const response = await fetch(`${import.meta.env.VITE_HOSTNAME}user/refresh`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include'
+    });
+    const data = response.ok ? await response.json() : null;
+    if (data?.status !== 'ok' || !data.access_token)
+      return;
+    if (belongsToAnotherUser(data.access_token))
+      handleSessionSwitch();
+    else
+      userStore.token = data.access_token;
+  } catch {
+    // Rete assente: la prima richiesta ritentera' il rinnovo da sola.
+  }
+};
+
 const session = {
   tokenUserId,
+  restoreAccessToken,
   clearTenantData,
   belongsToAnotherUser,
   handleSessionSwitch,
