@@ -2,7 +2,7 @@
   <AuthManager
     class="mt-10 rounded-login-logo"
     title="Login"
-    logo="/ares-app-icon.png"
+    logo="/hubstra-app-icon.png"
     :secondary-color="theme.current.value.primaryColor"
     :sign-up="false"
     :hostname="hostname"

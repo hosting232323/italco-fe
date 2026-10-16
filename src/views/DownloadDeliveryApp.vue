@@ -4,7 +4,7 @@
     style="max-width: 500px;"
   >
     <v-img
-      src="/ares-app-icon.png"
+      src="/hubstra-app-icon.png"
       max-width="96"
       class="mb-6 rounded-login-logo"
     />
