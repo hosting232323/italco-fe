@@ -15,17 +15,16 @@ export const useLogStore = defineStore('log', {
     }
   }),
   actions: {
-    initList(router) {
-      storesUtils.refreshList(this, (callback) => http.postRequest(
+    initList() {
+      storesUtils.refreshList(this, (callback) => http.makeRequest(
         'log/filter',
-        {filters: storesUtils.formatFilters(
+        'POST',
+        { body: { filters: storesUtils.formatFilters(
           this.filters,
           storesUtils.LOG_DATE_FILTER_TYPES,
           'Log'
-        )},
-        callback,
-        'POST',
-        router
+        ) } },
+        callback
       ));
     },
     setList(data) {

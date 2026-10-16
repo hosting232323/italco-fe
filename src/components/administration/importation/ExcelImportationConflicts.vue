@@ -91,9 +91,9 @@
             </v-col>
             <v-col cols="6">
               <v-select
-                v-model="selectedAresServices[order['Rif. Com'] + productName]"
+                v-model="selectedHubstraServices[order['Rif. Com'] + productName]"
                 :items="getServiceUser()"
-                label="Servizi da Ares"
+                label="Servizi da Hubstra"
                 item-title="name"
                 item-value="id"
                 :rules="getRules(order, productName)"
@@ -102,7 +102,7 @@
                 <template #item="{ props }">
                   <v-list-item
                     v-bind="props"
-                    @click="selectService(order, productName, 'ares')"
+                    @click="selectService(order, productName, 'hubstra')"
                   />
                 </template>
               </v-select>
@@ -135,7 +135,6 @@ import { ref } from 'vue';
 import http from '@/utils/http';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import { useOrderStore } from '@/stores/order';
 import { useServiceStore } from '@/stores/service';
@@ -159,17 +158,16 @@ const form = ref(null);
 const message = ref('');
 const theme = useTheme();
 const loading = ref(false);
-const router = useRouter();
 const serviceNames = ref({});
 const orderStore = useOrderStore();
 const activeNewProductForm = ref({});
 const selectedFileServices = ref({});
-const selectedAresServices = ref({});
+const selectedHubstraServices = ref({});
 const serviceStore = useServiceStore();
 const emits = defineEmits(['cancel', 'deleteOrder']);
 
 const { ready } = storeToRefs(orderStore);
-const services = storesUtils.getStoreList(serviceStore, router);
+const services = storesUtils.getStoreList(serviceStore);
 
 const submitConflictsForm = async () => {
   if (!(await form.value.validate()).valid) return;
@@ -185,32 +183,45 @@ const submitConflictsForm = async () => {
   }
 
   loading.value = true;
-  http.postRequest('import/excel/conflict', {
-    orders: conflictsOrders,
-    customer_id: customerId
+  http.makeRequest('import/excel/conflict', 'POST', {
+    body: {
+      orders: conflictsOrders,
+      customer_id: customerId
+    }
   }, function (data) {
     loading.value = false;
-    if (data.status == 'ok') {
-      if (data.imported_orders_count > 0)
-        alert(`Importati ${data.imported_orders_count} ordini con successo.`);
-
-      ready.value = false;
-      orderStore.initList(router);
-      emits('cancel', isActive);
+    if (data.status == 'ko') {
+      alert(data.message || 'Si è verificato un problema durante l\'importazione degli ordini.');
+      return;
     }
-  }, 'POST', router);
+
+    if (data.imported_orders_count > 0)
+      alert(`Importati ${data.imported_orders_count} ordini con successo.`);
+
+    // Il backend scarta gli ordini che non superano la validazione: senza questo
+    // avviso sparirebbero senza che l'utente se ne accorga.
+    if (data.failed_orders && data.failed_orders.length > 0)
+      alert(
+        'Non è stato possibile importare i seguenti ordini:\n' +
+        data.failed_orders.map(order => `${order.external_id}: ${order.error}`).join('\n')
+      );
+
+    ready.value = false;
+    orderStore.initList();
+    emits('cancel', isActive);
+  });
 };
 
 const selectService = (order, productName, type) => {
   const refId = order['Rif. Com'] + productName;
-  const serviceId = type == 'file' ? selectedFileServices.value[refId] : selectedAresServices.value[refId];
+  const serviceId = type == 'file' ? selectedFileServices.value[refId] : selectedHubstraServices.value[refId];
   order.products[productName].services.push(serviceId);
 
   if (!serviceNames.value[serviceId])
     serviceNames.value[serviceId] = services.value.find(service => service.users.find(user => user.id == serviceId)).name;
 
-  if (type == 'ares')
-    selectedAresServices.value[refId] = null;
+  if (type == 'hubstra')
+    selectedHubstraServices.value[refId] = null;
   else {
     selectedFileServices.value[refId] = null;
     order.services.splice(order.services.findIndex(service => service.id === serviceId), 1);

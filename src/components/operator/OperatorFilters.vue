@@ -60,18 +60,16 @@
 <script setup>
 import { storeToRefs } from 'pinia';
 import mobile from '@/utils/mobile';
-import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import { useOrderStore } from '@/stores/order';
 import { useCustomerGroupStore } from '@/stores/customerGroup';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
-const router = useRouter();
 const orderStore = useOrderStore();
 const isMobile = mobile.setupMobileUtils();
 const customerGroupStore = useCustomerGroupStore();
 const administrationUserStore = useAdministrationUserStore();
 const { filters } = storeToRefs(orderStore);
-const users = storesUtils.getStoreList(administrationUserStore, router);
-const customerGroups = storesUtils.getStoreList(customerGroupStore, router);
+const users = storesUtils.getStoreList(administrationUserStore);
+const customerGroups = storesUtils.getStoreList(customerGroupStore);
 </script>

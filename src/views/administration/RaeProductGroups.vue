@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <h1>
-      Configurazione Raggruppamenti Raee
+      Raggruppamenti
       <v-btn
         icon="mdi-plus"
         style="float: right;"
@@ -9,9 +9,14 @@
         @click="openForm"
       />
     </h1><hr>
-    <RaeProductGroupForm />
     <RaeProductGroupTable />
   </v-container>
+  <v-dialog
+    v-model="activeForm"
+    max-width="1500"
+  >
+    <RaeProductGroupForm />
+  </v-dialog>
 </template>
 
 <script setup>

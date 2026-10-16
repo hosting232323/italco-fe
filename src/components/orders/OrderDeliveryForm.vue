@@ -14,7 +14,7 @@
   <v-file-input
     v-model="order.photos"
     multiple
-    accept="image/*"
+    :accept="fileUtils.buildAccept(fileUtils.imageExtensions)"
     label="Foto"
   />
   <v-row no-gutters>
@@ -81,6 +81,7 @@ import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import mobile from '@/utils/mobile';
 import orderUtils from '@/utils/order';
+import { fileUtils } from 'generic-module';
 import validation from '@/utils/validation';
 import { useOrderStore } from '@/stores/order';
 

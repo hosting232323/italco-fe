@@ -10,43 +10,39 @@ export const useCustomerGroupStore = defineStore('customerGroup', {
     activeForm: false
   }),
   actions: {
-    createElement(router, func) {
-      http.postRequest(
+    createElement(func) {
+      http.makeRequest(
         'customer-group',
-        this.element,
-        func,
         'POST',
-        router
+        { body: this.element },
+        func
       );
     },
-    initList(router) {
-      storesUtils.refreshList(this, (callback) => http.getRequest(
+    initList() {
+      storesUtils.refreshList(this, (callback) => http.makeRequest(
         'customer-group',
-        {},
-        callback,
         'GET',
-        router
+        {},
+        callback
       ));
     },
-    deleteElement(element, router, func) {
-      http.getRequest(
+    deleteElement(element, func) {
+      http.makeRequest(
         `customer-group/${element.id}`,
-        {},
-        func,
         'DELETE',
-        router
+        {},
+        func
       );
     },
-    assignUser(userId, router, func, deassign = false) {
-      http.postRequest(
+    assignUser(userId, func, deassign = false) {
+      http.makeRequest(
         'customer-group/user',
-        {
+        'PUT',
+        { body: {
           user_id: userId,
           customer_group_id: deassign ? null : this.element.id
-        },
-        func,
-        'PUT',
-        router
+        } },
+        func
       );
     },
     setList(data) {

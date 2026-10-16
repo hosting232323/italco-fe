@@ -1,105 +1,105 @@
 <template>
   <v-dialog max-width="1500">
     <template #activator="{ props: activatorProps }">
-      <v-row no-gutters>
-        <v-col cols="3">
+      <div class="d-flex flex-wrap align-center">
+        <v-btn
+          prepend-icon="mdi-pencil"
+          text="Modifica"
+          title="Modifica ordine"
+          variant="text"
+          :loading="loadingEdit"
+          :color="theme.current.value.primaryColor"
+          @click="openForm(item)"
+        />
+        <v-btn
+          variant="text"
+          prepend-icon="mdi-file-export"
+          text="PDF ordine"
+          title="Esporta l'ordine in PDF"
+          :loading="loadingExport"
+          :color="theme.current.value.primaryColor"
+          @click="exportPdf(item)"
+        />
+        <v-btn
+          prepend-icon="mdi-truck-delivery"
+          text="Consegna"
+          title="Riepilogo della consegna"
+          variant="text"
+          :color="theme.current.value.primaryColor"
+          v-bind="activatorProps"
+          @click="openPopUp(item, 'delivery')"
+        />
+        <v-btn
+          prepend-icon="mdi-link-variant"
+          text="Link ordine"
+          title="Copia link di tracking dell'ordine"
+          variant="text"
+          :color="theme.current.value.primaryColor"
+          @click="copyOrderLink(item.id)"
+        />
+        <template v-if="role != 'Customer'">
           <v-btn
-            icon="mdi-pencil"
-            variant="text"
-            :loading="loadingEdit"
-            :color="theme.current.value.primaryColor"
-            @click="openForm(item)"
-          />
-        </v-col>
-        <v-col cols="3">
-          <v-btn
-            variant="text"
-            icon="mdi-file-export"
-            :loading="loadingExport"
-            :color="theme.current.value.primaryColor"
-            @click="exportPdf(item)"
-          />
-        </v-col>
-        <v-col cols="3">
-          <v-btn
-            icon="mdi-truck-delivery"
+            prepend-icon="mdi-account"
+            text="Punto vendita"
+            title="Cambia punto vendita"
             variant="text"
             :color="theme.current.value.primaryColor"
             v-bind="activatorProps"
-            @click="openPopUp(item, 'delivery')"
+            @click="openPopUp(item, 'customer')"
           />
-        </v-col>
-        <v-col cols="3">
           <v-btn
-            icon="mdi-link-variant"
+            v-if="item.status == 'To Reschedule' &&
+              Object.values(item.products).every(
+                product => !product.rae_product || !product.rae_product.status.includes(['Emitted', 'Generated'])
+              )"
+            prepend-icon="mdi-content-copy"
+            text="Clona"
+            title="Clona ordine"
             variant="text"
             :color="theme.current.value.primaryColor"
-            title="Copia link ordine"
-            @click="copyOrderLink(item.id)"
+            @click="copyOrder(item)"
           />
-        </v-col>
-      </v-row>
-      <template v-if="role != 'Customer'">
-        <v-row no-gutters>
-          <v-col cols="3">
-            <v-btn
-              icon="mdi-account"
-              variant="text"
-              :color="theme.current.value.primaryColor"
-              title="Cambia punto vendita"
-              v-bind="activatorProps"
-              @click="openPopUp(item, 'customer')"
-            />
-          </v-col>
-          <v-col cols="3">
-            <v-btn
-              v-if="role == 'Admin'"
-              icon="mdi-delete"
-              :loading="loadingDelete"
-              variant="text"
-              :color="theme.current.value.primaryColor"
-              title="Elimina ordine"
-              @click="deleteOrder(item)"
-            />
-          </v-col>
-          <v-col cols="3">
-            <v-btn
-              v-if="item.status == 'To Reschedule' &&
-                Object.values(item.products).every(
-                  product => !product.rae_product || !product.rae_product.status.includes(['Emitted', 'Generated'])
-                )"
-              icon="mdi-content-copy"
-              variant="text"
-              :color="theme.current.value.primaryColor"
-              title="Clona ordine"
-              @click="copyOrder(item)"
-            />
-          </v-col>
-          <v-col cols="3">
-            <v-btn
-              v-if="Object.values(item.products).some(product => product.rae_product) && !['Acquired', 'Booked'].includes(item.status)"
-              icon="mdi-human-dolly"
-              variant="text"
-              :loading="raeLoading"
-              :color="theme.current.value.primaryColor"
-              title="Esportazione Raee"
-              @click="raeExport(item)"
-            />
-          </v-col>
-        </v-row>
-        <v-row no-gutters>
-          <v-col cols="3">
-            <v-btn
-              v-if="item.external_link"
-              icon="mdi-exit-to-app"
-              variant="text"
-              :color="theme.current.value.primaryColor"
-              title="Chudi ordine in piattaforma Euronics"
-              @click="openExternalLink(item.external_link)"
-            />
-          </v-col>
-        </v-row>
-      </template>
+          <v-btn
+            v-if="raeEnabled && Object.values(item.products).some(product => product.rae_product) && !['Acquired', 'Booked'].includes(item.status)"
+            prepend-icon="mdi-human-dolly"
+            text="RAEE"
+            title="Esportazione RAEE"
+            variant="text"
+            :loading="raeLoading"
+            :color="theme.current.value.primaryColor"
+            @click="raeExport(item)"
+          />
+          <v-btn
+            v-if="item.external_link"
+            prepend-icon="mdi-exit-to-app"
+            text="Euronics"
+            title="Chiudi ordine in piattaforma Euronics"
+            variant="text"
+            :color="theme.current.value.primaryColor"
+            @click="openExternalLink(item.external_link)"
+          />
+          <v-btn
+            v-if="role == 'Admin' && ['Acquired', 'Booked'].includes(item.status)"
+            prepend-icon="mdi-swap-horizontal"
+            text="Sposta company"
+            title="Sposta in un'altra company"
+            variant="text"
+            :color="theme.current.value.primaryColor"
+            v-bind="activatorProps"
+            @click="openPopUp(item, 'company')"
+          />
+          <v-btn
+            v-if="role == 'Admin'"
+            prepend-icon="mdi-delete"
+            text="Elimina"
+            title="Elimina ordine"
+            :loading="loadingDelete"
+            variant="text"
+            :color="theme.current.value.primaryColor"
+            @click="deleteOrder(item)"
+          />
+        </template>
+      </div>
     </template>
     <template #default="{ isActive }">
       <OrderDeliverySummary
@@ -111,22 +111,28 @@
         :order="order"
         @cancel="isActive.value = false"
       />
+      <MoveOrderCompany
+        v-else-if="popUpType == 'company'"
+        :order="order"
+        @cancel="isActive.value = false"
+      />
     </template>
   </v-dialog>
 </template>
 
 <script setup>
 import ChangeOrderUser from '@/components/orders/ChangeOrderUser';
+import MoveOrderCompany from '@/components/orders/MoveOrderCompany';
 import OrderDeliverySummary from '@/components/orders/OrderDeliverySummary';
 
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import http from '@/utils/http';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
-import { encodeId } from '@/utils/hashids';
+import rae from '@/utils/rae';
 import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
+import { useRaeProductStore } from '@/stores/raeProduct';
 
 const { item } = defineProps({
   item: {
@@ -138,7 +144,6 @@ const { item } = defineProps({
 const order = ref({});
 const theme = useTheme();
 const popUpType = ref('');
-const router = useRouter();
 const raeLoading = ref(false);
 const loadingEdit = ref(false);
 const loadingExport = ref(false);
@@ -146,7 +151,13 @@ const loadingDelete = ref(false);
 
 const userStore = useUserStore();
 const orderStore = useOrderStore();
-const { role } = storeToRefs(userStore);
+// effectiveRole: il super admin in una company agisce con i permessi di un admin.
+const { effectiveRole: role, company } = storeToRefs(userStore);
+const raeProductStore = useRaeProductStore();
+
+// Un'attività può spegnere il modulo dopo averlo usato: gli ordini con ritiro
+// restano, ma l'esportazione RAEE non è più un endpoint raggiungibile.
+const raeEnabled = computed(() => !!company.value?.rae);
 const { element: updatedOrder, activeForm, ready } = storeToRefs(orderStore);
 
 const openExternalLink = (link) => {
@@ -156,15 +167,16 @@ const openExternalLink = (link) => {
 const openForm = (item) => {
   loadingEdit.value = true;
 
-  http.getRequest(`order/${item.id}`, {}, function (data) {
+  http.makeRequest(`order/${item.id}`, 'GET', {}, function (data) {
     loadingEdit.value = false;
     if (data.status == 'ok') {
       updatedOrder.value = data.order;
       updatedOrder.value.user_id = data.order.user.id;
+      orderStore.addressValid = true;
       activeForm.value = true;
     } else
-      alert(data.error || 'Ordine non trovato, ricarica la pagina');
-  }, 'GET', router);
+      alert(data.message || 'Ordine non trovato, ricarica la pagina');
+  });
 };
 
 const openPopUp = (item, type) => {
@@ -175,38 +187,32 @@ const openPopUp = (item, type) => {
 const exportPdf = (item) => {
   loadingExport.value = true;
 
-  http.getRequest(`export/order/${item.id}`, {}, function (data) {
-    loadingExport.value = false;
-    if (data.status == 'ko')
-      alert(data.error);
-    else {
-      const blob = new Blob([data], { type: 'application/pdf' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `ordine_${item.id}.pdf`;
-      a.click();
-      window.URL.revokeObjectURL(url);
-    }
-  }, 'GET', router);
+  http.downloadRequest(
+    `export/order/${item.id}`,
+    'GET',
+    {},
+    () => loadingExport.value = false
+  );
 };
 
 const copyOrderLink = (id) => {
-  const url = `${window.location.origin}/order/${encodeId(id)}`;
-  navigator.clipboard.writeText(url).then(() => {
-    alert('Link ordine copiato negli appunti:\n' + url);
-  }).catch(() => {
-    alert('Errore nel copiare il link');
+  http.makeRequest(`order/${id}/tracking-link`, 'POST', {}, (data) => {
+    if (data.status !== 'ok' || !data.token) {
+      alert('Errore nella creazione del link ordine');
+      return;
+    }
+    const url = `${window.location.origin}/order/track#${encodeURIComponent(data.token)}`;
+    navigator.clipboard.writeText(url).then(() => {
+      alert('Link ordine copiato negli appunti:\n' + url);
+    }).catch(() => {
+      alert('Errore nel copiare il link');
+    });
   });
 };
 
 const copyOrder = (selectedOrder) => {
   const { user, id, products, ...rest } = selectedOrder;
-  const filteredProducts = Object.fromEntries(
-    Object.entries(products).filter(
-      ([, product]) => !product.rae_product || product.rae_product.status === 'Annulled'
-    )
-  );
+  const filteredProducts = rae.filterCloneProducts(products);
 
   updatedOrder.value = {
     user,
@@ -222,37 +228,31 @@ const copyOrder = (selectedOrder) => {
       )
     )
   };
+  orderStore.addressValid = false; // clone: l'indirizzo copiato va riselezionato da Nominatim
   activeForm.value = true;
 };
 
 const deleteOrder = (item) => {
   loadingDelete.value = true;
-  http.getRequest(`order/${item.id}`, {}, function (data) {
+  http.makeRequest(`order/${item.id}`, 'DELETE', {}, function (data) {
     loadingDelete.value = false;
     if (data.status == 'ok') {
       ready.value = false;
-      orderStore.initList(router);
+      orderStore.initList();
+      raeProductStore.initList();
     } else
-      alert(data.error);
-  }, 'DELETE', router);
+      alert(data.message);
+  });
 };
 
 const raeExport = (item) => {
   raeLoading.value = true;
 
-  http.getRequest(`export/rae/${item.id}`, {}, function (data) {
-    raeLoading.value = false;
-    if (data.status == 'ko')
-      alert(data.error);
-    else {
-      const blob = new Blob([data], { type: 'application/pdf' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `raee_${item.id}.pdf`;
-      a.click();
-      window.URL.revokeObjectURL(url);
-    }
-  }, 'GET', router);
+  http.downloadRequest(
+    `export/rae/${item.id}`,
+    'GET',
+    {},
+    () => raeLoading.value = false
+  );
 };
 </script>

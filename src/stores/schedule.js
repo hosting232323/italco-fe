@@ -12,50 +12,56 @@ export const useScheduleStore = defineStore('schedule', {
     element: {},
     filters: {},
     ready: false,
+    geocodeResults: {},
     filtersSetting: {
       doubleDates: false,
       dateType: Object.keys(storesUtils.SCHEDULE_DATE_FILTER_TYPES)[0]
     }
   }),
   actions: {
-    createElement(router, func) {
-      http.postRequest(
+    createElement(func) {
+      http.makeRequest(
         'schedule',
-        storesUtils.exclude_keys(this.element, EXCLUDED_KEYS),
-        func,
         'POST',
-        router
+        { body: storesUtils.exclude_keys(this.element, EXCLUDED_KEYS) },
+        func
       );
     },
-    updateElement(router, func) {
-      http.postRequest(
+    updateElement(func) {
+      http.makeRequest(
         `schedule/${this.element.id}`,
-        storesUtils.exclude_keys(this.element, EXCLUDED_KEYS),
-        func,
         'PUT',
-        router
+        { body: storesUtils.exclude_keys(this.element, EXCLUDED_KEYS) },
+        func
       );
     },
-    initList(router) {
-      storesUtils.refreshList(this, (callback) => http.postRequest(
+    updateItemAddress(item, address, func) {
+      const isOrder = item.operation_type === 'Order';
+      http.makeRequest(
+        isOrder ? `order/${item.order_id}` : `collection-point/${item.collection_point_id}`,
+        'PUT',
+        { body: isOrder ? { ...address, version: item.version } : address },
+        func
+      );
+    },
+    initList() {
+      storesUtils.refreshList(this, (callback) => http.makeRequest(
         'schedule/filter',
-        {filters: storesUtils.formatFilters(
+        'POST',
+        { body: { filters: storesUtils.formatFilters(
           this.filters,
           storesUtils.SCHEDULE_DATE_FILTER_TYPES,
           'Schedule'
-        )},
-        callback,
-        'POST',
-        router
+        ) } },
+        callback
       ));
     },
-    deleteElement(element, router, func) {
-      http.getRequest(
+    deleteElement(element, func) {
+      http.makeRequest(
         `schedule/${element.id}`,
-        {},
-        func,
         'DELETE',
-        router
+        {},
+        func
       );
     },
     setList(data) {

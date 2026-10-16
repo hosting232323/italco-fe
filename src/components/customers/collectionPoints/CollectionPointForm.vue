@@ -19,8 +19,10 @@
             cols="12"
             md="6"
           >
-            <GooglePlacesAutocomplete
+            <AddressAutocomplete
               v-model="collectionPoint.address"
+              :api-key="GOOGLE_API_KEY"
+              :formatted="true"
               :custom-class="isMobile ? '' : 'mr-2'"
               label="Indirizzo"
               :rules="validation.requiredRules"
@@ -72,18 +74,17 @@
 
 <script setup>
 import FormButtons from '@/components/FormButtons';
-import GooglePlacesAutocomplete from '@/components/GooglePlacesAutocomplete.vue';
+import { AddressAutocomplete } from 'generic-module';
+import { GOOGLE_API_KEY } from '@/utils/googleMaps';
 
 import { ref } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import validation from '@/utils/validation';
 import { useCollectionPointStore } from '@/stores/collectionPoint';
 
 const form = ref(null);
 const loading = ref(false);
-const router = useRouter();
 const isMobile = mobile.setupMobileUtils();
 const collectionPointStore = useCollectionPointStore();
 const { element: collectionPoint, activeForm } = storeToRefs(collectionPointStore);
@@ -93,16 +94,16 @@ const submitForm = async () => {
 
   loading.value = true;
   if (collectionPoint.value.id)
-    collectionPointStore.updateElement(router, callback);
+    collectionPointStore.updateElement(callback);
   else
-    collectionPointStore.createElement(router, callback);
+    collectionPointStore.createElement(callback);
 };
 
 const callback = (data) => {
   loading.value = false;
   if (data.status == 'ok') {
     collectionPoint.value = {};
-    collectionPointStore.initList(router);
+    collectionPointStore.initList();
     activeForm.value = false;
   }
 };

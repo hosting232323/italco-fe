@@ -4,69 +4,100 @@
     max-width="1500"
   >
     <template #activator>
-      <v-btn
-        v-if="role == 'Admin'"
-        text="Pianificazione Automatica"
-        class="mr-5"
-        :color="theme.current.value.primaryColor"
-        prepend-icon="mdi-calendar-arrow-right"
-        @click="openSchedulationPopUp()"
-      />
-      <template v-if="['Admin', 'Operator'].includes(role) && schedule.orders?.length">
+      <div class="orders-toolbar">
         <v-btn
-          text="Crea Borderò"
+          v-if="role == 'Admin' && company?.automatic_planning"
+          text="Pianificazione Automatica"
+          class="mr-5"
           :color="theme.current.value.primaryColor"
-          prepend-icon="mdi-text-box-plus-outline"
-          @click="openFormPopUp()"
+          prepend-icon="mdi-calendar-arrow-right"
+          @click="openSchedulationPopUp()"
         />
-        <v-btn
-          text="Esporta"
-          :color="theme.current.value.primaryColor"
-          prepend-icon="mdi-microsoft-excel"
-          :loading="downloadingExcel"
-          class="ml-2"
-          @click="downloadExcel()"
-        />
-      </template>
+        <template v-if="['Admin', 'Operator'].includes(role) && selectedCount">
+          <v-btn
+            text="Crea Borderò"
+            :color="theme.current.value.primaryColor"
+            prepend-icon="mdi-text-box-plus-outline"
+            @click="openFormPopUp()"
+          />
+          <v-btn
+            text="Esporta"
+            :color="theme.current.value.primaryColor"
+            prepend-icon="mdi-microsoft-excel"
+            :loading="downloadingExcel"
+            class="ml-2"
+            @click="downloadExcel()"
+          />
+        </template>
+      </div>
       <v-skeleton-loader
         v-if="!ready"
         type="table"
         :color="theme.current.value.secondaryColor"
         class="mt-5"
       />
-      <v-data-table
+      <div
         v-else
-        v-model="schedule.orders"
-        :items="orders"
-        :headers="getHeaders()"
-        :show-select="['Admin', 'Operator'].includes(role)"
-        :items-per-page="25"
-        :items-per-page-options="[10, 25, 50, 100]"
+        class="orders-table-area"
       >
-        <template #[`item.info`]="{ item }">
-          <OrderInfoRow
-            :item="item"
-            @open-statuses-popup="openStatusesPopup(item)"
-          />
-        </template>
-        <template #[`item.addressee`]="{ item }">
-          {{ item.addressee }}<br>
-          <p style="font-size: smaller;">
-            {{ item.address }}, {{ item.cap }}
-          </p>
-        </template>
-        <template #[`item.price`]="{ item }">
-          {{ item.price == 0 ? '0' : (item.price ? item.price.toFixed(2) : '') }}€
-        </template>
-        <template #[`item.actions`]="{ item }">
-          <div class="actions-column">
-            <Action :item="item" />
-          </div>
-        </template>
-        <template #[`item.created_at`]="{ item }">
-          {{ createdAt(item.created_at) }}
-        </template>
-      </v-data-table>
+        <v-data-table
+          class="orders-table"
+          fixed-header
+          v-model="schedule.orders"
+          :items="orders"
+          :headers="getHeaders()"
+          show-select
+          :items-per-page="25"
+          :items-per-page-options="[10, 25, 50, 100]"
+        >
+          <template #[`item.info`]="{ item }">
+            <OrderInfoRow
+              :item="item"
+              @open-statuses-popup="openStatusesPopup(item)"
+            />
+          </template>
+          <template #[`item.addressee`]="{ item }">
+            {{ item.addressee }}<br>
+            <p style="font-size: smaller;">
+              {{ item.address }}, {{ item.cap }}
+            </p>
+          </template>
+          <template #[`item.price`]="{ item }">
+            {{ item.price == 0 ? '0' : (item.price ? item.price.toFixed(2) : '') }}€
+          </template>
+          <template #[`item.user.company_name`]="{ item }">
+            {{ item.user?.company_name || item.user?.nickname || '' }}
+          </template>
+          <template #[`item.created_at`]="{ item }">
+            {{ createdAt(item.created_at) }}
+          </template>
+          <template #bottom>
+            <div class="orders-table-bottom">
+              <div
+                v-if="selectedOrder"
+                class="orders-selection-bar"
+                :style="{ background: theme.current.value.primaryColor }"
+              >
+                <span class="font-weight-medium mx-2">
+                  1 selezionato
+                </span>
+                <OrderActions
+                  :key="selectedOrder.id"
+                  :item="selectedOrder"
+                />
+                <v-btn
+                  icon="mdi-close"
+                  variant="text"
+                  title="Deseleziona tutto"
+                  @click="schedule.orders = []"
+                />
+              </div>
+              <v-spacer />
+              <v-data-table-footer />
+            </div>
+          </template>
+        </v-data-table>
+      </div>
     </template>
     <template #default>
       <SchedulationForm
@@ -104,18 +135,17 @@
 </template>
 
 <script setup>
-import Action from '@/components/orders/OrderActions';
+import OrderActions from '@/components/orders/OrderActions';
 import OrderInfoRow from '@/components/orders/OrderInfoRow';
 import OrderDatesForm from '@/components/orders/OrderDatesForm';
 import OrderHistoryPopup from '@/components/orders/OrderHistoryPopup';
 import ScheduleForm from '@/components/operator/schedules/ScheduleForm';
 import SchedulationForm from '@/components/operator/schedules/SchedulationForm';
 
-import { ref } from 'vue';
+import { ref, computed, watch } from 'vue';
 import http from '@/utils/http';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
@@ -124,7 +154,6 @@ import { useScheduleStore } from '@/stores/schedule';
 const statuses = ref([]);
 const theme = useTheme();
 const dialog = ref(false);
-const router = useRouter();
 const popUpType = ref(null);
 const orderToUpdate = ref(null);
 const userStore = useUserStore();
@@ -134,10 +163,12 @@ const downloadingExcel = ref(false);
 
 const orderStore = useOrderStore();
 const scheduleStore = useScheduleStore();
-const { role } = storeToRefs(userStore);
+// Il super admin che opera in una company ha i permessi di un admin: i pulsanti
+// gated su Admin/Operator (Crea Borderò, selezione righe, ...) devono comparirgli.
+const { effectiveRole: role, company } = storeToRefs(userStore);
 const { ready } = storeToRefs(orderStore);
 const { element: schedule } = storeToRefs(scheduleStore);
-const orders = storesUtils.getStoreList(orderStore, router);
+const orders = storesUtils.getStoreList(orderStore);
 schedule.value = {};
 
 const getHeaders = () => {
@@ -147,18 +178,36 @@ const getHeaders = () => {
     { title: 'Recapito', value: 'addressee_contact', sortable: false }
   ];
   if (role.value != 'Customer')
-    headers.push({ title: 'Punto Vendita', value: 'user.nickname', sortable: false });
+    headers.push({ title: 'Punto Vendita', value: 'user.company_name', sortable: false });
   headers.push(
     { title: 'D.P.C.', value: 'dpc', sortable: false },
     { title: 'D.R.C.', value: 'drc', sortable: false },
     { title: 'Data Consegna', value: 'booking_date', sortable: false },
     { title: 'Data Creazione', value: 'created_at', sortable: false }
   );
-  if (role.value == 'Admin')
+  if (role.value == 'Admin' || role.value == 'Customer')
     headers.push({ title: 'Prezzo', value: 'price', sortable: false });
-  headers.push({ title: 'Azioni', key: 'actions', sortable: false });
   return headers;
 };
+
+const selectedCount = computed(() => schedule.value.orders?.length || 0);
+
+// I comandi del singolo ordine compaiono solo con una riga selezionata.
+const selectedOrder = computed(() => {
+  const selected = schedule.value.orders;
+  if (selected?.length != 1) return null;
+  const id = typeof selected[0] === 'object' ? selected[0].id : selected[0];
+  return orders.value.find(order => order.id == id) || null;
+});
+
+// Un ordine sparito dalla lista (eliminato, filtrato) non resta selezionato.
+watch(orders, (list) => {
+  if (!schedule.value.orders?.length) return;
+  const ids = new Set(list.map(order => order.id));
+  schedule.value.orders = schedule.value.orders.filter(
+    order => ids.has(typeof order === 'object' ? order.id : order)
+  );
+});
 
 const goToSchedulation = (id, status) => {
   orderToUpdate.value = {id, status};
@@ -175,19 +224,16 @@ const downloadExcel = async () => {
   if (!schedule.value.orders?.length) return;
 
   downloadingExcel.value = true;
-  http.postRequest('export/orders/excel', {
-    order_ids: schedule.value.orders.map(order => typeof order === 'object' ? order.id : order)
-  }, (data) => {
-    downloadingExcel.value = false;
-    const url = window.URL.createObjectURL(new Blob([data]));
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'ordini_selezionati.xlsx';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    window.URL.revokeObjectURL(url);
-  }, 'POST', router);
+  http.downloadRequest(
+    'export/orders/excel',
+    'POST',
+    {
+      body: {
+        order_ids: schedule.value.orders.map(order => typeof order === 'object' ? order.id : order)
+      }
+    },
+    () => downloadingExcel.value = false
+  );
 };
 
 const openFormPopUp = () => {
@@ -195,15 +241,15 @@ const openFormPopUp = () => {
   popUpType.value = 'message';
   scheduleFormMessage.value = 'Loading...';
 
-  http.postRequest('schedule/pianification', {
-    orders_id: schedule.value.orders
+  http.makeRequest('schedule/pianification', 'POST', {
+    body: { orders_id: schedule.value.orders }
   }, (data) => {
     if (data.status == 'ok') {
       popUpType.value = 'schedule-form';
       schedule.value.schedule_items = data.schedule_items;
     } else
-      scheduleFormMessage.value = data.error;
-  }, 'POST', router);
+      scheduleFormMessage.value = data.message;
+  });
 };
 
 const openSchedulationPopUp = () => {
@@ -216,15 +262,60 @@ const openStatusesPopup = (item) => {
   popUpType.value = 'message';
   scheduleFormMessage.value = 'Loading...';
 
-  http.getRequest(`order/statuses/${item.id}`, {}, (data) => {
+  http.makeRequest(`order/statuses/${item.id}`, 'GET', {}, (data) => {
     popUpType.value = 'statuses';
     statuses.value = data.statuses;
-  }, 'GET', router);
+  });
 };
 </script>
 
 <style scoped>
-.actions-column {
-  width: 200px;
+.orders-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+/* Footer: barra azioni a sinistra con una selezione, paginazione a destra. */
+.orders-table-bottom {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 4px 8px;
+}
+
+.orders-selection-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  min-width: 0;
+  padding: 2px 12px;
+  border-radius: 8px;
+  color: #fff;
+}
+
+.orders-selection-bar :deep(.v-btn) {
+  color: #fff !important;
+}
+
+@media (min-width: 960px) {
+  .orders-table-area {
+    flex: 1 1 0;
+    min-height: 300px;
+    margin-top: 12px;
+  }
+
+  .orders-table {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .orders-table :deep(.v-table__wrapper) {
+    flex: 1 1 0;
+    min-height: 0;
+    overflow: auto;
+  }
 }
 </style>

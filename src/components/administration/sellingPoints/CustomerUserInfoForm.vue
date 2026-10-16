@@ -95,17 +95,15 @@ import http from '@/utils/http';
 import { ref, computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import mobile from '@/utils/mobile';
-import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
 const form = ref(null);
 const loading = ref(false);
-const router = useRouter();
 const isMobile = mobile.setupMobileUtils();
 
 const administrationUserStore = useAdministrationUserStore();
-const users = storesUtils.getStoreList(administrationUserStore, router);
+const users = storesUtils.getStoreList(administrationUserStore);
 const { element: user, activeForm, ready } = storeToRefs(administrationUserStore);
 
 const data = computed(() => {
@@ -118,15 +116,17 @@ const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
 
   loading.value = true;
-  http.postRequest('user/info', {
-    data: storesUtils.exclude_keys(data.value, ['created_at', 'updated_at']),
-    class: 'Customer',
-    user_id: user.value.id
+  http.makeRequest('user/info', 'POST', {
+    body: {
+      data: storesUtils.exclude_keys(data.value, ['created_at', 'updated_at']),
+      class: 'Customer',
+      user_id: user.value.id
+    }
   }, function () {
     loading.value = false;
     data.value = {};
-    administrationUserStore.initList(router);
+    administrationUserStore.initList();
     activeForm.value = false;
-  }, 'POST', router);
+  });
 };
 </script>

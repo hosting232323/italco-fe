@@ -45,23 +45,21 @@
 import { reactive } from 'vue';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import { useCustomerGroupStore } from '@/stores/customerGroup';
 
 const theme = useTheme();
-const router = useRouter();
 const deleteLoading = reactive({});
 const emits = defineEmits(['openPopUp']);
 
 const customerGroupStore = useCustomerGroupStore();
 const { ready } = storeToRefs(customerGroupStore);
-const customerGroups = storesUtils.getStoreList(customerGroupStore, router);
+const customerGroups = storesUtils.getStoreList(customerGroupStore);
 
 const deleteItem = (item) => {
   deleteLoading[item.id] = true;
-  customerGroupStore.deleteElement(item, router, function() {
-    customerGroupStore.initList(router);
+  customerGroupStore.deleteElement(item, function() {
+    customerGroupStore.initList();
     deleteLoading[item.id] = false;
   });
 };

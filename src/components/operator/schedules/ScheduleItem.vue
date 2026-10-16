@@ -11,63 +11,65 @@
         <v-icon>mdi-drag</v-icon>
       </div>
     </v-col>
-    <v-col :cols="editingAddressId === (element.order_id || element.collection_point_id) ? 10 : 4">
-      <p>
-        {{ element.index + 1 }}: 
+    <v-col cols="4">
+      <p v-if="isActivity">
+        {{ element.index + 1 }}: Attività - {{ element.title }}
+        <span v-if="element.duration_minutes">({{ activityUtils.formatDuration(element.duration_minutes) }})</span>
+        <v-icon
+          icon="mdi-pencil"
+          size="x-small"
+          style="cursor: pointer;"
+          title="Modifica attività"
+          @click="activityFormFlag = true"
+        />
+        <v-dialog
+          v-model="activityFormFlag"
+          max-width="600"
+        >
+          <ActivityForm
+            :activity="element"
+            @save="saveActivity"
+            @close-form="activityFormFlag = false"
+          />
+        </v-dialog>
+      </p>
+      <p v-else>
+        {{ element.index + 1 }}:
         {{ element.operation_type == 'Order' ? 'Ordine' : 'Punto di ritiro' }}
         ID {{ element.operation_type == 'Order' ? element.order_id : element.collection_point_id }}
       </p>
-      <div style="font-size: smaller; padding-right: 5px;">
-        <template v-if="editingAddressId !== (element.order_id || element.collection_point_id)">
-          {{ element.address }}, {{ element.cap }}
-          <template v-if="notFoundAddresses.includes(element.address)">
-            <v-icon
-              color="warning"
-              size="16"
-              class="ml-1"
-              title="Indirizzo non identificato"
-            >
-              mdi-alert-circle
-            </v-icon>
-            <v-icon
-              size="16"
-              class="ml-1"
-              style="cursor:pointer"
-              @click="startEditing(element)"
-            >
-              mdi-pencil
-            </v-icon>
-          </template>
-        </template>
-        <template v-else>
-          <div class="d-flex justify-center align-center">
-            <div
-              class="d-flex flex-column"
-              style="width: 100%;"
-            >
-              {{ previousAddress }}
-              <GooglePlacesAutocomplete
-                v-model="element.address"
-                label="Modifica indirizzo"
-                :rules="validation.requiredRules"
-                custom-class="mt-2"
-                @address-components="(data) => updateAddress(data, element)"
-              />
-            </div>
-            <v-btn
-              icon="mdi-close"
-              variant="text"
-              style="margin-bottom: 22px;"
-              @click="editingAddressId = null"
-            />
-          </div>
-        </template>
+      <div
+        v-if="isActivity && element.note"
+        style="font-size: smaller; padding-right: 5px;"
+      >
+        {{ element.note }}
+      </div>
+      <div
+        v-if="!isActivity || element.address"
+        style="font-size: smaller; padding-right: 5px;"
+      >
+        {{ [element.address, element.cap].filter(Boolean).join(', ') }}
+        <v-icon
+          v-if="invalidAddress && !isActivity"
+          icon="mdi-pencil"
+          size="x-small"
+          color="#C62828"
+          style="cursor: pointer;"
+          title="Indirizzo non riconosciuto: correggilo per posizionare la tappa"
+          @click="addressFormFlag = true"
+        />
+        <v-dialog
+          v-model="addressFormFlag"
+          max-width="800"
+        >
+          <AddressForm
+            :index="index"
+            @close-form="addressFormFlag = false"
+          />
+        </v-dialog>
       </div>
     </v-col>
-    <v-col   
-      v-if="editingAddressId !== (element.order_id || element.collection_point_id)"
-      cols="6"
-    >
+    <v-col cols="6">
       <div :class="['d-flex', 'align-center', isMobile ? 'flex-column' : '']">
         <v-text-field 
           v-model="element.start_time_slot" 
@@ -91,6 +93,13 @@
     </v-col>
     <v-col cols="1">
       <v-btn
+        v-if="isActivity"
+        variant="text"
+        icon="mdi-delete"
+        :color="theme.current.value.primaryColor"
+        @click="removeActivity"
+      />
+      <v-btn
         v-if="element.operation_type === 'Order' &&
           !orderUtils.isTerminatedOrder(element) &&
           schedule.schedule_items.filter(item => item.operation_type == 'Order').length > 1"
@@ -104,45 +113,60 @@
 </template>
 
 <script setup>
-import GooglePlacesAutocomplete from '@/components/GooglePlacesAutocomplete';
+import AddressForm from '@/components/operator/schedules/ScheduleItemAddressForm';
+import ActivityForm from '@/components/operator/schedules/ScheduleActivityForm';
 
-import http from '@/utils/http';
+import { computed, ref } from 'vue';
 import { useTheme } from 'vuetify';
-import { ref, computed } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import orderUtils from '@/utils/order';
+import activityUtils from '@/utils/activity';
 import validation from '@/utils/validation';
-import { useOrderStore } from '@/stores/order';
 import { useScheduleStore } from '@/stores/schedule';
 
-const { index, notFoundAddresses } = defineProps({
+const { index } = defineProps({
   index: {
     type: Number,
-    required: true
-  },
-  notFoundAddresses: {
-    type: Array,
     required: true
   }
 });
 
 const theme = useTheme();
-const router = useRouter();
-const previousAddress = ref('');
-const editingAddressId = ref(null);
 const isMobile = mobile.setupMobileUtils();
+const addressFormFlag = ref(false);
+const activityFormFlag = ref(false);
 
-const orderStore = useOrderStore();
 const scheduleStore = useScheduleStore();
-const { element: schedule } = storeToRefs(scheduleStore);
+const { element: schedule, geocodeResults } = storeToRefs(scheduleStore);
 const element = computed(() => schedule.value.schedule_items.find(item => item.index === index));
+const isActivity = computed(() => element.value?.operation_type === 'Activity');
+
+// La mappa ripiega sul CAP (pallino rosso) quando l'indirizzo non viene
+// riconosciuto: in quel caso si offre la correzione.
+const invalidAddress = computed(() => {
+  if (!element.value.address) return true;
+
+  const result = geocodeResults.value[`${element.value.address}|${element.value.cap}`];
+  return result === null || result?.precision === 'cap';
+});
 
 if (!element.value?.id) {
   element.value.start_time_slot = '08:00';
-  element.value.end_time_slot = '09:00';
+  // Un'attività con durata nota propone la fine; con durata 0 resta la fascia di un'ora.
+  element.value.end_time_slot = isActivity.value && element.value.duration_minutes
+    ? activityUtils.addMinutes('08:00', element.value.duration_minutes)
+    : '09:00';
 }
+
+const saveActivity = (activity) => {
+  Object.assign(element.value, activity);
+  activityFormFlag.value = false;
+};
+
+const removeActivity = () => {
+  schedule.value.schedule_items = schedule.value.schedule_items.filter(item => item.index !== index);
+};
 
 const removeOrder = (order) => {
   const remainingItems = schedule.value.schedule_items.filter(
@@ -165,33 +189,7 @@ const removeOrder = (order) => {
     else if (item.operation_type === 'CollectionPoint')
       return usedCollectionPointIds.has(item.collection_point_id);
     else
-      return false;
+      return item.operation_type === 'Activity';
   });
-};
-
-const updateAddress = (value, element) => {
-  element.cap = value.cap;
-  element.address = value.address;
-  if(element.operation_type == 'CollectionPoint')
-    http.postRequest(`collection-point/${element.collection_point_id}`,{ 
-      address: value.address,
-      cap: value.cap
-    }, callback, 'PUT', router);
-  else
-    http.postRequest(`order/${element.order_id}`,{ 
-      address: value.address,
-      cap: value.cap
-    }, callback, 'PUT', router);
-};
-
-const callback = () => {
-  orderStore.initList(router);
-  editingAddressId.value = null;
-};
-
-const startEditing = (element) => {
-  previousAddress.value = element.address;
-  editingAddressId.value = element.order_id || element.collection_point_id;
-  element.address = '';
 };
 </script>

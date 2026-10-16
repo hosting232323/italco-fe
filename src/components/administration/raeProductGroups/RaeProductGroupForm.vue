@@ -30,10 +30,13 @@
             cols="12"
             md="6"
           >
-            <v-text-field
+            <v-select
               v-model="raeProductGroup.group_code"
               :class="isMobile ? '' : 'ml-2'"
               label="Codice Raggruppamento"
+              item-title="name"
+              item-value="name"
+              :items="orderUtils.raeGrouping"
               :rules="validation.requiredRules"
             />
           </v-col>
@@ -53,13 +56,12 @@ import FormButtons from '@/components/FormButtons';
 import { ref } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
+import orderUtils from '@/utils/order';
 import validation from '@/utils/validation';
 import { useRaeProductGroupStore } from '@/stores/raeProductGroup';
 
 const form = ref(null);
 const loading = ref(false);
-const router = useRouter();
 const isMobile = mobile.setupMobileUtils();
 const raeProductGroupStore = useRaeProductGroupStore();
 const { element: raeProductGroup, activeForm } = storeToRefs(raeProductGroupStore);
@@ -69,16 +71,16 @@ const submitForm = async () => {
 
   loading.value = true;
   if (raeProductGroup.value.id)
-    raeProductGroupStore.updateElement(router, callback);
+    raeProductGroupStore.updateElement(callback);
   else
-    raeProductGroupStore.createElement(router, callback);
+    raeProductGroupStore.createElement(callback);
 };
 
 const callback = (data) => {
   loading.value = false;
   if (data.status == 'ok') {
     raeProductGroup.value = {};
-    raeProductGroupStore.initList(router);
+    raeProductGroupStore.initList();
     activeForm.value = false;
   }
 };

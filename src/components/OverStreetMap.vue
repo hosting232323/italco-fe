@@ -20,7 +20,13 @@
       "
     >
       <div>🚗 Distanza: {{ distanceKm }} km</div>
-      <div>🕒 Tempo: {{ durationMin }} min</div>
+      <div>🕒 Tempo: {{ totalMin }} min</div>
+      <div
+        v-if="activityMinutes"
+        style="font-weight: normal; font-size: 12px;"
+      >
+        di cui {{ activityMinutes }} min di attività
+      </div>
     </div>
 
     <div
@@ -55,7 +61,7 @@
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { storeToRefs } from 'pinia';
-import { onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useScheduleStore } from '@/stores/schedule';
 
 const loading = ref(true);
@@ -70,23 +76,74 @@ const durationMin = ref(0);
 const osmUrl = ref('');
 
 const scheduleStore = useScheduleStore();
-const { element: schedule } = storeToRefs(scheduleStore);
+const { element: schedule, geocodeResults } = storeToRefs(scheduleStore);
 
-const emits = defineEmits(['not-found-addresses']);
+// Le attività senza indirizzo non entrano nel percorso, ma il loro tempo conta
+// comunque: al tempo di guida si somma la durata di tutte le attività.
+const activityMinutes = computed(() => (schedule.value.schedule_items || [])
+  .filter(item => item.operation_type === 'Activity')
+  .reduce((total, item) => total + (Number(item.duration_minutes) || 0), 0));
+const totalMin = computed(() => Number(durationMin.value) + activityMinutes.value);
 
-const geocode = async (address) => {
-  const res = await fetch(
-    `https://nominatim.ares-logistics.it/search?format=json&q=${encodeURIComponent(address)}`
-  );
-  const data = await res.json();
+const searchNominatim = async (query) => {
+  try {
+    const res = await fetch(
+      `https://nominatim.fastsite.it/search?format=json&q=${encodeURIComponent(query)}`
+    );
+    const data = await res.json();
 
-  return data[0]
-    ? { lat: +data[0].lat, lng: +data[0].lon }
-    : null;
+    return data[0]
+      ? { lat: +data[0].lat, lng: +data[0].lon }
+      : null;
+  } catch {
+    return null;
+  }
+};
+
+const simplifyAddress = (address) => address
+  .split(',')
+  .map(part => part
+    .replace(/\b(snc|s\.n\.c\.?)\b/gi, '')
+    .replace(/\b\d+\s*\/?\s*[a-z]?(?=\s|,|$)/gi, '')
+    .replace(/\s{2,}/g, ' ')
+    .trim())
+  .filter(Boolean)
+  .join(', ');
+
+const geocode = async (item) => {
+  const cacheKey = `${item.address}|${item.cap}`;
+  if (cacheKey in geocodeResults.value) return geocodeResults.value[cacheKey];
+
+  const queries = [];
+  if (item.address) {
+    queries.push({ query: item.address, precision: 'full' });
+    const simplified = simplifyAddress(item.address);
+    if (simplified && simplified !== item.address)
+      queries.push({ query: simplified, precision: 'simplified' });
+  }
+  if (item.cap) queries.push({ query: `${item.cap} Italia`, precision: 'cap' });
+
+  let result = null;
+  for (const { query, precision } of queries) {
+    const coords = await searchNominatim(query);
+    if (coords) {
+      result = { ...coords, precision };
+      break;
+    }
+  }
+
+  geocodeResults.value[cacheKey] = result;
+  return result;
 };
 
 const drawRoute = async (coords) => {
-  if (coords.length < 2) return;
+  if (coords.length < 2) {
+    distanceKm.value = 0;
+    durationMin.value = 0;
+    if (routeLine.value) map.value.removeLayer(routeLine.value);
+    routeLine.value = null;
+    return;
+  }
 
   const coordStr = coords.map(c => `${c.lng},${c.lat}`).join(';');
 
@@ -94,10 +151,15 @@ const drawRoute = async (coords) => {
     'https://www.openstreetmap.org/directions?engine=fossgis_osrm_car&route=' +
     coords.map(c => `${c.lat},${c.lng}`).join(';');
 
-  const res = await fetch(
-    `https://router.project-osrm.org/route/v1/driving/${coordStr}?overview=full&geometries=geojson`
-  );
-  const data = await res.json();
+  let data;
+  try {
+    const res = await fetch(
+      `https://router.project-osrm.org/route/v1/driving/${coordStr}?overview=full&geometries=geojson`
+    );
+    data = await res.json();
+  } catch {
+    return;
+  }
 
   if (!data.routes?.length) return;
 
@@ -111,61 +173,90 @@ const drawRoute = async (coords) => {
   routeLine.value = L.geoJSON(route.geometry).addTo(map.value);
 };
 
-const updateMap = async () => {
-  if (!map.value) return;
-  loading.value = true;
+// Prodotti del borderò da ritirare a un punto di ritiro, divisi tra già ritirati e
+// ancora da ritirare. Si ricavano dalle tappe-ordine: è lì che il prodotto dice
+// da quale punto di ritiro parte.
+const collectionPointProducts = (item) => {
+  const pending = [];
+  let total = 0;
 
-  markers.value.forEach(m => map.value.removeLayer(m));
-  markers.value = [];
+  (schedule.value.schedule_items || [])
+    .filter(other => other.operation_type === 'Order')
+    .forEach(order => Object.entries(order.products || {}).forEach(([name, product]) => {
+      if (product.collection_point?.id !== item.collection_point_id) return;
+      total++;
+      if (!product.collected) pending.push(name);
+    }));
 
-  const results = await Promise.all(
-    schedule.value.schedule_items.map(async (item) => {
-      if (!item.address) return null;
-
-      const coords = await geocode(item.address);
-
-      return {
-        address: item.address,
-        coords
-      };
-    })
-  );
-
-  emits(
-    'not-found-addresses',
-    results.filter(r => r && !r.coords).map(r => r.address)
-  );
-
-  locations.value = results.filter(r => r && r.coords).map(r => r.coords);
-
-  locations.value.forEach((pos, i) => {
-    const marker = L.marker([pos.lat, pos.lng], { icon: redIcon }).addTo(map.value);
-
-    marker.bindTooltip(`${i + 1}`, {
-      permanent: true,
-      direction: 'top',
-      className: 'number-tooltip'
-    });
-
-    markers.value.push(marker);
-  });
-
-  if (locations.value.length) {
-    const bounds = L.latLngBounds(locations.value.map(p => [p.lat, p.lng]));
-    map.value.fitBounds(bounds);
-    await drawRoute(locations.value);
-  }
-  loading.value = false;
+  return { total, pending };
 };
 
-const redIcon = L.icon({
-  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-});
+// Un punto di ritiro con tutti i prodotti già ritirati non serve più al giro.
+const isFullyCollected = (item) => {
+  if (item.operation_type !== 'CollectionPoint') return false;
+  const { total, pending } = collectionPointProducts(item);
+
+  return total > 0 && pending.length === 0;
+};
+
+let updateToken = 0;
+
+const updateMap = async () => {
+  if (!map.value) return;
+  const token = ++updateToken;
+  loading.value = true;
+
+  try {
+    const items = schedule.value.schedule_items.filter(item => !isFullyCollected(item));
+    const results = await Promise.all(
+      items.map(async (item) => {
+        if (!item.address && !item.cap) return null;
+
+        return await geocode(item);
+      })
+    );
+
+    if (token !== updateToken) return;
+
+    markers.value.forEach(m => map.value.removeLayer(m));
+    markers.value = [];
+
+    locations.value = results.filter(coords => coords);
+
+    locations.value.forEach((pos, i) => {
+      const marker = L.marker(
+        [pos.lat, pos.lng],
+        { icon: numberedIcon(pos.precision, i + 1) }
+      ).addTo(map.value);
+
+      markers.value.push(marker);
+    });
+
+    if (locations.value.length)
+      map.value.fitBounds(L.latLngBounds(locations.value.map(p => [p.lat, p.lng])));
+    await drawRoute(locations.value);
+  } finally {
+    if (token === updateToken) loading.value = false;
+  }
+};
+
+const precisionColors = {
+  full: { background: '#2E7D32', color: 'white' },
+  simplified: { background: '#F9A825', color: '#212121' },
+  cap: { background: '#C62828', color: 'white' }
+};
+
+const numberedIcon = (precision, number) => {
+  const { background, color } = precisionColors[precision];
+  return L.divIcon({
+    className: '',
+    html: `<div style="width:28px;height:28px;border-radius:50%;background:${background};color:${color};` +
+      'border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.5);display:flex;align-items:center;' +
+      `justify-content:center;font-weight:bold;font-size:13px;">${number}</div>`,
+    iconSize: [28, 28],
+    iconAnchor: [14, 14]
+  });
+};
 
 const openInGoogleMaps = () => {
   if (locations.value.length < 2) return;
@@ -198,24 +289,16 @@ onMounted(() => {
 });
 
 watch(
-  () => schedule.value.schedule_items,
-  updateMap,
-  { deep: true }
+  () => (schedule.value.schedule_items || []).map(item => [
+    item.address,
+    item.cap,
+    item.operation_type === 'CollectionPoint' ? collectionPointProducts(item).pending.join(',') : ''
+  ].join('|')).join(';'),
+  updateMap
 );
 </script>
 
 <style scoped>
-/* eslint-disable-next-line vue-scoped-css/no-unused-selector */
-.number-tooltip {
-  background: none;
-  border: none;
-  color: white;
-  font-weight: bold;
-  font-size: 14px;
-  text-align: center;
-  padding: 0;
-}
-
 .loading {
   position: absolute;
   top: 0;

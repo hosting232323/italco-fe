@@ -10,52 +10,47 @@ export const useGeographicZoneStore = defineStore('geographicZone', {
     activeForm: false
   }),
   actions: {
-    createElement(router, func) {
-      http.postRequest(
+    createElement(func) {
+      http.makeRequest(
         'geographic-zone',
-        this.element,
-        func,
         'POST',
-        router
+        { body: this.element },
+        func
       );
     },
-    initList(router) {
-      storesUtils.refreshList(this, (callback) => http.getRequest(
+    initList() {
+      storesUtils.refreshList(this, (callback) => http.makeRequest(
         'geographic-zone',
-        {},
-        callback,
         'GET',
-        router
+        {},
+        callback
       ));
     },
-    deleteElement(element, router, func) {
-      http.getRequest(
+    deleteElement(element, func) {
+      http.makeRequest(
         `geographic-zone/${element.id}`,
-        {},
-        func,
         'DELETE',
-        router
+        {},
+        func
       );
     },
-    createEntity(data, entity, router, func) {
-      http.postRequest(
+    createEntity(data, entity, func) {
+      http.makeRequest(
         `geographic-zone/${entity}`,
-        {
+        'POST',
+        { body: {
           ...data,
           zone_id: this.element.id
-        },
-        func,
-        'POST',
-        router
+        } },
+        func
       );
     },
-    deleteEntity(data, entity, router, func) {
-      http.getRequest(
+    deleteEntity(data, entity, func) {
+      http.makeRequest(
         `geographic-zone/${entity}/${data.id}`,
-        {},
-        func,
         'DELETE',
-        router
+        {},
+        func
       );
     },
     setList(data) {

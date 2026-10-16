@@ -44,17 +44,15 @@
 import { reactive } from 'vue';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import { useRaeProductGroupStore } from '@/stores/raeProductGroup';
 
 const theme = useTheme();
-const router = useRouter();
 const deleteLoading = reactive({});
 
 const raeProductGroupStore = useRaeProductGroupStore();
 const { element: raeProductGroup, activeForm, ready } = storeToRefs(raeProductGroupStore);
-const raeProductGroups = storesUtils.getStoreList(raeProductGroupStore, router);
+const raeProductGroups = storesUtils.getStoreList(raeProductGroupStore);
 
 const openForm = (item) => {
   raeProductGroup.value = item;
@@ -68,8 +66,8 @@ const openForm = (item) => {
 
 const deleteItem = (item) => {
   deleteLoading[item.id] = true;
-  raeProductGroupStore.deleteElement(item, router, function() {
-    raeProductGroupStore.initList(router);
+  raeProductGroupStore.deleteElement(item, function() {
+    raeProductGroupStore.initList();
     deleteLoading[item.id] = false;
   });
 };

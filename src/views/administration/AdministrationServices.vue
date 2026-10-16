@@ -11,13 +11,18 @@
             @click="openForm"
           />
         </h1><hr>
-        <ServiceForm />
         <ServiceTable :activator-props="activatorProps" />
       </v-container>
     </template>
     <template #default>
       <ServicePopUp />
     </template>
+  </v-dialog>
+  <v-dialog
+    v-model="activeForm"
+    max-width="1500"
+  >
+    <ServiceForm />
   </v-dialog>
 </template>
 

@@ -22,9 +22,16 @@
         v-for="scheduleItem in item.schedule_items.sort((a, b) => a.index - b.index)"
         :key="scheduleItem.index"
       >
-        {{ scheduleItem.operation_type == 'Order' ? 'Ordine' : 'Punto di ritiro' }}
-        ID: <b>{{ scheduleItem.operation_type == 'Order' ? scheduleItem.order_id : scheduleItem.collection_point_id }}</b>
-        Indirizzo: <b>{{ scheduleItem.address }}</b>
+        <template v-if="scheduleItem.operation_type == 'Activity'">
+          Attività: <b>{{ scheduleItem.title }}</b>
+          <span v-if="scheduleItem.duration_minutes"> ({{ activityUtils.formatDuration(scheduleItem.duration_minutes) }})</span>
+          <span v-if="scheduleItem.address"> Indirizzo: <b>{{ scheduleItem.address }}</b></span>
+        </template>
+        <template v-else>
+          {{ scheduleItem.operation_type == 'Order' ? 'Ordine' : 'Punto di ritiro' }}
+          ID: <b>{{ scheduleItem.operation_type == 'Order' ? scheduleItem.order_id : scheduleItem.collection_point_id }}</b>
+          Indirizzo: <b>{{ scheduleItem.address }}</b>
+        </template>
       </div>
     </template>
     <template #[`item.users`]="{ item }">
@@ -77,13 +84,13 @@ import { reactive } from 'vue';
 import http from '@/utils/http';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
+import activityUtils from '@/utils/activity';
 import { useOrderStore } from '@/stores/order';
 import { useScheduleStore } from '@/stores/schedule';
+import { useRaeProductStore } from '@/stores/raeProduct';
 
 const theme = useTheme();
-const router = useRouter();
 const editLoading = reactive({});
 const deleteLoading = reactive({});
 const exportLoading = reactive({});
@@ -91,30 +98,34 @@ const emits = defineEmits(['open-dialog']);
 
 const orderStore = useOrderStore();
 const scheduleStore = useScheduleStore();
+const raeProductStore = useRaeProductStore();
 const { ready, element: schedule } = storeToRefs(scheduleStore);
-const schedules = storesUtils.getStoreList(scheduleStore, router);
+const schedules = storesUtils.getStoreList(scheduleStore);
 
+// Il borderò si ricarica dal server: la riga della lista può essere vecchia
+// e salvarla toglierebbe le modifiche fatte nel frattempo da altri.
 const editElement = (item) => {
   editLoading[item.id] = true;
 
-  http.postRequest('schedule/filter', {
-    filters: [{ model: 'Schedule', field: 'id', value: item.id }]
+  http.makeRequest('schedule/filter', 'POST', {
+    body: { filters: [{ model: 'Schedule', field: 'id', value: item.id }] }
   }, function (data) {
     editLoading[item.id] = false;
     if (data.status == 'ok' && data.schedules && data.schedules.length > 0) {
       schedule.value = data.schedules[0];
       emits('open-dialog');
     } else
-      alert(data.error || 'Borderò non trovato, ricarica la pagina');
-  }, 'POST', router);
+      alert(data.message || 'Borderò non trovato, ricarica la pagina');
+  });
 };
 
 const deleteItem = (item) => {
   deleteLoading[item.id] = true;
 
-  scheduleStore.deleteElement(item, router, function() {
-    orderStore.initList(router);
-    scheduleStore.initList(router);
+  scheduleStore.deleteElement(item, function() {
+    orderStore.initList();
+    scheduleStore.initList();
+    raeProductStore.initList();
     deleteLoading[item.id] = false;
   });
 };
@@ -122,19 +133,11 @@ const deleteItem = (item) => {
 const exportElement = async (item) => {
   exportLoading[item.id] = true;
 
-  http.getRequest(`export/schedule/${item.id}`, {}, function (data) {
-    if (data.status == 'ko')
-      alert(data.error);
-    else {
-      exportLoading[item.id] = false;
-      const blob = new Blob([data], { type: 'application/pdf' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `bordero_${item.id}.pdf`;
-      a.click();
-      window.URL.revokeObjectURL(url);
-    }
-  }, 'GET', router);
+  http.downloadRequest(
+    `export/schedule/${item.id}`,
+    'GET',
+    {},
+    () => exportLoading[item.id] = false
+  );
 };
 </script>

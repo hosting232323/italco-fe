@@ -8,7 +8,7 @@
         v-model="filters[`${dateFilterTypes[filtersSetting.dateType].entity}.${filtersSetting.dateType}`][0]"
         :class="isMobile ? '' : 'mr-2'"
         :label="dateFilterTypes[filtersSetting.dateType].label"
-        type="date"
+        :type="dateInputType"
         clearable
         :prepend-icon="filtersSetting.doubleDates ? 'mdi-minus' : 'mdi-plus'"
         @click:prepend="updateDoubleDates"
@@ -23,7 +23,7 @@
         v-model="filters[`${dateFilterTypes[filtersSetting.dateType].entity}.${filtersSetting.dateType}`][1]"
         :class="isMobile ? '' : 'ml-2 mr-2'"
         label="Data di fine intervallo"
-        type="date"
+        :type="dateInputType"
         :rules="validation.futureDate(filters[`${dateFilterTypes[filtersSetting.dateType].entity}.${filtersSetting.dateType}`][0])"
         clearable
       />
@@ -55,7 +55,7 @@ import { useOrderStore } from '@/stores/order';
 import { useScheduleStore } from '@/stores/schedule';
 import { useRaeProductStore } from '@/stores/raeProduct';
 
-const { filterTypes, element } = defineProps({
+const { filterTypes, element, dateInputType } = defineProps({
   element: {
     type: String,
     required: true
@@ -63,6 +63,10 @@ const { filterTypes, element } = defineProps({
   filterTypes: {
     type: Object,
     required: true
+  },
+  dateInputType: {
+    type: String,
+    default: 'date'
   }
 });
 
@@ -71,7 +75,8 @@ const userStore = useUserStore();
 const orderStore = useOrderStore();
 const scheduleStore = useScheduleStore();
 const raeProductStore = useRaeProductStore();
-const { role } = storeToRefs(userStore);
+// effectiveRole: il super admin in una company filtra come un admin, non un customer.
+const { effectiveRole: role } = storeToRefs(userStore);
 const { filters, filtersSetting } = storeToRefs(
   element == 'Order' ? orderStore :
     element == 'Schedule' ? scheduleStore :
@@ -84,8 +89,13 @@ const previousDateType = ref(filtersSetting.value.dateType);
 const dateFilterTypes = role.value != 'Customer' || element != 'Order'
   ? filterTypes
   : Object.fromEntries(Object.entries(filterTypes).filter(
-    ([key]) => ['drc', 'dpc', 'created_at'].includes(key)
+    ([key]) => ['booking_date', 'drc', 'dpc', 'created_at'].includes(key)
   ));
+
+// Lo store parte da work_date, che al cliente non è concesso: ripiego sul primo tipo valido.
+if (!dateFilterTypes[filtersSetting.value.dateType])
+  filtersSetting.value.dateType = Object.keys(dateFilterTypes)[0];
+previousDateType.value = filtersSetting.value.dateType;
 
 const formatFilters = () => {
   if (!filters.value[`${dateFilterTypes[filtersSetting.value.dateType].entity}.${filtersSetting.value.dateType}`])

@@ -14,18 +14,16 @@
         <i v-if="order.products[product].rae_product?.quantity > 1">
           x{{ order.products[product].rae_product.quantity }}
         </i>
-        [{{
-          order.products[product].collection_point ?
-            order.products[product].collection_point.name :
-            order.products[product].transport.name
-        }}]
+        <template v-if="productLocation(order.products[product])">
+          [{{ productLocation(order.products[product]) }}]
+        </template>
       </v-list-item-title>
       <v-list-item-subtitle>
         {{ order.products[product].services.map(service => service.name).join(', ') }}
       </v-list-item-subtitle>
       <template #append>
         <v-icon
-          v-if="!orderUtils.isTerminatedOrder(order)"
+          v-if="canDeleteProduct(order.products[product])"
           icon="mdi-delete"
           @click.stop="delete order.products[product]"
         />
@@ -39,7 +37,7 @@
     >
       <v-col
         cols="12"
-        :md="isRae ? 3 : 4"
+        md="4"
       >
         <v-text-field
           v-if="!isRae"
@@ -65,7 +63,7 @@
       </v-col>
       <v-col
         cols="12"
-        :md="role === 'Customer' ? 4 : 3"
+        :md="role === 'Customer' || !raeEnabled ? 4 : 3"
       >
         <v-select
           v-model="selectedService"
@@ -86,12 +84,13 @@
         </v-select>
       </v-col>
       <v-col
+        v-if="!isRae"
         cols="12"
-        :md="role === 'Customer' ? 4 : (isRae ? 2 : 3)"
+        :md="role === 'Customer' || !raeEnabled ? 4 : 3"
       >
         <v-autocomplete
           v-model="selectedCollectionPoint"
-          :class="isMobile ? '' : (isRae ? 'ml-2 mr-2' : 'ml-2')"
+          :class="isMobile ? '' : 'ml-2'"
           label="Punto di Ritiro"
           :items="filteredCollectionPoints"
           item-title="name"
@@ -103,7 +102,7 @@
       <v-col
         v-if="role != 'Customer' && isRae"
         cols="12"
-        md="2"
+        md="3"
       >
         <v-text-field
           v-model="raeQuantity"
@@ -113,7 +112,7 @@
         />
       </v-col>
       <v-col
-        v-if="role != 'Customer'"
+        v-if="role != 'Customer' && raeEnabled"
         cols="12"
         md="2"
       >
@@ -144,20 +143,18 @@
 <script setup>
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
-import orderUtils from '@/utils/order';
 import storesUtils from '@/utils/stores';
 import validation from '@/utils/validation';
 import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
 import { useServiceStore } from '@/stores/service';
 import { ref, computed, watch, nextTick } from 'vue';
+import { useTransportStore } from '@/stores/transport';
 import { useRaeProductGroupStore } from '@/stores/raeProductGroup';
 import { useCollectionPointStore } from '@/stores/collectionPoint';
 
 const form = ref(null);
 const isRae = ref(false);
-const router = useRouter();
 const raeQuantity = ref(1);
 const selectedServices = ref([]);
 const selectedProduct = ref(null);
@@ -169,15 +166,21 @@ const isMobile = mobile.setupMobileUtils();
 const userStore = useUserStore();
 const orderStore = useOrderStore();
 const serviceStore = useServiceStore();
+const transportStore = useTransportStore();
 const raeProductGroupStore = useRaeProductGroupStore();
 const collectionPointStore = useCollectionPointStore();
 
-const { role } = storeToRefs(userStore);
+// effectiveRole: il super admin in una company compila la riga come un admin.
+const { effectiveRole: role, company } = storeToRefs(userStore);
 const { element: order } = storeToRefs(orderStore);
-const services = storesUtils.getStoreList(serviceStore, router);
-const collectionPoints = storesUtils.getStoreList(collectionPointStore, router);
-const raeProductGroups = (role.value != 'Customer')
-  ? storesUtils.getStoreList(raeProductGroupStore, router)
+const services = storesUtils.getStoreList(serviceStore);
+const collectionPoints = storesUtils.getStoreList(collectionPointStore);
+
+// Il ritiro RAEE è un modulo dell'attività: senza, la spunta resta visibile ma
+// disattivata, così chi la cerca capisce che è spenta e non che è sparita.
+const raeEnabled = computed(() => !!company.value?.rae);
+const raeProductGroups = (role.value != 'Customer' && raeEnabled.value)
+  ? storesUtils.getStoreList(raeProductGroupStore)
   : ref([]);
 
 const filteredCollectionPoints = computed(() => {
@@ -192,6 +195,23 @@ watch([filteredCollectionPoints, () => selectedCollectionPoint.value], async ([l
     selectedCollectionPoint.value = list[0];
   }
 }, { immediate: true });
+
+const canDeleteProduct = (product) => {
+  return !product.rae_product || !product.rae_product.status || product.rae_product.status === 'Generated';
+};
+
+const productLocation = (product) => {
+  if (order.value.cloned_order_id) {
+    if (product.release_transport_id)
+      return storesUtils.getStoreList(transportStore).value
+        .find(transport => transport.id === product.release_transport_id)?.plate;
+    if (product.release_collection_point_id)
+      return collectionPoints.value.find(collectionPoint => collectionPoint.id === product.release_collection_point_id)?.name;
+  }
+
+  if (product.collection_point) return product.collection_point.name;
+  return product.transport?.plate ?? product.transport?.name;
+};
 
 const resetFormRow = () => {
   isRae.value = false;
@@ -210,8 +230,9 @@ const addProduct = async () => {
 
   order.value.products[selectedProduct.value] = {
     services: selectedServices.value,
-    collection_point: selectedCollectionPoint.value
   };
+  if (!isRae.value)
+    order.value.products[selectedProduct.value].collection_point = selectedCollectionPoint.value;
   if (isRae.value)
     order.value.products[selectedProduct.value].rae_product= {
       quantity: raeQuantity.value,

@@ -1,10 +1,6 @@
 import http from '@/utils/http';
 import { defineStore } from 'pinia';
 import storesUtils from '@/utils/stores';
-import { encryptPassword } from 'generic-module';
-
-const iv = import.meta.env.VITE_IV;
-const secretKey = import.meta.env.VITE_SECRET_KEY;
 
 export const useAdministrationUserStore = defineStore('administrationUser', {
   state: () => ({
@@ -14,37 +10,35 @@ export const useAdministrationUserStore = defineStore('administrationUser', {
     activeForm: false
   }),
   actions: {
-    createElement(router, func) {
-      http.postRequest(
+    createElement(func) {
+      http.makeRequest(
         'user',
-        {
-          ...this.element,
-          password: encryptPassword(this.element.password, secretKey, iv)
-        },
-        func,
         'POST',
-        router
+        { body: { ...this.element } },
+        func
       );
     },
-    initList(router) {
-      storesUtils.refreshList(this, (callback) => http.getRequest(
+    initList() {
+      storesUtils.refreshList(this, (callback) => http.makeRequest(
         'user',
-        {},
-        callback,
         'GET',
-        router
+        {},
+        callback
       ));
     },
-    deleteElement(force, element, router, func) {
+    resetPassword(id, password, func) {
+      const body = password ? { password } : {};
+      http.makeRequest(`user/${id}/password`, 'POST', { body }, func);
+    },
+    deleteElement(force, element, func) {
       const args = {};
       if (force) args.force = force;
 
-      http.getRequest(
+      http.makeRequest(
         `user/${element.id}`,
-        args,
-        func,
         'DELETE',
-        router
+        { params: args },
+        func
       );
     },
     setList(data) {

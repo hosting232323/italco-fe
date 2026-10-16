@@ -36,11 +36,9 @@
 import { reactive } from 'vue';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import { useServiceStore } from '@/stores/service';
 
 const theme = useTheme();
-const router = useRouter();
 const deleteLoading = reactive({});
 
 const serviceStore = useServiceStore();
@@ -48,9 +46,9 @@ const { element: service, innerElement: serviceUser, activePopUpForm } = storeTo
 
 const deleteItem = (item) => {
   deleteLoading[item.id] = true;
-  serviceStore.deleteServiceUserRelationships(item, router, function() {
+  serviceStore.deleteServiceUserRelationships(item, function() {
     service.value.users = service.value.users.filter(user => user.id !== item.id);
-    serviceStore.initList(router);
+    serviceStore.initList();
     deleteLoading[item.id] = false;
   });
 };

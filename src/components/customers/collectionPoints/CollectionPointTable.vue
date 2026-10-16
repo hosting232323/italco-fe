@@ -48,17 +48,15 @@
 import { reactive } from 'vue';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import { useCollectionPointStore } from '@/stores/collectionPoint';
 
 const theme = useTheme();
-const router = useRouter();
 const deleteLoading = reactive({});
 
 const collectionPointStore = useCollectionPointStore();
 const { element: collectionPoint, activeForm, ready } = storeToRefs(collectionPointStore);
-const collectionPoints = storesUtils.getStoreList(collectionPointStore, router);
+const collectionPoints = storesUtils.getStoreList(collectionPointStore);
 
 const openForm = (item) => {
   collectionPoint.value = item;
@@ -67,8 +65,8 @@ const openForm = (item) => {
 
 const deleteItem = (item) => {
   deleteLoading[item.id] = true;
-  collectionPointStore.deleteElement(item, router, function() {
-    collectionPointStore.initList(router);
+  collectionPointStore.deleteElement(item, function() {
+    collectionPointStore.initList();
     deleteLoading[item.id] = false;
   });
 };

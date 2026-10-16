@@ -1,0 +1,24 @@
+User-agent: *
+
+# La radice e' la landing pubblica; l'accesso e' su /login e tutto il resto
+# sta dietro autenticazione. /order/<id> mostra i dati di una singola
+# spedizione e non va indicizzato.
+Disallow: /order
+Disallow: /dashboard
+Disallow: /orders
+Disallow: /services
+Disallow: /users
+Disallow: /customer-points
+Disallow: /collection-points
+Disallow: /companies
+Disallow: /delivery
+Disallow: /schedules
+Disallow: /log
+Disallow: /rae-carrier
+Disallow: /rae-collection-center
+Disallow: /rae-dashboard
+Disallow: /rae-disposal
+Disallow: /rae-product-groups
+
+Allow: /
+Allow: /privacy

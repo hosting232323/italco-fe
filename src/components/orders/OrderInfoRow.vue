@@ -44,28 +44,20 @@
       >
         {{ orderUtils.LABELS.find(label => label.value == item.status).title }}
       </v-chip>
-      <v-tooltip v-if="item.delay">
-        <template #activator="{ props }">
-          <v-btn
-            icon="mdi-clock-alert-outline"
-            variant="text"
-            :color="theme.current.value.primaryColor"
-            v-bind="props"
-          />
-        </template>
-        <span>Ordine in ritardo</span>
-      </v-tooltip>
-      <v-tooltip v-if="item.anomaly">
-        <template #activator="{ props }">
-          <v-btn
-            icon="mdi-alert-outline"
-            variant="text"
-            :color="theme.current.value.primaryColor"
-            v-bind="props"
-          />
-        </template>
-        <span>Anomalia</span>
-      </v-tooltip>
+      <v-btn
+        v-if="item.delay"
+        title="Ordine in ritardo"
+        icon="mdi-clock-alert-outline"
+        variant="text"
+        :color="theme.current.value.primaryColor"
+      />
+      <v-btn
+        v-if="item.anomaly"
+        title="Anomalia"
+        icon="mdi-alert-outline"
+        variant="text"
+        :color="theme.current.value.primaryColor"
+      />
     </div>
   </div>
 </template>
@@ -76,9 +68,9 @@ import http from '@/utils/http';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import orderUtils from '@/utils/order';
-import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
+import { useRaeProductStore } from '@/stores/raeProduct';
 
 const { item } = defineProps({
   item: {
@@ -88,24 +80,28 @@ const { item } = defineProps({
 });
 
 const theme = useTheme();
-const router = useRouter();
 const confirmLoading = ref({});
 const emits = defineEmits(['open-statuses-popup']);
 
 const userStore = useUserStore();
 const orderStore = useOrderStore();
-const { role } = storeToRefs(userStore);
+// effectiveRole: il super admin in una company non e' un customer, vede lo storico.
+const { effectiveRole: role } = storeToRefs(userStore);
+const raeProductStore = useRaeProductStore();
 
 const confirmOrder = (order) => {
   confirmLoading.value[order.id] = true;
-  http.postRequest(`order/${order.id}`, {
-    order_id: order.id,
-    confirmed: !order.confirmed
+  http.makeRequest(`order/${order.id}`, 'PUT', {
+    body: {
+      order_id: order.id,
+      confirmed: !order.confirmed
+    }
   }, (data) => {
     confirmLoading.value[order.id] = false;
     if (data.status == 'ok')
-      orderStore.initList(router);
-  }, 'PUT', router);
+      orderStore.initList();
+    raeProductStore.initList();
+  });
 };
 </script>
 

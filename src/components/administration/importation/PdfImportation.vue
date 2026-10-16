@@ -17,7 +17,7 @@
           >
             <v-file-input
               label="File PDF"
-              accept="application/pdf"
+              :accept="fileUtils.buildAccept(fileUtils.pdfExtensions)"
               :rules="validation.requiredRules"
               multiple
               :error-messages="fileError"
@@ -94,7 +94,7 @@ import FormButtons from '@/components/FormButtons';
 import { ref } from 'vue';
 import http from '@/utils/http';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
+import { fileUtils } from 'generic-module';
 import storesUtils from '@/utils/stores';
 import validation from '@/utils/validation';
 import { useOrderStore } from '@/stores/order';
@@ -105,51 +105,49 @@ const form = ref(null);
 const user = ref(null);
 const fileError = ref('');
 const loading = ref(false);
-const router = useRouter();
 const orderStore = useOrderStore();
 const administrationUserStore = useAdministrationUserStore();
 
 const { ready } = storeToRefs(orderStore);
-const users = storesUtils.getStoreList(administrationUserStore, router);
+const users = storesUtils.getStoreList(administrationUserStore);
 
 const submitForm = async (isActive) => {
   if (!(await form.value.validate()).valid) return;
 
   loading.value = true;
-  const content = {customer_id: user.value};
-  files.value.forEach(file => {
-    if (file.selectedFile)
-      content[file.selectedFile.name] = file.selectedFile;
-  });
-
-  http.formDataRequest(
+  http.uploadRequest(
     'import/pdf',
-    content, 
+    'POST',
+    {
+      body: { customer_id: user.value },
+      files: { pdf: files.value },
+      extensions: fileUtils.pdfExtensions
+    },
     function (data) {
       loading.value = false;
-      if (data.status == 'ok' && data.imported_orders_count > 0) {
-        alert(`Importati ${data.imported_orders_count} ordini con successo.`);
-
-        files.value = [];
-        user.value = null;
+      if (data.status == 'ko')
+        alert(data.message || 'Si è verificato un problema durante l\'importazione dei file.');
+      else if (data.status == 'ok') {
+        alert(data.imported_orders_count > 0
+          ? `Importati ${data.imported_orders_count} ordini con successo.`
+          : 'Nessun ordine importato dai file selezionati.');
 
         ready.value = false;
-        orderStore.initList(router);
+        orderStore.initList();
+        resetForm();
         isActive.value = false;
       }
-    }, 'POST', router);
+    });
 };
 
 const onFilesSelected = (event) => {
   const selectedFiles = event.target.files;
   if (selectedFiles.length == 0) return;
 
+  fileError.value = fileUtils.validateFiles(selectedFiles, fileUtils.pdfExtensions) || '';
+  if (fileError.value) return;
+
   selectedFiles.forEach(selectedFile => {
-    fileError.value = '';
-    if (selectedFile.type != 'application/pdf') {
-      fileError.value = 'Puoi caricare solo file Excel (.xls, .xlsx).';
-      return;
-    }
     files.value.push({
       selectedFile,
       preview: URL.createObjectURL(selectedFile)

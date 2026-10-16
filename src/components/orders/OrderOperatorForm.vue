@@ -23,12 +23,15 @@
       cols="12"
       md="4"
     >
-      <GooglePlacesAutocomplete
+      <AddressAutocomplete
         v-model="order.address"
+        :api-key="GOOGLE_API_KEY"
+        :formatted="true"
         :custom-class="isMobile ? '' : 'ml-2 mr-2'"
         label="Indirizzo"
         :rules="validation.requiredRules"
         @address-components="handleAddressComponents"
+        @update:is-valid="orderStore.addressValid = $event"
       />
     </v-col>
     <v-col
@@ -97,16 +100,12 @@
       md="6"
     >
       <v-text-field
-        v-model="order.floor"
+        v-model.number="order.floor"
         :class="isMobile ? '' : 'ml-2'"
         label="Piano"
         type="number"
-        :rules="validation.positiveNumberRules.concat([
-          (value) => {
-            if (value !== undefined || value !== '') return true;
-            return 'Campo obbligatorio';
-          }
-        ])"
+        step="1"
+        :rules="validation.nonNegativeIntegerRules"
       />
     </v-col>
   </v-row>
@@ -126,7 +125,8 @@
 
 <script setup>
 import ProductServiceInput from '@/components/orders/OrderProductServiceInput';
-import GooglePlacesAutocomplete from '@/components/GooglePlacesAutocomplete';
+import { AddressAutocomplete } from 'generic-module';
+import { GOOGLE_API_KEY } from '@/utils/googleMaps';
 
 import { ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
@@ -141,7 +141,8 @@ const isMobile = mobile.setupMobileUtils();
 
 const userStore = useUserStore();
 const orderStore = useOrderStore();
-const { role } = storeToRefs(userStore);
+// effectiveRole: il super admin in una company non e' un customer.
+const { effectiveRole: role } = storeToRefs(userStore);
 const { element: order } = storeToRefs(orderStore);
 
 watch(

@@ -14,9 +14,10 @@
           <v-form
             v-if="conflictsOrders.length == 0"
             ref="form"
-            @submit.prevent="submitForm()"
+            @submit.prevent="submitForm(isActive)"
           >
             <v-file-input
+              :accept="fileUtils.buildAccept(fileUtils.spreadsheetExtensions)"
               label="File Excel"
               :rules="validation.requiredRules"
               :error-messages="fileError"
@@ -95,7 +96,7 @@ import ExcelImportationConflicts from '@/components/administration/importation/E
 import { ref } from 'vue';
 import http from '@/utils/http';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
+import { fileUtils } from 'generic-module';
 import storesUtils from '@/utils/stores';
 import validation from '@/utils/validation';
 import { useOrderStore } from '@/stores/order';
@@ -106,24 +107,26 @@ const form = ref(null);
 const user = ref(null);
 const fileError = ref('');
 const loading = ref(false);
-const router = useRouter();
 const conflictsOrders = ref([]);
 const orderStore = useOrderStore();
 const administrationUserStore = useAdministrationUserStore();
 
 const { ready } = storeToRefs(orderStore);
-const users = storesUtils.getStoreList(administrationUserStore, router);
+const users = storesUtils.getStoreList(administrationUserStore);
 
-const submitForm = async () => {
+const submitForm = async (isActive) => {
   if (!(await form.value.validate()).valid) return;
 
   loading.value = true;
-  http.formDataRequest('import/excel', {
-    file: file.value,
-    customer_id: user.value
+  http.uploadRequest('import/excel', 'POST', {
+    body: { customer_id: user.value },
+    files: { file: file.value },
+    extensions: fileUtils.spreadsheetExtensions
   }, function (data) {
     loading.value = false;
-    if (data.status == 'ok') {
+    if (data.status == 'ko')
+      alert(data.message || 'Si è verificato un problema durante l\'importazione del file.');
+    else if (data.status == 'ok') {
       if (data.imported_orders_count > 0)
         alert(`Importati ${data.imported_orders_count} ordini con successo.`);
 
@@ -131,26 +134,20 @@ const submitForm = async () => {
         conflictsOrders.value = data.conflicted_orders;
       else {
         ready.value = false;
-        orderStore.initList(router);
+        orderStore.initList();
         resetForm();
+        isActive.value = false;
       }
     }
-  }, 'POST', router);
+  });
 };
 
 const onFilesSelected = (event) => {
   const selectedFile = event.target.files[0];
   if (selectedFile.length == 0) return;
 
-  const validTypes = [
-    'application/vnd.ms-excel',
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-  ];
-  fileError.value = '';
-  if (!validTypes.includes(selectedFile.type)) {
-    fileError.value = 'Puoi caricare solo file Excel (.xls, .xlsx).';
-    return;
-  }
+  fileError.value = fileUtils.validateFiles([selectedFile], fileUtils.spreadsheetExtensions) || '';
+  if (fileError.value) return;
 
   file.value = selectedFile;
 };

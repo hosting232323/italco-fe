@@ -1,9 +1,9 @@
 import { storeToRefs } from 'pinia';
 
 
-const getStoreList = (store, router) => {
+const getStoreList = (store) => {
   const { list, ready } = storeToRefs(store);
-  if (!ready.value) store.initList(router);
+  if (!ready.value) store.initList();
   return list;
 };
 
@@ -102,9 +102,9 @@ const RAE_PRODUCT_DATE_FILTER_TYPES = {
     label: 'Data di Creazione',
     entity: 'RaeProduct'
   },
-  date: {
+  dtr_date: {
     label: 'Data DTR',
-    entity: 'Schedule'
+    entity: 'RaeProduct'
   },
   emission_date: {
     label: 'Data di Emissione',
@@ -123,7 +123,7 @@ const formatFilters = (filters, dateFilterType) => {
       else return filters[key];
     })
     .map(key => {
-      let value = null;
+      let value;
       if (!formattedKeys.includes(key))
         value = filters[key];
       else if (!filters[key][1])

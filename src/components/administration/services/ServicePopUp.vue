@@ -47,7 +47,6 @@ import { ref } from 'vue';
 import http from '@/utils/http';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
 import validation from '@/utils/validation';
 import { useServiceStore } from '@/stores/service';
 
@@ -55,7 +54,6 @@ const form = ref(null);
 const price = ref(null);
 const theme = useTheme();
 const loading = ref(false);
-const router = useRouter();
 const serviceStore = useServiceStore();
 const { element: service, activePopUpForm } = storeToRefs(serviceStore);
 
@@ -63,15 +61,17 @@ const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
 
   loading.value = true;
-  http.getRequest('service/set-all-users', {
-    service_id: service.value.id,
-    price: price.value,
+  http.makeRequest('service/set-all-users', 'GET', {
+    params: {
+      service_id: service.value.id,
+      price: price.value,
+    }
   }, function (data) {
     loading.value = false;
     if (data.status == 'ok') {
       service.value.users = data.service_users;
-      serviceStore.initList(router);
+      serviceStore.initList();
     }
-  }, 'GET', router);
+  });
 };
 </script>
