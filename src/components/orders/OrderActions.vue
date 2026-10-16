@@ -7,6 +7,7 @@
           text="Modifica"
           title="Modifica ordine"
           variant="text"
+          :loading="loadingEdit"
           :color="theme.current.value.primaryColor"
           @click="openForm(item)"
         />
@@ -144,6 +145,7 @@ const order = ref({});
 const theme = useTheme();
 const popUpType = ref('');
 const raeLoading = ref(false);
+const loadingEdit = ref(false);
 const loadingExport = ref(false);
 const loadingDelete = ref(false);
 
@@ -162,11 +164,26 @@ const openExternalLink = (link) => {
   window.open(link, '_blank');
 };
 
+// L'ordine si ricarica dal server: la riga della lista può essere vecchia e
+// salvarla sovrascriverebbe stato e prodotti con dati vecchi. Si passa dal
+// filtro per id, come per borderò e ritiri RAE: un ordine sparito è una lista
+// vuota con status ok, mentre il dettaglio risponderebbe 404 e il client
+// condiviso non richiamerebbe il callback, lasciando il pulsante in caricamento.
 const openForm = (item) => {
-  updatedOrder.value = item;
-  updatedOrder.value.user_id = updatedOrder.value.user.id;
-  orderStore.addressValid = true;
-  activeForm.value = true;
+  loadingEdit.value = true;
+
+  http.makeRequest('order/filter', 'POST', {
+    body: { filters: [{ model: 'Order', field: 'id', value: item.id }] }
+  }, function (data) {
+    loadingEdit.value = false;
+    if (data.status == 'ok' && data.orders && data.orders.length > 0) {
+      updatedOrder.value = data.orders[0];
+      updatedOrder.value.user_id = data.orders[0].user.id;
+      orderStore.addressValid = true;
+      activeForm.value = true;
+    } else
+      alert(data.message || 'Ordine non trovato, ricarica la pagina');
+  });
 };
 
 const openPopUp = (item, type) => {
