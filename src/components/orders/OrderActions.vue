@@ -164,14 +164,21 @@ const openExternalLink = (link) => {
   window.open(link, '_blank');
 };
 
+// L'ordine si ricarica dal server: la riga della lista può essere vecchia e
+// salvarla sovrascriverebbe stato e prodotti con dati vecchi. Si passa dal
+// filtro per id, come per borderò e ritiri RAE: un ordine sparito è una lista
+// vuota con status ok, mentre il dettaglio risponderebbe 404 e il client
+// condiviso non richiamerebbe il callback, lasciando il pulsante in caricamento.
 const openForm = (item) => {
   loadingEdit.value = true;
 
-  http.makeRequest(`order/${item.id}`, 'GET', {}, function (data) {
+  http.makeRequest('order/filter', 'POST', {
+    body: { filters: [{ model: 'Order', field: 'id', value: item.id }] }
+  }, function (data) {
     loadingEdit.value = false;
-    if (data.status == 'ok') {
-      updatedOrder.value = data.order;
-      updatedOrder.value.user_id = data.order.user.id;
+    if (data.status == 'ok' && data.orders && data.orders.length > 0) {
+      updatedOrder.value = data.orders[0];
+      updatedOrder.value.user_id = data.orders[0].user.id;
       orderStore.addressValid = true;
       activeForm.value = true;
     } else
