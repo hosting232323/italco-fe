@@ -1,6 +1,7 @@
 lint_frontend:
   stage: housekeeping
   image: node:22
+  needs: []
   allow_failure: true
   rules:
     - if: '$CI_COMMIT_BRANCH != "main"'
@@ -11,6 +12,7 @@ lint_frontend:
 deps_check:
   stage: housekeeping
   image: node:22
+  needs: []
   allow_failure: true
   rules:
     - if: '$CI_COMMIT_BRANCH != "main"'
