@@ -213,13 +213,17 @@ const productLocation = (product) => {
   return product.transport?.plate ?? product.transport?.name;
 };
 
-const resetFormRow = () => {
+const resetFormRow = async () => {
   isRae.value = false;
   selectedServices.value = [];
   selectedService.value = null;
   selectedProduct.value = null;
   selectedRaeProductGroup.value = null;
   selectedCollectionPoint.value = null;
+  // Svuotare i campi fa rivalutare le rules a Vuetify: senza questo la riga
+  // appena azzerata si accende di «Campo obbligatorio» prima che l'utente la tocchi.
+  await nextTick();
+  await form.value?.resetValidation();
 };
 
 const addProduct = async () => {
@@ -238,12 +242,12 @@ const addProduct = async () => {
       quantity: raeQuantity.value,
       rae_product_group_id: selectedRaeProductGroup.value,
     };
-  resetFormRow();
+  await resetFormRow();
 };
 
-const resetFields = () => {
+const resetFields = async () => {
   order.value.products = {};
-  resetFormRow();
+  await resetFormRow();
 };
 
 defineExpose({ resetFields });
