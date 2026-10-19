@@ -32,7 +32,10 @@
         </v-chip>
       </div>
 
-      <div class="coverage-map-wrapper">
+      <div
+        class="coverage-map-wrapper"
+        :style="{ height: `${mapHeight}px` }"
+      >
         <div
           ref="mapContainer"
           class="coverage-map"
@@ -40,6 +43,16 @@
         <div class="coverage-map-overlay">
           <slot name="overlay" />
         </div>
+      </div>
+      <div
+        class="coverage-map-resizer"
+        title="Trascina per cambiare l'altezza della mappa"
+        @pointerdown="startResize"
+        @pointermove="resize"
+        @pointerup="stopResize"
+        @pointercancel="stopResize"
+      >
+        <v-icon icon="mdi-drag-horizontal-variant" />
       </div>
 
       <div
@@ -156,6 +169,26 @@ const preloadedCollectionPointIcon = L.divIcon({
 });
 
 const mapContainer = ref(null);
+
+// L'altezza minima e' quella di partenza; l'operatore puo' estenderla a piacere
+// trascinando la maniglia sotto la mappa (il ResizeObserver sotto riallinea Leaflet).
+const MIN_MAP_HEIGHT = 480;
+const mapHeight = ref(MIN_MAP_HEIGHT);
+let resizeStart = null;
+
+const startResize = (event) => {
+  resizeStart = { y: event.clientY, height: mapHeight.value };
+  event.currentTarget.setPointerCapture(event.pointerId);
+};
+
+const resize = (event) => {
+  if (!resizeStart) return;
+  mapHeight.value = Math.max(MIN_MAP_HEIGHT, Math.round(resizeStart.height + event.clientY - resizeStart.y));
+};
+
+const stopResize = () => {
+  resizeStart = null;
+};
 // Le istanze Leaflet non devono passare attraverso i Proxy profondi di Vue:
 // Leaflet rimuove i listener usando l'identita' dell'istanza come context.
 const map = shallowRef(null);
@@ -536,9 +569,23 @@ watch(collectionPoints, updateCollectionPointLayers);
 
 .coverage-map {
   width: 100%;
-  height: 480px;
+  height: 100%;
   border-radius: 8px;
   overflow: hidden;
+}
+
+.coverage-map-resizer {
+  display: flex;
+  justify-content: center;
+  margin-top: 4px;
+  cursor: ns-resize;
+  touch-action: none;
+  user-select: none;
+  color: rgba(var(--v-theme-on-surface), 0.6);
+}
+
+.coverage-map-resizer:hover {
+  color: rgb(var(--v-theme-on-surface));
 }
 
 .day-picker {

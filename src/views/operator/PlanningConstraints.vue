@@ -1,10 +1,11 @@
 <template>
   <v-container>
-    <h1>Vincoli di pianificazione</h1><hr>
+    <PageHeader title="Vincoli di pianificazione" />
     <PlanningConstraints />
   </v-container>
 </template>
 
 <script setup>
+import PageHeader from '@/components/PageHeader';
 import PlanningConstraints from '@/components/operator/planning/PlanningConstraints';
 </script>

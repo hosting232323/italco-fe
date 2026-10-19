@@ -1,13 +1,12 @@
 <template>
-  <v-data-table
+  <SelectionTable
     :items="rows"
     :headers="[
       { title: 'Giorno', value: 'day_of_week', sortable: false },
       { title: 'Veicolo', value: 'transport_name', sortable: false },
       { title: 'Fascia oraria', value: 'slot', sortable: false },
       { title: 'CAP', value: 'caps', sortable: false },
-      { title: 'Precarichi', value: 'accepts_preloads', sortable: false },
-      { title: 'Azioni', key: 'actions', sortable: false }
+      { title: 'Precarichi', value: 'accepts_preloads', sortable: false }
     ]"
   >
     <template #[`item.day_of_week`]="{ item }">
@@ -37,35 +36,35 @@
     <template #[`item.accepts_preloads`]="{ item }">
       {{ item.accepts_preloads ? 'Sì' : 'No' }}
     </template>
-    <template #[`item.actions`]="{ item }">
+    <template #actions="{ item }">
       <v-btn
-        icon="mdi-pencil"
+        prepend-icon="mdi-pencil"
+        text="Modifica"
         variant="text"
-        :color="theme.current.value.primaryColor"
         @click="editItem(item)"
       />
       <v-btn
-        icon="mdi-delete"
+        prepend-icon="mdi-delete"
+        text="Elimina"
         variant="text"
         :loading="deleteLoading[item.id]"
-        :color="theme.current.value.primaryColor"
         @click="deleteItem(item)"
       />
     </template>
-  </v-data-table>
+  </SelectionTable>
 </template>
 
 <script setup>
+import SelectionTable from '@/components/SelectionTable';
+
 import { computed, reactive } from 'vue';
 import days from '@/utils/days';
-import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import coverage from '@/utils/coverage';
 import storesUtils from '@/utils/stores';
 import { useTransportStore } from '@/stores/transport';
 import { useDeliveryCoverageStore } from '@/stores/deliveryCoverage';
 
-const theme = useTheme();
 const deleteLoading = reactive({});
 
 const store = useDeliveryCoverageStore();
