@@ -4,11 +4,8 @@
     max-width="1500"
   >
     <template #activator>
-      <v-container>
-        <h1>
-          Logs
-        </h1>
-        <hr>
+      <v-container class="table-page">
+        <PageHeader title="Logs" />
         <LogFilters />
         <LogTable />
       </v-container>
@@ -21,6 +18,7 @@
 </template>
 
 <script setup>
+import PageHeader from '@/components/PageHeader';
 import LogTable from '@/components/administration/logs/LogTable';
 import LogPopUp from '@/components/administration/logs/LogPopUp';
 import LogFilters from '@/components/administration/logs/LogFilters';

@@ -2,9 +2,10 @@
   <v-dialog max-width="1500">
     <template #activator="{ props: activatorProps }">
       <v-btn
-        icon="mdi-microsoft-excel"
-        style="float: right;"
+        prepend-icon="mdi-microsoft-excel"
+        text="Importa da Excel"
         variant="text"
+        :color="theme.current.value.primaryColor"
         v-bind="activatorProps"
       />
     </template>
@@ -95,6 +96,7 @@ import ExcelImportationConflicts from '@/components/administration/importation/E
 
 import { ref } from 'vue';
 import http from '@/utils/http';
+import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { fileUtils } from 'generic-module';
 import storesUtils from '@/utils/stores';
@@ -102,6 +104,7 @@ import validation from '@/utils/validation';
 import { useOrderStore } from '@/stores/order';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
+const theme = useTheme();
 const file = ref({});
 const form = ref(null);
 const user = ref(null);

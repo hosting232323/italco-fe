@@ -1,20 +1,14 @@
 <template>
-  <v-skeleton-loader
-    v-if="!ready"
-    type="table"
-    :color="theme.current.value.secondaryColor"
-    class="mt-5"
-  />
-  <v-data-table
-    v-else
+  <SelectionTable
+    :ready="ready"
     :items="companies"
     :headers="[
       { title: 'ID', value: 'id', sortable: false },
       { title: 'Nome', value: 'name', sortable: false },
       { title: 'Modulo RAEE', key: 'rae', sortable: false },
-      { title: 'Pianificazione automatica', key: 'automatic_planning', sortable: false },
-      { title: 'Azioni', key: 'actions', sortable: false }
+      { title: 'Pianificazione automatica', key: 'automatic_planning', sortable: false }
     ]"
+    fill
   >
     <template #[`item.rae`]="{ item }">
       <v-icon
@@ -28,43 +22,35 @@
         :color="item.automatic_planning ? 'success' : 'grey'"
       />
     </template>
-    <template #[`item.actions`]="{ item }">
-      <v-row no-gutters>
-        <v-col cols="4">
-          <v-btn
-            variant="text"
-            :loading="selectLoading[item.id]"
-            :color="theme.current.value.primaryColor"
-            :prepend-icon="item.id == activeCompany?.id ? 'mdi-check-circle' : 'mdi-login-variant'"
-            :text="item.id == activeCompany?.id ? 'Selezionata' : 'Opera come'"
-            @click="selectItem(item)"
-          />
-        </v-col>
-        <v-col cols="4">
-          <v-btn
-            icon="mdi-pencil"
-            variant="text"
-            :color="theme.current.value.primaryColor"
-            @click="openForm(item)"
-          />
-        </v-col>
-        <v-col cols="4">
-          <v-btn
-            icon="mdi-recycle"
-            variant="text"
-            title="Luoghi di smaltimento RAEE"
-            :color="theme.current.value.primaryColor"
-            @click="openDisposalPlaces(item)"
-          />
-        </v-col>
-      </v-row>
+    <template #actions="{ item }">
+      <v-btn
+        variant="text"
+        :loading="selectLoading[item.id]"
+        :prepend-icon="item.id == activeCompany?.id ? 'mdi-check-circle' : 'mdi-login-variant'"
+        :text="item.id == activeCompany?.id ? 'Selezionata' : 'Opera come'"
+        @click="selectItem(item)"
+      />
+      <v-btn
+        prepend-icon="mdi-pencil"
+        text="Modifica"
+        variant="text"
+        @click="openForm(item)"
+      />
+      <v-btn
+        prepend-icon="mdi-recycle"
+        text="Luoghi di smaltimento RAEE"
+        variant="text"
+        title="Luoghi di smaltimento RAEE"
+        @click="openDisposalPlaces(item)"
+      />
     </template>
-  </v-data-table>
+  </SelectionTable>
 </template>
 
 <script setup>
+import SelectionTable from '@/components/SelectionTable';
+
 import { reactive } from 'vue';
-import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
@@ -72,7 +58,6 @@ import { useUserStore } from '@/stores/user';
 import { useCompanyStore } from '@/stores/company';
 import { useCompanyRaeDisposalPlaceStore } from '@/stores/companyRaeDisposalPlace';
 
-const theme = useTheme();
 const router = useRouter();
 const selectLoading = reactive({});
 

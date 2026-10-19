@@ -5,7 +5,7 @@ import RaeProductTable from '@/components/operator/raeProducts/RaeProductTable.v
 import { useRaeProductStore } from '@/stores/raeProduct';
 import { useUserStore } from '@/stores/user';
 
-import { createTestPinia, mountComponent } from '../../../helpers/mount';
+import { createTestPinia, mountComponent, selectRow } from '../../../helpers/mount';
 
 
 vi.mock('@/utils/http', () => ({
@@ -34,7 +34,10 @@ const mountTable = () => {
   return mountComponent(RaeProductTable, { pinia, global: { stubs: { DisposalForm: true } } });
 };
 
-const editButton = (wrapper) => wrapper.find('.mdi-pencil');
+const editButton = async (wrapper) => {
+  await selectRow(wrapper);
+  return wrapper.find('.mdi-pencil');
+};
 
 const lastCall = () => http.makeRequest.mock.calls.at(-1);
 
@@ -50,7 +53,7 @@ describe('RaeProductTable, modifica ritiro', () => {
   it('ricarica il ritiro dal server con il filtro per id invece di usare la riga della lista', async () => {
     const wrapper = mountTable();
 
-    await editButton(wrapper).trigger('click');
+    await (await editButton(wrapper)).trigger('click');
 
     const [url, method, payload] = lastCall();
     expect([url, method]).toEqual(['rae/product/filter', 'POST']);
@@ -60,7 +63,7 @@ describe('RaeProductTable, modifica ritiro', () => {
 
   it('apre il form con il ritiro ricevuto dal server', async () => {
     const wrapper = mountTable();
-    await editButton(wrapper).trigger('click');
+    await (await editButton(wrapper)).trigger('click');
 
     lastCall().at(-1)({ status: 'ok', rae_products: [ritiroAggiornato] });
 
@@ -71,7 +74,7 @@ describe('RaeProductTable, modifica ritiro', () => {
 
   it('avvisa e non apre il form se il ritiro non c-e- piu-', async () => {
     const wrapper = mountTable();
-    await editButton(wrapper).trigger('click');
+    await (await editButton(wrapper)).trigger('click');
 
     lastCall().at(-1)({ status: 'ok', rae_products: [] });
 
@@ -81,7 +84,7 @@ describe('RaeProductTable, modifica ritiro', () => {
 
   it('mostra il messaggio del backend quando risponde ko', async () => {
     const wrapper = mountTable();
-    await editButton(wrapper).trigger('click');
+    await (await editButton(wrapper)).trigger('click');
 
     lastCall().at(-1)({ status: 'ko', message: 'Modulo RAEE non attivo per questa attività' });
 

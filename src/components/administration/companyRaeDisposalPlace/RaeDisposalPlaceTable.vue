@@ -1,50 +1,37 @@
 <template>
-  <v-skeleton-loader
-    v-if="!ready"
-    type="table"
-    :color="theme.current.value.secondaryColor"
-    class="mt-2"
-  />
-  <v-data-table
-    v-else
+  <SelectionTable
+    :ready="ready"
     :items="places"
     :headers="[
       { title: 'Nome', value: 'name', sortable: false },
-      { title: 'Luogo di raggruppamento RAEE', value: 'rae_grouping_place', sortable: false },
-      { title: 'Azioni', key: 'actions', sortable: false }
+      { title: 'Luogo di raggruppamento RAEE', value: 'rae_grouping_place', sortable: false }
     ]"
   >
-    <template #[`item.actions`]="{ item }">
-      <v-row no-gutters>
-        <v-col cols="6">
-          <v-btn
-            icon="mdi-pencil"
-            variant="text"
-            :color="theme.current.value.primaryColor"
-            @click="openForm(item)"
-          />
-        </v-col>
-        <v-col cols="6">
-          <v-btn
-            icon="mdi-delete"
-            variant="text"
-            :loading="deleteLoading[item.id]"
-            :color="theme.current.value.primaryColor"
-            @click="deleteItem(item)"
-          />
-        </v-col>
-      </v-row>
+    <template #actions="{ item }">
+      <v-btn
+        prepend-icon="mdi-pencil"
+        text="Modifica"
+        variant="text"
+        @click="openForm(item)"
+      />
+      <v-btn
+        prepend-icon="mdi-delete"
+        text="Elimina"
+        variant="text"
+        :loading="deleteLoading[item.id]"
+        @click="deleteItem(item)"
+      />
     </template>
-  </v-data-table>
+  </SelectionTable>
 </template>
 
 <script setup>
+import SelectionTable from '@/components/SelectionTable';
+
 import { reactive } from 'vue';
-import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { useCompanyRaeDisposalPlaceStore } from '@/stores/companyRaeDisposalPlace';
 
-const theme = useTheme();
 const deleteLoading = reactive({});
 
 const store = useCompanyRaeDisposalPlaceStore();

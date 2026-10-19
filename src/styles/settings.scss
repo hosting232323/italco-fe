@@ -9,3 +9,57 @@ html {
 .v-table {
   background-color: rgb(var(--v-theme-secondaryColor));
 }
+
+/* Tabelle a scorrimento diretto (vedi SelectionTable) */
+.selection-table .v-table__wrapper {
+  max-height: 60vh;
+}
+
+.selection-table-bottom {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 4px 8px;
+}
+
+.selection-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  min-width: 0;
+  padding: 2px 12px;
+  border-radius: 8px;
+  color: #fff;
+}
+
+.selection-bar .v-btn {
+  color: #fff !important;
+}
+
+@media (min-width: 960px) {
+  .table-page {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow-y: auto;
+  }
+
+  .selection-table-area--fill {
+    flex: 1 1 0;
+    min-height: 300px;
+    margin-top: 12px;
+  }
+
+  .selection-table-area--fill .selection-table {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .selection-table-area--fill .selection-table .v-table__wrapper {
+    flex: 1 1 0;
+    min-height: 0;
+    max-height: none;
+    overflow: auto;
+  }
+}

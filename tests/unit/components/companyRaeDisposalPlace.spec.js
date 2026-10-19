@@ -10,7 +10,7 @@ import { useUserStore } from '@/stores/user';
 import { useCompanyStore } from '@/stores/company';
 import { useCompanyRaeDisposalPlaceStore } from '@/stores/companyRaeDisposalPlace';
 
-import { createTestPinia, mountComponent } from '../../helpers/mount';
+import { createTestPinia, mountComponent, selectRow } from '../../helpers/mount';
 
 // Non condivide il contratto generico di describeCrudTable/describeCrudForm:
 // companyId vive nello store (impostato da open()), non e' un prop.
@@ -64,7 +64,8 @@ describe('RaeDisposalPlaceTable', () => {
     const { pinia, store } = setup();
     const wrapper = mountTable(store, pinia);
 
-    await rowsOf(wrapper)[0].find('.mdi-pencil').trigger('click');
+    await selectRow(wrapper);
+    await wrapper.find('.mdi-pencil').trigger('click');
 
     expect(store.element).toEqual({ id: 1, ...VALID_ELEMENT });
     expect(store.activeForm).toBe(true);
@@ -75,7 +76,8 @@ describe('RaeDisposalPlaceTable', () => {
     const deleteElement = vi.spyOn(store, 'deleteElement');
     const wrapper = mountTable(store, pinia);
 
-    await rowsOf(wrapper)[0].find('.mdi-delete').trigger('click');
+    await selectRow(wrapper);
+    await wrapper.find('.mdi-delete').trigger('click');
 
     expect(deleteElement).toHaveBeenCalledWith({ id: 1, ...VALID_ELEMENT }, expect.any(Function));
   });

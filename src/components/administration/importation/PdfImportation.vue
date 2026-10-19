@@ -2,9 +2,10 @@
   <v-dialog max-width="1500">
     <template #activator="{ props: activatorProps }">
       <v-btn
-        icon="mdi-file-pdf-box"
-        style="float: right;"
+        prepend-icon="mdi-file-pdf-box"
+        text="Importa da PDF"
         variant="text"
+        :color="theme.current.value.primaryColor"
         v-bind="activatorProps"
       />
     </template>
@@ -93,6 +94,7 @@ import FormButtons from '@/components/FormButtons';
 
 import { ref } from 'vue';
 import http from '@/utils/http';
+import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { fileUtils } from 'generic-module';
 import storesUtils from '@/utils/stores';
@@ -100,6 +102,7 @@ import validation from '@/utils/validation';
 import { useOrderStore } from '@/stores/order';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
+const theme = useTheme();
 const files = ref([]);
 const form = ref(null);
 const user = ref(null);

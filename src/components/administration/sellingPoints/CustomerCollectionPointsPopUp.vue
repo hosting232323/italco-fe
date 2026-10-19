@@ -5,7 +5,8 @@
   >
     <template #append>
       <v-btn
-        icon="mdi-plus"
+        prepend-icon="mdi-plus"
+        text="Crea nuovo punto di ritiro"
         variant="text"
         @click="openForm"
       />

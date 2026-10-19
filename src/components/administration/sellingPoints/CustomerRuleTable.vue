@@ -1,17 +1,10 @@
 <template>
-  <v-skeleton-loader
-    v-if="!ready"
-    type="table"
-    :color="theme.current.value.secondaryColor"
-    class="mt-5"
-  />
-  <v-data-table
-    v-else
+  <SelectionTable
+    :ready="ready"
     :items="customerRules"
     :headers="[
       { title: 'Utente', value: 'nickname', sortable: false },
-      { title: 'Regole', value: 'rules', sortable: false },
-      { title: 'Azioni', key: 'actions', sortable: false }
+      { title: 'Regole', value: 'rules', sortable: false }
     ]"
   >
     <template #[`item.rules`]="{ item }">
@@ -23,27 +16,27 @@
         {{ rules.max_orders }}
       </div>
     </template>
-    <template #[`item.actions`]="{ item }">
+    <template #actions="{ item }">
       <v-btn
-        icon="mdi-delete"
+        prepend-icon="mdi-delete"
+        text="Elimina"
         variant="text"
         :loading="deleteLoading[item.id]"
-        :color="theme.current.value.primaryColor"
         @click="deleteItem(item)"
       />
     </template>
-  </v-data-table>
+  </SelectionTable>
 </template>
 
 <script setup>
+import SelectionTable from '@/components/SelectionTable';
+
 import { reactive } from 'vue';
 import days from '@/utils/days';
-import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import storesUtils from '@/utils/stores';
 import { useCustomerRuleStore } from '@/stores/customerRule';
 
-const theme = useTheme();
 const deleteLoading = reactive({});
 
 const customerRuleStore = useCustomerRuleStore();

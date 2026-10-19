@@ -8,7 +8,7 @@ import ServicePopUpTable from '@/components/administration/services/ServicePopUp
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 import { useServiceStore } from '@/stores/service';
 
-import { createTestPinia, mountComponent } from '../../../helpers/mount';
+import { createTestPinia, mountComponent, selectRow } from '../../../helpers/mount';
 
 
 vi.mock('@/utils/http', () => ({
@@ -190,7 +190,8 @@ describe('ServicePopUpTable', () => {
   it('la matita apre il form sull-associazione scelta', async () => {
     const wrapper = mountComponent(ServicePopUpTable, { pinia });
 
-    await wrapper.findAll('tbody tr')[0].find('.mdi-pencil').trigger('click');
+    await selectRow(wrapper);
+    await wrapper.find('.mdi-pencil').trigger('click');
 
     expect(store.innerElement).toEqual({ id: 1, nickname: 'mario', price: 10, code: 'A1' });
     expect(store.activePopUpForm).toBe(true);
@@ -201,7 +202,8 @@ describe('ServicePopUpTable', () => {
     const initList = vi.spyOn(store, 'initList').mockImplementation(() => {});
     const wrapper = mountComponent(ServicePopUpTable, { pinia });
 
-    await wrapper.findAll('tbody tr')[0].find('.mdi-delete').trigger('click');
+    await selectRow(wrapper);
+    await wrapper.find('.mdi-delete').trigger('click');
     remove.mock.calls.at(-1)[1]();
 
     expect(store.element.users.map(({ id }) => id)).toEqual([2]);

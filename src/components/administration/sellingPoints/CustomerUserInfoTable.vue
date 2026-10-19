@@ -1,12 +1,6 @@
 <template>
-  <v-skeleton-loader
-    v-if="!ready"
-    type="table"
-    :color="theme.current.value.secondaryColor"
-    class="mt-5"
-  />
-  <v-data-table
-    v-else
+  <SelectionTable
+    :ready="ready"
     :items="users.filter(user => user.role == 'Customer')"
     :headers="[
       { title: 'ID', value: 'id', sortable: false },
@@ -17,8 +11,7 @@
       { title: 'Codice Fiscale', value: 'tax_code', sortable: false },
       { title: 'Ragione Sociale', value: 'company_name', sortable: false },
       { title: 'Email', value: 'email', sortable: false },
-      { title: 'Codice Distribuzione RAEE', value: 'rae_code', sortable: false },
-      { title: 'Azioni', key: 'actions', sortable: false, minWidth: '140px' }
+      { title: 'Codice Distribuzione RAEE', value: 'rae_code', sortable: false }
     ]"
   >
     <template #[`item.import_code`]="{ item }">
@@ -42,37 +35,31 @@
     <template #[`item.rae_code`]="{ item }">
       {{ item.customer_user_info?.rae_code }}
     </template>
-    <template #[`item.actions`]="{ item }">
-      <v-row no-gutters>
-        <v-col cols="6">
-          <v-btn
-            icon="mdi-pencil"
-            variant="text"
-            :color="theme.current.value.primaryColor"
-            @click="openForm(item)"
-          />
-        </v-col>
-        <v-col cols="6">
-          <v-btn
-            icon="mdi-map-marker-multiple"
-            variant="text"
-            :color="theme.current.value.primaryColor"
-            @click="emit('open-collection-points', item)"
-          />
-        </v-col>
-      </v-row>
+    <template #actions="{ item }">
+      <v-btn
+        prepend-icon="mdi-pencil"
+        text="Modifica"
+        variant="text"
+        @click="openForm(item)"
+      />
+      <v-btn
+        prepend-icon="mdi-map-marker-multiple"
+        text="Punti di ritiro"
+        variant="text"
+        @click="emit('open-collection-points', item)"
+      />
     </template>
-  </v-data-table>
+  </SelectionTable>
 </template>
 
 <script setup>
-import { useTheme } from 'vuetify';
+import SelectionTable from '@/components/SelectionTable';
+
 import { storeToRefs } from 'pinia';
 import storesUtils from '@/utils/stores';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
 const emit = defineEmits(['open-collection-points']);
-const theme = useTheme();
 
 const administrationUserStore = useAdministrationUserStore();
 const { element: user, activeForm, ready } = storeToRefs(administrationUserStore);

@@ -6,7 +6,7 @@ import CompanyTable from '@/components/administration/company/CompanyTable.vue';
 import http from '@/utils/http';
 import { useCompanyStore } from '@/stores/company';
 import { useCompanyRaeDisposalPlaceStore } from '@/stores/companyRaeDisposalPlace';
-import { createTestPinia, createTestRouter, mountComponent } from '../../helpers/mount';
+import { createTestPinia, createTestRouter, mountComponent, selectRow } from '../../helpers/mount';
 
 
 vi.mock('@/utils/http', () => ({
@@ -149,6 +149,7 @@ describe('CompanyTable', () => {
     const disposalPlaceStore = useCompanyRaeDisposalPlaceStore();
     const wrapper = mountComponent(CompanyTable, { pinia, router: createTestRouter() });
 
+    await selectRow(wrapper);
     await wrapper.find('.mdi-recycle').trigger('click');
 
     expect(disposalPlaceStore.companyId).toBe(7);

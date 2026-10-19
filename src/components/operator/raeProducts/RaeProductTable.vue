@@ -4,23 +4,11 @@
     max-width="1500"
   >
     <template #activator>
-      <v-btn
-        v-if="selectedProducts.length"
-        text="Smaltimento"
-        :color="theme.current.value.primaryColor"
-        @click="dialog = true"
-      />
-      <v-skeleton-loader
-        v-if="!ready"
-        type="table"
-        :color="theme.current.value.secondaryColor"
-        class="mt-5"
-      />
-      <v-data-table
-        v-else
+      <SelectionTable
         v-model="selectedProducts"
+        :ready="ready"
         :items="raeProducts"
-        show-select
+        multiple
         return-object
         :headers="[
           { title: 'Id', value: 'id', sortable: false },
@@ -32,9 +20,9 @@
           { title: 'Destinatario', value: 'order.addressee', sortable: false },
           { title: 'Punto Vendita', value: 'user.company_name', sortable: false },
           { title: 'Data DTR', value: 'dtr_date', sortable: false },
-          { title: 'Data di emissione', value: 'emission_date', sortable: false },
-          { title: 'Azioni', key: 'actions', sortable: false }
+          { title: 'Data di emissione', value: 'emission_date', sortable: false }
         ]"
+        fill
       >
         <template #[`item.number`]="{ item }">
           {{ item.number || '' }}
@@ -61,41 +49,49 @@
         <template #[`item.user.company_name`]="{ item }">
           {{ item.user?.company_name || item.user?.nickname || '' }}
         </template>
-        <template #[`item.actions`]="{ item }">
+        <template #actions="{ item }">
           <v-btn
-            v-if="item.status == 'Emitted' && orderUtils.isTerminatedOrder(item.order)"
-            icon="mdi-pencil"
+            prepend-icon="mdi-recycle"
+            text="Smaltimento"
             variant="text"
-            :loading="!!editLoading[item.id]"
-            :color="theme.current.value.primaryColor"
-            @click="editElement(item)"
+            @click="dialog = true"
           />
-          <v-btn
-            v-if="item.status == 'Annulled' && !item.link"
-            icon="mdi-pencil"
-            variant="text"
-            :loading="!!editLoading[item.id]"
-            :color="theme.current.value.primaryColor"
-            @click="editElement(item)"
-          />
-          <v-btn
-            v-if="item.order && item.status != 'Generated'"
-            icon="mdi-file-export"
-            variant="text"
-            :loading="!!exportLoading[item.id]"
-            :color="theme.current.value.primaryColor"
-            @click="raeExport(item)"
-          />
-          <v-btn
-            v-if="item.link"
-            icon="mdi-file-pdf-box"
-            variant="text"
-            :color="theme.current.value.primaryColor"
-            :href="http.withSessionToken(item.link)"
-            target="_blank"
-          />
+          <template v-if="item">
+            <v-btn
+              v-if="item.status == 'Emitted' && orderUtils.isTerminatedOrder(item.order)"
+              prepend-icon="mdi-pencil"
+              text="Modifica"
+              variant="text"
+              :loading="!!editLoading[item.id]"
+              @click="editElement(item)"
+            />
+            <v-btn
+              v-if="item.status == 'Annulled' && !item.link"
+              prepend-icon="mdi-pencil"
+              text="Modifica"
+              variant="text"
+              :loading="!!editLoading[item.id]"
+              @click="editElement(item)"
+            />
+            <v-btn
+              v-if="item.order && item.status != 'Generated'"
+              prepend-icon="mdi-file-export"
+              text="Esporta"
+              variant="text"
+              :loading="!!exportLoading[item.id]"
+              @click="raeExport(item)"
+            />
+            <v-btn
+              v-if="item.link"
+              prepend-icon="mdi-file-pdf-box"
+              text="PDF"
+              variant="text"
+              :href="http.withSessionToken(item.link)"
+              target="_blank"
+            />
+          </template>
         </template>
-      </v-data-table>
+      </SelectionTable>
     </template>
     <template #default>
       <DisposalForm
@@ -110,9 +106,9 @@
 
 <script setup>
 import DisposalForm from '@/components/operator/raeDisposal/DisposalForm';
+import SelectionTable from '@/components/SelectionTable';
 
 import http from '@/utils/http';
-import { useTheme } from 'vuetify';
 import { reactive, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import orderUtils from '@/utils/order';
@@ -120,7 +116,6 @@ import storesUtils from '@/utils/stores';
 import { useRaeProductStore } from '@/stores/raeProduct';
 import { useRaeDisposalStore } from '@/stores/raeDisposal';
 
-const theme = useTheme();
 const dialog = ref(false);
 const selectedProducts = ref([]);
 const editLoading = reactive({});

@@ -1,12 +1,6 @@
 <template>
-  <v-skeleton-loader
-    v-if="!ready"
-    type="table"
-    :color="theme.current.value.secondaryColor"
-    class="mt-5"
-  />
-  <v-data-table
-    v-else
+  <SelectionTable
+    :ready="ready"
     :items="raeCarriers"
     :headers="[
       { title: 'ID', value: 'id', sortable: false },
@@ -15,42 +9,36 @@
       { title: 'Codice Fiscale', value: 'fiscal_code', sortable: false },
       { title: 'Partita IVA', value: 'vat_number', sortable: false },
       { title: 'Codice di autorizzazione', value: 'authorization_code', sortable: false },
-      { title: 'Data di autorizzazione', value: 'authorization_date', sortable: false },
-      { title: 'Azioni', key: 'actions', sortable: false }
+      { title: 'Data di autorizzazione', value: 'authorization_date', sortable: false }
     ]"
+    fill
   >
-    <template #[`item.actions`]="{ item }">
-      <v-row no-gutters>
-        <v-col cols="6">
-          <v-btn
-            icon="mdi-pencil"
-            variant="text"
-            :color="theme.current.value.primaryColor"
-            @click="openForm(item)"
-          />
-        </v-col>
-        <v-col cols="6">
-          <v-btn
-            icon="mdi-delete"
-            variant="text"
-            :loading="deleteLoading[item.id]"
-            :color="theme.current.value.primaryColor"
-            @click="deleteItem(item)"
-          />
-        </v-col>
-      </v-row>
+    <template #actions="{ item }">
+      <v-btn
+        prepend-icon="mdi-pencil"
+        text="Modifica"
+        variant="text"
+        @click="openForm(item)"
+      />
+      <v-btn
+        prepend-icon="mdi-delete"
+        text="Elimina"
+        variant="text"
+        :loading="deleteLoading[item.id]"
+        @click="deleteItem(item)"
+      />
     </template>
-  </v-data-table>
+  </SelectionTable>
 </template>
 
 <script setup>
+import SelectionTable from '@/components/SelectionTable';
+
 import { reactive } from 'vue';
-import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import storesUtils from '@/utils/stores';
 import { useRaeCollectionCenterStore } from '@/stores/raeCollectionCenter';
 
-const theme = useTheme();
 const deleteLoading = reactive({});
 
 const raeCollectionCenterStore = useRaeCollectionCenterStore();
