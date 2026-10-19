@@ -57,15 +57,19 @@
         </template>
       </CoverageMap>
 
-      <h2 class="mt-8">
-        Blocchi di copertura
+      <PageHeader
+        title="Blocchi di copertura"
+        level="h2"
+        class="mt-8"
+      >
         <v-btn
-          icon="mdi-plus"
-          style="float: right;"
+          prepend-icon="mdi-plus"
+          text="Crea nuovo blocco"
           variant="text"
+          :color="theme.current.value.primaryColor"
           @click="openEntryForm"
         />
-      </h2><hr>
+      </PageHeader>
       <CoverageEntryTable />
     </template>
   </div>
@@ -78,6 +82,7 @@
 </template>
 
 <script setup>
+import PageHeader from '@/components/PageHeader';
 import CoverageCalendar from '@/components/operator/deliveryCoverage/CoverageCalendar';
 import CoverageEntryForm from '@/components/operator/deliveryCoverage/CoverageEntryForm';
 import CoverageEntryTable from '@/components/operator/deliveryCoverage/CoverageEntryTable';

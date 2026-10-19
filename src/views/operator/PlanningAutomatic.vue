@@ -1,12 +1,13 @@
 <template>
   <v-container>
-    <h1>Pianificazione</h1><hr>
+    <PageHeader title="Pianificazione" />
     <PlanningCoverage v-if="automaticPlanning" />
     <PlanningAutomaticTeaser v-else />
   </v-container>
 </template>
 
 <script setup>
+import PageHeader from '@/components/PageHeader';
 import PlanningCoverage from '@/components/operator/planning/PlanningCoverage';
 import PlanningAutomaticTeaser from '@/components/operator/planning/PlanningAutomaticTeaser';
 
