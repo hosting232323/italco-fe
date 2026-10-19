@@ -1,14 +1,14 @@
 <template>
-  <v-container>
-    <h1>
-      Gestione Trasportatori
+  <v-container class="table-page">
+    <PageHeader title="Gestione Trasportatori">
       <v-btn
-        icon="mdi-plus"
-        style="float: right;"
+        prepend-icon="mdi-plus"
+        text="Crea nuovo trasportatore"
         variant="text"
+        :color="theme.current.value.primaryColor"
         @click="openForm"
       />
-    </h1><hr>
+    </PageHeader>
     <CarrierTable />
   </v-container>
   <v-dialog
@@ -20,12 +20,15 @@
 </template>
 
 <script setup>
+import PageHeader from '@/components/PageHeader';
 import CarrierForm from '@/components/administration/raeCarrier/CarrierForm';
 import CarrierTable from '@/components/administration/raeCarrier/CarrierTable';
 
+import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { useRaeCarrierStore } from '@/stores/raeCarrier';
 
+const theme = useTheme();
 const raeCarrierStore = useRaeCarrierStore();
 const { activeForm, element: raeCarrier } = storeToRefs(raeCarrierStore);
 

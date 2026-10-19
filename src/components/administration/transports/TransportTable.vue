@@ -1,57 +1,44 @@
 <template>
-  <v-skeleton-loader
-    v-if="!ready"
-    type="table"
-    :color="theme.current.value.secondaryColor"
-    class="mt-5"
-  />
-  <v-data-table
-    v-else
+  <SelectionTable
+    :ready="ready"
     :items="transports"
     :headers="[
       { title: 'ID', value: 'id', sortable: false },
       { title: 'Nome', value: 'name', sortable: false },
       { title: 'Targa', value: 'plate', sortable: false },
-      { title: 'Località', value: 'cap', sortable: false },
-      { title: 'Azioni', key: 'actions', sortable: false }
+      { title: 'Località', value: 'cap', sortable: false }
     ]"
   >
     <template #[`item.cap`]="{ item }">
       {{ addressUtils.getCityByCap(item.cap) }}
     </template>
-    <template #[`item.actions`]="{ item }">
-      <v-row no-gutters>
-        <v-col cols="6">
-          <v-btn
-            icon="mdi-pencil"
-            variant="text"
-            :color="theme.current.value.primaryColor"
-            @click="openForm(item)"
-          />
-        </v-col>
-        <v-col cols="6">
-          <v-btn
-            icon="mdi-delete"
-            variant="text"
-            :loading="deleteLoading[item.id]"
-            :color="theme.current.value.primaryColor"
-            @click="deleteItem(item)"
-          />
-        </v-col>
-      </v-row>
+    <template #actions="{ item }">
+      <v-btn
+        prepend-icon="mdi-pencil"
+        text="Modifica"
+        variant="text"
+        @click="openForm(item)"
+      />
+      <v-btn
+        prepend-icon="mdi-delete"
+        text="Elimina"
+        variant="text"
+        :loading="deleteLoading[item.id]"
+        @click="deleteItem(item)"
+      />
     </template>
-  </v-data-table>
+  </SelectionTable>
 </template>
 
 <script setup>
+import SelectionTable from '@/components/SelectionTable';
+
 import { reactive } from 'vue';
-import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import storesUtils from '@/utils/stores';
 import addressUtils from '@/utils/address';
 import { useTransportStore } from '@/stores/transport';
 
-const theme = useTheme();
 const deleteLoading = reactive({});
 
 const transportStore = useTransportStore();

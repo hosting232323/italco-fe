@@ -1,54 +1,41 @@
 <template>
-  <v-skeleton-loader
-    v-if="!ready"
-    type="table"
-    :color="theme.current.value.secondaryColor"
-    class="mt-5"
-  />
-  <v-data-table
-    v-else
+  <SelectionTable
+    :ready="ready"
     :items="customerGroups"
     :headers="[
       { title: 'Nome', value: 'name', sortable: false },
-      { title: 'Utenti', value: 'users', sortable: false },
-      { title: 'Azioni', key: 'actions', sortable: false }
+      { title: 'Utenti', value: 'users', sortable: false }
     ]"
   >
     <template #[`item.users`]="{ item }">
       {{ item.users.map(user => user.nickname).join(', ') }}
     </template>
-    <template #[`item.actions`]="{ item }">
-      <v-row no-gutters>
-        <v-col cols="6">
-          <v-btn
-            icon="mdi-account-group"
-            variant="text"
-            :color="theme.current.value.primaryColor"
-            @click="emits('openPopUp', item, 'customerGroup')"
-          />
-        </v-col>
-        <v-col cols="6">
-          <v-btn
-            icon="mdi-delete"
-            variant="text"
-            :loading="deleteLoading[item.id]"
-            :color="theme.current.value.primaryColor"
-            @click="deleteItem(item)"
-          />
-        </v-col>
-      </v-row>
+    <template #actions="{ item }">
+      <v-btn
+        prepend-icon="mdi-account-group"
+        text="Utenti"
+        variant="text"
+        @click="emits('openPopUp', item, 'customerGroup')"
+      />
+      <v-btn
+        prepend-icon="mdi-delete"
+        text="Elimina"
+        variant="text"
+        :loading="deleteLoading[item.id]"
+        @click="deleteItem(item)"
+      />
     </template>
-  </v-data-table>
+  </SelectionTable>
 </template>
 
 <script setup>
+import SelectionTable from '@/components/SelectionTable';
+
 import { reactive } from 'vue';
-import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import storesUtils from '@/utils/stores';
 import { useCustomerGroupStore } from '@/stores/customerGroup';
 
-const theme = useTheme();
 const deleteLoading = reactive({});
 const emits = defineEmits(['openPopUp']);
 

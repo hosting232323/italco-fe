@@ -1,44 +1,37 @@
 <template>
-  <v-data-table
+  <SelectionTable
     :items="service.users"
     :headers="[
       { title: 'Nickname', value: 'nickname', sortable: false },
       { title: 'Prezzo', value: 'price', sortable: false },
-      { title: 'Codice', value: 'code', sortable: false },
-      { title: 'Azioni', key: 'actions', sortable: false }
+      { title: 'Codice', value: 'code', sortable: false }
     ]"
   >
-    <template #[`item.actions`]="{ item }">
-      <v-row no-gutters>
-        <v-col cols="6">
-          <v-btn
-            icon="mdi-pencil"
-            variant="text"
-            :color="theme.current.value.primaryColor"
-            @click="openForm(item)"
-          />
-        </v-col>
-        <v-col cols="6">
-          <v-btn
-            icon="mdi-delete"
-            variant="text"
-            :loading="deleteLoading[item.id]"
-            :color="theme.current.value.primaryColor"
-            @click="deleteItem(item)"
-          />
-        </v-col>
-      </v-row>
+    <template #actions="{ item }">
+      <v-btn
+        prepend-icon="mdi-pencil"
+        text="Modifica"
+        variant="text"
+        @click="openForm(item)"
+      />
+      <v-btn
+        prepend-icon="mdi-delete"
+        text="Elimina"
+        variant="text"
+        :loading="deleteLoading[item.id]"
+        @click="deleteItem(item)"
+      />
     </template>
-  </v-data-table>
+  </SelectionTable>
 </template>
 
 <script setup>
+import SelectionTable from '@/components/SelectionTable';
+
 import { reactive } from 'vue';
-import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { useServiceStore } from '@/stores/service';
 
-const theme = useTheme();
 const deleteLoading = reactive({});
 
 const serviceStore = useServiceStore();

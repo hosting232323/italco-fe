@@ -1,14 +1,14 @@
 <template>
-  <v-container>
-    <h1>
-      Gestione Utenti
+  <v-container class="table-page">
+    <PageHeader title="Gestione Utenti">
       <v-btn
-        icon="mdi-plus"
-        style="float: right;"
+        prepend-icon="mdi-plus"
+        text="Crea nuovo utente"
         variant="text"
+        :color="theme.current.value.primaryColor"
         @click="openUserForm"
       />
-    </h1><hr>
+    </PageHeader>
     <UserTable />
   </v-container>
   <v-dialog
@@ -20,12 +20,15 @@
 </template>
 
 <script setup>
+import PageHeader from '@/components/PageHeader';
 import UserForm from '@/components/administration/users/UserForm';
 import UserTable from '@/components/administration/users/UserTable';
 
+import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
+const theme = useTheme();
 const administrationUserStore = useAdministrationUserStore();
 const { activeForm: userForm, element: user } = storeToRefs(administrationUserStore);
 

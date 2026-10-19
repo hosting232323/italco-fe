@@ -1,18 +1,11 @@
 <template>
-  <v-skeleton-loader
-    v-if="!ready"
-    type="table"
-    :color="theme.current.value.secondaryColor"
-    class="mt-5"
-  />
-  <v-data-table
-    v-else
+  <SelectionTable
+    :ready="ready"
     :items="geographicZones"
     :headers="[
       { title: 'Nome', value: 'name', sortable: false },
       { title: 'CAP aggiunti e rimossi', value: 'codes', sortable: false },
-      { title: 'Vincoli', value: 'constraints', sortable: false },
-      { title: 'Azioni', key: 'actions', sortable: false }
+      { title: 'Vincoli', value: 'constraints', sortable: false }
     ]"
   >
     <template #[`item.codes`]="{ item }">
@@ -42,47 +35,39 @@
         Nessun vincolo
       </div>
     </template>
-    <template #[`item.actions`]="{ item }">
-      <v-row no-gutters>
-        <v-col cols="4">
-          <v-btn
-            icon="mdi-map-marker-outline"
-            variant="text"
-            :color="theme.current.value.primaryColor"
-            @click="emits('openPopUp', item, 'geographicCode')"
-          />
-        </v-col>
-        <v-col cols="4">
-          <v-btn
-            icon="mdi-store-clock"
-            variant="text"
-            :color="theme.current.value.primaryColor"
-            @click="emits('openPopUp', item, 'constraint')"
-          />
-        </v-col>
-        <v-col cols="4">
-          <v-btn
-            icon="mdi-delete"
-            variant="text"
-            :loading="deleteLoading[item.id]"
-            :color="theme.current.value.primaryColor"
-            @click="deleteItem(item)"
-          />
-        </v-col>
-      </v-row>
+    <template #actions="{ item }">
+      <v-btn
+        prepend-icon="mdi-map-marker-outline"
+        text="CAP"
+        variant="text"
+        @click="emits('openPopUp', item, 'geographicCode')"
+      />
+      <v-btn
+        prepend-icon="mdi-store-clock"
+        text="Vincoli"
+        variant="text"
+        @click="emits('openPopUp', item, 'constraint')"
+      />
+      <v-btn
+        prepend-icon="mdi-delete"
+        text="Elimina"
+        variant="text"
+        :loading="deleteLoading[item.id]"
+        @click="deleteItem(item)"
+      />
     </template>
-  </v-data-table>
+  </SelectionTable>
 </template>
 
 <script setup>
+import SelectionTable from '@/components/SelectionTable';
+
 import { reactive } from 'vue';
 import days from '@/utils/days';
-import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import storesUtils from '@/utils/stores';
 import { useGeographicZoneStore } from '@/stores/geographicZone';
 
-const theme = useTheme();
 const deleteLoading = reactive({});
 const emits = defineEmits(['openPopUp']);
 

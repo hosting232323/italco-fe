@@ -1,21 +1,15 @@
 <template>
-  <v-skeleton-loader
-    v-if="!ready"
-    type="table"
-    :color="theme.current.value.secondaryColor"
-    class="mt-5"
-  />
-  <v-data-table
-    v-else
+  <SelectionTable
+    :ready="ready"
     :items="schedules"
     :headers="[
       { title: 'ID', value: 'id', sortable: false },
       { title: 'Data', value: 'date', sortable: false },
       { title: 'Utenti Delivery', value: 'users', sortable: false },
       { title: 'Veicolo', key: 'transport.name', sortable: false },
-      { title: 'Pianificazione', key: 'schedule_items', sortable: false },
-      { title: 'Azioni', key: 'actions', sortable: false }
+      { title: 'Pianificazione', key: 'schedule_items', sortable: false }
     ]"
+    fill
   >
     <template #[`item.schedule_items`]="{ item }">
       <div
@@ -45,44 +39,37 @@
       </div>
       <span v-else>-</span>
     </template>
-    <template #[`item.actions`]="{ item }">
-      <v-row no-gutters>
-        <v-col cols="4">
-          <v-btn
-            icon="mdi-pencil"
-            variant="text"
-            :loading="!!editLoading[item.id]"
-            :color="theme.current.value.primaryColor"
-            @click="editElement(item)"
-          />
-        </v-col>
-        <v-col cols="4">
-          <v-btn
-            icon="mdi-file-export"
-            variant="text"
-            :loading="!!exportLoading[item.id]"
-            :color="theme.current.value.primaryColor"
-            @click="exportElement(item)"
-          />
-        </v-col>
-        <v-col cols="4">
-          <v-btn
-            icon="mdi-delete"
-            variant="text"
-            :loading="!!deleteLoading[item.id]"
-            :color="theme.current.value.primaryColor"
-            @click="deleteItem(item)"
-          />
-        </v-col>
-      </v-row>
+    <template #actions="{ item }">
+      <v-btn
+        prepend-icon="mdi-pencil"
+        text="Modifica"
+        variant="text"
+        :loading="!!editLoading[item.id]"
+        @click="editElement(item)"
+      />
+      <v-btn
+        prepend-icon="mdi-file-export"
+        text="Esporta"
+        variant="text"
+        :loading="!!exportLoading[item.id]"
+        @click="exportElement(item)"
+      />
+      <v-btn
+        prepend-icon="mdi-delete"
+        text="Elimina"
+        variant="text"
+        :loading="!!deleteLoading[item.id]"
+        @click="deleteItem(item)"
+      />
     </template>
-  </v-data-table>
+  </SelectionTable>
 </template>
 
 <script setup>
+import SelectionTable from '@/components/SelectionTable';
+
 import { reactive } from 'vue';
 import http from '@/utils/http';
-import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import storesUtils from '@/utils/stores';
 import activityUtils from '@/utils/activity';
@@ -90,7 +77,6 @@ import { useOrderStore } from '@/stores/order';
 import { useScheduleStore } from '@/stores/schedule';
 import { useRaeProductStore } from '@/stores/raeProduct';
 
-const theme = useTheme();
 const editLoading = reactive({});
 const deleteLoading = reactive({});
 const exportLoading = reactive({});

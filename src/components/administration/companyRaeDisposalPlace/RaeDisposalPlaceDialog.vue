@@ -68,7 +68,8 @@
         </v-btn>
         <div class="text-right mb-2">
           <v-btn
-            icon="mdi-plus"
+            prepend-icon="mdi-plus"
+            text="Crea nuovo luogo"
             variant="text"
             :color="theme.current.value.primaryColor"
             @click="openForm"

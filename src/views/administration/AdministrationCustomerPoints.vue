@@ -5,41 +5,42 @@
   >
     <template #activator>
       <v-container>
-        <h1>
-          Gestione GDO
+        <PageHeader title="Gestione GDO">
           <v-btn
-            icon="mdi-plus"
-            style="float: right;"
+            prepend-icon="mdi-plus"
+            text="Crea nuovo GDO"
             variant="text"
+            :color="theme.current.value.primaryColor"
             @click="openCustomerGroupForm"
           />
-        </h1><hr>
+        </PageHeader>
         <CustomerGroupTable @open-pop-up="openPopUp" />
-        <h1>
-          Gestione Aree Geografiche
+        <PageHeader title="Gestione Aree Geografiche">
           <v-btn
-            icon="mdi-plus"
-            style="float: right;"
+            prepend-icon="mdi-plus"
+            text="Crea nuova area geografica"
             variant="text"
+            :color="theme.current.value.primaryColor"
             @click="openGeographicZoneForm"
           />
-        </h1><hr>
+        </PageHeader>
         Attenzione: Se non vengono configurate regole per una certa area geografica,
         i punti vendita non potranno effettuare ordini per i clienti di quella zona.
         <GeographicZoneTable @open-pop-up="openPopUp" />
-        <h1>
-          Gestione Regole Punti Vendita
+        <PageHeader title="Gestione Regole Punti Vendita">
           <v-btn
-            icon="mdi-plus"
-            style="float: right;"
+            prepend-icon="mdi-plus"
+            text="Crea nuova regola"
             variant="text"
+            :color="theme.current.value.primaryColor"
             @click="openCustomerRuleForm"
           />
-        </h1><hr>
+        </PageHeader>
         <CustomerRuleTable />
-        <h1 id="customer-user-form">
-          Dati Punti Vendita
-        </h1><hr>
+        <PageHeader
+          id="customer-user-form"
+          title="Dati Punti Vendita"
+        />
         <CustomerUserInfoTable @open-collection-points="openCollectionPoints" />
       </v-container>
     </template>
@@ -85,6 +86,7 @@
 </template>
 
 <script setup>
+import PageHeader from '@/components/PageHeader';
 import ConstraintPopUp from '@/components/administration/sellingPoints/ConstraintPopUp';
 import CustomerRuleForm from '@/components/administration/sellingPoints/CustomerRuleForm';
 import CustomerGroupForm from '@/components/administration/sellingPoints/CustomerGroupForm';
@@ -99,6 +101,7 @@ import CustomerUserInfoTable from '@/components/administration/sellingPoints/Cus
 import CustomerCollectionPointsPopUp from '@/components/administration/sellingPoints/CustomerCollectionPointsPopUp';
 
 import { ref } from 'vue';
+import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { useCustomerRuleStore } from '@/stores/customerRule';
 import { useCustomerGroupStore } from '@/stores/customerGroup';
@@ -106,6 +109,7 @@ import { useGeographicZoneStore } from '@/stores/geographicZone';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 import { useCollectionPointStore } from '@/stores/collectionPoint';
 
+const theme = useTheme();
 const popUp = ref(false);
 const collectionPointsPopUp = ref(false);
 const collectionPointsCustomer = ref(null);

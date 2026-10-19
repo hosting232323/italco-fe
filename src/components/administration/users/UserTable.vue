@@ -4,40 +4,34 @@
     max-width="1500"
   >
     <template #activator>
-      <v-skeleton-loader
-        v-if="!ready"
-        type="table"
-        :color="theme.current.value.secondaryColor"
-        class="mt-5"
-      />
-      <v-data-table
-        v-else
+      <SelectionTable
+        :ready="ready"
         :items="users"
         :headers="[
           { title: 'ID', value: 'id', sortable: false },
           { title: 'Nickname', value: 'nickname', sortable: false },
-          { title: 'Ruolo', value: 'role', sortable: false },
-          { title: 'Azioni', key: 'actions', sortable: false }
+          { title: 'Ruolo', value: 'role', sortable: false }
         ]"
+        fill
       >
-        <template #[`item.actions`]="{ item }">
+        <template #actions="{ item }">
           <template v-if="item.role !== 'Admin'">
             <v-btn
-              icon="mdi-lock-reset"
+              prepend-icon="mdi-lock-reset"
+              text="Reimposta password"
               variant="text"
-              :color="theme.current.value.primaryColor"
               @click="openResetDialog(item)"
             />
             <v-btn
-              icon="mdi-delete"
+              prepend-icon="mdi-delete"
+              text="Elimina"
               variant="text"
               :loading="deleteLoading[item.id]"
-              :color="theme.current.value.primaryColor"
               @click="deleteItem(item)"
             />
           </template>
         </template>
-      </v-data-table>
+      </SelectionTable>
     </template>
     <template #default>
       <v-card title="Attenzione!">
@@ -133,6 +127,8 @@
 </template>
 
 <script setup>
+import SelectionTable from '@/components/SelectionTable';
+
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { ref, reactive  } from 'vue';

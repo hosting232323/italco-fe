@@ -1,18 +1,19 @@
 <template>
   <v-container>
-    <h1>
-      Veicoli
+    <PageHeader title="Veicoli">
       <v-btn
-        icon="mdi-plus"
-        style="float: right;"
+        prepend-icon="mdi-plus"
+        text="Crea nuovo veicolo"
         variant="text"
+        :color="theme.current.value.primaryColor"
         @click="openTransportForm"
       />
-    </h1><hr>
+    </PageHeader>
     <TransportTable />
-    <h1 id="delivery-form">
-      Utenti Delivery
-    </h1><hr>
+    <PageHeader
+      id="delivery-form"
+      title="Utenti Delivery"
+    />
     <DeliveryUserInfoTable />
   </v-container>
   <v-dialog
@@ -30,15 +31,18 @@
 </template>
 
 <script setup>
+import PageHeader from '@/components/PageHeader';
 import TransportForm from '@/components/administration/transports/TransportForm';
 import TransportTable from '@/components/administration/transports/TransportTable';
 import DeliveryUserInfoForm from '@/components/administration/transports/DeliveryUserInfoForm';
 import DeliveryUserInfoTable from '@/components/administration/transports/DeliveryUserInfoTable';
 
+import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { useTransportStore } from '@/stores/transport';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
+const theme = useTheme();
 const transportStore = useTransportStore();
 const administrationUserStore = useAdministrationUserStore();
 const { activeForm: activeTransportForm, element: transport } = storeToRefs(transportStore);

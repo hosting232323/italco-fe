@@ -4,8 +4,8 @@
     max-width="1500"
   >
     <template #activator>
-      <v-container>
-        <h1>Smaltimento</h1><hr>
+      <v-container class="table-page">
+        <PageHeader title="Smaltimento" />
         <DisposalTable @open-dialog="dialog = true" />
       </v-container>
     </template>
@@ -16,6 +16,7 @@
 </template>
 
 <script setup>
+import PageHeader from '@/components/PageHeader';
 import DisposalTable from '@/components/operator/raeDisposal/DisposalTable';
 import DisposalPopUp from '@/components/operator/raeDisposal/DisposalPopUp';
 

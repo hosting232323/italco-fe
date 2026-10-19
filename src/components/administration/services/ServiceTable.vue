@@ -1,12 +1,6 @@
 <template>
-  <v-skeleton-loader
-    v-if="!ready"
-    type="table"
-    :color="theme.current.value.secondaryColor"
-    class="mt-5"
-  />
-  <v-data-table
-    v-else
+  <SelectionTable
+    :ready="ready"
     :items="services"
     :headers="[
       { title: 'ID', value: 'id', sortable: false },
@@ -15,9 +9,9 @@
       { title: 'Descrizione', value: 'description', sortable: false },
       { title: 'Durata', value: 'duration', sortable: false },
       { title: 'Professionale', value: 'professional', sortable: false },
-      { title: 'Max Giornaieri', value: 'max_services', sortable: false },
-      { title: 'Azioni', key: 'actions', sortable: false }
+      { title: 'Max Giornaieri', value: 'max_services', sortable: false }
     ]"
+    fill
   >
     <template #[`item.type`]="{ item }">
       {{ orderUtils.TYPES.find(type => type.value == item.type)?.title }}
@@ -28,42 +22,35 @@
     <template #[`item.professional`]="{ item }">
       {{ item.professional ? 'Si' : 'No' }}
     </template>
-    <template #[`item.actions`]="{ item }">
-      <v-row no-gutters>
-        <v-col cols="4">
-          <v-btn
-            icon="mdi-pencil"
-            variant="text"
-            :color="theme.current.value.primaryColor"
-            @click="openForm(item)"
-          />
-        </v-col>
-        <v-col cols="4">
-          <v-btn
-            icon="mdi-label"
-            variant="text"
-            :color="theme.current.value.primaryColor"
-            v-bind="activatorProps"
-            @click="service = item"
-          />
-        </v-col>
-        <v-col cols="4">
-          <v-btn
-            icon="mdi-delete"
-            variant="text"
-            :loading="deleteLoading[item.id]"
-            :color="theme.current.value.primaryColor"
-            @click="deleteItem(item)"
-          />
-        </v-col>
-      </v-row>
+    <template #actions="{ item }">
+      <v-btn
+        prepend-icon="mdi-pencil"
+        text="Modifica"
+        variant="text"
+        @click="openForm(item)"
+      />
+      <v-btn
+        prepend-icon="mdi-label"
+        text="Utenti associati"
+        variant="text"
+        v-bind="activatorProps"
+        @click="service = item"
+      />
+      <v-btn
+        prepend-icon="mdi-delete"
+        text="Elimina"
+        variant="text"
+        :loading="deleteLoading[item.id]"
+        @click="deleteItem(item)"
+      />
     </template>
-  </v-data-table>
+  </SelectionTable>
 </template>
 
 <script setup>
+import SelectionTable from '@/components/SelectionTable';
+
 import { reactive } from 'vue';
-import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import orderUtils from '@/utils/order';
 import storesUtils from '@/utils/stores';
@@ -76,7 +63,6 @@ const { activatorProps } = defineProps({
   }
 });
 
-const theme = useTheme();
 const deleteLoading = reactive({});
 
 const serviceStore = useServiceStore();

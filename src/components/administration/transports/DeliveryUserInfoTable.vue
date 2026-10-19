@@ -1,42 +1,35 @@
 <template>
-  <v-skeleton-loader
-    v-if="!ready"
-    type="table"
-    :color="theme.current.value.secondaryColor"
-    class="mt-5"
-  />
-  <v-data-table
-    v-else
+  <SelectionTable
+    :ready="ready"
     :items="users.filter(user => user.role == 'Delivery')"
     :headers="[
       { title: 'ID', value: 'id', sortable: false },
       { title: 'Nickname', value: 'nickname', sortable: false },
-      { title: 'Località', value: 'cap', sortable: false },
-      { title: 'Azioni', key: 'actions', sortable: false }
+      { title: 'Località', value: 'cap', sortable: false }
     ]"
   >
     <template #[`item.cap`]="{ item }">
       {{ item.delivery_user_info ? addressUtils.getCityByCap(item.delivery_user_info.cap) : '' }}
     </template>
-    <template #[`item.actions`]="{ item }">
+    <template #actions="{ item }">
       <v-btn
-        icon="mdi-pencil"
+        prepend-icon="mdi-pencil"
+        text="Modifica"
         variant="text"
-        :color="theme.current.value.primaryColor"
         @click="openForm(item)"
       />
     </template>
-  </v-data-table>
+  </SelectionTable>
 </template>
 
 <script setup>
-import { useTheme } from 'vuetify';
+import SelectionTable from '@/components/SelectionTable';
+
 import { storeToRefs } from 'pinia';
 import storesUtils from '@/utils/stores';
 import addressUtils from '@/utils/address';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 
-const theme = useTheme();
 
 const administrationUserStore = useAdministrationUserStore();
 const { element: user, activeForm, ready } = storeToRefs(administrationUserStore);
