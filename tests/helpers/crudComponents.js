@@ -1,7 +1,7 @@
 import { flushPromises } from '@vue/test-utils';
 import { expect, it, vi } from 'vitest';
 
-import { createTestPinia, mountComponent } from './mount';
+import { createTestPinia, mountComponent, selectRow } from './mount';
 import { useUserStore } from '@/stores/user';
 
 
@@ -51,7 +51,8 @@ export const describeCrudTable = ({ component, useStore, items, ready = true }) 
     const { pinia, store } = setup(useStore);
     const wrapper = mountTable(store, pinia);
 
-    await rowsOf(wrapper)[0].find('.mdi-pencil').trigger('click');
+    await selectRow(wrapper);
+    await wrapper.find('.mdi-pencil').trigger('click');
 
     expect(store.element).toEqual(items[0]);
     expect(store.activeForm).toBe(true);
@@ -63,7 +64,8 @@ export const describeCrudTable = ({ component, useStore, items, ready = true }) 
     const initList = vi.spyOn(store, 'initList').mockImplementation(() => {});
     const wrapper = mountTable(store, pinia);
 
-    await rowsOf(wrapper)[0].find('.mdi-delete').trigger('click');
+    await selectRow(wrapper);
+    await wrapper.find('.mdi-delete').trigger('click');
 
     expect(deleteElement).toHaveBeenCalledWith(items[0], expect.any(Function));
 

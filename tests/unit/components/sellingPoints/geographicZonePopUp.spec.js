@@ -6,7 +6,7 @@ import GeographicCodePopUpForm from '@/components/administration/sellingPoints/G
 import GeographicCodePopUpTable from '@/components/administration/sellingPoints/GeographicCodePopUpTable.vue';
 import { useGeographicZoneStore } from '@/stores/geographicZone';
 
-import { createTestPinia, mountComponent } from '../../../helpers/mount';
+import { createTestPinia, mountComponent, selectRow } from '../../../helpers/mount';
 
 
 vi.mock('@/utils/http', () => ({
@@ -174,7 +174,8 @@ describe('GeographicCodePopUpTable', () => {
     const initList = vi.spyOn(store, 'initList').mockImplementation(() => {});
     const wrapper = mountComponent(GeographicCodePopUpTable, { pinia });
 
-    await wrapper.findAll('tbody tr')[0].find('.mdi-delete').trigger('click');
+    await selectRow(wrapper);
+    await wrapper.find('.mdi-delete').trigger('click');
 
     expect(deleteEntity).toHaveBeenCalledWith(
       { id: 1, code: '70020', type: true },

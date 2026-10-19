@@ -46,3 +46,14 @@ export const mountInApp = (component, { props, ...options } = {}) => mountCompon
   { render: () => h(VApp, () => [h(component, props)]) },
   options
 ).findComponent(component);
+
+
+/**
+ * Le azioni di una tabella stanno nella barra della riga selezionata (vedi
+ * SelectionTable): per raggiungere i pulsanti prima si seleziona la riga.
+ */
+export const selectRow = async (wrapper, index = 0) => {
+  const checkbox = wrapper.findAll('tbody tr')[index].find('input[type="checkbox"]');
+  if (checkbox.element.checked) return;
+  await checkbox.trigger('click');
+};
