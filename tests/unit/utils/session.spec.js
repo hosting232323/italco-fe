@@ -342,6 +342,25 @@ describe('session', () => {
       expect(userStore.token).toBe('');
     });
 
+    it('non resta appeso se il backend non risponde: abortisce dopo il tetto', async () => {
+      vi.useFakeTimers();
+      try {
+        const userStore = useUserStore();
+        userStore.$patch({ role: 'Customer', userId: 7, token: '' });
+        vi.spyOn(globalThis, 'fetch').mockImplementation((_url, { signal }) => new Promise((_resolve, reject) => {
+          signal.addEventListener('abort', () => reject(new Error('abort')));
+        }));
+
+        const restoring = session.restoreAccessToken();
+        await vi.advanceTimersByTimeAsync(5000);
+        await restoring;
+
+        expect(userStore.token).toBe('');
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
     it('non adotta il token di un altro utente: riallinea la scheda', async () => {
       const userStore = useUserStore();
       userStore.$patch({ role: 'Customer', userId: 7, token: '' });

@@ -128,16 +128,24 @@ const watchOtherTabs = (target = window) => {
 // rinnovo. Rinnovandolo prima del mount le richieste partono una volta sola.
 // Se il rinnovo non riesce non si fa nulla: ci pensa il client alla prima
 // richiesta, come prima.
+const RESTORE_TIMEOUT_MS = 5000;
+
 const restoreAccessToken = async () => {
   const userStore = useUserStore();
   if (!hasUser(userStore.userId) || userStore.token)
     return;
 
+  // L'app non si monta finche' questa funzione non ritorna: senza un tetto, con
+  // l'API lenta o giu' chi ha una sessione salvata (anche sulla landing
+  // pubblica) vedrebbe una pagina bianca fino al timeout del browser.
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), RESTORE_TIMEOUT_MS);
   try {
     const response = await fetch(`${import.meta.env.VITE_HOSTNAME}user/refresh`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      credentials: 'include'
+      credentials: 'include',
+      signal: controller.signal
     });
     const data = response.ok ? await response.json() : null;
     if (data?.status !== 'ok' || !data.access_token)
@@ -147,7 +155,9 @@ const restoreAccessToken = async () => {
     else
       userStore.token = data.access_token;
   } catch {
-    // Rete assente: la prima richiesta ritentera' il rinnovo da sola.
+    // Rete assente o troppo lenta: la prima richiesta ritentera' il rinnovo da sola.
+  } finally {
+    clearTimeout(timer);
   }
 };
 
