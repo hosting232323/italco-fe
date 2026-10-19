@@ -6,7 +6,7 @@ import ConstraintPopUpForm from '@/components/administration/sellingPoints/Const
 import ConstraintPopUpTable from '@/components/administration/sellingPoints/ConstraintPopUpTable.vue';
 import { useGeographicZoneStore } from '@/stores/geographicZone';
 
-import { createTestPinia, mountComponent } from '../../../helpers/mount';
+import { createTestPinia, mountComponent, selectRow } from '../../../helpers/mount';
 
 
 vi.mock('@/utils/http', () => ({
@@ -140,7 +140,8 @@ describe('ConstraintPopUpTable', () => {
     const initList = vi.spyOn(store, 'initList').mockImplementation(() => {});
     const wrapper = mountComponent(ConstraintPopUpTable, { pinia });
 
-    await wrapper.findAll('tbody tr')[0].find('.mdi-delete').trigger('click');
+    await selectRow(wrapper);
+    await wrapper.find('.mdi-delete').trigger('click');
 
     expect(deleteEntity).toHaveBeenCalledWith(
       { id: 1, day_of_week: 0, max_orders: 5 },

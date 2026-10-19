@@ -4,22 +4,17 @@
     max-width="1500"
   >
     <template #activator>
-      <v-container>
-        <v-row
-          no-gutters
-          align="center"
-          justify="space-between"
-        >
-          <h1>Ritiri Raee</h1>
+      <v-container class="table-page">
+        <PageHeader title="Ritiri Raee">
           <v-btn
             title="Schedario Ritiri Raee"
-            icon="mdi-store-outline"
+            prepend-icon="mdi-store-outline"
+            text="Schedario ritiri RAEE"
             variant="text"
             :color="theme.current.value.primaryColor"
             @click="cardIndexDialog = true"
           />
-        </v-row>
-        <hr>
+        </PageHeader>
         <RaeProductFilters />
         <RaeProductTable @open-dialog="dialog = true" />
       </v-container>
@@ -37,6 +32,7 @@
 </template>
 
 <script setup>
+import PageHeader from '@/components/PageHeader';
 import RaeProductTable from '@/components/operator/raeProducts/RaeProductTable';
 import RaeProductPopUp from '@/components/operator/raeProducts/RaeProductPopUp';
 import RaeProductFilters from '@/components/operator/raeProducts/RaeProductFilters';

@@ -10,7 +10,7 @@ import { useAdministrationUserStore } from '@/stores/administrationUser';
 import { useCustomerGroupStore } from '@/stores/customerGroup';
 import { useCustomerRuleStore } from '@/stores/customerRule';
 
-import { createTestPinia, mountComponent } from '../../../helpers/mount';
+import { createTestPinia, mountComponent, selectRow } from '../../../helpers/mount';
 
 
 vi.mock('@/utils/http', () => ({
@@ -134,7 +134,8 @@ describe('CustomerGroupPopUpTable', () => {
     const initList = vi.spyOn(store, 'initList').mockImplementation(() => {});
     const wrapper = mountComponent(CustomerGroupPopUpTable, { pinia });
 
-    await wrapper.findAll('tbody tr')[0].find('.mdi-delete').trigger('click');
+    await selectRow(wrapper);
+    await wrapper.find('.mdi-delete').trigger('click');
 
     expect(assignUser).toHaveBeenCalledWith(7, expect.any(Function), true);
 
@@ -226,6 +227,7 @@ describe('CustomerRuleTable', () => {
     const initList = vi.spyOn(store, 'initList').mockImplementation(() => {});
     const wrapper = mountComponent(CustomerRuleTable, { pinia });
 
+    await selectRow(wrapper);
     await wrapper.find('.mdi-delete').trigger('click');
 
     expect(deleteElements).toHaveBeenCalledWith([10, 11], expect.any(Function));

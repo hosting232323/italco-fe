@@ -5,17 +5,17 @@
   >
     <template #activator>
       <v-container class="orders-page">
-        <h1>
-          Ordini
+        <PageHeader title="Ordini">
+          <PdfImportation v-if="role == 'Admin'" />
+          <ExcelImportation v-if="role == 'Admin'" />
           <v-btn
-            icon="mdi-plus"
-            style="float: right;"
+            prepend-icon="mdi-plus"
+            text="Crea nuovo ordine"
             variant="text"
+            :color="theme.current.value.primaryColor"
             @click="openForm"
           />
-          <ExcelImportation v-if="role == 'Admin'" />
-          <PdfImportation v-if="role == 'Admin'" />
-        </h1><hr>
+        </PageHeader>
         <OrdersFilters />
         <OrderTable />
       </v-container>
@@ -27,16 +27,19 @@
 </template>
 
 <script setup>
+import PageHeader from '@/components/PageHeader';
 import OrderTable from '@/components/orders/OrderTable';
 import OrderForm from '@/components/orders/OrderFormCard';
 import OrdersFilters from '@/components/orders/OrderFilters';
 import PdfImportation from '@/components/administration/importation/PdfImportation';
 import ExcelImportation from '@/components/administration/importation/ExcelImportation';
 
+import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
 
+const theme = useTheme();
 const userStore = useUserStore();
 const orderStore = useOrderStore();
 // effectiveRole: il super admin in una company vede l'import Excel/PDF come un admin.

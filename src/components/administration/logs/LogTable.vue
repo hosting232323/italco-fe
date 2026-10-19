@@ -1,43 +1,38 @@
 <template>
-  <v-skeleton-loader
-    v-if="!ready"
-    type="table"
-    :color="theme.current.value.secondaryColor"
-    class="mt-5"
-  />
-  <v-data-table
-    v-else
+  <SelectionTable
+    :ready="ready"
     :items="logs"
     :headers="[
       { title: 'Data', value: 'logs.created_at', sortable: false },
       { title: 'Metodo', value: 'logs.method', sortable: false },
       { title: 'Endpoint', value: 'logs.endpoint', sortable: false },
-      { title: 'User', value: 'user.nickname', sortable: false },
-      { title: 'Azioni', key: 'actions', sortable: false }
+      { title: 'User', value: 'user.nickname', sortable: false }
     ]"
+    item-value="logs.id"
+    fill
   >
     <template #[`item.logs.created_at`]="{ item }">
       {{ days.formatDateTime(item.logs.created_at) }}
     </template>
-    <template #[`item.actions`]="{ item }">
+    <template #actions="{ item }">
       <v-btn
-        icon="mdi-magnify-plus-outline"
+        prepend-icon="mdi-magnify-plus-outline"
+        text="Dettaglio"
         variant="text"
-        :color="theme.current.value.primaryColor"
         @click="openForm(item.logs)"
       />
     </template>
-  </v-data-table>
+  </SelectionTable>
 </template>
 
 <script setup>
+import SelectionTable from '@/components/SelectionTable';
+
 import days from '@/utils/days';
-import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import storesUtils from '@/utils/stores';
 import { useLogStore } from '@/stores/log';
 
-const theme = useTheme();
 const logStore = useLogStore();
 const { ready, activePopUp, selectedLog } = storeToRefs(logStore);
 const logs = storesUtils.getStoreList(logStore);

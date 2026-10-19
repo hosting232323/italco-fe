@@ -1,16 +1,16 @@
 <template>
   <v-dialog max-width="1500">
     <template #activator="{ props: activatorProps }">
-      <v-container>
-        <h1>
-          Gestione Servizi
+      <v-container class="table-page">
+        <PageHeader title="Gestione Servizi">
           <v-btn
-            icon="mdi-plus"
-            style="float: right;"
+            prepend-icon="mdi-plus"
+            text="Crea nuovo servizio"
             variant="text"
+            :color="theme.current.value.primaryColor"
             @click="openForm"
           />
-        </h1><hr>
+        </PageHeader>
         <ServiceTable :activator-props="activatorProps" />
       </v-container>
     </template>
@@ -27,13 +27,16 @@
 </template>
 
 <script setup>
+import PageHeader from '@/components/PageHeader';
 import ServiceForm from '@/components/administration/services/ServiceForm';
 import ServicePopUp from '@/components/administration/services/ServicePopUp';
 import ServiceTable from '@/components/administration/services/ServiceTable';
 
+import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { useServiceStore } from '@/stores/service';
 
+const theme = useTheme();
 const serviceStore = useServiceStore();
 const { activeForm, element: service } = storeToRefs(serviceStore);
 

@@ -5,7 +5,7 @@ import GeographicZoneTable from '@/components/administration/sellingPoints/Geogr
 import { useCustomerGroupStore } from '@/stores/customerGroup';
 import { useGeographicZoneStore } from '@/stores/geographicZone';
 
-import { createTestPinia, mountComponent } from '../../../helpers/mount';
+import { createTestPinia, mountComponent, selectRow } from '../../../helpers/mount';
 
 
 vi.mock('@/utils/http', () => ({
@@ -51,7 +51,8 @@ describe('CustomerGroupTable', () => {
   it('chiede di aprire il popup del gruppo', async () => {
     const wrapper = mountTable(CustomerGroupTable, useCustomerGroupStore(), gruppi);
 
-    await rows(wrapper)[0].find('.mdi-account-group').trigger('click');
+    await selectRow(wrapper);
+    await wrapper.find('.mdi-account-group').trigger('click');
 
     expect(wrapper.emitted('openPopUp')[0]).toEqual([gruppi[0], 'customerGroup']);
   });
@@ -62,7 +63,8 @@ describe('CustomerGroupTable', () => {
     const initList = vi.spyOn(store, 'initList').mockImplementation(() => {});
     const wrapper = mountTable(CustomerGroupTable, store, gruppi);
 
-    await rows(wrapper)[0].find('.mdi-delete').trigger('click');
+    await selectRow(wrapper);
+    await wrapper.find('.mdi-delete').trigger('click');
     deleteElement.mock.calls.at(-1)[1]();
 
     expect(deleteElement.mock.calls.at(-1)[0]).toEqual(gruppi[0]);
@@ -108,8 +110,10 @@ describe('GeographicZoneTable', () => {
   it('chiede di aprire i due popup della zona', async () => {
     const wrapper = mountTable(GeographicZoneTable, useGeographicZoneStore(), zone);
 
-    await rows(wrapper)[0].find('.mdi-map-marker-outline').trigger('click');
-    await rows(wrapper)[0].find('.mdi-store-clock').trigger('click');
+    await selectRow(wrapper);
+    await wrapper.find('.mdi-map-marker-outline').trigger('click');
+    await selectRow(wrapper);
+    await wrapper.find('.mdi-store-clock').trigger('click');
 
     expect(wrapper.emitted('openPopUp')[0]).toEqual([zone[0], 'geographicCode']);
     expect(wrapper.emitted('openPopUp')[1]).toEqual([zone[0], 'constraint']);
@@ -121,7 +125,8 @@ describe('GeographicZoneTable', () => {
     const initList = vi.spyOn(store, 'initList').mockImplementation(() => {});
     const wrapper = mountTable(GeographicZoneTable, store, zone);
 
-    await rows(wrapper)[0].find('.mdi-delete').trigger('click');
+    await selectRow(wrapper);
+    await wrapper.find('.mdi-delete').trigger('click');
     deleteElement.mock.calls.at(-1)[1]();
 
     expect(initList).toHaveBeenCalled();

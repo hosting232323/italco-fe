@@ -1,6 +1,6 @@
 <template>
-  <v-container>
-    <h1>Borderò</h1><hr>
+  <v-container class="table-page">
+    <PageHeader title="Borderò" />
     <ScheduleFilters />
     <ScheduleTable @open-dialog="dialog = true" />
   </v-container>
@@ -13,6 +13,7 @@
 </template>
 
 <script setup>
+import PageHeader from '@/components/PageHeader';
 import ScheduleForm from '@/components/operator/schedules/ScheduleForm';
 import ScheduleTable from '@/components/operator/schedules/ScheduleTable';
 import ScheduleFilters from '@/components/operator/schedules/ScheduleFilters';

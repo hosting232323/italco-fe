@@ -1,14 +1,14 @@
 <template>
-  <v-container>
-    <h1>
-      Raggruppamenti
+  <v-container class="table-page">
+    <PageHeader title="Raggruppamenti">
       <v-btn
-        icon="mdi-plus"
-        style="float: right;"
+        prepend-icon="mdi-plus"
+        text="Crea nuovo raggruppamento"
         variant="text"
+        :color="theme.current.value.primaryColor"
         @click="openForm"
       />
-    </h1><hr>
+    </PageHeader>
     <RaeProductGroupTable />
   </v-container>
   <v-dialog
@@ -20,12 +20,15 @@
 </template>
 
 <script setup>
+import PageHeader from '@/components/PageHeader';
 import RaeProductGroupForm from '@/components/administration/raeProductGroups/RaeProductGroupForm';
 import RaeProductGroupTable from '@/components/administration/raeProductGroups/RaeProductGroupTable';
 
+import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { useRaeProductGroupStore } from '@/stores/raeProductGroup';
 
+const theme = useTheme();
 const raeProductGroupStore = useRaeProductGroupStore();
 const { activeForm, element: raeProductGroup } = storeToRefs(raeProductGroupStore);
 

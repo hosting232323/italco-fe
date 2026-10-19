@@ -8,7 +8,7 @@ import LogTable from '@/components/administration/logs/LogTable.vue';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 import { useLogStore } from '@/stores/log';
 
-import { createTestPinia, mountComponent } from '../../../helpers/mount';
+import { createTestPinia, mountComponent, selectRow } from '../../../helpers/mount';
 
 
 vi.mock('@/utils/http', () => ({
@@ -60,6 +60,7 @@ describe('LogTable', () => {
   it('la lente apre il dettaglio del log', async () => {
     const wrapper = mountTable();
 
+    await selectRow(wrapper);
     await wrapper.find('.mdi-magnify-plus-outline').trigger('click');
 
     expect(store.selectedLog).toBe(1);

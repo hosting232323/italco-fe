@@ -1,30 +1,29 @@
 <template>
-  <v-data-table
+  <SelectionTable
     :items="customerGroup.users"
     :headers="[
-      { title: 'Nickname', value: 'nickname', sortable: false },
-      { title: 'Azioni', key: 'actions', sortable: false }
+      { title: 'Nickname', value: 'nickname', sortable: false }
     ]"
   >
-    <template #[`item.actions`]="{ item }">
+    <template #actions="{ item }">
       <v-btn
-        icon="mdi-delete"
+        prepend-icon="mdi-delete"
+        text="Elimina"
         variant="text"
         :loading="deleteLoading[item.id]"
-        :color="theme.current.value.primaryColor"
         @click="deleteItem(item)"
       />
     </template>
-  </v-data-table>
+  </SelectionTable>
 </template>
 
 <script setup>
+import SelectionTable from '@/components/SelectionTable';
+
 import { reactive } from 'vue';
-import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { useCustomerGroupStore } from '@/stores/customerGroup';
 
-const theme = useTheme();
 const deleteLoading = reactive({});
 
 const customerGroupStore = useCustomerGroupStore();

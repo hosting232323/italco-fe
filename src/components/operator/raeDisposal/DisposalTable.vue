@@ -1,12 +1,6 @@
 <template>
-  <v-skeleton-loader
-    v-if="!ready"
-    type="table"
-    :color="theme.current.value.secondaryColor"
-    class="mt-5"
-  />
-  <v-data-table
-    v-else
+  <SelectionTable
+    :ready="ready"
     :items="raeDisposals"
     :headers="[
       { title: 'ID', value: 'id', sortable: false },
@@ -16,83 +10,69 @@
       { title: 'Raggruppamenti', key: 'group_quantities', sortable: false },
       { title: 'Trasportatore', value: 'carrier.company_name', sortable: false },
       { title: 'Centro di raccolta', value: 'collection_center.company_name', sortable: false },
-      { title: 'Luogo di smaltimento', value: 'rae_disposal_place.name', sortable: false },
-      { title: 'Azioni', key: 'actions', sortable: false }
+      { title: 'Luogo di smaltimento', value: 'rae_disposal_place.name', sortable: false }
     ]"
+    fill
   >
     <template #[`item.group_quantities`]="{ item }">
       {{ formatGroupQuantities(item.group_quantities) }}
     </template>
-    <template #[`item.actions`]="{ item }">
-      <v-row no-gutters>
-        <v-col cols="4">
-          <v-btn
-            title="Modifica smaltimento"
-            icon="mdi-pencil"
-            variant="text"
-            :color="theme.current.value.primaryColor"
-            @click="editElement(item)"
-          />
-        </v-col>
-        <v-col cols="4">
-          <v-btn
-            title="FIR Prima Copia"
-            icon="mdi-file-pdf-box"
-            variant="text"
-            :color="theme.current.value.primaryColor"
-            :href="http.withSessionToken(item.first_copy_document_fir)"
-            :disabled="!item.first_copy_document_fir"
-            target="_blank"
-          />
-        </v-col>
-        <v-col cols="4">
-          <v-btn
-            title="FIR Quarta Copia"
-            icon="mdi-file-pdf-box"
-            variant="text"
-            :color="theme.current.value.primaryColor"
-            :href="http.withSessionToken(item.fourth_copy_document_fir)"
-            :disabled="!item.fourth_copy_document_fir"
-            target="_blank"
-          />
-        </v-col>
-      </v-row>
-      <v-row no-gutters>
-        <v-col cols="4">
-          <v-btn
-            title="Allegato 1"
-            icon="mdi-clipboard-list-outline"
-            variant="text"
-            :color="theme.current.value.primaryColor"
-            :loading="exportingAttachment1[item.id]"
-            @click="exportAllegato(item, 1)"
-          />
-        </v-col>
-        <v-col cols="4">
-          <v-btn
-            title="Allegato 2"
-            icon="mdi-chart-bar"
-            variant="text"
-            :color="theme.current.value.primaryColor"
-            :loading="exportingAttachment2[item.id]"
-            @click="exportAllegato(item, 2)"
-          />
-        </v-col>
-      </v-row>
+    <template #actions="{ item }">
+      <v-btn
+        title="Modifica smaltimento"
+        prepend-icon="mdi-pencil"
+        text="Modifica"
+        variant="text"
+        @click="editElement(item)"
+      />
+      <v-btn
+        title="FIR Prima Copia"
+        prepend-icon="mdi-file-pdf-box"
+        text="FIR prima copia"
+        variant="text"
+        :href="http.withSessionToken(item.first_copy_document_fir)"
+        :disabled="!item.first_copy_document_fir"
+        target="_blank"
+      />
+      <v-btn
+        title="FIR Quarta Copia"
+        prepend-icon="mdi-file-pdf-box"
+        text="FIR quarta copia"
+        variant="text"
+        :href="http.withSessionToken(item.fourth_copy_document_fir)"
+        :disabled="!item.fourth_copy_document_fir"
+        target="_blank"
+      />
+      <v-btn
+        title="Allegato 1"
+        prepend-icon="mdi-clipboard-list-outline"
+        text="Allegato 1"
+        variant="text"
+        :loading="exportingAttachment1[item.id]"
+        @click="exportAllegato(item, 1)"
+      />
+      <v-btn
+        title="Allegato 2"
+        prepend-icon="mdi-chart-bar"
+        text="Allegato 2"
+        variant="text"
+        :loading="exportingAttachment2[item.id]"
+        @click="exportAllegato(item, 2)"
+      />
     </template>
-  </v-data-table>
+  </SelectionTable>
 </template>
 
 <script setup>
+import SelectionTable from '@/components/SelectionTable';
+
 import http from '@/utils/http';
 
 import { reactive } from 'vue';
-import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import storesUtils from '@/utils/stores';
 import { useRaeDisposalStore } from '@/stores/raeDisposal';
 
-const theme = useTheme();
 const emits = defineEmits(['open-dialog']);
 
 const raeDisposalStore = useRaeDisposalStore();

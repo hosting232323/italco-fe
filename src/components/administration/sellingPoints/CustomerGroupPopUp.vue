@@ -5,7 +5,8 @@
   >
     <template #append>
       <v-btn
-        icon="mdi-plus"
+        prepend-icon="mdi-plus"
+        text="Associa utente"
         variant="text"
         @click="formFlag = true"
       />

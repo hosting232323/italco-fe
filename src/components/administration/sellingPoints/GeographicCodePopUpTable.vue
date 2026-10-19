@@ -1,34 +1,33 @@
 <template>
-  <v-data-table
+  <SelectionTable
     :items="geographicZone.codes"
     :headers="[
       { title: 'CAP', value: 'code', sortable: false },
-      { title: 'Tipo', value: 'type', sortable: false },
-      { title: 'Azioni', key: 'actions', sortable: false }
+      { title: 'Tipo', value: 'type', sortable: false }
     ]"
   >
     <template #[`item.type`]="{ item }">
       {{ item.type ? 'Aggiunto' : 'Rimosso' }}
     </template>
-    <template #[`item.actions`]="{ item }">
+    <template #actions="{ item }">
       <v-btn
-        icon="mdi-delete"
+        prepend-icon="mdi-delete"
+        text="Elimina"
         variant="text"
         :loading="deleteLoading[item.id]"
-        :color="theme.current.value.primaryColor"
         @click="deleteItem(item)"
       />
     </template>
-  </v-data-table>
+  </SelectionTable>
 </template>
 
 <script setup>
+import SelectionTable from '@/components/SelectionTable';
+
 import { reactive } from 'vue';
-import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { useGeographicZoneStore } from '@/stores/geographicZone';
 
-const theme = useTheme();
 const deleteLoading = reactive({});
 
 const geographicZoneStore = useGeographicZoneStore();
