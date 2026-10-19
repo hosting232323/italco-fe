@@ -3,6 +3,8 @@
   interruptible: false
   tags:
     - "${SERVER_NAME}-deploy"
+  variables:
+    DOCKER_CONFIG: "$CI_PROJECT_DIR/.docker-$CI_JOB_ID"
   script:
     - |
       set -eu
@@ -13,17 +15,38 @@
         FIRST_PORT="${PORT_TEST%%-*}"
         SECOND_PORT="${PORT_TEST#*-}"
         IMAGE_TAG="test-$CI_COMMIT_SHA"
+        IMAGE_REF="test-$CI_COMMIT_REF_SLUG"
+        IMAGE_MAIN="test-main"
+        BUILD_VITE_GOOGLE_API_KEY="$VITE_GOOGLE_API_KEY_TEST"
+        BUILD_VITE_HOSTNAME="$VITE_HOSTNAME_TEST"
       else
         CONTAINER_ACTIVE="${PROJECT_NAME}"
         CONTAINER_NEXT="${PROJECT_NAME}-next"
         FIRST_PORT="${PORT_PROD%%-*}"
         SECOND_PORT="${PORT_PROD#*-}"
         IMAGE_TAG="prod-$CI_COMMIT_SHA"
+        IMAGE_REF="prod-$CI_COMMIT_REF_SLUG"
+        IMAGE_MAIN="prod-main"
+        BUILD_VITE_GOOGLE_API_KEY="$VITE_GOOGLE_API_KEY_PROD"
+        BUILD_VITE_HOSTNAME="$VITE_HOSTNAME_PROD"
       fi
 
       echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
       IMAGE="$CI_REGISTRY_IMAGE:$IMAGE_TAG"
-      docker pull "$IMAGE"
+      # L'immagine si costruisce qui, sullo stesso runner che la avvia: niente
+      # job di build separato che giri a ogni pipeline anche senza deploy. Il
+      # push nel registry resta per avere lo storico delle immagini deployate.
+      # --cache-from sul registry come ripiego se la cache locale del runner
+      # non c'e' (runner nuovo, cache potata).
+      docker build --provenance=false --sbom=false \
+        --build-arg BUILDKIT_INLINE_CACHE=1 \
+        --build-arg VITE_GOOGLE_API_KEY="$BUILD_VITE_GOOGLE_API_KEY" \
+        --build-arg VITE_HOSTNAME="$BUILD_VITE_HOSTNAME" \
+        --cache-from "$CI_REGISTRY_IMAGE:$IMAGE_REF" \
+        --cache-from "$CI_REGISTRY_IMAGE:$IMAGE_MAIN" \
+        -t "$IMAGE" -t "$CI_REGISTRY_IMAGE:$IMAGE_REF" .
+      docker push "$IMAGE"
+      docker push "$CI_REGISTRY_IMAGE:$IMAGE_REF"
 
       docker rm -f "${CONTAINER_NEXT}" 2>/dev/null || true
 
@@ -57,18 +80,21 @@
       fi
 
   after_script:
+    - docker image prune -f || true
+    # Niente prune totale: la cache dei layer e' cio' che rende veloce il build.
+    # Si elimina solo quella vecchia o oltre la soglia di spazio.
+    - docker builder prune -f --filter until=168h --keep-storage 15GB || true
     - docker logout "$CI_REGISTRY" || true
+    - rm -rf "$CI_PROJECT_DIR/.docker-$CI_JOB_ID" || true
 
 deploy_test:
   extends: .deploy
-  needs:
-    - build_test
+  needs: []
   when: manual
 
 deploy_prod:
   extends: .deploy
-  needs:
-    - build_prod
+  needs: []
   when: manual
   only:
     - main
