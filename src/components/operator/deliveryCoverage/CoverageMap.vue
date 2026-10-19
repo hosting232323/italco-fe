@@ -313,7 +313,7 @@ const updateCollectionPointLayers = () => {
         icon: point.preloaded ? preloadedCollectionPointIcon : collectionPointIcon
       });
       marker.bindTooltip(
-        `<strong>${point.name}</strong><div>${point.address}</div>` +
+        `<strong>${escapeHtml(point.name)}</strong><div>${escapeHtml(point.address)}</div>` +
         `<div>Precarico: ${point.preloaded ? 'sì' : 'no'}</div>`,
         { sticky: true, direction: 'top' }
       );
@@ -323,6 +323,10 @@ const updateCollectionPointLayers = () => {
     });
   });
 };
+
+// Nome e indirizzo dei punti di ritiro li scrivono i clienti: nel tooltip (HTML) vanno neutralizzati.
+const HTML_ESCAPES = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', '\'': '&#39;' };
+const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => HTML_ESCAPES[char]);
 
 const tooltipHtml = (cap, capEntries) => {
   const details = capEntries

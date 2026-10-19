@@ -23,7 +23,7 @@ export const useCollectionPointStore = defineStore('collectionPoint', {
       http.makeRequest(
         `collection-point/${this.element.id}`,
         'PUT',
-        { body: storesUtils.exclude_keys(this.element, ['created_at', 'updated_at', 'users']) },
+        { body: storesUtils.exclude_keys(this.element, ['created_at', 'updated_at', 'users', 'preload_areas']) },
         func
       );
     },
