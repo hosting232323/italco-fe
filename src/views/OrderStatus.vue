@@ -19,12 +19,6 @@
           </tr>
           <tr>
             <td class="label">
-              Recapito
-            </td>
-            <td>{{ order.addressee_contact ?? '/' }}</td>
-          </tr>
-          <tr>
-            <td class="label">
               Punto vendita
             </td>
             <td>{{ order.user.company_name || order.user.nickname }}</td>
