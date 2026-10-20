@@ -430,6 +430,15 @@ describe('schedule store', () => {
     expect(lastRequest()[2].body).toEqual({ id: 3, date: '2026-09-01' });
   });
 
+  it('rimanda la versione letta, cosi il backend rifiuta il salvataggio da una pagina vecchia', () => {
+    const store = useScheduleStore();
+    store.element = { id: 3, date: '2026-09-01', version: 4 };
+
+    store.updateElement(vi.fn());
+
+    expect(lastRequest()[2].body).toEqual({ id: 3, date: '2026-09-01', version: 4 });
+  });
+
   it('chiede i bordero filtrati in post', () => {
     const store = useScheduleStore();
     store.filters = { 'Schedule.date': ['2026-09-01', null] };
