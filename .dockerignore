@@ -1,0 +1,9 @@
+.git
+.gitignore
+.gitlab-ci.yml
+gitlab
+.npm
+node_modules
+dist
+coverage
+.claude
