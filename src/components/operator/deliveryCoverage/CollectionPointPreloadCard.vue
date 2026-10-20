@@ -28,7 +28,8 @@
       />
       <p class="text-medium-emphasis text-caption mt-2 mb-0">
         Con il precarico attivo, nelle aree che lo accettano i prodotti di questo punto si ritirano il giorno
-        prima della consegna.
+        prima della consegna, ma solo se quel giorno il veicolo passa già da qui. Se ci passa il giorno della
+        consegna il ritiro si fa quel giorno, come per un ordine normale.
       </p>
       <v-alert
         v-if="!isAdmin"
