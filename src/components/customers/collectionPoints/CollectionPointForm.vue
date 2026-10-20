@@ -68,7 +68,7 @@
           v-if="isAdmin"
           v-model="collectionPoint.preloaded"
           label="Precarico"
-          hint="Nelle aree che accettano precarichi i prodotti di questo punto si ritirano il giorno prima della consegna"
+          hint="Nelle aree che accettano precarichi i prodotti di questo punto si ritirano il giorno prima della consegna, se quel giorno il veicolo passa già dal punto"
           persistent-hint
           color="primary"
         />
