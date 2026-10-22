@@ -36,10 +36,28 @@ describe('CompanyForm', () => {
     store.element = { id: 7, name: 'Attivita', rae: false, ...LEGAL };
     const wrapper = mountComponent(CompanyForm, { pinia });
 
-    // Il modulo RAEE non è più qui: nessun testo dedicato, restano solo i due
-    // radio della pianificazione automatica.
+    // Il modulo RAEE non è più qui: nessun testo dedicato, restano solo i
+    // radio di pianificazione e pagamento automatico (due ciascuno).
     expect(wrapper.text()).not.toContain('Modulo RAEE');
-    expect(wrapper.findAll('input[type="radio"]')).toHaveLength(2);
+    expect(wrapper.findAll('input[type="radio"]')).toHaveLength(4);
+  });
+
+  it('invia true quando il super admin attiva il pagamento automatico', async () => {
+    const pinia = createTestPinia();
+    const store = useCompanyStore();
+    store.activeForm = true;
+    store.element = { id: 7, name: 'Attivita', rae: false, automatic_payment: false, ...LEGAL };
+    const wrapper = mountComponent(CompanyForm, { pinia });
+
+    await wrapper.findAll('input[type="radio"]')[2].trigger('click');
+    expect(store.element.automatic_payment).toBe(true);
+
+    await wrapper.find('form').trigger('submit');
+    await flushPromises();
+
+    const [url, method, options] = http.uploadRequest.mock.calls.at(-1);
+    expect([url, method]).toEqual(['company/7', 'PUT']);
+    expect(options.body).toMatchObject({ automatic_payment: true });
   });
 
   it('invia true quando il super admin attiva la pianificazione automatica', async () => {
