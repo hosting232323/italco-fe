@@ -109,6 +109,10 @@ deploy_prod:
   image: node:22
   needs: []
   interruptible: false
+
+deploy_pages_test:
+  extends: .deploy_pages
+  resource_group: italco-fe-test
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       when: manual
@@ -116,10 +120,6 @@ deploy_prod:
     - if: '$CI_COMMIT_BRANCH == "main"'
       when: manual
       allow_failure: true
-
-deploy_pages_test:
-  extends: .deploy_pages
-  resource_group: italco-fe-test
   script:
     - npm ci
     - VITE_HOSTNAME="$VITE_HOSTNAME_TEST" VITE_GOOGLE_API_KEY="$VITE_GOOGLE_API_KEY_TEST" npm run build
@@ -131,6 +131,11 @@ deploy_pages_test:
 deploy_pages_demo:
   extends: .deploy_pages
   resource_group: italco-fe-demo
+  # Solo dalla MR del branch demo; il branch non ha pipeline propria (vedi workflow).
+  rules:
+    - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "demo/pianificazione-automatica"'
+      when: manual
+      allow_failure: true
   script:
     - npm ci
     - VITE_HOSTNAME="$VITE_HOSTNAME_DEMO" VITE_GOOGLE_API_KEY="$VITE_GOOGLE_API_KEY_DEMO" npm run build
