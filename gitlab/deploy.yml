@@ -1,106 +1,6 @@
-.deploy:
-  stage: deploy
-  interruptible: false
-  tags:
-    - "${SERVER_NAME}-deploy"
-  variables:
-    DOCKER_CONFIG: "$CI_PROJECT_DIR/.docker-$CI_JOB_ID"
-  script:
-    - |
-      set -eu
-
-      if [ "$CI_JOB_NAME" = "deploy_test" ]; then
-        CONTAINER_ACTIVE="${PROJECT_NAME}-test"
-        CONTAINER_NEXT="${PROJECT_NAME}-test-next"
-        FIRST_PORT="${PORT_TEST%%-*}"
-        SECOND_PORT="${PORT_TEST#*-}"
-        IMAGE_TAG="test-$CI_COMMIT_SHA"
-        IMAGE_REF="test-$CI_COMMIT_REF_SLUG"
-        IMAGE_MAIN="test-main"
-        BUILD_VITE_GOOGLE_API_KEY="$VITE_GOOGLE_API_KEY_TEST"
-        BUILD_VITE_HOSTNAME="$VITE_HOSTNAME_TEST"
-      else
-        CONTAINER_ACTIVE="${PROJECT_NAME}"
-        CONTAINER_NEXT="${PROJECT_NAME}-next"
-        FIRST_PORT="${PORT_PROD%%-*}"
-        SECOND_PORT="${PORT_PROD#*-}"
-        IMAGE_TAG="prod-$CI_COMMIT_SHA"
-        IMAGE_REF="prod-$CI_COMMIT_REF_SLUG"
-        IMAGE_MAIN="prod-main"
-        BUILD_VITE_GOOGLE_API_KEY="$VITE_GOOGLE_API_KEY_PROD"
-        BUILD_VITE_HOSTNAME="$VITE_HOSTNAME_PROD"
-      fi
-
-      echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
-      IMAGE="$CI_REGISTRY_IMAGE:$IMAGE_TAG"
-      # L'immagine si costruisce qui, sullo stesso runner che la avvia: niente
-      # job di build separato che giri a ogni pipeline anche senza deploy. Il
-      # push nel registry resta per avere lo storico delle immagini deployate.
-      # --cache-from sul registry come ripiego se la cache locale del runner
-      # non c'e' (runner nuovo, cache potata).
-      docker build --provenance=false --sbom=false \
-        --build-arg BUILDKIT_INLINE_CACHE=1 \
-        --build-arg VITE_GOOGLE_API_KEY="$BUILD_VITE_GOOGLE_API_KEY" \
-        --build-arg VITE_HOSTNAME="$BUILD_VITE_HOSTNAME" \
-        --cache-from "$CI_REGISTRY_IMAGE:$IMAGE_REF" \
-        --cache-from "$CI_REGISTRY_IMAGE:$IMAGE_MAIN" \
-        -t "$IMAGE" -t "$CI_REGISTRY_IMAGE:$IMAGE_REF" .
-      docker push "$IMAGE"
-      docker push "$CI_REGISTRY_IMAGE:$IMAGE_REF"
-
-      docker rm -f "${CONTAINER_NEXT}" 2>/dev/null || true
-
-      docker run -d --name "${CONTAINER_NEXT}" \
-        -p ${SECOND_PORT}:3000 \
-        "$IMAGE"
-
-      READY=0
-      for _ in $(seq 1 30); do
-        if curl -fs "http://localhost:${SECOND_PORT}" >/dev/null 2>&1; then
-          READY=1; break
-        fi
-        sleep 2
-      done
-
-      if [ "${READY}" = "1" ]; then
-        docker rm -f "${CONTAINER_ACTIVE}" 2>/dev/null || true
-
-        docker run -d --restart unless-stopped \
-          --name "${CONTAINER_ACTIVE}" \
-          -p ${FIRST_PORT}:3000 \
-          "$IMAGE"
-
-        docker rm -f "${CONTAINER_NEXT}" 2>/dev/null || true
-        echo "✅ Deploy completato con successo su ${CONTAINER_ACTIVE} (porta ${FIRST_PORT})"
-      else
-        echo "❌ Il nuovo container non è diventato pronto sulla porta ${SECOND_PORT}"
-        docker logs "${CONTAINER_NEXT}" --tail 50 || true
-        docker rm -f "${CONTAINER_NEXT}" 2>/dev/null || true
-        exit 1
-      fi
-
-  after_script:
-    - docker image prune -f || true
-    # Niente prune totale: la cache dei layer e' cio' che rende veloce il build.
-    # Si elimina solo quella vecchia o oltre la soglia di spazio.
-    - docker builder prune -f --filter until=168h --keep-storage 15GB || true
-    - docker logout "$CI_REGISTRY" || true
-    - rm -rf "$CI_PROJECT_DIR/.docker-$CI_JOB_ID" || true
-
-deploy_test:
-  extends: .deploy
-  needs: []
-  when: manual
-
-deploy_prod:
-  extends: .deploy
-  needs: []
-  when: manual
-  only:
-    - main
-
 # Deploy manuale su Cloudflare Pages (progetti direct upload hubstra-fe-test
-# e hubstra-fe). Sovrascrive sempre l'URL del progetto.
+# per deploy_test e hubstra-fe per deploy_prod). Sovrascrive sempre l'URL
+# del progetto.
 # Variabili CI richieste: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID,
 # VITE_HOSTNAME_TEST / VITE_GOOGLE_API_KEY_TEST e
 # VITE_HOSTNAME_PROD / VITE_GOOGLE_API_KEY_PROD.
@@ -110,7 +10,7 @@ deploy_prod:
   needs: []
   interruptible: false
 
-deploy_pages_test:
+deploy_test:
   extends: .deploy_pages
   resource_group: hubstra-fe-test
   rules:
@@ -128,7 +28,7 @@ deploy_pages_test:
     name: pages-test
     url: https://hubstra-fe-test.pages.dev
 
-deploy_pages_prod:
+deploy_prod:
   extends: .deploy_pages
   resource_group: hubstra-fe
   rules:
