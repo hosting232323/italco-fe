@@ -41,9 +41,9 @@
         class="orders-table-area"
       >
         <v-data-table
+          v-model="schedule.orders"
           class="orders-table"
           fixed-header
-          v-model="schedule.orders"
           :items="orders"
           :headers="getHeaders()"
           show-select
