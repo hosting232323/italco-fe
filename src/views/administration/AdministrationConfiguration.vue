@@ -1,5 +1,5 @@
 <template>
-  <v-container class="table-page">
+  <v-container>
     <PageHeader title="Configurazione" />
 
     <h2 class="text-h6 mt-4 mb-2">

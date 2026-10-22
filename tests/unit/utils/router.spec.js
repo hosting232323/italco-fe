@@ -43,7 +43,7 @@ describe('router guard', () => {
       await router.push('/orders');
     });
 
-    it("e' raggiungibile dall'admin di un'attivita' con il pagamento automatico", async () => {
+    it('raggiungibile dall admin di un attivita con il pagamento automatico', async () => {
       userStore.$patch({ role: 'Admin', userId: 5, company: { id: 1, automatic_payment: true } });
 
       await router.push('/configuration');
@@ -51,7 +51,7 @@ describe('router guard', () => {
       expect(router.currentRoute.value.name).toBe('Configurazione');
     });
 
-    it("riporta alla dashboard se il super admin non l'ha abilitato", async () => {
+    it('riporta alla dashboard se il super admin non lo ha abilitato', async () => {
       userStore.$patch({ role: 'Admin', userId: 5, company: { id: 1, automatic_payment: false } });
 
       await router.push('/configuration');
@@ -59,7 +59,7 @@ describe('router guard', () => {
       expect(router.currentRoute.value.name).toBe('Dashboard');
     });
 
-    it("riporta alla dashboard chi non e' admin", async () => {
+    it('riporta alla dashboard chi non è admin', async () => {
       userStore.$patch({ role: 'Operator', userId: 6, company: { id: 1, automatic_payment: true } });
 
       await router.push('/configuration');
