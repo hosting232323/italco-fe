@@ -113,6 +113,11 @@ const routes = [
         component: () => import('@/views/operator/RaeDisposal.vue')
       },
       {
+        path: 'configuration',
+        name: 'Configurazione',
+        component: () => import('@/views/administration/AdministrationConfiguration.vue')
+      },
+      {
         path: 'companies',
         name: 'Company',
         component: () => import('@/views/administration/AdministrationCompanies.vue')
@@ -176,6 +181,11 @@ router.beforeEach((to) => {
   // I log contengono le richieste di tutte le company: l'URL digitato da un
   // admin di company riporta alla dashboard, il backend risponderebbe 403.
   if (to.name == 'Log' && role != 'Super Admin')
+    return { name: 'Dashboard' };
+
+  // La configurazione (abbonamento) e' dell'admin delle attivita' con il
+  // pagamento automatico acceso dal super admin; il backend risponde ko altrimenti.
+  if (to.name == 'Configurazione' && (!company?.automatic_payment || !['Admin', 'Super Admin'].includes(role)))
     return { name: 'Dashboard' };
 
   // Togliere le voci dal menù non basta: l'URL resta digitabile e i preferiti

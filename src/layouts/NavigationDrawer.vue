@@ -63,6 +63,12 @@
           title="Utenti"
           prepend-icon="mdi-account-group"
         />
+        <v-list-item
+          v-if="automaticPayment"
+          to="/configuration"
+          title="Configurazione"
+          prepend-icon="mdi-cog"
+        />
       </template>
       <template v-if="rae">
         <v-divider class="my-2" />
@@ -145,4 +151,7 @@ const { role, company, effectiveRole } = storeToRefs(userStore);
 // Modulo RAEE dell'attività su cui si sta operando: senza, il blocco di voci
 // RAEE non esiste per nessun ruolo.
 const rae = computed(() => !!company.value?.rae);
+
+// Pagamento automatico abilitato dal super admin: solo allora esiste la pagina di configurazione.
+const automaticPayment = computed(() => !!company.value?.automatic_payment);
 </script>

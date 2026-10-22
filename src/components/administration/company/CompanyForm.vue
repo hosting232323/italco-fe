@@ -43,6 +43,30 @@
           </v-col>
         </v-row>
 
+        <v-row no-gutters>
+          <v-col
+            cols="12"
+            md="6"
+          >
+            <label class="mr-2">Pagamento automatico (abbonamento)</label>
+            <v-radio-group
+              v-model="company.automatic_payment"
+              inline
+            >
+              <v-radio
+                label="Sì"
+                :value="true"
+                @click="company.automatic_payment = true"
+              />
+              <v-radio
+                label="No"
+                :value="false"
+                @click="company.automatic_payment = false"
+              />
+            </v-radio-group>
+          </v-col>
+        </v-row>
+
         <!-- Dati legali: finiscono nei PDF (oggi il DDT RAEE) -->
         <v-divider class="my-4" />
         <div class="text-subtitle-1 mb-2">
@@ -291,6 +315,7 @@ watch(
     if (!val) return;
 
     if (company.value.automatic_planning == undefined) company.value.automatic_planning = false;
+    if (company.value.automatic_payment == undefined) company.value.automatic_payment = false;
     logoError.value = '';
     message.value = '';
     releaseObjectUrl();

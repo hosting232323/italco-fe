@@ -6,7 +6,8 @@
       { title: 'ID', value: 'id', sortable: false },
       { title: 'Nome', value: 'name', sortable: false },
       { title: 'Modulo RAEE', key: 'rae', sortable: false },
-      { title: 'Pianificazione automatica', key: 'automatic_planning', sortable: false }
+      { title: 'Pianificazione automatica', key: 'automatic_planning', sortable: false },
+      { title: 'Pagamento automatico', key: 'automatic_payment', sortable: false }
     ]"
     fill
   >
@@ -20,6 +21,12 @@
       <v-icon
         :icon="item.automatic_planning ? 'mdi-check-circle' : 'mdi-close-circle'"
         :color="item.automatic_planning ? 'success' : 'grey'"
+      />
+    </template>
+    <template #[`item.automatic_payment`]="{ item }">
+      <v-icon
+        :icon="item.automatic_payment ? 'mdi-check-circle' : 'mdi-close-circle'"
+        :color="item.automatic_payment ? 'success' : 'grey'"
       />
     </template>
     <template #actions="{ item }">

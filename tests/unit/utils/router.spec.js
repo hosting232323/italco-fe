@@ -34,4 +34,37 @@ describe('router guard', () => {
 
     expect(router.currentRoute.value.name).toBe('Dashboard');
   });
+
+  describe('configurazione (pagamento automatico)', () => {
+    // Il router e' un singleton: senza una rotta di partenza diversa, un push
+    // verso la stessa rotta della prova precedente non rieseguirebbe la guard.
+    beforeEach(async () => {
+      userStore.$patch({ role: 'Customer', userId: 1 });
+      await router.push('/orders');
+    });
+
+    it("e' raggiungibile dall'admin di un'attivita' con il pagamento automatico", async () => {
+      userStore.$patch({ role: 'Admin', userId: 5, company: { id: 1, automatic_payment: true } });
+
+      await router.push('/configuration');
+
+      expect(router.currentRoute.value.name).toBe('Configurazione');
+    });
+
+    it("riporta alla dashboard se il super admin non l'ha abilitato", async () => {
+      userStore.$patch({ role: 'Admin', userId: 5, company: { id: 1, automatic_payment: false } });
+
+      await router.push('/configuration');
+
+      expect(router.currentRoute.value.name).toBe('Dashboard');
+    });
+
+    it("riporta alla dashboard chi non e' admin", async () => {
+      userStore.$patch({ role: 'Operator', userId: 6, company: { id: 1, automatic_payment: true } });
+
+      await router.push('/configuration');
+
+      expect(router.currentRoute.value.name).toBe('Dashboard');
+    });
+  });
 });
