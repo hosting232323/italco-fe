@@ -99,11 +99,10 @@ deploy_prod:
   only:
     - main
 
-# Deploy manuale del branch su Cloudflare Pages (progetti direct upload
-# italco-fe-test e italco-fe-demo). Sovrascrive sempre l'URL del progetto.
+# Deploy manuale del branch su Cloudflare Pages (progetto direct upload
+# italco-fe-test). Sovrascrive sempre l'URL del progetto.
 # Variabili CI richieste: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID,
-# VITE_HOSTNAME_TEST / VITE_GOOGLE_API_KEY_TEST e
-# VITE_HOSTNAME_DEMO / VITE_GOOGLE_API_KEY_DEMO.
+# VITE_HOSTNAME_TEST / VITE_GOOGLE_API_KEY_TEST.
 .deploy_pages:
   stage: deploy
   image: node:22
@@ -127,19 +126,3 @@ deploy_pages_test:
   environment:
     name: pages-test
     url: https://italco-fe-test.pages.dev
-
-deploy_pages_demo:
-  extends: .deploy_pages
-  resource_group: italco-fe-demo
-  # Solo dalla MR del branch demo; il branch non ha pipeline propria (vedi workflow).
-  rules:
-    - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "demo/pianificazione-automatica"'
-      when: manual
-      allow_failure: true
-  script:
-    - npm ci
-    - VITE_HOSTNAME="$VITE_HOSTNAME_DEMO" VITE_GOOGLE_API_KEY="$VITE_GOOGLE_API_KEY_DEMO" npm run build
-    - npx wrangler pages deploy dist --project-name=italco-fe-demo --branch=main --commit-dirty=true
-  environment:
-    name: pages-demo
-    url: https://italco-fe-demo.pages.dev
