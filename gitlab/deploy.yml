@@ -99,10 +99,11 @@ deploy_prod:
   only:
     - main
 
-# Deploy manuale del branch su Cloudflare Pages (progetto direct upload
-# hubstra-fe-test). Sovrascrive sempre l'URL del progetto.
+# Deploy manuale su Cloudflare Pages (progetti direct upload hubstra-fe-test
+# e hubstra-fe). Sovrascrive sempre l'URL del progetto.
 # Variabili CI richieste: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID,
-# VITE_HOSTNAME_TEST / VITE_GOOGLE_API_KEY_TEST.
+# VITE_HOSTNAME_TEST / VITE_GOOGLE_API_KEY_TEST e
+# VITE_HOSTNAME_PROD / VITE_GOOGLE_API_KEY_PROD.
 .deploy_pages:
   stage: deploy
   image: node:22
@@ -126,3 +127,18 @@ deploy_pages_test:
   environment:
     name: pages-test
     url: https://hubstra-fe-test.pages.dev
+
+deploy_pages_prod:
+  extends: .deploy_pages
+  resource_group: hubstra-fe
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: manual
+      allow_failure: true
+  script:
+    - npm ci
+    - VITE_HOSTNAME="$VITE_HOSTNAME_PROD" VITE_GOOGLE_API_KEY="$VITE_GOOGLE_API_KEY_PROD" npm run build
+    - npx wrangler pages deploy dist --project-name=hubstra-fe --branch=main --commit-dirty=true
+  environment:
+    name: pages-prod
+    url: https://hubstra-fe.pages.dev
