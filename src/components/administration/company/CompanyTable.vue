@@ -9,6 +9,19 @@
     @click:close="message = ''"
   >
     {{ message }}
+    <!-- Il modulo RAEE si accende solo con almeno un luogo di smaltimento, ma il
+    pulsante dei luoghi esiste solo a modulo acceso: da qui si arriva a prepararli. -->
+    <template
+      v-if="placesPrompt"
+      #append
+    >
+      <v-btn
+        variant="text"
+        prepend-icon="mdi-recycle"
+        text="Luoghi di smaltimento RAEE"
+        @click="openDisposalPlaces(placesPrompt)"
+      />
+    </template>
   </v-alert>
   <SelectionTable
     :ready="ready"
@@ -45,34 +58,15 @@
       />
     </template>
     <template #[`item.automatic_payment`]="{ item }">
-      <div class="d-flex align-center">
-        <v-switch
-          :key="switchKey(item, 'automatic_payment')"
-          :model-value="!!item.automatic_payment"
-          :disabled="!!saving[`${item.id}-automatic_payment`]"
-          color="success"
-          density="compact"
-          hide-details
-          @update:model-value="(value) => toggle(item, 'automatic_payment', value)"
-        />
-        <!-- Il prezzo mensile che l'attività paga: serve solo con il pagamento acceso. -->
-        <v-text-field
-          v-if="item.automatic_payment"
-          :model-value="priceValue(item)"
-          :disabled="!!saving[`${item.id}-subscription_price_cents`]"
-          type="number"
-          min="0.5"
-          step="0.01"
-          label="Prezzo"
-          suffix="€/mese"
-          density="compact"
-          hide-details
-          class="ml-4 price-field"
-          @update:model-value="(value) => (prices[item.id] = value)"
-          @blur="savePrice(item)"
-          @keydown.enter="savePrice(item)"
-        />
-      </div>
+      <v-switch
+        :key="switchKey(item, 'automatic_payment')"
+        :model-value="!!item.automatic_payment"
+        :disabled="!!saving[`${item.id}-automatic_payment`]"
+        color="success"
+        density="compact"
+        hide-details
+        @update:model-value="(value) => toggle(item, 'automatic_payment', value)"
+      />
     </template>
     <template #actions="{ item }">
       <v-btn
@@ -82,12 +76,22 @@
         :text="item.id == activeCompany?.id ? 'Selezionata' : 'Opera come'"
         @click="selectItem(item)"
       />
+      <!-- Le azioni di un modulo esistono solo con il modulo acceso. -->
       <v-btn
+        v-if="item.rae"
         prepend-icon="mdi-recycle"
         text="Luoghi di smaltimento RAEE"
         variant="text"
         title="Luoghi di smaltimento RAEE"
         @click="openDisposalPlaces(item)"
+      />
+      <v-btn
+        v-if="item.automatic_payment"
+        prepend-icon="mdi-credit-card-edit-outline"
+        text="Abbonamento"
+        variant="text"
+        title="Prezzo e abbonamento"
+        @click="openSubscription(item)"
       />
     </template>
   </SelectionTable>
@@ -102,20 +106,21 @@ import { useRouter } from 'vue-router';
 import storesUtils from '@/utils/stores';
 import { useUserStore } from '@/stores/user';
 import { useCompanyStore } from '@/stores/company';
+import { useCompanySubscriptionStore } from '@/stores/companySubscription';
 import { useCompanyRaeDisposalPlaceStore } from '@/stores/companyRaeDisposalPlace';
 
 const router = useRouter();
 const selectLoading = reactive({});
-// Salvataggi in corso per "idCompany-campo" e prezzi digitati ma non ancora
-// salvati per idCompany: l'interruttore o il campo si bloccano finché risponde il backend.
+// Salvataggi in corso per "idCompany-campo": l'interruttore si blocca finché risponde il backend.
 const saving = reactive({});
-const prices = reactive({});
 // Rifiutato dal backend, un interruttore resterebbe comunque acceso a video (il
 // DOM si è già mosso, la proprietà no): cambiandogli la key viene ricreato e
 // torna a mostrare il valore vero.
 const resets = reactive({});
 // Errore dell'ultimo salvataggio (es. modulo RAEE senza iscrizione o senza luoghi).
 const message = ref('');
+// Company per cui l'accensione del modulo RAEE è stata rifiutata: l'avviso offre i suoi luoghi.
+const placesPrompt = ref(null);
 
 const companyStore = useCompanyStore();
 const { ready } = storeToRefs(companyStore);
@@ -124,19 +129,25 @@ const { company: activeCompany } = storeToRefs(useUserStore());
 const companies = storesUtils.getStoreList(companyStore);
 
 const disposalPlaceStore = useCompanyRaeDisposalPlaceStore();
+const subscriptionStore = useCompanySubscriptionStore();
 
-// Popup a parte: gestire i luoghi è una responsabilità diversa dagli interruttori,
-// e va tenuta disponibile a prescindere dal fatto che il modulo RAEE sia acceso
-// (i luoghi servono proprio per poterlo accendere).
+// Popup a parte: gestire i luoghi è una responsabilità diversa dagli interruttori.
 const openDisposalPlaces = (item) => {
   disposalPlaceStore.open(item.id);
 };
 
 const switchKey = (item, key) => `${item.id}-${key}-${resets[`${item.id}-${key}`] ?? 0}`;
 
+// Prezzo e abbonamento sono un popup a parte: cambiare il prezzo di un
+// abbonamento già attivo è una scelta, non un interruttore.
+const openSubscription = (item) => {
+  subscriptionStore.open(item.id);
+};
+
 const save = (item, key, changes, onOk) => {
   saving[`${item.id}-${key}`] = true;
   message.value = '';
+  placesPrompt.value = null;
   companyStore.updateSettings(item, changes, (data) => {
     saving[`${item.id}-${key}`] = false;
     if (data.status == 'ok') {
@@ -149,28 +160,12 @@ const save = (item, key, changes, onOk) => {
     } else {
       resets[`${item.id}-${key}`] = (resets[`${item.id}-${key}`] ?? 0) + 1;
       message.value = data.message || 'Errore durante il salvataggio';
+      if (key == 'rae') placesPrompt.value = item;
     }
   });
 };
 
 const toggle = (item, key, value) => save(item, key, { [key]: value });
-
-const priceValue = (item) => {
-  if (prices[item.id] !== undefined) return prices[item.id];
-  return item.subscription_price_cents != null ? (item.subscription_price_cents / 100).toFixed(2) : '';
-};
-
-const savePrice = (item) => {
-  if (prices[item.id] === undefined) return;
-
-  const raw = prices[item.id];
-  const cents = raw === '' || raw === null ? null : Math.round(Number(raw) * 100);
-  if (cents === (item.subscription_price_cents ?? null)) {
-    delete prices[item.id];
-    return;
-  }
-  save(item, 'subscription_price_cents', { subscription_price_cents: cents }, () => delete prices[item.id]);
-};
 
 const selectItem = (item) => {
   selectLoading[item.id] = true;
@@ -180,9 +175,3 @@ const selectItem = (item) => {
   });
 };
 </script>
-
-<style scoped>
-.price-field {
-  max-width: 190px;
-}
-</style>

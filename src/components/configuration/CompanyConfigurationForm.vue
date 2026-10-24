@@ -1,6 +1,11 @@
 <template>
   <v-card class="mb-6">
-    <v-card-title>Dati dell'attività</v-card-title>
+    <v-card-item
+      prepend-icon="mdi-domain"
+      title="Dati dell'attività"
+      subtitle="Anagrafica e dati legali, stampati nei documenti"
+    />
+    <v-divider />
     <v-card-text>
       <v-skeleton-loader
         v-if="!ready"
@@ -82,16 +87,16 @@
               label="Codice fiscale (opzionale)"
             />
           </v-col>
-          <!-- Solo col modulo RAEE acceso: compare unicamente nel DDT RAEE. -->
+          <!-- Compare nel DDT RAEE: obbligatoria solo col modulo acceso, ma sempre
+          compilabile, perché serve già per poterlo accendere. -->
           <v-col
-            v-if="company.rae"
             cols="12"
             md="6"
           >
             <v-text-field
               v-model="company.rae_registration"
               label="Estremi iscrizione Albo Gestori Ambientali"
-              :rules="validation.requiredRules"
+              :rules="company.rae ? validation.requiredRules : []"
             />
           </v-col>
         </v-row>
