@@ -89,21 +89,21 @@ describe('CompanySubscriptionDialog', () => {
     });
   });
 
-  it('senza abbonamento attivo non propone la scelta sull-abbonamento in corso', () => {
-    const { wrapper } = setup();
-
-    expect(wrapper.findAll('input[type="radio"]')).toHaveLength(0);
-  });
-
-  it('con abbonamento attivo propone di applicare il prezzo anche a quello, dal prossimo rinnovo', () => {
+  it('non propone scelte: il prezzo vale sempre anche per l-abbonamento attivo', () => {
     const { wrapper } = setup({ subscription: ACTIVE });
 
-    expect(wrapper.findAll('input[type="radio"]')).toHaveLength(2);
-    expect(wrapper.text()).toContain('dal prossimo rinnovo');
+    expect(wrapper.findAll('input[type="radio"]')).toHaveLength(0);
+    expect(wrapper.text()).toContain('il nuovo prezzo vale dal prossimo rinnovo');
     expect(wrapper.text()).toContain('Prossimo rinnovo il');
   });
 
-  it('salva il prezzo in centesimi sull-abbonamento attivo di default', async () => {
+  it('senza abbonamento attivo non parla di rinnovo', () => {
+    const { wrapper } = setup();
+
+    expect(wrapper.text()).not.toContain('il nuovo prezzo vale dal prossimo rinnovo');
+  });
+
+  it('salva il prezzo in centesimi', async () => {
     const { wrapper } = setup({ subscription: ACTIVE });
     http.makeRequest.mockImplementation((url, method, options, func) =>
       func({ status: 'ok', price_cents: 5990, subscription: ACTIVE })
@@ -115,37 +115,8 @@ describe('CompanySubscriptionDialog', () => {
 
     const [url, method, options] = http.makeRequest.mock.calls.find(([, requestMethod]) => requestMethod == 'PUT');
     expect([url, method]).toEqual(['subscription/company/42/price', 'PUT']);
-    expect(options.body).toEqual({ price_cents: 5990, apply_to_active: true });
+    expect(options.body).toEqual({ price_cents: 5990 });
     expect(wrapper.text()).toContain('Prezzo aggiornato');
-  });
-
-  it('scegliendo solo i nuovi abbonamenti non tocca quello attivo', async () => {
-    const { wrapper } = setup({ subscription: ACTIVE });
-    http.makeRequest.mockImplementation((url, method, options, func) =>
-      func({ status: 'ok', price_cents: 5990, subscription: ACTIVE })
-    );
-
-    await wrapper.findAll('input[type="radio"]')[1].setValue(true);
-    await wrapper.find('input[type="number"]').setValue('59.90');
-    await saveButton(wrapper).trigger('click');
-    await flushPromises();
-
-    const [, , options] = http.makeRequest.mock.calls.find(([, requestMethod]) => requestMethod == 'PUT');
-    expect(options.body.apply_to_active).toBe(false);
-  });
-
-  it('senza abbonamento attivo non chiede mai di applicarlo', async () => {
-    const { wrapper } = setup();
-    http.makeRequest.mockImplementation((url, method, options, func) =>
-      func({ status: 'ok', price_cents: 5990, subscription: NONE })
-    );
-
-    await wrapper.find('input[type="number"]').setValue('59.90');
-    await saveButton(wrapper).trigger('click');
-    await flushPromises();
-
-    const [, , options] = http.makeRequest.mock.calls.find(([, requestMethod]) => requestMethod == 'PUT');
-    expect(options.body.apply_to_active).toBe(false);
   });
 
   it('mostra l-errore del backend, ad esempio il rifiuto di Stripe', async () => {

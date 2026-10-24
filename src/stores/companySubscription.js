@@ -49,13 +49,12 @@ export const useCompanySubscriptionStore = defineStore('companySubscription', {
         if (func) func(data);
       });
     },
-    // applyToActive: il nuovo prezzo vale anche per l'abbonamento già attivo,
-    // dal prossimo rinnovo; altrimenti solo per chi si abbonerà da ora in poi.
-    updatePrice(priceCents, applyToActive, func) {
+    // Il nuovo prezzo vale anche per l'abbonamento già attivo, dal prossimo rinnovo.
+    updatePrice(priceCents, func) {
       http.makeRequest(
         `subscription/company/${this.companyId}/price`,
         'PUT',
-        { body: { price_cents: priceCents, apply_to_active: applyToActive } },
+        { body: { price_cents: priceCents } },
         (data) => {
           if (data.status == 'ok') this.setData(data);
           if (func) func(data);

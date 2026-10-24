@@ -94,17 +94,17 @@ describe('companySubscription store', () => {
     expect(func).toHaveBeenCalledWith({ status: 'ko', message: 'Company non trovata' });
   });
 
-  it('updatePrice manda prezzo e scelta sull-abbonamento attivo e aggiorna lo stato', () => {
+  it('updatePrice manda il prezzo e aggiorna lo stato', () => {
     const store = useCompanySubscriptionStore();
     const func = vi.fn();
     store.companyId = 42;
     respondWith({ status: 'ok', price_cents: 5900, subscription: ACTIVE });
 
-    store.updatePrice(5900, true, func);
+    store.updatePrice(5900, func);
 
     const [url, method, options] = lastCall();
     expect([url, method]).toEqual(['subscription/company/42/price', 'PUT']);
-    expect(options.body).toEqual({ price_cents: 5900, apply_to_active: true });
+    expect(options.body).toEqual({ price_cents: 5900 });
     expect(store.priceCents).toBe(5900);
     expect(func).toHaveBeenCalled();
   });
@@ -115,7 +115,7 @@ describe('companySubscription store', () => {
     store.priceCents = 4900;
     respondWith({ status: 'ko', message: 'Errore Stripe' });
 
-    store.updatePrice(5900, false);
+    store.updatePrice(5900);
 
     expect(store.priceCents).toBe(4900);
   });
