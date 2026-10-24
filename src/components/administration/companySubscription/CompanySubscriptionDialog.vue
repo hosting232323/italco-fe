@@ -42,33 +42,17 @@
           :rules="priceRules"
         />
 
-        <!-- Con un abbonamento attivo il prezzo va deciso: Stripe non ricalcola da
-        solo gli abbonamenti già in corso, che mantengono quello con cui il cliente
-        si è abbonato finché non li si sposta. Lo spostamento vale dal prossimo
-        rinnovo, senza addebiti né crediti immediati e senza che il cliente debba riabbonarsi. -->
-        <template v-if="subscription.active">
-          <v-alert
-            type="info"
-            variant="tonal"
-            density="compact"
-            class="mb-2"
-          >
-            L'attività ha un abbonamento attivo: scegli se il nuovo prezzo vale anche per quello.
-          </v-alert>
-          <v-radio-group
-            v-model="applyToActive"
-            hide-details
-          >
-            <v-radio
-              label="Applica anche all'abbonamento attivo, dal prossimo rinnovo (nessuna interruzione, nessun addebito immediato)"
-              :value="true"
-            />
-            <v-radio
-              label="Solo ai nuovi abbonamenti: quello attivo mantiene il prezzo attuale"
-              :value="false"
-            />
-          </v-radio-group>
-        </template>
+        <!-- Il nuovo prezzo vale anche per l'abbonamento già attivo: Stripe lo applica dal
+        prossimo rinnovo, senza addebiti né crediti immediati e senza che il cliente debba riabbonarsi. -->
+        <v-alert
+          v-if="subscription.active"
+          type="info"
+          variant="tonal"
+          density="compact"
+        >
+          L'attività ha un abbonamento attivo: il nuovo prezzo vale dal prossimo rinnovo
+          (nessuna interruzione, nessun addebito immediato).
+        </v-alert>
 
         <v-btn
           :loading="loading"
@@ -156,7 +140,6 @@
               <th>Fattura</th>
               <th>Importo</th>
               <th>Stato</th>
-              <th>Tentativi</th>
               <th />
             </tr>
           </thead>
@@ -176,7 +159,6 @@
                   {{ subscriptionUtils.invoiceStatusLabel(invoice.status) }}
                 </v-chip>
               </td>
-              <td>{{ invoice.attempts }}</td>
               <td>
                 <v-btn
                   v-if="invoice.url"
@@ -250,7 +232,6 @@ const { dialogOpen, companyId, priceCents, subscription, ready, history, history
 const companyName = computed(() => companies.value?.find((item) => item.id == companyId.value)?.name ?? companyId.value);
 
 const price = ref('');
-const applyToActive = ref(true);
 const loading = ref(false);
 const message = ref('');
 const saved = ref(false);
@@ -266,7 +247,6 @@ watch(
   () => {
     if (!ready.value) return;
     price.value = priceCents.value != null ? (priceCents.value / 100).toFixed(2) : '';
-    applyToActive.value = true;
     message.value = '';
   },
   { immediate: true }
@@ -275,7 +255,7 @@ watch(
 const save = () => {
   message.value = '';
   loading.value = true;
-  store.updatePrice(Math.round(Number(price.value) * 100), subscription.value.active && applyToActive.value, (data) => {
+  store.updatePrice(Math.round(Number(price.value) * 100), (data) => {
     loading.value = false;
     saved.value = data.status == 'ok';
     message.value = saved.value ? 'Prezzo aggiornato' : data.message || 'Errore durante il salvataggio';
