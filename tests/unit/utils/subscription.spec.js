@@ -20,6 +20,17 @@ describe('subscription utils', () => {
     expect(subscriptionUtils.statusColor('paused')).toBe('grey');
   });
 
+  it.each([
+    ['paid', 'Saldata', 'success'],
+    ['open', 'Da pagare', 'warning'],
+    ['uncollectible', 'Non riscossa', 'error'],
+    ['void', 'Annullata', 'grey'],
+    ['altro', 'altro', 'grey']
+  ])('lo stato fattura %s si legge %s con colore %s', (status, label, color) => {
+    expect(subscriptionUtils.invoiceStatusLabel(status)).toBe(label);
+    expect(subscriptionUtils.invoiceStatusColor(status)).toBe(color);
+  });
+
   it('formatta i centesimi in euro', () => {
     expect(subscriptionUtils.formatPrice(4900)).toContain('49,00');
     expect(subscriptionUtils.formatPrice(4900)).toContain('€');

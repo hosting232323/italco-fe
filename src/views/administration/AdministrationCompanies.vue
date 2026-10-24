@@ -33,7 +33,7 @@
   </v-dialog>
   <v-dialog
     v-model="subscriptionOpen"
-    max-width="800"
+    max-width="1000"
   >
     <CompanySubscriptionDialog />
   </v-dialog>
