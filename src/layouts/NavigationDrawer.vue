@@ -63,11 +63,6 @@
           title="Utenti"
           prepend-icon="mdi-account-group"
         />
-        <v-list-item
-          to="/configuration"
-          title="Configurazione"
-          prepend-icon="mdi-cog"
-        />
       </template>
       <v-divider class="my-2" />
       <v-list-item

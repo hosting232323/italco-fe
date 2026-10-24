@@ -48,21 +48,21 @@ describe('companyConfiguration store', () => {
     expect(store.ready).toBe(false);
   });
 
-  it('salva anagrafica e dati legali con il codice fiscale nullo quando vuoto', () => {
+  it('salva anagrafica e dati legali con codice fiscale e iscrizione nulli quando vuoti', () => {
     const store = useCompanyConfigurationStore();
-    store.element = { id: 3, ...LEGAL, rae: false, rae_registration: 'ignorata', logo: 'https://api/logo.png' };
+    store.element = { id: 3, ...LEGAL, rae: false, logo: 'https://api/logo.png' };
 
     store.updateElement(vi.fn());
 
     const [url, method, options] = http.uploadRequest.mock.calls.at(-1);
     expect([url, method]).toEqual(['company/me', 'PUT']);
-    expect(options.body).toEqual({ ...LEGAL, tax_code: null });
+    expect(options.body).toEqual({ ...LEGAL, tax_code: null, rae_registration: null });
     expect(options.files).toHaveProperty('logo');
   });
 
-  it('manda l-iscrizione all-Albo solo col modulo RAEE acceso', () => {
+  it('manda l-iscrizione all-Albo anche a modulo spento: serve per poterlo accendere', () => {
     const store = useCompanyConfigurationStore();
-    store.element = { id: 3, ...LEGAL, rae: true, rae_registration: 'RD-1' };
+    store.element = { id: 3, ...LEGAL, rae: false, rae_registration: 'RD-1' };
 
     store.updateElement(vi.fn());
 

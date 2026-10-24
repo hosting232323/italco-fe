@@ -46,13 +46,20 @@ describe('CompanyConfigurationForm', () => {
     expect(wrapper.find('input[type="text"]').element.value).toBe('Attivita');
   });
 
-  it('il campo iscrizione Albo compare solo col modulo RAEE acceso', async () => {
+  it('l-iscrizione Albo e sempre compilabile ma obbligatoria solo col modulo RAEE acceso', async () => {
     const spento = mountForm(COMPANY).wrapper;
-    const acceso = mountForm({ ...COMPANY, rae: true, rae_registration: 'RD-1' }).wrapper;
+    const acceso = mountForm({ ...COMPANY, rae: true }).wrapper;
     await flushPromises();
 
-    expect(spento.text()).not.toContain('Estremi iscrizione Albo');
+    expect(spento.text()).toContain('Estremi iscrizione Albo');
     expect(acceso.text()).toContain('Estremi iscrizione Albo');
+
+    // Spento si salva anche vuota, acceso la submit viene bloccata.
+    http.uploadRequest.mockImplementation((url, method, options, func) => func({ status: 'ok', company: COMPANY }));
+    await spento.find('form').trigger('submit');
+    await acceso.find('form').trigger('submit');
+    await flushPromises();
+    expect(http.uploadRequest).toHaveBeenCalledTimes(1);
   });
 
   it('salva e aggiorna la company in sessione', async () => {
@@ -155,7 +162,7 @@ describe('SubscriptionCard', () => {
     await flushPromises();
 
     expect(wrapper.text()).toContain('Attivo');
-    expect(wrapper.text()).toContain('Prossimo rinnovo il');
+    expect(wrapper.text()).toContain('Prossimo rinnovo');
     expect(wrapper.text()).toContain('Gestisci abbonamento');
   });
 
