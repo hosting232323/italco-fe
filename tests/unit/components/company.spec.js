@@ -4,6 +4,7 @@ import { flushPromises } from '@vue/test-utils';
 import CompanyForm from '@/components/administration/company/CompanyForm.vue';
 import CompanyTable from '@/components/administration/company/CompanyTable.vue';
 import http from '@/utils/http';
+import { useUserStore } from '@/stores/user';
 import { useCompanyStore } from '@/stores/company';
 import { useCompanyRaeDisposalPlaceStore } from '@/stores/companyRaeDisposalPlace';
 import { createTestPinia, createTestRouter, mountComponent, selectRow } from '../../helpers/mount';
@@ -29,54 +30,16 @@ const LEGAL = {
 describe('CompanyForm', () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it('non ha piu il modulo RAEE: si gestisce dal popup dei luoghi di smaltimento', () => {
+  it('e solo di creazione: niente interruttori ne logo, si gestiscono altrove', () => {
     const pinia = createTestPinia();
     const store = useCompanyStore();
     store.activeForm = true;
-    store.element = { id: 7, name: 'Attivita', rae: false, ...LEGAL };
+    store.element = {};
     const wrapper = mountComponent(CompanyForm, { pinia });
 
-    // Il modulo RAEE non è più qui: nessun testo dedicato, restano solo i
-    // radio di pianificazione e pagamento automatico (due ciascuno).
-    expect(wrapper.text()).not.toContain('Modulo RAEE');
-    expect(wrapper.findAll('input[type="radio"]')).toHaveLength(4);
-  });
-
-  it('invia true quando il super admin attiva il pagamento automatico', async () => {
-    const pinia = createTestPinia();
-    const store = useCompanyStore();
-    store.activeForm = true;
-    store.element = { id: 7, name: 'Attivita', rae: false, automatic_payment: false, ...LEGAL };
-    const wrapper = mountComponent(CompanyForm, { pinia });
-
-    await wrapper.findAll('input[type="radio"]')[2].trigger('click');
-    expect(store.element.automatic_payment).toBe(true);
-
-    await wrapper.find('form').trigger('submit');
-    await flushPromises();
-
-    const [url, method, options] = http.uploadRequest.mock.calls.at(-1);
-    expect([url, method]).toEqual(['company/7', 'PUT']);
-    expect(options.body).toMatchObject({ automatic_payment: true });
-  });
-
-  it('invia true quando il super admin attiva la pianificazione automatica', async () => {
-    const pinia = createTestPinia();
-    const store = useCompanyStore();
-    store.activeForm = true;
-    store.element = { id: 7, name: 'Attivita senza pianificazione', rae: false, automatic_planning: false, ...LEGAL };
-    const wrapper = mountComponent(CompanyForm, { pinia });
-
-    const radios = wrapper.findAll('input[type="radio"]');
-    await radios[0].trigger('click');
-    expect(store.element.automatic_planning).toBe(true);
-
-    await wrapper.find('form').trigger('submit');
-    await flushPromises();
-
-    const [url, method, options] = http.uploadRequest.mock.calls.at(-1);
-    expect([url, method]).toEqual(['company/7', 'PUT']);
-    expect(options.body).toMatchObject({ name: 'Attivita senza pianificazione', rae: false, automatic_planning: true });
+    expect(wrapper.text()).toContain('Crea Company');
+    expect(wrapper.findAll('input[type="radio"]')).toHaveLength(0);
+    expect(wrapper.find('input[type="file"]').exists()).toBe(false);
   });
 
   it('manda i dati legali e il codice fiscale nullo quando vuoto in creazione', async () => {
@@ -99,7 +62,6 @@ describe('CompanyForm', () => {
     expect([url, method]).toEqual(['company', 'POST']);
     expect(options.body.tax_code).toBeNull();
     expect(options.body).toMatchObject({ address: 'Via Test 1', city: 'Bari' });
-    expect(options.files).toHaveProperty('logo');
   });
 
   it('blocca la submit se mancano i dati legali obbligatori', async () => {
@@ -116,25 +78,19 @@ describe('CompanyForm', () => {
     expect(http.uploadRequest).not.toHaveBeenCalled();
   });
 
-  it('in modifica mostra il logo già caricato con token e cache-buster', async () => {
+  it('a creazione riuscita svuota il form, ricarica la lista e si chiude', async () => {
+    http.uploadRequest.mockImplementation((url, method, options, func) => func({ status: 'ok' }));
     const pinia = createTestPinia();
     const store = useCompanyStore();
     store.activeForm = true;
-    store.element = {
-      id: 3,
-      name: 'Con logo',
-      rae: false,
-      updated_at: '01/01/2026 10:00',
-      logo: 'https://api.test/company/logo/3.png',
-      ...LEGAL
-    };
+    store.element = { name: 'Nuova', adminNickname: 'admin', adminPassword: 'pw', ...LEGAL };
     const wrapper = mountComponent(CompanyForm, { pinia });
+
+    await wrapper.find('form').trigger('submit');
     await flushPromises();
 
-    const img = wrapper.findComponent({ name: 'VImg' });
-    expect(img.exists()).toBe(true);
-    expect(img.props('src')).toBe('https://api.test/company/logo/3.png?token=fake&v=01%2F01%2F2026%2010%3A00');
-    expect(wrapper.text()).toContain('Logo attuale');
+    expect(store.activeForm).toBe(false);
+    expect(store.element).toEqual({});
   });
 
   it('mostra il messaggio di errore del backend quando la creazione fallisce', async () => {
@@ -153,26 +109,181 @@ describe('CompanyForm', () => {
     expect(wrapper.text()).toContain('Nickname già in uso');
     expect(store.activeForm).toBe(true);
   });
+
+  it('usa un messaggio di ripiego quando il backend non ne manda uno', async () => {
+    http.uploadRequest.mockImplementation((url, method, options, func) => func({ status: 'ko' }));
+    const pinia = createTestPinia();
+    const store = useCompanyStore();
+    store.activeForm = true;
+    store.element = { name: 'Nuova', adminNickname: 'admin', adminPassword: 'pw', ...LEGAL };
+    const wrapper = mountComponent(CompanyForm, { pinia });
+
+    await wrapper.find('form').trigger('submit');
+    await flushPromises();
+
+    expect(wrapper.text()).toContain('Errore durante il salvataggio');
+  });
 });
 
 
 describe('CompanyTable', () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it('il bottone dedicato apre il popup dei luoghi di smaltimento su un popup a parte, non sul form di modifica', async () => {
+  const mountTable = (list) => {
     const pinia = createTestPinia();
     const companyStore = useCompanyStore();
     companyStore.ready = true;
-    companyStore.list = [{ id: 7, name: 'Attivita RAEE', rae: true }];
-    const disposalPlaceStore = useCompanyRaeDisposalPlaceStore();
+    companyStore.list = list;
     const wrapper = mountComponent(CompanyTable, { pinia, router: createTestRouter() });
+    return { wrapper, companyStore };
+  };
+
+  // Gli interruttori sono nell'ordine delle colonne: RAEE, pianificazione, pagamento.
+  const switches = (wrapper) => wrapper.findAll('tbody tr')[0].findAll('input[type="checkbox"]').slice(1);
+
+  const lastPut = () => http.makeRequest.mock.calls.filter(([, method]) => method === 'PUT').at(-1);
+
+  it('non ha piu il bottone Modifica: ne il form ne la modifica passano da qui', async () => {
+    const { wrapper, companyStore } = mountTable([{ id: 7, name: 'Attivita' }]);
+
+    await selectRow(wrapper);
+
+    expect(wrapper.find('.mdi-pencil').exists()).toBe(false);
+    expect(companyStore.activeForm).toBe(false);
+  });
+
+  it('il bottone dedicato apre il popup dei luoghi di smaltimento', async () => {
+    const { wrapper, companyStore } = mountTable([{ id: 7, name: 'Attivita RAEE', rae: true }]);
+    const disposalPlaceStore = useCompanyRaeDisposalPlaceStore();
 
     await selectRow(wrapper);
     await wrapper.find('.mdi-recycle').trigger('click');
 
     expect(disposalPlaceStore.companyId).toBe(7);
     expect(disposalPlaceStore.dialogOpen).toBe(true);
-    // Il form di modifica della company resta chiuso: sono due popup distinti.
     expect(companyStore.activeForm).toBe(false);
+  });
+
+  it.each([
+    [0, 'rae'],
+    [1, 'automatic_planning'],
+    [2, 'automatic_payment']
+  ])('l-interruttore %i accende %s con la sola PUT del campo', async (index, key) => {
+    http.makeRequest.mockImplementation((url, method, options, func) => func({ status: 'ok', company: { id: 7 } }));
+    const { wrapper } = mountTable([{ id: 7, name: 'Attivita' }]);
+
+    await switches(wrapper)[index].setValue(true);
+    await flushPromises();
+
+    const [url, method, options] = lastPut();
+    expect([url, method]).toEqual(['company/7', 'PUT']);
+    expect(options.body).toEqual({ name: 'Attivita', [key]: true });
+  });
+
+  it('mostra l-errore del backend e lascia l-interruttore dov-era', async () => {
+    http.makeRequest.mockImplementation((url, method, options, func) =>
+      func({ status: 'ko', message: 'Configura almeno un luogo di smaltimento RAEE prima di attivare il modulo' })
+    );
+    const { wrapper } = mountTable([{ id: 7, name: 'Attivita', rae: false }]);
+
+    await switches(wrapper)[0].setValue(true);
+    await flushPromises();
+
+    expect(wrapper.text()).toContain('Configura almeno un luogo di smaltimento RAEE');
+    expect(switches(wrapper)[0].element.checked).toBe(false);
+  });
+
+  it('usa un messaggio di ripiego quando il backend non ne manda uno', async () => {
+    http.makeRequest.mockImplementation((url, method, options, func) => func({ status: 'ko' }));
+    const { wrapper } = mountTable([{ id: 7, name: 'Attivita' }]);
+
+    await switches(wrapper)[1].setValue(true);
+    await flushPromises();
+
+    expect(wrapper.text()).toContain('Errore durante il salvataggio');
+  });
+
+  it('aggiorna la sessione se la company modificata e quella su cui opera il super admin', async () => {
+    http.makeRequest.mockImplementation((url, method, options, func) =>
+      func({ status: 'ok', company: { id: 7, name: 'Attivita', automatic_payment: true } })
+    );
+    const { wrapper } = mountTable([{ id: 7, name: 'Attivita' }]);
+    useUserStore().company = { id: 7, name: 'Attivita' };
+
+    await switches(wrapper)[2].setValue(true);
+    await flushPromises();
+
+    expect(useUserStore().company.automatic_payment).toBe(true);
+  });
+
+  it('non tocca la sessione se la company modificata e un-altra', async () => {
+    http.makeRequest.mockImplementation((url, method, options, func) =>
+      func({ status: 'ok', company: { id: 7, name: 'Attivita', automatic_payment: true } })
+    );
+    const { wrapper } = mountTable([{ id: 7, name: 'Attivita' }]);
+    useUserStore().company = { id: 99, name: 'Altra' };
+
+    await switches(wrapper)[2].setValue(true);
+    await flushPromises();
+
+    expect(useUserStore().company).toEqual({ id: 99, name: 'Altra' });
+  });
+
+  it('il campo prezzo compare solo con il pagamento automatico acceso', () => {
+    const spento = mountTable([{ id: 7, name: 'Attivita', automatic_payment: false }]).wrapper;
+    const acceso = mountTable([{ id: 8, name: 'Attivita', automatic_payment: true }]).wrapper;
+
+    expect(spento.find('input[type="number"]').exists()).toBe(false);
+    expect(acceso.find('input[type="number"]').exists()).toBe(true);
+  });
+
+  it('mostra il prezzo in euro dai centesimi salvati', () => {
+    const { wrapper } = mountTable([
+      { id: 7, name: 'Attivita', automatic_payment: true, subscription_price_cents: 4950 }
+    ]);
+
+    expect(wrapper.find('input[type="number"]').element.value).toBe('49.50');
+  });
+
+  it('salva il prezzo in centesimi quando si esce dal campo', async () => {
+    http.makeRequest.mockImplementation((url, method, options, func) => func({ status: 'ok', company: { id: 7 } }));
+    const { wrapper } = mountTable([{ id: 7, name: 'Attivita', automatic_payment: true }]);
+    const input = wrapper.find('input[type="number"]');
+
+    await input.setValue('49.9');
+    await input.trigger('blur');
+    await flushPromises();
+
+    const [url, method, options] = lastPut();
+    expect([url, method]).toEqual(['company/7', 'PUT']);
+    expect(options.body).toEqual({ name: 'Attivita', subscription_price_cents: 4990 });
+  });
+
+  it('svuotare il campo toglie il prezzo', async () => {
+    http.makeRequest.mockImplementation((url, method, options, func) => func({ status: 'ok', company: { id: 7 } }));
+    const { wrapper } = mountTable([
+      { id: 7, name: 'Attivita', automatic_payment: true, subscription_price_cents: 4900 }
+    ]);
+    const input = wrapper.find('input[type="number"]');
+
+    await input.setValue('');
+    await input.trigger('keydown.enter');
+    await flushPromises();
+
+    expect(lastPut()[2].body).toEqual({ name: 'Attivita', subscription_price_cents: null });
+  });
+
+  it('non salva se il prezzo non e cambiato o non e stato toccato', async () => {
+    const { wrapper } = mountTable([
+      { id: 7, name: 'Attivita', automatic_payment: true, subscription_price_cents: 4900 }
+    ]);
+    const input = wrapper.find('input[type="number"]');
+
+    await input.trigger('blur');
+    await input.setValue('49');
+    await input.trigger('blur');
+    await flushPromises();
+
+    expect(lastPut()).toBeUndefined();
   });
 });

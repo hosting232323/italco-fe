@@ -14,7 +14,7 @@ const lastCall = () => http.makeRequest.mock.calls.at(-1);
 // makeRequest(url, method, options, callback): il callback si invoca con la risposta.
 const respondWith = (data) => http.makeRequest.mockImplementationOnce((_u, _m, _o, callback) => callback(data));
 
-const ACTIVE = { status: 'active', plan: 'pro', active: true, current_period_end: null, cancel_at_period_end: false };
+const ACTIVE = { status: 'active', active: true, current_period_end: null, cancel_at_period_end: false };
 
 describe('subscription store', () => {
   beforeEach(() => {
@@ -31,15 +31,15 @@ describe('subscription store', () => {
     expect(store.ready).toBe(false);
   });
 
-  it('carica piani e abbonamento', () => {
+  it('carica prezzo e abbonamento', () => {
     const store = useSubscriptionStore();
     const func = vi.fn();
-    respondWith({ status: 'ok', plans: [{ id: 'base' }], subscription: ACTIVE });
+    respondWith({ status: 'ok', price_cents: 4900, subscription: ACTIVE });
 
     store.initData(func);
 
     expect(lastCall().slice(0, 2)).toEqual(['subscription', 'GET']);
-    expect(store.plans).toEqual([{ id: 'base' }]);
+    expect(store.priceCents).toBe(4900);
     expect(store.subscription).toEqual(ACTIVE);
     expect(store.ready).toBe(true);
     expect(func).toHaveBeenCalled();
@@ -53,7 +53,7 @@ describe('subscription store', () => {
 
     expect(store.message).toBe('Pagamento automatico non attivo per questa attività');
     expect(store.ready).toBe(true);
-    expect(store.plans).toEqual([]);
+    expect(store.priceCents).toBeNull();
   });
 
   it('usa un messaggio di ripiego quando il backend non ne manda', () => {
@@ -77,14 +77,14 @@ describe('subscription store', () => {
     expect(func).toHaveBeenCalled();
   });
 
-  it('checkout manda il piano e porta il browser all\'URL di Stripe', () => {
+  it('checkout porta il browser all\'URL di Stripe', () => {
     const store = useSubscriptionStore();
     respondWith({ status: 'ok', url: 'https://stripe.test/checkout' });
 
-    store.startCheckout('pro');
+    store.startCheckout();
 
     const [url, method, options] = lastCall();
-    expect([url, method, options.body]).toEqual(['subscription/checkout', 'POST', { plan: 'pro' }]);
+    expect([url, method, options.body]).toEqual(['subscription/checkout', 'POST', {}]);
     expect(window.location.href).toBe('https://stripe.test/checkout');
   });
 
@@ -103,7 +103,7 @@ describe('subscription store', () => {
     const func = vi.fn();
     respondWith({ status: 'ko', message: 'Piano non valido' });
 
-    store.startCheckout('gratis', func);
+    store.startCheckout(func);
 
     expect(window.location.href).toBe('');
     expect(store.message).toBe('Piano non valido');

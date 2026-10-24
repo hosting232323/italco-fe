@@ -5,8 +5,6 @@ import RaeDisposalPlaceTable from '@/components/administration/companyRaeDisposa
 import RaeDisposalPlaceForm from '@/components/administration/companyRaeDisposalPlace/RaeDisposalPlaceForm.vue';
 import RaeDisposalPlaceDialog from '@/components/administration/companyRaeDisposalPlace/RaeDisposalPlaceDialog.vue';
 
-import http from '@/utils/http';
-import { useUserStore } from '@/stores/user';
 import { useCompanyStore } from '@/stores/company';
 import { useCompanyRaeDisposalPlaceStore } from '@/stores/companyRaeDisposalPlace';
 
@@ -199,22 +197,23 @@ describe('RaeDisposalPlaceDialog', () => {
     expect(wrapper.text()).toContain('Attivita Test');
   });
 
-  it('con il modulo spento non mostra ne il bottone di aggiunta ne la lista', () => {
+  it('mostra bottone di aggiunta e lista anche con il modulo spento: i luoghi servono per poterlo accendere', () => {
     const { pinia } = setup({ rae: false });
-
-    const wrapper = mountComponent(RaeDisposalPlaceDialog, { pinia });
-
-    expect(wrapper.find('.mdi-plus').exists()).toBe(false);
-    expect(wrapper.findComponent(RaeDisposalPlaceTable).exists()).toBe(false);
-  });
-
-  it('con il modulo acceso mostra il bottone di aggiunta e la lista', () => {
-    const { pinia } = setup({ rae: true });
 
     const wrapper = mountComponent(RaeDisposalPlaceDialog, { pinia });
 
     expect(wrapper.find('.mdi-plus').exists()).toBe(true);
     expect(wrapper.findComponent(RaeDisposalPlaceTable).exists()).toBe(true);
+  });
+
+  it('non gestisce piu il modulo ne l-iscrizione: sono la tabella e la configurazione', () => {
+    const { pinia } = setup({ rae: true });
+
+    const wrapper = mountComponent(RaeDisposalPlaceDialog, { pinia });
+
+    expect(wrapper.text()).not.toContain('Modulo RAEE');
+    expect(wrapper.text()).not.toContain('Estremi iscrizione Albo Gestori Ambientali');
+    expect(wrapper.findAll('input[type="radio"]')).toHaveLength(0);
   });
 
   it('aprendo il form di creazione compare sopra la lista, non sotto', async () => {
@@ -242,76 +241,5 @@ describe('RaeDisposalPlaceDialog', () => {
 
     expect(store.activeForm).toBe(true);
     expect(store.element).toEqual({});
-  });
-
-  it('accendere il modulo mostra subito la sezione dei luoghi e inoltra l-iscrizione della company', async () => {
-    const { pinia } = setup({ rae: false, rae_registration: 'RD-ESISTENTE' });
-    http.makeRequest.mockImplementation((url, method, options, func) =>
-      func({ status: 'ok', company: { id: 42, name: 'Attivita Test', rae: true } })
-    );
-    const wrapper = mountComponent(RaeDisposalPlaceDialog, { pinia });
-
-    await wrapper.findAll('input[type="radio"]')[0].trigger('click');
-    await flushPromises();
-
-    // Il successo rilancia companyStore.initList() (debounced): non si puo'
-    // assumere che la PUT sia l'ultima chiamata registrata, va cercata.
-    const [url, method, options] = http.makeRequest.mock.calls.find(([, requestMethod]) => requestMethod === 'PUT');
-    expect([url, method]).toEqual(['company/42', 'PUT']);
-    expect(options.body).toEqual({ name: 'Attivita Test', rae: true, rae_registration: 'RD-ESISTENTE' });
-    expect(wrapper.find('.mdi-plus').exists()).toBe(true);
-  });
-
-  it('il campo iscrizione Albo compare solo con il modulo acceso', () => {
-    const spento = mountComponent(RaeDisposalPlaceDialog, { pinia: setup({ rae: false }).pinia });
-    expect(spento.text()).not.toContain('Estremi iscrizione Albo Gestori Ambientali');
-
-    const acceso = mountComponent(RaeDisposalPlaceDialog, { pinia: setup({ rae: true }).pinia });
-    expect(acceso.text()).toContain('Estremi iscrizione Albo Gestori Ambientali');
-  });
-
-  it('Salva inoltra l-iscrizione digitata con rae gia a true', async () => {
-    const { pinia } = setup({ rae: true, rae_registration: 'RD-VECCHIO' });
-    http.makeRequest.mockImplementation((url, method, options, func) =>
-      func({ status: 'ok', company: { id: 42, name: 'Attivita Test', rae: true } })
-    );
-    const wrapper = mountComponent(RaeDisposalPlaceDialog, { pinia });
-
-    await wrapper.find('input[type="text"]').setValue('RD-NUOVO del 02/02/26');
-    await wrapper.findAll('button').find((button) => button.text() === 'Salva').trigger('click');
-    await flushPromises();
-
-    const [url, method, options] = http.makeRequest.mock.calls.find(([, requestMethod]) => requestMethod === 'PUT');
-    expect([url, method]).toEqual(['company/42', 'PUT']);
-    expect(options.body).toEqual({ name: 'Attivita Test', rae: true, rae_registration: 'RD-NUOVO del 02/02/26' });
-  });
-
-  it('se il backend rifiuta (nessun luogo o iscrizione mancante) la sezione resta aperta e mostra l-errore', async () => {
-    const { pinia } = setup({ rae: false });
-    http.makeRequest.mockImplementation((url, method, options, func) =>
-      func({ status: 'ko', message: 'Configura almeno un luogo di smaltimento RAEE prima di attivare il modulo' })
-    );
-    const wrapper = mountComponent(RaeDisposalPlaceDialog, { pinia });
-
-    await wrapper.findAll('input[type="radio"]')[0].trigger('click');
-    await flushPromises();
-
-    expect(wrapper.text()).toContain('Configura almeno un luogo di smaltimento RAEE');
-    // La sezione resta visibile: e' cosi' che si arriva a compilare cio' che manca.
-    expect(wrapper.find('.mdi-plus').exists()).toBe(true);
-  });
-
-  it('aggiorna la sessione se la company modificata e quella attiva del super admin', async () => {
-    const { pinia } = setup({ rae: false });
-    useUserStore().company = { id: 42, name: 'Attivita Test', rae: false };
-    http.makeRequest.mockImplementation((url, method, options, func) =>
-      func({ status: 'ok', company: { id: 42, name: 'Attivita Test', rae: true } })
-    );
-    const wrapper = mountComponent(RaeDisposalPlaceDialog, { pinia });
-
-    await wrapper.findAll('input[type="radio"]')[0].trigger('click');
-    await flushPromises();
-
-    expect(useUserStore().company.rae).toBe(true);
   });
 });

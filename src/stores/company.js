@@ -50,21 +50,13 @@ export const useCompanyStore = defineStore('company', {
         func
       );
     },
-    updateElement(func) {
-      http.uploadRequest(
-        `company/${this.element.id}`,
+    // Interruttori e prezzo direttamente dalla tabella: la PUT vuole sempre il
+    // nome, il resto sono solo i campi che cambiano.
+    updateSettings(company, changes, func) {
+      http.makeRequest(
+        `company/${company.id}`,
         'PUT',
-        {
-          body: {
-            name: this.element.name,
-            rae: this.element.rae || false,
-            automatic_planning: this.element.automatic_planning || false,
-            automatic_payment: this.element.automatic_payment || false,
-            ...this.legalBody(),
-          },
-          files: { logo: this.element.logo },
-          extensions: fileUtils.imageExtensions,
-        },
+        { body: { name: company.name, ...changes } },
         func
       );
     },
