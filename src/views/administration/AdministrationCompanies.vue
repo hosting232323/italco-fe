@@ -31,17 +31,25 @@
   >
     <RaeDisposalPlaceDialog />
   </v-dialog>
+  <v-dialog
+    v-model="subscriptionOpen"
+    max-width="800"
+  >
+    <CompanySubscriptionDialog />
+  </v-dialog>
 </template>
 
 <script setup>
 import PageHeader from '@/components/PageHeader';
 import CompanyForm from '@/components/administration/company/CompanyForm';
 import CompanyTable from '@/components/administration/company/CompanyTable';
+import CompanySubscriptionDialog from '@/components/administration/companySubscription/CompanySubscriptionDialog';
 import RaeDisposalPlaceDialog from '@/components/administration/companyRaeDisposalPlace/RaeDisposalPlaceDialog';
 
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '@/stores/company';
+import { useCompanySubscriptionStore } from '@/stores/companySubscription';
 import { useCompanyRaeDisposalPlaceStore } from '@/stores/companyRaeDisposalPlace';
 
 const theme = useTheme();
@@ -49,6 +57,7 @@ const companyStore = useCompanyStore();
 const { activeForm, element: company } = storeToRefs(companyStore);
 
 const { dialogOpen: disposalPlacesOpen } = storeToRefs(useCompanyRaeDisposalPlaceStore());
+const { dialogOpen: subscriptionOpen } = storeToRefs(useCompanySubscriptionStore());
 
 const openForm = () => {
   company.value = {};

@@ -35,8 +35,9 @@ export const useCompanyConfigurationStore = defineStore('companyConfiguration', 
             tax_code: this.element.tax_code || null,
             address: this.element.address,
             city: this.element.city,
-            // Obbligatoria solo col modulo RAEE acceso: senza modulo non si manda.
-            ...(this.element.rae ? { rae_registration: this.element.rae_registration } : {})
+            // Obbligatoria solo col modulo RAEE acceso, ma sempre modificabile:
+            // il modulo si accende solo se l'iscrizione c'è già.
+            rae_registration: this.element.rae_registration || null
           },
           files: { logo: this.element.logo },
           extensions: fileUtils.imageExtensions

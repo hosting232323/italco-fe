@@ -6,6 +6,7 @@ import CompanyTable from '@/components/administration/company/CompanyTable.vue';
 import http from '@/utils/http';
 import { useUserStore } from '@/stores/user';
 import { useCompanyStore } from '@/stores/company';
+import { useCompanySubscriptionStore } from '@/stores/companySubscription';
 import { useCompanyRaeDisposalPlaceStore } from '@/stores/companyRaeDisposalPlace';
 import { createTestPinia, createTestRouter, mountComponent, selectRow } from '../../helpers/mount';
 
@@ -229,61 +230,62 @@ describe('CompanyTable', () => {
     expect(useUserStore().company).toEqual({ id: 99, name: 'Altra' });
   });
 
-  it('il campo prezzo compare solo con il pagamento automatico acceso', () => {
+  it('il bottone dei luoghi di smaltimento esiste solo col modulo RAEE acceso', async () => {
+    const spento = mountTable([{ id: 7, name: 'Attivita', rae: false }]).wrapper;
+    const acceso = mountTable([{ id: 8, name: 'Attivita', rae: true }]).wrapper;
+
+    await selectRow(spento);
+    await selectRow(acceso);
+
+    expect(spento.find('.mdi-recycle').exists()).toBe(false);
+    expect(acceso.find('.mdi-recycle').exists()).toBe(true);
+  });
+
+  it('il bottone Abbonamento esiste solo col pagamento automatico acceso e apre il popup', async () => {
     const spento = mountTable([{ id: 7, name: 'Attivita', automatic_payment: false }]).wrapper;
-    const acceso = mountTable([{ id: 8, name: 'Attivita', automatic_payment: true }]).wrapper;
+    const { wrapper } = mountTable([{ id: 8, name: 'Attivita', automatic_payment: true }]);
+    const subscriptionStore = useCompanySubscriptionStore();
 
-    expect(spento.find('input[type="number"]').exists()).toBe(false);
-    expect(acceso.find('input[type="number"]').exists()).toBe(true);
+    await selectRow(spento);
+    await selectRow(wrapper);
+    expect(spento.find('.mdi-credit-card-edit-outline').exists()).toBe(false);
+
+    await wrapper.find('.mdi-credit-card-edit-outline').trigger('click');
+
+    expect(subscriptionStore.companyId).toBe(8);
+    expect(subscriptionStore.dialogOpen).toBe(true);
   });
 
-  it('mostra il prezzo in euro dai centesimi salvati', () => {
-    const { wrapper } = mountTable([
-      { id: 7, name: 'Attivita', automatic_payment: true, subscription_price_cents: 4950 }
-    ]);
-
-    expect(wrapper.find('input[type="number"]').element.value).toBe('49.50');
-  });
-
-  it('salva il prezzo in centesimi quando si esce dal campo', async () => {
-    http.makeRequest.mockImplementation((url, method, options, func) => func({ status: 'ok', company: { id: 7 } }));
-    const { wrapper } = mountTable([{ id: 7, name: 'Attivita', automatic_payment: true }]);
-    const input = wrapper.find('input[type="number"]');
-
-    await input.setValue('49.9');
-    await input.trigger('blur');
-    await flushPromises();
-
-    const [url, method, options] = lastPut();
-    expect([url, method]).toEqual(['company/7', 'PUT']);
-    expect(options.body).toEqual({ name: 'Attivita', subscription_price_cents: 4990 });
-  });
-
-  it('svuotare il campo toglie il prezzo', async () => {
-    http.makeRequest.mockImplementation((url, method, options, func) => func({ status: 'ok', company: { id: 7 } }));
+  it('non c-e piu il campo prezzo in tabella: sta nel popup dell-abbonamento', () => {
     const { wrapper } = mountTable([
       { id: 7, name: 'Attivita', automatic_payment: true, subscription_price_cents: 4900 }
     ]);
-    const input = wrapper.find('input[type="number"]');
 
-    await input.setValue('');
-    await input.trigger('keydown.enter');
-    await flushPromises();
-
-    expect(lastPut()[2].body).toEqual({ name: 'Attivita', subscription_price_cents: null });
+    expect(wrapper.find('input[type="number"]').exists()).toBe(false);
   });
 
-  it('non salva se il prezzo non e cambiato o non e stato toccato', async () => {
-    const { wrapper } = mountTable([
-      { id: 7, name: 'Attivita', automatic_payment: true, subscription_price_cents: 4900 }
-    ]);
-    const input = wrapper.find('input[type="number"]');
+  it('se l-accensione del modulo RAEE e rifiutata l-avviso offre i luoghi di smaltimento', async () => {
+    http.makeRequest.mockImplementation((url, method, options, func) =>
+      func({ status: 'ko', message: 'Configura almeno un luogo di smaltimento RAEE prima di attivare il modulo' })
+    );
+    const { wrapper } = mountTable([{ id: 7, name: 'Attivita', rae: false }]);
 
-    await input.trigger('blur');
-    await input.setValue('49');
-    await input.trigger('blur');
+    await switches(wrapper)[0].setValue(true);
+    await flushPromises();
+    const button = wrapper.findAll('button').find((item) => item.text() == 'Luoghi di smaltimento RAEE');
+    await button.trigger('click');
+
+    expect(useCompanyRaeDisposalPlaceStore().companyId).toBe(7);
+    expect(useCompanyRaeDisposalPlaceStore().dialogOpen).toBe(true);
+  });
+
+  it('un rifiuto su un altro interruttore non offre i luoghi', async () => {
+    http.makeRequest.mockImplementation((url, method, options, func) => func({ status: 'ko', message: 'No' }));
+    const { wrapper } = mountTable([{ id: 7, name: 'Attivita' }]);
+
+    await switches(wrapper)[1].setValue(true);
     await flushPromises();
 
-    expect(lastPut()).toBeUndefined();
+    expect(wrapper.findAll('button').find((item) => item.text() == 'Luoghi di smaltimento RAEE')).toBeUndefined();
   });
 });
