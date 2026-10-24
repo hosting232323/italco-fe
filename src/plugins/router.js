@@ -183,9 +183,9 @@ router.beforeEach((to) => {
   if (to.name == 'Log' && role != 'Super Admin')
     return { name: 'Dashboard' };
 
-  // La configurazione (abbonamento) e' dell'admin delle attivita' con il
-  // pagamento automatico acceso dal super admin; il backend risponde ko altrimenti.
-  if (to.name == 'Configurazione' && (!company?.automatic_payment || !['Admin', 'Super Admin'].includes(role)))
+  // La configurazione dell'attivita' e' dell'admin (o del super admin che opera
+  // su una company): il backend risponde 403 a tutti gli altri ruoli.
+  if (to.name == 'Configurazione' && !['Admin', 'Super Admin'].includes(role))
     return { name: 'Dashboard' };
 
   // Togliere le voci dal menù non basta: l'URL resta digitabile e i preferiti
