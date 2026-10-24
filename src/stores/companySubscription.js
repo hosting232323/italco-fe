@@ -12,7 +12,11 @@ export const useCompanySubscriptionStore = defineStore('companySubscription', {
     dialogOpen: false,
     priceCents: null,
     subscription: { status: 'none', active: false, current_period_end: null, cancel_at_period_end: false },
-    ready: false
+    ready: false,
+    // Storico letto da Stripe: si carica a parte dal prezzo (e può fallire da solo).
+    history: { subscriptions: [], invoices: [], summary: null },
+    historyReady: false,
+    historyMessage: ''
   }),
   actions: {
     open(companyId) {
@@ -20,6 +24,7 @@ export const useCompanySubscriptionStore = defineStore('companySubscription', {
       this.dialogOpen = true;
       this.ready = false;
       this.initData();
+      this.initHistory();
     },
     setData(data) {
       this.priceCents = data.price_cents ?? null;
@@ -29,6 +34,18 @@ export const useCompanySubscriptionStore = defineStore('companySubscription', {
     initData(func) {
       http.makeRequest(`subscription/company/${this.companyId}`, 'GET', {}, (data) => {
         if (data.status == 'ok') this.setData(data);
+        if (func) func(data);
+      });
+    },
+    initHistory(func) {
+      this.historyReady = false;
+      this.historyMessage = '';
+      http.makeRequest(`subscription/company/${this.companyId}/history`, 'GET', {}, (data) => {
+        if (data.status == 'ok')
+          this.history = { subscriptions: data.subscriptions, invoices: data.invoices, summary: data.summary };
+        else
+          this.historyMessage = data.message || 'Errore nella lettura dello storico';
+        this.historyReady = true;
         if (func) func(data);
       });
     },
