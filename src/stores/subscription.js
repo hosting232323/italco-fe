@@ -4,8 +4,9 @@ import { defineStore } from 'pinia';
 
 export const useSubscriptionStore = defineStore('subscription', {
   state: () => ({
-    plans: [],
-    subscription: { status: 'none', plan: null, active: false, current_period_end: null, cancel_at_period_end: false },
+    // Prezzo mensile deciso dal super admin per questa attivita', in centesimi.
+    priceCents: null,
+    subscription: { status: 'none', active: false, current_period_end: null, cancel_at_period_end: false },
     ready: false,
     // Messaggio di errore dell'ultima azione (es. pagamento automatico non attivo).
     message: ''
@@ -21,7 +22,7 @@ export const useSubscriptionStore = defineStore('subscription', {
     },
     initData(func) {
       http.makeRequest('subscription', 'GET', {}, (data) => {
-        if (data.status == 'ok') this.plans = data.plans;
+        if (data.status == 'ok') this.priceCents = data.price_cents;
         this.setSubscription(data);
         this.ready = true;
         if (func) func(data);
@@ -44,8 +45,8 @@ export const useSubscriptionStore = defineStore('subscription', {
         if (func) func(data);
       });
     },
-    startCheckout(plan, func) {
-      this.redirectTo('subscription/checkout', { plan }, func);
+    startCheckout(func) {
+      this.redirectTo('subscription/checkout', {}, func);
     },
     openPortal(func) {
       this.redirectTo('subscription/portal', {}, func);
