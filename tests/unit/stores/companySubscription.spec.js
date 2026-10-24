@@ -28,10 +28,49 @@ describe('companySubscription store', () => {
 
     expect(store.companyId).toBe(42);
     expect(store.dialogOpen).toBe(true);
-    expect(lastCall().slice(0, 2)).toEqual(['subscription/company/42', 'GET']);
+    expect(http.makeRequest.mock.calls[0].slice(0, 2)).toEqual(['subscription/company/42', 'GET']);
     expect(store.priceCents).toBe(4900);
     expect(store.subscription).toEqual(ACTIVE);
     expect(store.ready).toBe(true);
+  });
+
+  it('open chiede anche lo storico dei pagamenti', () => {
+    const store = useCompanySubscriptionStore();
+    const history = { subscriptions: [{ id: 's' }], invoices: [{ id: 'i' }], summary: { regular: true } };
+    http.makeRequest.mockImplementation((url, method, options, callback) =>
+      callback(url.endsWith('/history') ? { status: 'ok', ...history } : { status: 'ok', subscription: ACTIVE })
+    );
+
+    store.open(42);
+
+    expect(http.makeRequest.mock.calls.map(([url]) => url)).toContain('subscription/company/42/history');
+    expect(store.history).toEqual(history);
+    expect(store.historyReady).toBe(true);
+    expect(store.historyMessage).toBe('');
+  });
+
+  it('se lo storico fallisce tiene il messaggio senza toccare il resto', () => {
+    const store = useCompanySubscriptionStore();
+    const func = vi.fn();
+    store.companyId = 42;
+    respondWith({ status: 'ko', message: 'Errore Stripe: rete' });
+
+    store.initHistory(func);
+
+    expect(store.historyMessage).toBe('Errore Stripe: rete');
+    expect(store.historyReady).toBe(true);
+    expect(store.history.invoices).toEqual([]);
+    expect(func).toHaveBeenCalled();
+  });
+
+  it('lo storico usa un messaggio di ripiego quando il backend non ne manda uno', () => {
+    const store = useCompanySubscriptionStore();
+    store.companyId = 42;
+    respondWith({ status: 'ko' });
+
+    store.initHistory();
+
+    expect(store.historyMessage).toBe('Errore nella lettura dello storico');
   });
 
   it('senza prezzo definito lo tiene a null', () => {
