@@ -36,6 +36,31 @@ describe('CompanySubscriptionDialog', () => {
     return { wrapper, store };
   };
 
+  const INVOICE = {
+    id: 'in_1',
+    number: 'N-1',
+    status: 'paid',
+    amount_cents: 4900,
+    created: '2026-01-01T00:00:00',
+    paid_at: '2026-01-01T00:01:00',
+    attempts: 1,
+    url: 'https://stripe.test/in_1'
+  };
+  const SUMMARY = {
+    customer_since: '2026-01-01T00:01:00',
+    paid_count: 1,
+    paid_total_cents: 4900,
+    unpaid_count: 0,
+    retried_count: 0,
+    regular: true
+  };
+  const RECORD = { id: 'sub_1', status: 'active', created: '2026-01-01T00:00:00', ended_at: null, price_cents: 4900 };
+
+  const withHistory = (store, history) => {
+    store.history = history;
+    store.historyReady = true;
+  };
+
   const saveButton = (wrapper) => wrapper.findAll('button').find((item) => item.text() == 'Salva prezzo');
 
   it('mostra la company, lo stato e il prezzo attuale', () => {
@@ -151,5 +176,74 @@ describe('CompanySubscriptionDialog', () => {
     await wrapper.find('input[type="number"]').setValue('0.10');
 
     expect(saveButton(wrapper).element.disabled).toBe(true);
+  });
+
+  describe('storico pagamenti', () => {
+    it('mentre carica mostra la barra e non la tabella', () => {
+      const { wrapper } = setup();
+
+      expect(wrapper.text()).toContain('Storico pagamenti');
+      expect(wrapper.find('table').exists()).toBe(false);
+    });
+
+    it('senza fatture dice che non ha mai sottoscritto', () => {
+      const { wrapper, store } = setup();
+      withHistory(store, { subscriptions: [], invoices: [], summary: null });
+
+      return wrapper.vm.$nextTick().then(() => {
+        expect(wrapper.text()).toContain('non ha ancora sottoscritto');
+      });
+    });
+
+    it('se Stripe non risponde mostra l-errore al posto dello storico', () => {
+      const { wrapper, store } = setup();
+      store.historyReady = true;
+      store.historyMessage = 'Errore Stripe: rete';
+
+      return wrapper.vm.$nextTick().then(() => {
+        expect(wrapper.text()).toContain('Errore Stripe: rete');
+      });
+    });
+
+    it('con pagamenti sempre regolari lo dice, con da quando paga e il totale incassato', async () => {
+      const { wrapper, store } = setup({ subscription: ACTIVE });
+      withHistory(store, { subscriptions: [RECORD], invoices: [INVOICE], summary: SUMMARY });
+      await wrapper.vm.$nextTick();
+
+      const text = wrapper.text();
+      expect(text).toContain('Pagamenti sempre regolari');
+      expect(text).toContain('Paga dal');
+      expect(text).toContain('01/01/2026');
+      expect(text).toContain('1 saldate');
+      expect(text).toContain('N-1');
+      expect(text).toContain('Saldata');
+      expect(wrapper.find('a[href="https://stripe.test/in_1"]').exists()).toBe(true);
+    });
+
+    it('elenca anche gli abbonamenti, con prezzo e fine', async () => {
+      const { wrapper, store } = setup();
+      const ended = { ...RECORD, id: 'sub_old', status: 'canceled', ended_at: '2026-02-01T00:00:00' };
+      withHistory(store, { subscriptions: [ended, RECORD], invoices: [INVOICE], summary: SUMMARY });
+      await wrapper.vm.$nextTick();
+
+      expect(wrapper.text()).toContain('Annullato');
+      expect(wrapper.text()).toContain('01/02/2026');
+      expect(wrapper.text()).toContain('49,00');
+    });
+
+    it('segnala le irregolarita: non saldate e saldate dopo un nuovo tentativo', async () => {
+      const { wrapper, store } = setup();
+      const unpaid = { ...INVOICE, id: 'in_2', status: 'open', number: null, url: null, attempts: 3 };
+      const summary = { ...SUMMARY, regular: false, unpaid_count: 1, retried_count: 2 };
+      withHistory(store, { subscriptions: [], invoices: [INVOICE, unpaid], summary });
+      await wrapper.vm.$nextTick();
+
+      const text = wrapper.text();
+      expect(text).toContain('Pagamenti con irregolarità');
+      expect(text).toContain('1 non saldate');
+      expect(text).toContain('2 saldate solo dopo un nuovo tentativo');
+      expect(text).toContain('Da pagare');
+      expect(text).toContain('in_2');
+    });
   });
 });
