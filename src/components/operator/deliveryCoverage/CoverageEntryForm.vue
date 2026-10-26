@@ -1,0 +1,177 @@
+<template>
+  <v-card
+    v-if="entryForm"
+    :title="element.id ? `Modifica blocco ID ${element.id}` : 'Nuovo blocco di copertura'"
+    class="mt-10 mb-5"
+  >
+    <v-card-text>
+      <v-form
+        ref="form"
+        @submit.prevent="submitForm"
+      >
+        <v-row no-gutters>
+          <v-col
+            cols="12"
+            md="6"
+          >
+            <v-select
+              v-model="element.day_of_week"
+              label="Giorno"
+              :items="days.weekDays"
+              item-title="title"
+              item-value="value"
+              :class="isMobile ? '' : 'mr-2'"
+              :rules="validation.requiredRulesWithZero"
+            />
+          </v-col>
+          <v-col
+            cols="12"
+            md="6"
+          >
+            <v-autocomplete
+              v-model="element.transport_id"
+              label="Veicolo"
+              :items="transports"
+              item-title="name"
+              item-value="id"
+              :class="isMobile ? '' : 'ml-2'"
+              :rules="validation.requiredRules"
+            />
+          </v-col>
+        </v-row>
+        <v-row no-gutters>
+          <v-col
+            cols="12"
+            md="6"
+          >
+            <v-text-field
+              v-model="element.start_time"
+              type="time"
+              label="Dalle"
+              :class="isMobile ? '' : 'mr-2'"
+              :rules="validation.requiredRules"
+            />
+          </v-col>
+          <v-col
+            cols="12"
+            md="6"
+          >
+            <v-text-field
+              v-model="element.end_time"
+              type="time"
+              label="Alle"
+              :class="isMobile ? '' : 'ml-2'"
+              :rules="[...validation.futureTime(element.start_time), ...overlapRules]"
+            />
+          </v-col>
+        </v-row>
+        <v-alert
+          v-if="element.polygon"
+          type="info"
+          variant="tonal"
+          density="comfortable"
+          class="mb-4"
+        >
+          Zona disegnata sulla mappa ({{ element.polygon.length }} vertici), nessun CAP da selezionare.
+          <a
+            href="#"
+            @click.prevent="element.polygon = null"
+          >Torna alla selezione per CAP</a>
+        </v-alert>
+        <v-combobox
+          v-else
+          v-model="element.caps"
+          label="CAP coperti"
+          multiple
+          chips
+          closable-chips
+          hint="Scrivi un CAP e premi Invio per aggiungerlo, puoi inserirne più di uno"
+          persistent-hint
+          :rules="validation.arrayRules"
+        />
+        <v-switch
+          v-model="element.accepts_preloads"
+          label="Accetta precarichi"
+          hint="Gli ordini di quest'area hanno come fasce solo quelle dei giorni in cui il veicolo passa già dagli stessi punti di ritiro"
+          persistent-hint
+          color="primary"
+          class="mt-2"
+        />
+        <FormButtons
+          :loading="loading"
+          @cancel="entryForm = false"
+        />
+      </v-form>
+    </v-card-text>
+  </v-card>
+</template>
+
+<script setup>
+import FormButtons from '@/components/FormButtons';
+
+import { computed, ref } from 'vue';
+import days from '@/utils/days';
+import mobile from '@/utils/mobile';
+import storesUtils from '@/utils/stores';
+import { storeToRefs } from 'pinia';
+import validation from '@/utils/validation';
+import { useTransportStore } from '@/stores/transport';
+import { useDeliveryCoverageStore } from '@/stores/deliveryCoverage';
+
+const form = ref(null);
+const loading = ref(false);
+const isMobile = mobile.setupMobileUtils();
+
+const store = useDeliveryCoverageStore();
+const { element, entryForm } = storeToRefs(store);
+
+const transportStore = useTransportStore();
+const transports = storesUtils.getStoreList(transportStore);
+
+const toMinutes = (time) => {
+  const [hours, minutes] = time.split(':').map(Number);
+  return hours * 60 + minutes;
+};
+
+// Stesso veicolo non può avere due fasce sovrapposte nello stesso giorno;
+// veicoli diversi possono invece coprire la stessa fascia (vedi anche il
+// controllo gemello lato backend in end_points/delivery_coverage.py).
+const overlapRules = computed(() => [
+  () => {
+    const { id, day_of_week, transport_id, start_time, end_time } = element.value;
+    if (day_of_week === undefined || day_of_week === null || !transport_id || !start_time || !end_time) return true;
+
+    const startMinutes = toMinutes(start_time);
+    const endMinutes = toMinutes(end_time);
+
+    const overlaps = store.entries.some((entry) => (
+      entry.id !== id &&
+      entry.transport_id === transport_id &&
+      entry.day_of_week === day_of_week &&
+      startMinutes < toMinutes(entry.end_time) &&
+      endMinutes > toMinutes(entry.start_time)
+    ));
+
+    return !overlaps || 'Il veicolo ha già una fascia sovrapposta in quel giorno';
+  }
+]);
+
+const submitForm = async () => {
+  if (!(await form.value.validate()).valid) return;
+
+  loading.value = true;
+  const done = (data) => {
+    loading.value = false;
+    if (data.status == 'ok') {
+      store.initList();
+      element.value = {};
+      entryForm.value = false;
+    } else {
+      alert(data.message);
+    }
+  };
+
+  if (element.value.id) store.updateEntry(done);
+  else store.createEntry(done);
+};
+</script>

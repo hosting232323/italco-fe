@@ -1,7 +1,10 @@
 <template>
   <div class="page-header">
     <div class="page-header-row">
-      <h1>{{ title }}</h1>
+      <component :is="level">
+        {{ title }}
+        <slot name="title-extra" />
+      </component>
       <div class="page-header-actions">
         <slot />
       </div>
@@ -15,6 +18,11 @@ defineProps({
   title: {
     type: String,
     required: true
+  },
+  // Intestazione di sezione dentro una pagina: h2 al posto dell'h1 del titolo pagina.
+  level: {
+    type: String,
+    default: 'h1'
   }
 });
 </script>

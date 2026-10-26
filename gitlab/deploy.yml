@@ -1,8 +1,6 @@
-# Deploy manuale su Cloudflare Pages (progetti direct upload hubstra-fe-test
-# per deploy_test e hubstra-fe per deploy_prod). Sovrascrive sempre l'URL
-# del progetto.
-# Variabili CI richieste: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID,
-# VITE_HOSTNAME_TEST / VITE_GOOGLE_API_KEY_TEST e
+# Manual Cloudflare Pages deploys: production, test and a dedicated demo project.
+# Required CI variables: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID,
+# VITE_HOSTNAME_TEST / VITE_GOOGLE_API_KEY_TEST and
 # VITE_HOSTNAME_PROD / VITE_GOOGLE_API_KEY_PROD.
 .deploy_pages:
   stage: deploy
@@ -23,10 +21,30 @@ deploy_test:
   script:
     - npm ci
     - VITE_HOSTNAME="$VITE_HOSTNAME_TEST" VITE_GOOGLE_API_KEY="$VITE_GOOGLE_API_KEY_TEST" npm run build
-    - npx wrangler pages deploy dist --project-name=hubstra-fe-test --branch=main --commit-dirty=true
+    - npx wrangler pages deploy dist --project-name=hubstra-fe-test --branch=main
   environment:
     name: pages-test
     url: https://hubstra-fe-test.pages.dev
+
+# Il progetto Pages dedicato separa la demo dalla produzione e dal progetto test.
+deploy_demo:
+  extends: .deploy_pages
+  resource_group: hubstra-fe-demo
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "fix/review-automatic-planning"'
+      when: manual
+    - if: '$CI_COMMIT_BRANCH == "demo/pianificazione-automatica"'
+      when: manual
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: manual
+      allow_failure: true
+  script:
+    - npm ci
+    - VITE_HOSTNAME="https://demo.hubstra.it/api/" VITE_GOOGLE_API_KEY="$VITE_GOOGLE_API_KEY_TEST" npm run build
+    - npx wrangler pages deploy dist --project-name=hubstra-fe-demo --branch=main
+  environment:
+    name: pages-demo
+    url: https://hubstra-fe-demo.pages.dev
 
 deploy_prod:
   extends: .deploy_pages
@@ -38,7 +56,7 @@ deploy_prod:
   script:
     - npm ci
     - VITE_HOSTNAME="$VITE_HOSTNAME_PROD" VITE_GOOGLE_API_KEY="$VITE_GOOGLE_API_KEY_PROD" npm run build
-    - npx wrangler pages deploy dist --project-name=hubstra-fe --branch=main --commit-dirty=true
+    - npx wrangler pages deploy dist --project-name=hubstra-fe --branch=main
   environment:
     name: pages-prod
     url: https://hubstra-fe.pages.dev

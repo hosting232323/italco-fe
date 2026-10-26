@@ -83,6 +83,25 @@ const routes = [
         component: () => import('@/views/operator/OperatorSchedules.vue')
       },
       {
+        path: 'planning',
+        redirect: '/planning/constraints'
+      },
+      {
+        path: 'planning/constraints',
+        name: 'Vincoli',
+        component: () => import('@/views/operator/PlanningConstraints.vue')
+      },
+      {
+        path: 'planning/automatic',
+        name: 'Pianificazione',
+        component: () => import('@/views/operator/PlanningAutomatic.vue')
+      },
+      {
+        // Vecchio indirizzo della copertura corrieri, ora nella pagina Pianificazione automatica.
+        path: 'delivery-coverage',
+        redirect: '/planning/automatic'
+      },
+      {
         path: 'collection-points',
         name: 'Punti di ritiro',
         component: () => import('@/views/customer/CollectionPoints.vue')
@@ -153,6 +172,7 @@ const RAE_ROUTES = [
 router.beforeEach((to) => {
   const userStore = useUserStore();
   const { role, company } = userStore;
+  const planningRoles = ['Super Admin', 'Admin', 'Operator'];
 
   // Sessioni Delivery aperte da prima della rimozione della UI web: la
   // company web non offre più nulla per questo ruolo, quindi si chiude la
@@ -161,6 +181,11 @@ router.beforeEach((to) => {
     userStore.$reset();
     return { name: 'Download App' };
   }
+
+  // I controlli del backend restano l'autorità, ma le pagine di pianificazione
+  // non devono essere raggiungibili via URL da clienti e ruoli non operativi.
+  if (to.path.startsWith('/planning/') && !planningRoles.includes(role))
+    return { name: role == 'Customer' ? 'Ordini' : role ? 'Dashboard' : 'Login' };
 
   // Il super admin non possiede dati propri: finché non sceglie una company
   // non c'è niente da mostrargli, e ogni altra rotta lo riporta alla scelta.

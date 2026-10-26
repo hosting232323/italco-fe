@@ -84,6 +84,62 @@ describe('CompanyForm', () => {
     expect(options.files).toHaveProperty('logo');
   });
 
+  it('manda gli orari di inizio e fine attivita', async () => {
+    const pinia = createTestPinia();
+    const store = useCompanyStore();
+    store.activeForm = true;
+    store.element = {
+      id: 7,
+      name: 'Attivita',
+      rae: false,
+      activity_start_time: '08:00',
+      activity_end_time: '18:30',
+      ...LEGAL
+    };
+    const wrapper = mountComponent(CompanyForm, { pinia });
+
+    await wrapper.find('form').trigger('submit');
+    await flushPromises();
+
+    const [, , options] = http.uploadRequest.mock.calls.at(-1);
+    expect(options.body).toMatchObject({ activity_start_time: '08:00', activity_end_time: '18:30' });
+  });
+
+  it('manda orari nulli quando non sono compilati', async () => {
+    const pinia = createTestPinia();
+    const store = useCompanyStore();
+    store.activeForm = true;
+    store.element = { id: 7, name: 'Attivita', rae: false, ...LEGAL };
+    const wrapper = mountComponent(CompanyForm, { pinia });
+
+    await wrapper.find('form').trigger('submit');
+    await flushPromises();
+
+    const [, , options] = http.uploadRequest.mock.calls.at(-1);
+    expect(options.body.activity_start_time).toBeNull();
+    expect(options.body.activity_end_time).toBeNull();
+  });
+
+  it('con un orario di inizio pretende una fine successiva', async () => {
+    const pinia = createTestPinia();
+    const store = useCompanyStore();
+    store.activeForm = true;
+    store.element = {
+      id: 7,
+      name: 'Attivita',
+      rae: false,
+      activity_start_time: '18:00',
+      activity_end_time: '08:00',
+      ...LEGAL
+    };
+    const wrapper = mountComponent(CompanyForm, { pinia });
+
+    await wrapper.find('form').trigger('submit');
+    await flushPromises();
+
+    expect(http.uploadRequest).not.toHaveBeenCalled();
+  });
+
   it('blocca la submit se mancano i dati legali obbligatori', async () => {
     const pinia = createTestPinia();
     const store = useCompanyStore();
@@ -117,6 +173,10 @@ describe('CompanyForm', () => {
     expect(img.exists()).toBe(true);
     expect(img.props('src')).toBe('https://api.test/company/logo/3.png?token=fake&v=01%2F01%2F2026%2010%3A00');
     expect(wrapper.text()).toContain('Logo attuale');
+
+    // In jsdom l'immagine non carica mai: VImg continua a ripollare con un
+    // timer che scatta dopo il teardown dell'ambiente (window is not defined).
+    wrapper.unmount();
   });
 
   it('mostra il messaggio di errore del backend quando la creazione fallisce', async () => {
@@ -156,5 +216,35 @@ describe('CompanyTable', () => {
     expect(disposalPlaceStore.dialogOpen).toBe(true);
     // Il form di modifica della company resta chiuso: sono due popup distinti.
     expect(companyStore.activeForm).toBe(false);
+  });
+
+  it('mostra l-orario di attivita senza i secondi che arrivano dal backend', () => {
+    const pinia = createTestPinia();
+    const companyStore = useCompanyStore();
+    companyStore.ready = true;
+    companyStore.list = [
+      { id: 7, name: 'Con orario', rae: false, activity_start_time: '08:00:00', activity_end_time: '18:30:00' }
+    ];
+
+    const wrapper = mountComponent(CompanyTable, { pinia, router: createTestRouter() });
+
+    expect(wrapper.text()).toContain('08:00 - 18:30');
+  });
+
+  it('senza orario mostra un trattino', () => {
+    const pinia = createTestPinia();
+    const companyStore = useCompanyStore();
+    companyStore.ready = true;
+    companyStore.list = [
+      { id: 7, name: 'Senza orario', rae: false },
+      // Mezza finestra non e uno stato che il backend accetta, ma se arrivasse
+      // non si mostra un intervallo monco.
+      { id: 8, name: 'Mezza finestra', rae: false, activity_start_time: '08:00:00' }
+    ];
+
+    const wrapper = mountComponent(CompanyTable, { pinia, router: createTestRouter() });
+
+    expect(wrapper.findAll('tbody tr')).toHaveLength(2);
+    expect(wrapper.text()).not.toContain('08:00');
   });
 });

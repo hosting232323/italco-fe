@@ -34,4 +34,20 @@ describe('router guard', () => {
 
     expect(router.currentRoute.value.name).toBe('Dashboard');
   });
+
+  it('impedisce ai clienti di aprire le pagine di pianificazione via URL', async () => {
+    userStore.$patch({ role: 'Customer', userId: 3 });
+
+    await router.push('/planning/automatic');
+
+    expect(router.currentRoute.value.name).toBe('Ordini');
+  });
+
+  it('permette agli operatori di aprire la pianificazione', async () => {
+    userStore.$patch({ role: 'Operator', userId: 4 });
+
+    await router.push('/planning/automatic');
+
+    expect(router.currentRoute.value.name).toBe('Pianificazione');
+  });
 });
