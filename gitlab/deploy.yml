@@ -42,37 +42,3 @@ deploy_prod:
   environment:
     name: pages-prod
     url: https://hubstra-fe.pages.dev
-
-# La demo usa un progetto Pages dedicato, distinto da test e produzione.
-deploy_demo:
-  extends: .deploy_pages
-  resource_group: hubstra-fe-demo
-  rules:
-    - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "demo/pianificazione-automatica"'
-      when: manual
-      allow_failure: true
-  script:
-    - npm ci
-    - VITE_HOSTNAME="$VITE_HOSTNAME_DEMO" VITE_GOOGLE_API_KEY="$VITE_GOOGLE_API_KEY_DEMO" npm run build
-    - npx wrangler pages deploy dist --project-name=italco-fe-demo --branch=main --commit-dirty=true
-  environment:
-    name: pages-demo
-    url: https://italco-fe-demo.pages.dev
-
-# Rimozione manuale dei vecchi container Docker frontend rimasti sui runner
-# server dai deploy precedenti a Pages. I nomi sono quelli del deploy storico.
-cleanup_legacy_frontend_containers:
-  stage: deploy
-  interruptible: false
-  tags:
-    - "${SERVER_NAME}-deploy"
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
-      when: manual
-      allow_failure: true
-  script:
-    - |
-      set -eu
-      test -n "$PROJECT_NAME"
-      docker rm -f "$PROJECT_NAME" "${PROJECT_NAME}-next" \
-        "${PROJECT_NAME}-test" "${PROJECT_NAME}-test-next" 2>/dev/null || true
