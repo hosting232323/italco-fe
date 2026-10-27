@@ -95,5 +95,25 @@ describe('deliveryCoverage store', () => {
       { id: 2, day_of_week: 0, transport_id: 1, start_time: '08:00:00', end_time: '18:00:00', caps: ['70051'] }
     ]);
     expect(store.ready).toBe(true);
+    expect(store.error).toBeNull();
+  });
+
+  it('su risposta ko svuota i blocchi, segna un errore e sblocca lo store', () => {
+    const store = useDeliveryCoverageStore();
+
+    store.setList({ status: 'ko', message: 'Pianificazione automatica non attiva' });
+
+    expect(store.entries).toEqual([]);
+    expect(store.error).toBe('Pianificazione automatica non attiva');
+    expect(store.ready).toBe(true);
+  });
+
+  it('su risposta ko senza messaggio usa un errore generico', () => {
+    const store = useDeliveryCoverageStore();
+
+    store.setList(undefined);
+
+    expect(store.entries).toEqual([]);
+    expect(store.error).toBe('Impossibile caricare la copertura');
   });
 });

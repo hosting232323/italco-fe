@@ -324,7 +324,8 @@ const updateCollectionPointLayers = () => {
   });
 };
 
-// Nome e indirizzo dei punti di ritiro li scrivono i clienti: nel tooltip (HTML) vanno neutralizzati.
+// Nome e indirizzo dei punti di ritiro li scrivono i clienti, nome e targa dei veicoli gli operatori:
+// nel tooltip (HTML) vanno neutralizzati.
 const HTML_ESCAPES = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', '\'': '&#39;' };
 const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => HTML_ESCAPES[char]);
 
@@ -332,13 +333,13 @@ const tooltipHtml = (cap, capEntries) => {
   const details = capEntries
     .slice()
     .sort((a, b) => a.start_time.localeCompare(b.start_time))
-    .map((entry) => `<div>${coverage.formatSlot(entry)} &middot; ${transportLabel(entry.transport_id)}</div>`)
+    .map((entry) => `<div>${coverage.formatSlot(entry)} &middot; ${escapeHtml(transportLabel(entry.transport_id))}</div>`)
     .join('');
   return `<strong>CAP ${cap}</strong>${details}`;
 };
 
 const polygonTooltipHtml = (entry) =>
-  `<strong>Zona disegnata</strong><div>${coverage.formatSlot(entry)} &middot; ${transportLabel(entry.transport_id)}</div>`;
+  `<strong>Zona disegnata</strong><div>${coverage.formatSlot(entry)} &middot; ${escapeHtml(transportLabel(entry.transport_id))}</div>`;
 
 let updateToken = 0;
 let mapResizeObserver = null;

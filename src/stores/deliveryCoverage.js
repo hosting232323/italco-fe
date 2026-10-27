@@ -13,6 +13,7 @@ export const useDeliveryCoverageStore = defineStore('deliveryCoverage', {
     entries: [],
     element: {},
     ready: false,
+    error: null,
     entryForm: false
   }),
   actions: {
@@ -49,7 +50,15 @@ export const useDeliveryCoverageStore = defineStore('deliveryCoverage', {
       );
     },
     setList(data) {
-      this.entries = data.entries;
+      // Risposta ko (piano non attivo, ruolo non ammesso): niente blocchi e un messaggio,
+      // invece di una lista undefined che rompe calendario e mappa.
+      if (!Array.isArray(data?.entries)) {
+        this.entries = [];
+        this.error = data?.message || 'Impossibile caricare la copertura';
+      } else {
+        this.entries = data.entries;
+        this.error = null;
+      }
       this.ready = true;
     }
   }

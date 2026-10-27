@@ -11,6 +11,14 @@
       type="card, table"
       :color="theme.current.value.secondaryColor"
     />
+    <v-alert
+      v-else-if="error"
+      type="error"
+      variant="tonal"
+      class="mb-4"
+    >
+      {{ error }}
+    </v-alert>
     <template v-else>
       <v-btn-toggle
         v-model="viewMode"
@@ -100,7 +108,7 @@ const theme = useTheme();
 const viewMode = ref('calendar');
 
 const store = useDeliveryCoverageStore();
-const { ready, entries, element, entryForm } = storeToRefs(store);
+const { ready, error, entries, element, entryForm } = storeToRefs(store);
 
 const userStore = useUserStore();
 const { effectiveRole } = storeToRefs(userStore);
