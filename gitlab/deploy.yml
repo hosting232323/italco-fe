@@ -46,7 +46,7 @@ deploy_demo:
       allow_failure: true
   script:
     - npm ci
-    - VITE_HOSTNAME="https://demo.ares-logistics.it/api/" VITE_GOOGLE_API_KEY="$VITE_GOOGLE_API_KEY_TEST" npm run build
+    - VITE_HOSTNAME="https://demo.hubstra.it/api/" VITE_GOOGLE_API_KEY="$VITE_GOOGLE_API_KEY_TEST" npm run build
     - npx wrangler pages deploy dist --project-name=hubstra-fe-demo --branch=main --commit-dirty=true
   environment:
     name: pages-demo
