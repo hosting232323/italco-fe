@@ -41,6 +41,21 @@ const client = createHttpClient({
   }
 });
 
+// Il backend risponde 'company_blocked' a ogni richiesta di un'attivita' bloccata
+// dal super admin: se il blocco arriva a sessione aperta, il layout lo mostra
+// subito invece di lasciare le pagine vuote.
+const markBlocked = (data) => {
+  if (data?.status != 'company_blocked') return;
+  const userStore = useUserStore();
+  if (userStore.company) userStore.company = { ...userStore.company, blocked: true };
+};
+
+const detectingBlock = (request) => (endpoint, method, options, func) =>
+  request(endpoint, method, options, (data) => {
+    markBlocked(data);
+    if (func) func(data);
+  });
+
 const withSessionToken = (url) => {
   if (!url) return url;
   const separator = url.includes('?') ? '&' : '?';
@@ -50,6 +65,8 @@ const withSessionToken = (url) => {
 
 export default {
   ...client,
+  makeRequest: detectingBlock(client.makeRequest),
+  uploadRequest: detectingBlock(client.uploadRequest),
   hostname,
   withSessionToken
 };

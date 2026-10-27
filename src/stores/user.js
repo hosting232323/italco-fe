@@ -44,7 +44,10 @@ export const useUserStore = defineStore('user', {
     // Company, redirect alla scelta della company). Il backend fa gia' lo
     // stesso bypass in flask_session_authentication.
     effectiveRole: (state) =>
-      (state.role == 'Super Admin' && state.company ? 'Admin' : state.role)
+      (state.role == 'Super Admin' && state.company ? 'Admin' : state.role),
+    // Attivita' bloccata dal super admin. Lui non e' mai bloccato: opera sulle
+    // company da fuori, anche su quelle bloccate (e' cosi' che le sblocca).
+    companyBlocked: (state) => state.role != 'Super Admin' && !!state.company?.blocked
   },
   // L'access token vive solo in memoria: al reload viene riottenuto dal
   // refresh token (cookie HttpOnly). Persistiamo ruolo, id e la company fissa dei

@@ -60,6 +60,10 @@ export const useCompanyStore = defineStore('company', {
         func
       );
     },
+    // Blocco manuale dell'attivita': gli utenti restano fuori finche' non si sblocca.
+    setBlocked(company, blocked, func) {
+      http.makeRequest(`company/${company.id}/block`, 'PUT', { body: { blocked } }, func);
+    },
     selectElement(company, func) {
       // Il backend riemette il token con la company scelta e il client http lo
       // raccoglie da solo (new_token): qui resta da aggiornare solo la parte

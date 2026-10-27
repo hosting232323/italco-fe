@@ -181,6 +181,18 @@ describe('CompanyTable', () => {
     expect(options.body).toEqual({ name: 'Attivita', [key]: true });
   });
 
+  it('l-interruttore Bloccata usa l-endpoint dedicato e non la PUT dell-anagrafica', async () => {
+    http.makeRequest.mockImplementation((url, method, options, func) => func({ status: 'ok', company: { id: 7 } }));
+    const { wrapper } = mountTable([{ id: 7, name: 'Attivita' }]);
+
+    await switches(wrapper)[3].setValue(true);
+    await flushPromises();
+
+    const [url, method, options] = lastPut();
+    expect([url, method]).toEqual(['company/7/block', 'PUT']);
+    expect(options.body).toEqual({ blocked: true });
+  });
+
   it('mostra l-errore del backend e lascia l-interruttore dov-era', async () => {
     http.makeRequest.mockImplementation((url, method, options, func) =>
       func({ status: 'ko', message: 'Configura almeno un luogo di smaltimento RAEE prima di attivare il modulo' })

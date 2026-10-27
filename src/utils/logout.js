@@ -33,8 +33,14 @@ const logout = async (router) => {
   try {
     await revokeSession();
   } finally {
-    resetStores();
-    router.push('/login');
+    // Prima si lascia la pagina, poi si svuotano gli store: al contrario il layout
+    // si ridisegna senza utente (es. dal blocco attivita' alla pagina vera) e le
+    // richieste senza token fanno comparire "Sessione scaduta".
+    try {
+      await router.push('/login');
+    } finally {
+      resetStores();
+    }
   }
 };
 

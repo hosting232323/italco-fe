@@ -6,6 +6,7 @@
     density="compact"
     closable
     class="mb-4"
+    style="flex: 0 0 auto;"
     @click:close="message = ''"
   >
     {{ message }}
@@ -31,7 +32,8 @@
       { title: 'Nome', value: 'name', sortable: false },
       { title: 'Modulo RAEE', key: 'rae', sortable: false },
       { title: 'Pianificazione automatica', key: 'automatic_planning', sortable: false },
-      { title: 'Pagamento automatico', key: 'automatic_payment', sortable: false }
+      { title: 'Pagamento automatico', key: 'automatic_payment', sortable: false },
+      { title: 'Bloccata', key: 'blocked', sortable: false }
     ]"
     fill
   >
@@ -66,6 +68,17 @@
         density="compact"
         hide-details
         @update:model-value="(value) => toggle(item, 'automatic_payment', value)"
+      />
+    </template>
+    <template #[`item.blocked`]="{ item }">
+      <v-switch
+        :key="switchKey(item, 'blocked')"
+        :model-value="!!item.blocked"
+        :disabled="!!saving[`${item.id}-blocked`]"
+        color="error"
+        density="compact"
+        hide-details
+        @update:model-value="(value) => toggle(item, 'blocked', value)"
       />
     </template>
     <template #actions="{ item }">
@@ -144,11 +157,17 @@ const openSubscription = (item) => {
   subscriptionStore.open(item.id);
 };
 
+// Il blocco ha un endpoint suo: non e' un campo dell'anagrafica.
+const requests = {
+  blocked: (item, changes, callback) => companyStore.setBlocked(item, changes.blocked, callback)
+};
+
 const save = (item, key, changes, onOk) => {
   saving[`${item.id}-${key}`] = true;
   message.value = '';
   placesPrompt.value = null;
-  companyStore.updateSettings(item, changes, (data) => {
+  const request = requests[key] || ((...args) => companyStore.updateSettings(...args));
+  request(item, changes, (data) => {
     saving[`${item.id}-${key}`] = false;
     if (data.status == 'ok') {
       if (onOk) onOk();
