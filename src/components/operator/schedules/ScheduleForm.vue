@@ -10,6 +10,15 @@
       schedule.schedule_items.flatMap(item => item.operation_type === 'Order' ? [item.order_id] : []).join(', ')"
   >
     <v-card-text>
+      <v-alert
+        v-if="formError"
+        class="mb-4"
+        type="error"
+        variant="tonal"
+        role="alert"
+      >
+        {{ formError }}
+      </v-alert>
       <v-row>
         <v-col
           cols="12"
@@ -37,7 +46,7 @@
               item-title="nickname"
               append-icon="mdi-plus"
               return-object
-              :error-messages="error"
+              :error-messages="userError"
               @click:append="addUser"
             />
             <v-row no-gutters>
@@ -165,7 +174,8 @@ const { fromSchedulation } = defineProps({
 });
 
 const form = ref(null);
-const error = ref(null);
+const formError = ref(null);
+const userError = ref(null);
 const loading = ref(false);
 const selectedUser = ref(null);
 const selectedOrderId = ref(null);
@@ -255,7 +265,7 @@ const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
 
   if (!schedule.value.users || schedule.value.users.length == 0) {
-    error.value = 'Aggiungi prima l\'utente';
+    userError.value = 'Aggiungi prima l\'utente';
     return;
   }
 
@@ -274,8 +284,8 @@ const callback = (data) => {
     raeProductStore.initList();
     schedule.value = {};
     emits('cancel');
-  } else 
-    error.value = data.message;
+  } else
+    formError.value = data.message;
 };
 
 const createScheduleItem = (element, type, index = undefined) => {
@@ -299,6 +309,6 @@ watch(
 );
 
 watch(() => schedule.value.users, () => {
-  error.value = null;
+  userError.value = null;
 });
 </script>
