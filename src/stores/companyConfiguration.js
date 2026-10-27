@@ -1,6 +1,7 @@
 import http from '@/utils/http';
 import { defineStore } from 'pinia';
 import { fileUtils } from 'generic-module';
+import { useUserStore } from '@/stores/user';
 
 
 // Anagrafica della propria attività, modificata dall'admin dalla pagina di
@@ -18,6 +19,15 @@ export const useCompanyConfigurationStore = defineStore('companyConfiguration', 
           this.element = data.company;
           this.ready = true;
         }
+        if (func) func(data);
+      });
+    },
+    // Rilegge la propria attivita' (anche se bloccata, per qualunque ruolo) e
+    // aggiorna la copia in sessione: arriva dal login e puo' essere vecchia, in un
+    // senso o nell'altro (bloccata o sbloccata nel frattempo).
+    syncSession(func) {
+      http.makeRequest('company/me/status', 'GET', {}, (data) => {
+        if (data.status == 'ok') useUserStore().company = data.company;
         if (func) func(data);
       });
     },

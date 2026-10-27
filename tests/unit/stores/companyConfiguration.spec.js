@@ -3,6 +3,7 @@ import { createPinia, setActivePinia } from 'pinia';
 
 import http from '@/utils/http';
 import { useCompanyConfigurationStore } from '@/stores/companyConfiguration';
+import { useUserStore } from '@/stores/user';
 
 
 vi.mock('@/utils/http', () => ({
@@ -22,6 +23,30 @@ describe('companyConfiguration store', () => {
 
     expect(store.element).toEqual({});
     expect(store.ready).toBe(false);
+  });
+
+  it('syncSession rilegge lo stato e aggiorna la company in sessione, bloccata o sbloccata', () => {
+    const user = useUserStore();
+    user.company = { id: 3, blocked: false };
+    http.makeRequest.mockImplementationOnce((url, method, options, callback) =>
+      callback({ status: 'ok', company: { id: 3, blocked: true } })
+    );
+
+    useCompanyConfigurationStore().syncSession();
+
+    expect(http.makeRequest.mock.calls[0].slice(0, 2)).toEqual(['company/me/status', 'GET']);
+    expect(user.company).toEqual({ id: 3, blocked: true });
+    expect(user.companyBlocked).toBe(true);
+  });
+
+  it('syncSession lascia la sessione com-e se la risposta non e ok', () => {
+    const user = useUserStore();
+    user.company = { id: 3 };
+    http.makeRequest.mockImplementationOnce((url, method, options, callback) => callback({ status: 'ko' }));
+
+    useCompanyConfigurationStore().syncSession();
+
+    expect(user.company).toEqual({ id: 3 });
   });
 
   it('carica la propria company', () => {
