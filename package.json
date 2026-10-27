@@ -8,15 +8,13 @@
     "build": "vite build",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage",
-    "serve": "node server.js"
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@mdi/font": "7.4.47",
     "apexcharts": "^6.6.1",
     "core-js": "^3.48.0",
-    "dotenv": "^17.3.1",
-    "express": "^5.2.1",
+    "dotenv": "17.3.1",
     "generic-module": "git+https://github.com/hosting232323/generic-module.git",
     "leaflet": "^1.9.4",
     "marked": "^17.0.3",
@@ -46,6 +44,7 @@
     "vite": "^7.3.1",
     "vite-plugin-vuetify": "^2.1.3",
     "vitest": "^4.1.10",
-    "vue-eslint-parser": "^10.4.1"
+    "vue-eslint-parser": "^10.4.1",
+    "wrangler": "4.153.0"
   }
 }
