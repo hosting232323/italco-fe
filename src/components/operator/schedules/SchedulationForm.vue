@@ -267,13 +267,6 @@ const submitForm = async () => {
         suggestions.value = data.groups.map(normalizeSuggestion);
         newSuggestionOrders.value = [];
         transports.value = data.transports;
-        deliveryUsers.value = [
-          ...new Map(
-            transports.value
-              .flatMap((transport) => transport.delivery_users || [])
-              .map((user) => [user.id, user]),
-          ).values(),
-        ];
       } else message.value = data.message;
     }
   );

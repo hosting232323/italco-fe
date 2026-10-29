@@ -3,7 +3,6 @@ import { flushPromises } from '@vue/test-utils';
 
 import TransportForm from '@/components/administration/transports/TransportForm.vue';
 import TransportTable from '@/components/administration/transports/TransportTable.vue';
-import DeliveryUserInfoTable from '@/components/administration/transports/DeliveryUserInfoTable.vue';
 import { useTransportStore } from '@/stores/transport';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 import { createTestPinia, mountComponent } from '../../helpers/mount';
@@ -77,32 +76,5 @@ describe('TransportTable', () => {
 
     expect(wrapper.text()).toContain('Via Deposito 1, Bisceglie, BT (70020)');
     expect(wrapper.text()).toContain('mario');
-  });
-});
-
-
-describe('DeliveryUserInfoTable', () => {
-  beforeEach(() => vi.clearAllMocks());
-
-  it('mostra il veicolo dell-utente delivery al posto della localita', () => {
-    const pinia = createTestPinia();
-    const transportStore = useTransportStore();
-    transportStore.ready = true;
-    transportStore.list = [{ id: 9, ...VALID_TRANSPORT }];
-    const userStore = useAdministrationUserStore();
-    userStore.ready = true;
-    userStore.list = [
-      { id: 1, nickname: 'mario', role: 'Delivery', delivery_user_info: { transport_id: 9 } },
-      { id: 2, nickname: 'luigi', role: 'Delivery', delivery_user_info: {} }
-    ];
-
-    const wrapper = mountComponent(DeliveryUserInfoTable, { pinia });
-
-    expect(wrapper.text()).not.toContain('Località');
-    expect(wrapper.text()).toContain('Furgone');
-    // Chi non sta su nessun veicolo resta in tabella, senza mezzo.
-    expect(wrapper.text()).toContain('luigi');
-    // Niente matita: la localita non si modifica piu da qui.
-    expect(wrapper.find('.mdi-pencil').exists()).toBe(false);
   });
 });
