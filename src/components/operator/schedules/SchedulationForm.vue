@@ -193,6 +193,9 @@ const syncSuggestionScheduleItems = (suggestion) => {
 const normalizeSuggestion = (suggestion) => {
   const normalizedSuggestion = {
     ...suggestion,
+    delivery_users: (suggestion.transports || []).flatMap(
+      (transport) => transport.delivery_users || [],
+    ),
     orders: getScheduleItemsByType(suggestion, 'Order').map((order) =>
       normalizeScheduleItem(order, 'Order'),
     ),
@@ -251,20 +254,25 @@ const submitForm = async () => {
         suggestions.value = data.groups.map(normalizeSuggestion);
         newSuggestionOrders.value = [];
         transports.value = data.transports;
-        deliveryUsers.value = data.delivery_users;
+        deliveryUsers.value = [
+          ...new Map(
+            transports.value
+              .flatMap((transport) => transport.delivery_users || [])
+              .map((user) => [user.id, user]),
+          ).values(),
+        ];
       } else message.value = data.message;
     }
   );
 };
 
 const openSchedule = (suggestion) => {
+  const transport = suggestion.transports[0];
   schedule.value.date = work_date.value;
   schedule.value.schedulation = true;
-  schedule.value.users = suggestion.delivery_users;
+  schedule.value.users = transport?.delivery_users || [];
   schedule.value.schedule_items = suggestion.schedule_items;
-  schedule.value.transport_id = suggestion.transports.length
-    ? suggestion.transports[0].id
-    : null;
+  schedule.value.transport_id = transport?.id ?? null;
   emits('goToSheduleForm');
 };
 
