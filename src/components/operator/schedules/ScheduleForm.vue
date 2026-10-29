@@ -160,7 +160,6 @@ const { fromSchedulation } = defineProps({
 
 const form = ref(null);
 const formError = ref(null);
-const userError = ref(null);
 const loading = ref(false);
 const selectedOrderId = ref(null);
 const activityFormFlag = ref(false);
@@ -237,7 +236,7 @@ const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
 
   if (!selectedTransportUsers.value.length) {
-    userError.value = 'Il veicolo selezionato non ha utenti delivery associati';
+    formError.value = 'Il veicolo selezionato non ha utenti delivery associati';
     return;
   }
 
@@ -281,6 +280,6 @@ watch(
 );
 
 watch(() => schedule.value.transport_id, () => {
-  userError.value = null;
+  formError.value = null;
 });
 </script>
