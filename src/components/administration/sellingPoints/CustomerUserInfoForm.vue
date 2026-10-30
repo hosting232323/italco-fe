@@ -82,7 +82,7 @@
           >
             <v-text-field
               v-model="data.email"
-              label="Email"
+              label="Email di contatto"
               :class="isMobile ? '' : 'mr-2'"
             />
           </v-col>
