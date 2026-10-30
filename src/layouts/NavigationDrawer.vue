@@ -120,6 +120,12 @@
     </template>
     <v-divider class="my-2" />
     <v-list-item
+      v-if="effectiveRole == 'Admin'"
+      to="/configuration"
+      title="Configurazione"
+      prepend-icon="mdi-cog"
+    />
+    <v-list-item
       title="Logout"
       prepend-icon="mdi-logout"
       @click="logoutModule.logout(router)"
