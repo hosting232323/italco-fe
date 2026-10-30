@@ -11,7 +11,8 @@
       { title: 'Indirizzo', value: 'address', sortable: false },
       { title: 'Codice Fiscale', value: 'tax_code', sortable: false },
       { title: 'Ragione Sociale', value: 'company_name', sortable: false },
-      { title: 'Email', value: 'email', sortable: false },
+      { title: 'Email profilo', value: 'email', sortable: false },
+      { title: 'Email di contatto', value: 'contact_email', sortable: false },
       { title: 'Codice Distribuzione RAEE', value: 'rae_code', sortable: false }
     ]"
   >
@@ -33,7 +34,7 @@
     <template #[`item.company_name`]="{ item }">
       {{ item.customer_user_info?.company_name }}
     </template>
-    <template #[`item.email`]="{ item }">
+    <template #[`item.contact_email`]="{ item }">
       {{ item.customer_user_info?.email }}
     </template>
     <template #[`item.rae_code`]="{ item }">
