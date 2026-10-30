@@ -10,7 +10,6 @@
       />
     </PageHeader>
     <UserTable />
-    <CompanyMailList />
   </v-container>
   <v-dialog
     v-model="userForm"
@@ -24,7 +23,6 @@
 import PageHeader from '@/components/PageHeader';
 import UserForm from '@/components/administration/users/UserForm';
 import UserTable from '@/components/administration/users/UserTable';
-import CompanyMailList from '@/components/administration/users/CompanyMailList';
 
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
