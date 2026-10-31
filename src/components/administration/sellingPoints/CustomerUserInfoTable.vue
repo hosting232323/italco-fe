@@ -7,7 +7,6 @@
       { title: 'Nickname', value: 'nickname', sortable: false },
       { title: 'Nome Punto Vendita', value: 'name', sortable: false },
       { title: 'Codice Importazioni', value: 'import_code', sortable: false },
-      { title: 'Città', value: 'city', sortable: false },
       { title: 'Indirizzo', value: 'address', sortable: false },
       { title: 'Codice Fiscale', value: 'tax_code', sortable: false },
       { title: 'Ragione Sociale', value: 'company_name', sortable: false },
@@ -22,11 +21,8 @@
     <template #[`item.import_code`]="{ item }">
       {{ item.customer_user_info?.import_code }}
     </template>
-    <template #[`item.city`]="{ item }">
-      {{ item.customer_user_info?.city }}
-    </template>
     <template #[`item.address`]="{ item }">
-      {{ item.customer_user_info?.address }}
+      {{ fullAddress(item.customer_user_info) }}
     </template>
     <template #[`item.tax_code`]="{ item }">
       {{ item.customer_user_info?.tax_code }}
@@ -69,6 +65,18 @@ const emit = defineEmits(['open-collection-points']);
 const administrationUserStore = useAdministrationUserStore();
 const { element: user, activeForm, ready } = storeToRefs(administrationUserStore);
 const users = storesUtils.getStoreList(administrationUserStore);
+
+const fullAddress = (info) => {
+  const address = info?.address?.trim();
+  const city = info?.city?.trim();
+  if (!city)
+    return address;
+  if (!address)
+    return city;
+
+  const cityName = city.replace(/\s*\([^)]*\)\s*$/, '').trim().toLowerCase();
+  return address.toLowerCase().includes(cityName) ? address : `${address}, ${city}`;
+};
 
 const openForm = (item) => {
   user.value = item;
