@@ -70,8 +70,9 @@ describe('CompanyForm', () => {
     const store = useCompanyStore();
     store.activeForm = true;
     store.element = {
-      id: 7,
       name: 'Attivita',
+      adminNickname: 'admin',
+      adminPassword: 'pw',
       rae: false,
       activity_start_time: '08:00',
       activity_end_time: '18:30',
@@ -90,7 +91,7 @@ describe('CompanyForm', () => {
     const pinia = createTestPinia();
     const store = useCompanyStore();
     store.activeForm = true;
-    store.element = { id: 7, name: 'Attivita', rae: false, ...LEGAL };
+    store.element = { name: 'Attivita', adminNickname: 'admin', adminPassword: 'pw', rae: false, ...LEGAL };
     const wrapper = mountComponent(CompanyForm, { pinia });
 
     await wrapper.find('form').trigger('submit');
@@ -106,8 +107,9 @@ describe('CompanyForm', () => {
     const store = useCompanyStore();
     store.activeForm = true;
     store.element = {
-      id: 7,
       name: 'Attivita',
+      adminNickname: 'admin',
+      adminPassword: 'pw',
       rae: false,
       activity_start_time: '18:00',
       activity_end_time: '08:00',
