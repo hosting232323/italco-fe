@@ -11,7 +11,62 @@
     @submit.prevent="submitForm"
   >
     Seleziona le date per l'ordine:
+    <template v-if="showAutomaticDpc">
+      <v-row
+        no-gutters
+        class="mt-2"
+      >
+        <v-col
+          cols="12"
+          :md="role == 'Customer' ? 12 : 6"
+        >
+          <DateField
+            v-model="order.drc"
+            label="Data Richiesta dal Cliente"
+            :class-style="isMobile || role == 'Customer' ? '' : 'mr-2'"
+            :rules="validation.requiredRules"
+            :allowed-dates="nextTwoMonths"
+            :disabled="role == 'Operator' && order.id"
+            :clearable="false"
+          />
+        </v-col>
+        <v-col
+          v-if="role != 'Customer'"
+          cols="12"
+          md="6"
+        >
+          <DateField
+            v-model="order.booking_date"
+            label="Data Consegna"
+            :rules="[]"
+            :allowed-dates="['all']"
+            :class-style="isMobile ? '' : 'ml-2'"
+            :clearable="false"
+          />
+        </v-col>
+      </v-row>
+      <v-row
+        no-gutters
+        class="mt-4"
+      >
+        <v-col cols="12">
+          <DpcCalendarField
+            v-model="order.dpc"
+            v-model:slot-start="order.delivery_slot_start"
+            v-model:slot-end="order.delivery_slot_end"
+            label="Data Prevista dal Cliente"
+            :allowed-dates="allowedDpcDates"
+            :slots="dpcSlots"
+            :blocked-days="blockedDays"
+            :slot-notes="slotNotes"
+            :rules="validation.requiredRules"
+            :disabled="role == 'Operator' && order.id"
+          />
+        </v-col>
+      </v-row>
+    </template>
     <v-row
+      v-else
       no-gutters
       class="mt-2"
     >
@@ -19,11 +74,11 @@
         cols="12"
         :md="role == 'Customer' ? 6 : 4"
       >
-        <DateField 
+        <DateField
           v-model="order.dpc"
           label="Data Prevista dal Cliente"
           :class-style="isMobile ? '' : 'ml-2 mr-2'"
-          :allowed-dates="allowedDpcDates"
+          :allowed-dates="manualDpcDates"
           :rules="validation.requiredRules"
           :disabled="role == 'Operator' && order.id"
           :clearable="false"
@@ -33,7 +88,7 @@
         cols="12"
         :md="role == 'Customer' ? 6 : 4"
       >
-        <DateField 
+        <DateField
           v-model="order.drc"
           label="Data Richiesta dal Cliente"
           :class-style="isMobile ? '' : 'ml-2 mr-2'"
@@ -48,7 +103,7 @@
         cols="12"
         md="4"
       >
-        <DateField 
+        <DateField
           v-model="order.booking_date"
           label="Data Consegna"
           :rules="[]"
@@ -68,8 +123,9 @@
 <script setup>
 import DateField from '@/components/DateField';
 import FormButtons from '@/components/FormButtons';
+import DpcCalendarField from '@/components/orders/DpcCalendarField';
 
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import days from '@/utils/days';
 import http from '@/utils/http';
 import mobile from '@/utils/mobile';
@@ -77,40 +133,113 @@ import { storeToRefs } from 'pinia';
 import validation from '@/utils/validation';
 import { useUserStore } from '@/stores/user';
 import { useOrderStore } from '@/stores/order';
+import { useAdministrationUserStore } from '@/stores/administrationUser';
 
 const form = ref(null);
 const loading = ref(false);
 const loadingDates = ref(true);
 const allowedDpcDates = ref([]);
+const dpcSlots = ref({});
+const blockedDays = ref([]);
+const slotNotes = ref({});
+const outOfCoverage = ref(false);
 const userStore = useUserStore();
 const orderStore = useOrderStore();
+const administrationUserStore = useAdministrationUserStore();
 const isMobile = mobile.setupMobileUtils();
 const nextTwoMonths = days.getDateRangeArray();
 const emits = defineEmits(['go-to-schedulation']);
 
 // effectiveRole: il super admin in una company edita le date come un admin.
-const { effectiveRole: role } = storeToRefs(userStore);
+const { effectiveRole: role, company, automaticPlanning: myAutomaticPlanning } = storeToRefs(userStore);
 const { element: order, activeForm } = storeToRefs(orderStore);
+const { list: customerUsers, ready: customerUsersReady } = storeToRefs(administrationUserStore);
 
-if (role.value == 'Customer')
+// Un cliente non ha i permessi per leggere GET /user (403): la lista va
+// caricata solo per operatore/admin, che ne hanno comunque bisogno per
+// risolvere il punto vendita scelto in OrderCustomerForm (nuovo ordine,
+// order.user_id) o già assegnato (ordine esistente, order.user.id).
+if (role.value !== 'Customer' && !customerUsersReady.value) administrationUserStore.initList();
+
+// Il punto vendita rilevante per l'ordine: se il cliente sta ordinando per sé
+// è l'utente loggato, altrimenti (operatore/admin) è quello scelto/assegnato.
+const customerAutomaticPlanning = computed(() => {
+  if (role.value === 'Customer') return !!myAutomaticPlanning.value;
+  const selectedId = order.value.user_id ?? order.value.user?.id;
+  const selected = customerUsers.value.find((user) => user.id === selectedId);
+  return selected ? !!selected.automatic_planning : true;
+});
+
+// Vale il nuovo DPC a calendario solo se sia l'attività sia il punto vendita
+// hanno la pianificazione automatica accesa; il check-constraints (sotto)
+// aggiunge il terzo caso, l'indirizzo fuori da ogni zona di copertura.
+const useAutomaticDpc = computed(() => !!company.value?.automatic_planning && customerAutomaticPlanning.value);
+
+const getServicesIds = () => {
+  if (!order.value.products) return [];
+  const ids = [];
+  for (const product of Object.values(order.value.products)) {
+    const services = Array.isArray(product?.services) ? product.services : (Array.isArray(product) ? product : []);
+    for (const service of services) {
+      const id = typeof service === 'object' && service !== null ? service.id : service;
+      if (id != null) ids.push(id);
+    }
+  }
+  return [...new Set(ids)];
+};
+
+const loadAllowedDates = () => {
   http.makeRequest('check-constraints', 'POST', {
     body: {
       cap: order.value.cap,
-      services_id: [
-        ...new Set(Object.values(order.value.products).flat().map(s => s.id))
-      ]
+      address: order.value.address,
+      address_lat: order.value.address_lat,
+      address_lon: order.value.address_lon,
+      services_id: getServicesIds(),
+      products: order.value.products,
+      order_id: order.value.id,
     }
   }, (data) => {
-    if (data.status === 'ok')
+    if (data.status === 'ok') {
       allowedDpcDates.value = data.dates;
-    else
+      dpcSlots.value = data.slots || {};
+      blockedDays.value = data.blocked || [];
+      slotNotes.value = data.slot_notes || {};
+      outOfCoverage.value = data.covered === false;
+    } else {
       allowedDpcDates.value = [];
+      dpcSlots.value = {};
+      blockedDays.value = [];
+      slotNotes.value = {};
+      outOfCoverage.value = true;
+    }
+    // La data già scelta che non è più disponibile si azzera (fuori copertura la
+    // data e' libera: vale quella scelta a mano).
+    if (!outOfCoverage.value && order.value.dpc && !allowedDpcDates.value.includes(order.value.dpc)) {
+      order.value.dpc = null;
+      order.value.delivery_slot_start = null;
+      order.value.delivery_slot_end = null;
+    }
     loadingDates.value = false;
   });
-else {
+};
+
+if (role.value == 'Customer' && useAutomaticDpc.value) {
+  loadAllowedDates();
+} else {
   allowedDpcDates.value = nextTwoMonths;
   loadingDates.value = false;
 }
+
+// Terzo caso di fallback alla dpc vecchio stile, oltre ai due flag: l'indirizzo
+// scelto è fuori da ogni zona di copertura corrieri. Per il cliente questo si
+// vede dal check-constraints appena fatto (nessuna data disponibile): se
+// mostrassimo comunque il calendario resterebbe vuoto e bloccherebbe l'ordine.
+const showAutomaticDpc = computed(() => useAutomaticDpc.value && !(role.value === 'Customer' && outOfCoverage.value));
+
+// Fuori copertura il calendario manuale ammette ogni giorno; con le fasce
+// esaurite (indirizzo coperto, nessuna data) resta vuoto: non c'e' da scegliere.
+const manualDpcDates = computed(() => (outOfCoverage.value ? nextTwoMonths : allowedDpcDates.value));
 
 const goBack = () => {
   if (order.value.schedulation)

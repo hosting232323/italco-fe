@@ -33,7 +33,10 @@ export const useUserStore = defineStore('user', {
     token: '',
     // Company su cui si sta operando. Per tutti i ruoli tranne il super admin è
     // la propria e non cambia mai; il super admin parte senza e la sceglie.
-    company: null
+    company: null,
+    // Pianificazione automatica del punto vendita loggato (significativa solo
+    // per role Customer): arriva dal login accanto a company, stesso ciclo di vita.
+    automaticPlanning: true
   }),
   getters: {
     // Un super admin che ha scelto una company opera dentro quella company con
@@ -54,7 +57,7 @@ export const useUserStore = defineStore('user', {
   // esiste piu' e viene ignorata in silenzio, con l'effetto di persistere lo
   // stato intero — token compreso, cioe' esattamente cio' che si vuole evitare.
   persist: {
-    pick: ['role', 'userId', 'company'],
+    pick: ['role', 'userId', 'company', 'automaticPlanning'],
     beforeHydrate: (context) => sanitizePersistedUser(context.store.$id)
   }
 });

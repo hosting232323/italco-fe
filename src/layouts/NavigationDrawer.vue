@@ -64,6 +64,17 @@
           prepend-icon="mdi-account-group"
         />
       </template>
+      <v-divider class="my-2" />
+      <v-list-item
+        to="/planning/constraints"
+        title="Vincoli"
+        prepend-icon="mdi-tune-variant"
+      />
+      <v-list-item
+        to="/planning/automatic"
+        title="Pianificazione"
+        prepend-icon="mdi-map-marker-radius"
+      />
       <template v-if="rae">
         <v-divider class="my-2" />
         <v-list-item

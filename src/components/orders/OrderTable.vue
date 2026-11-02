@@ -6,8 +6,8 @@
     <template #activator>
       <div class="orders-toolbar">
         <v-btn
-          v-if="role == 'Admin' && company?.automatic_planning"
-          text="Pianificazione Automatica"
+          v-if="role == 'Admin'"
+          text="Proposte Borderò"
           class="mr-5"
           :color="theme.current.value.primaryColor"
           prepend-icon="mdi-calendar-arrow-right"
@@ -60,6 +60,15 @@
             {{ item.addressee }}<br>
             <p style="font-size: smaller;">
               {{ item.address }}, {{ item.cap }}
+            </p>
+          </template>
+          <template #[`item.dpc`]="{ item }">
+            {{ item.dpc }}
+            <p
+              v-if="item.delivery_slot_start"
+              style="font-size: smaller;"
+            >
+              {{ item.delivery_slot_start.slice(0, 5) }} - {{ item.delivery_slot_end.slice(0, 5) }}
             </p>
           </template>
           <template #[`item.price`]="{ item }">
@@ -165,7 +174,7 @@ const orderStore = useOrderStore();
 const scheduleStore = useScheduleStore();
 // Il super admin che opera in una company ha i permessi di un admin: i pulsanti
 // gated su Admin/Operator (Crea Borderò, selezione righe, ...) devono comparirgli.
-const { effectiveRole: role, company } = storeToRefs(userStore);
+const { effectiveRole: role } = storeToRefs(userStore);
 const { ready } = storeToRefs(orderStore);
 const { element: schedule } = storeToRefs(scheduleStore);
 const orders = storesUtils.getStoreList(orderStore);

@@ -45,8 +45,9 @@
                   :class="isMobile ? '' : 'mr-2'"
                   label="Veicolo"
                   :items="transports"
-                  item-title="name"
+                  :item-title="transportTitle"
                   item-value="id"
+                  :error-messages="error"
                   :rules="validation.requiredRules"
                 />
               </v-col>
@@ -183,6 +184,14 @@ const selectedTransportUsersLabel = computed(() => {
   if (schedule.value.transport_id == null) return 'Nessun veicolo selezionato';
   return selectedTransportUsers.value.map(user => user.nickname).join(', ') || 'Nessun utente associato';
 });
+
+// Nel menu del veicolo si leggono anche i suoi corrieri: sono loro a fare il
+// borderò, e senza il vecchio selettore utenti è l'unico punto in cui si
+// vedono mentre lo si compila.
+const transportTitle = (transport) => {
+  const nicknames = (transport.delivery_users || []).map(user => user.nickname).join(', ');
+  return nicknames ? `${transport.name} (${nicknames})` : transport.name;
+};
 
 // Il selettore del luogo di smaltimento compare solo se il borderò raccoglie
 // ordini con prodotti RAE: gli item ordine portano il marcatore rae_product

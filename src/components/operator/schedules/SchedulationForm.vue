@@ -1,5 +1,5 @@
 <template>
-  <v-card title="Pianificazione Automatica">
+  <v-card title="Proposte Borderò">
     <v-card-text>
       <v-form
         ref="dpcForm"
@@ -14,7 +14,7 @@
         <v-row no-gutters>
           <v-col
             cols="12"
-            md="4"
+            md="3"
           >
             <v-text-field
               v-model="minSizeGroup"
@@ -26,7 +26,7 @@
           </v-col>
           <v-col
             cols="12"
-            md="4"
+            md="3"
           >
             <v-text-field
               v-model="maxSizeGroup"
@@ -38,12 +38,25 @@
           </v-col>
           <v-col
             cols="12"
-            md="4"
+            md="3"
           >
             <v-text-field
               v-model="maxDistanceKm"
               type="number"
               label="Massima distanza (KM)"
+              :class="isMobile ? '' : 'mx-2'"
+            />
+          </v-col>
+          <v-col
+            cols="12"
+            md="3"
+          >
+            <v-text-field
+              :model-value="MAX_PROFESSIONAL_ORDERS"
+              label="Servizi professionali per borderò"
+              hint="Limite fisso del motore di raggruppamento"
+              persistent-hint
+              readonly
               :class="isMobile ? '' : 'ml-2'"
             />
           </v-col>
@@ -64,7 +77,6 @@
       <SchedulationProposals
         :suggestions="suggestions"
         :new-suggestion-orders="newSuggestionOrders"
-        :available-delivery-users="availableDeliveryUsers"
         :available-transports="availableTransports"
         @update:new-suggestion-orders="newSuggestionOrders = $event"
         @create-suggestion="createSuggestionFromDroppedOrder"
@@ -96,6 +108,9 @@ const props = defineProps({
   }
 });
 
+// Limite fisso del motore di raggruppamento (MAX_PROFESSIONAL_ORDERS): non è salvato per company.
+const MAX_PROFESSIONAL_ORDERS = 2;
+
 const message = ref('');
 const dpcForm = ref(null);
 const loading = ref(false);
@@ -105,7 +120,6 @@ const suggestions = ref([]);
 const minSizeGroup = ref(9);
 const maxSizeGroup = ref(12);
 const maxDistanceKm = ref(50);
-const deliveryUsers = ref([]);
 const newSuggestionOrders = ref([]);
 const isMobile = mobile.setupMobileUtils();
 const emits = defineEmits(['cancel', 'goToSheduleForm', 'order-form']);
@@ -213,7 +227,6 @@ const syncSuggestionsAfterOrderMove = () => {
 
 const createSuggestion = (orders = []) => {
   const suggestion = {
-    delivery_users: [],
     transports: [],
     schedule_items: [],
     orders: orders.map((order) => normalizeScheduleItem(order, 'Order')),
@@ -254,13 +267,6 @@ const submitForm = async () => {
         suggestions.value = data.groups.map(normalizeSuggestion);
         newSuggestionOrders.value = [];
         transports.value = data.transports;
-        deliveryUsers.value = [
-          ...new Map(
-            transports.value
-              .flatMap((transport) => transport.delivery_users || [])
-              .map((user) => [user.id, user]),
-          ).values(),
-        ];
       } else message.value = data.message;
     }
   );
@@ -275,16 +281,6 @@ const openSchedule = (suggestion) => {
   schedule.value.transport_id = transport?.id ?? null;
   emits('goToSheduleForm');
 };
-
-const availableDeliveryUsers = computed(() => {
-  const assignedIds = new Set(
-    suggestions.value.flatMap(
-      (suggestion) => suggestion.delivery_users?.map((user) => user.id) ?? [],
-    ),
-  );
-
-  return deliveryUsers.value.filter((user) => !assignedIds.has(user.id));
-});
 
 const availableTransports = computed(() => {
   const assignedIds = new Set(
