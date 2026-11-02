@@ -83,6 +83,25 @@ const routes = [
         component: () => import('@/views/operator/OperatorSchedules.vue')
       },
       {
+        path: 'planning',
+        redirect: '/planning/constraints'
+      },
+      {
+        path: 'planning/constraints',
+        name: 'Vincoli',
+        component: () => import('@/views/operator/PlanningConstraints.vue')
+      },
+      {
+        path: 'planning/automatic',
+        name: 'Pianificazione',
+        component: () => import('@/views/operator/PlanningAutomatic.vue')
+      },
+      {
+        // Vecchio indirizzo della copertura corrieri, ora nella pagina Pianificazione automatica.
+        path: 'delivery-coverage',
+        redirect: '/planning/automatic'
+      },
+      {
         path: 'collection-points',
         name: 'Punti di ritiro',
         component: () => import('@/views/customer/CollectionPoints.vue')
@@ -150,6 +169,11 @@ const RAE_ROUTES = [
 ];
 
 
+// Le pagine di pianificazione sono di admin e operatori: il backend risponde 403
+// ai clienti, che ci arrivano solo da un URL digitato o da un preferito.
+const PLANNING_ROUTES = ['Vincoli', 'Pianificazione'];
+
+
 router.beforeEach((to) => {
   const userStore = useUserStore();
   const { role, company } = userStore;
@@ -171,6 +195,9 @@ router.beforeEach((to) => {
   // La dashboard e' degli admin e degli operatori: il backend risponde 403 ai
   // clienti, che ci arrivano da un preferito. La loro pagina iniziale e' Ordini.
   if (to.name == 'Dashboard' && role == 'Customer')
+    return { name: 'Ordini' };
+
+  if (PLANNING_ROUTES.includes(to.name) && role == 'Customer')
     return { name: 'Ordini' };
 
   // I log contengono le richieste di tutte le company: l'URL digitato da un

@@ -4,7 +4,8 @@ import { fileUtils } from 'generic-module';
 import storesUtils from '@/utils/stores';
 
 const EXCLUDED_KEYS = [
-  'created_at', 'updated_at', 'delivery_group', 'services', 'user', 'dates_form', 'schedulation'
+  'created_at', 'updated_at', 'delivery_group', 'services', 'user', 'dates_form', 'schedulation',
+  'preloaded', 'delivery_transport_id'
 ];
 
 const NUMERIC_KEYS = ['floor', 'mark'];
