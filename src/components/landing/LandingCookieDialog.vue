@@ -28,8 +28,9 @@
       <h3>Come gestire i cookie del browser</h3>
       <p>
         Puoi controllare ed eliminare i cookie nelle impostazioni del tuo browser. Per i dati personali e i recapiti del titolare consulta l’<a
-          href="#privacy"
-          @click.prevent="emit('open-policy', 'privacy')"
+          href="/privacy"
+          target="_blank"
+          rel="noopener"
         >informativa privacy</a>. Le fonti di riferimento sono le <a
           href="https://www.garanteprivacy.it/home/docweb/-/docweb-display/docweb/9677876"
           target="_blank"
@@ -46,5 +47,5 @@ import LandingDialog from '@/components/landing/LandingDialog.vue';
 defineProps({
   modelValue: { type: Boolean, default: false }
 });
-const emit = defineEmits(['update:modelValue', 'open-policy']);
+const emit = defineEmits(['update:modelValue']);
 </script>

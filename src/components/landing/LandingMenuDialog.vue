@@ -34,6 +34,7 @@
 </template>
 
 <script setup>
+import { useRoute } from 'vue-router';
 import LandingDialog from '@/components/landing/LandingDialog.vue';
 
 defineProps({
@@ -41,11 +42,14 @@ defineProps({
 });
 const emit = defineEmits(['update:modelValue', 'open-demo']);
 
+// Le sezioni stanno sulla home: dalle altre pagine i link passano da "/".
+const base = useRoute().path === '/' ? '' : '/';
+
 const links = [
-  { href: '#vantaggi', label: 'Perché HUBSTRA' },
-  { href: '#piattaforma', label: 'La piattaforma' },
-  { href: '#come-funziona', label: 'Come funziona' },
-  { href: '#domande', label: 'Domande frequenti' }
+  { href: base + '#vantaggi', label: 'Perché HUBSTRA' },
+  { href: base + '#piattaforma', label: 'La piattaforma' },
+  { href: base + '#come-funziona', label: 'Come funziona' },
+  { href: base + '#domande', label: 'Domande frequenti' }
 ];
 </script>
 
