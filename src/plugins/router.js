@@ -8,6 +8,11 @@ const routes = [
     component: () => import('@/views/landing/LandingPage.vue')
   },
   {
+    path: '/privacy',
+    name: 'Privacy Policy',
+    component: () => import('@/views/PrivacyPolicy.vue')
+  },
+  {
     path: '/',
     component: () => import('@/layouts/LoginLayout.vue'),
     children: [
@@ -20,11 +25,6 @@ const routes = [
         path: 'order/track',
         name: 'OrderStatus',
         component: () => import('@/views/OrderStatus.vue'),
-      },
-      {
-        path: 'privacy',
-        name: 'Privacy Policy',
-        component: () => import('@/views/PrivacyPolicy.vue')
       },
       {
         path: 'download-app',
