@@ -44,7 +44,7 @@
                 v-model="filters['User.id']"
                 :class="isMobile ? '' : 'ml-2'"
                 label="Punto Vendita"
-                :items="users.filter(user => user.role == 'Customer')"
+                :items="customers"
                 item-title="nickname"
                 item-value="id"
                 clearable
@@ -64,7 +64,7 @@
 <script setup>
 import FormButtons from '@/components/FormButtons';
 
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import mobile from '@/utils/mobile';
@@ -82,6 +82,8 @@ const serviceStore = useServiceStore();
 const administrationUserStore = useAdministrationUserStore();
 const { ready, filters } = storeToRefs(serviceStore);
 const users = storesUtils.getStoreList(administrationUserStore);
+
+const customers = computed(() => (users.value || []).filter(user => user.role == 'Customer'));
 
 const filterServices = async () => {
   if (!(await form.value.validate()).valid) return;
