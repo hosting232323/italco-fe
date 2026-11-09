@@ -22,11 +22,7 @@
       v-model="dialogs.menu"
       @open-demo="openDialog('demo')"
     />
-    <landing-demo-dialog
-      v-model="dialogs.demo"
-      @open-policy="openPolicy"
-    />
-    <landing-privacy-dialog v-model="dialogs.privacy" />
+    <landing-demo-dialog v-model="dialogs.demo" />
     <landing-cookie-dialog
       v-model="dialogs.cookie"
       @open-policy="openPolicy"
@@ -52,7 +48,6 @@ import LandingHeader from '@/components/landing/LandingHeader.vue';
 import LandingHero from '@/components/landing/LandingHero.vue';
 import LandingMenuDialog from '@/components/landing/LandingMenuDialog.vue';
 import LandingPartners from '@/components/landing/LandingPartners.vue';
-import LandingPrivacyDialog from '@/components/landing/LandingPrivacyDialog.vue';
 import LandingWorkflow from '@/components/landing/LandingWorkflow.vue';
 import LandingZoomDialog from '@/components/landing/LandingZoomDialog.vue';
 
@@ -60,7 +55,7 @@ const root = ref(null);
 const previousTitle = document.title;
 let observer = null;
 
-const dialogs = reactive({ menu: false, demo: false, zoom: false, privacy: false, cookie: false });
+const dialogs = reactive({ menu: false, demo: false, zoom: false, cookie: false });
 const zoomedScreen = ref(null);
 const anyDialogOpen = computed(() => Object.values(dialogs).some(Boolean));
 
@@ -329,12 +324,6 @@ body.landing-lock {
 }
 .landing .legal-dialog .legal-date {
   font-size: 13px;
-}
-.landing .legal-draft {
-  border: 1px solid #d8cfee;
-  background: #f0eafa;
-  padding: 16px;
-  border-radius: 10px;
 }
 @media (max-width: 650px) {
   .landing .legal-dialog {

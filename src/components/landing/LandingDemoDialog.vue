@@ -105,8 +105,9 @@
         </div>
         <p class="privacy-short">
           Useremo i recapiti per rispondere alla tua richiesta e organizzare la demo. Non ti iscrivi a newsletter. Leggi l’<a
-            href="#privacy"
-            @click.prevent="emit('open-policy', 'privacy')"
+            href="/privacy"
+            target="_blank"
+            rel="noopener"
           >informativa privacy</a>. I campi con * sono necessari per ricontattarti; gli altri sono facoltativi.
         </p>
         <button
@@ -137,7 +138,7 @@ import LandingDialog from '@/components/landing/LandingDialog.vue';
 defineProps({
   modelValue: { type: Boolean, default: false }
 });
-const emit = defineEmits(['update:modelValue', 'open-policy']);
+const emit = defineEmits(['update:modelValue']);
 
 const form = ref(null);
 const sending = ref(false);
