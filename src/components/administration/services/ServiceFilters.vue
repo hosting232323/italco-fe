@@ -64,7 +64,7 @@
 <script setup>
 import FormButtons from '@/components/FormButtons';
 
-import { computed, ref, watch } from 'vue';
+import { computed, onUnmounted, ref, watch } from 'vue';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import mobile from '@/utils/mobile';
@@ -94,6 +94,22 @@ watch(
 );
 
 const customers = computed(() => (users.value || []).filter(user => user.role == 'Customer'));
+
+// Ricerca per nome mentre si scrive: la richiesta parte a digitazione ferma.
+let nameTimer = null;
+watch(
+  () => filters.value['Service.name'],
+  (newValue, oldValue) => {
+    if ((newValue || '') === (oldValue || '')) return;
+
+    clearTimeout(nameTimer);
+    nameTimer = setTimeout(() => {
+      ready.value = false;
+      serviceStore.initList();
+    }, 400);
+  }
+);
+onUnmounted(() => clearTimeout(nameTimer));
 
 const filterServices = async () => {
   if (!(await form.value.validate()).valid) return;
