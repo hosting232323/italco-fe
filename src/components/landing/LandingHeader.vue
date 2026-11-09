@@ -2,7 +2,7 @@
   <header class="header">
     <div class="container nav">
       <a
-        href="#inizio"
+        :href="home"
         class="brand"
         aria-label="HUBSTRA, home"
       >HUBSTRA</a>
@@ -39,7 +39,12 @@
 </template>
 
 <script setup>
+import { useRoute } from 'vue-router';
+
 const emit = defineEmits(['open-menu', 'open-demo']);
+
+// Sulla home il marchio riporta in cima alla pagina, dalle altre pagine alla home.
+const home = useRoute().path === '/' ? '#inizio' : '/';
 </script>
 
 <style scoped>

@@ -14,10 +14,7 @@
       <div class="footer-bottom">
         <span>© 2026 HUBSTRA</span>
         <div class="legal-links">
-          <a
-            href="#privacy"
-            @click.prevent="emit('open-policy', 'privacy')"
-          >Privacy</a>
+          <a href="/privacy">Privacy</a>
           <a
             href="#cookie"
             @click.prevent="emit('open-policy', 'cookie')"
