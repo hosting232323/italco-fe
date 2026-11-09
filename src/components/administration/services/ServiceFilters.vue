@@ -64,7 +64,7 @@
 <script setup>
 import FormButtons from '@/components/FormButtons';
 
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useTheme } from 'vuetify';
 import { storeToRefs } from 'pinia';
 import mobile from '@/utils/mobile';
@@ -82,6 +82,16 @@ const serviceStore = useServiceStore();
 const administrationUserStore = useAdministrationUserStore();
 const { ready, filters } = storeToRefs(serviceStore);
 const users = storesUtils.getStoreList(administrationUserStore);
+
+// La lista utenti parte insieme a quella dei servizi, quando il token può essere
+// scaduto e la risposta arriva vuota: si richiede di nuovo a servizi caricati.
+watch(
+  () => serviceStore.ready,
+  (isReady) => {
+    if (isReady && !users.value?.length) administrationUserStore.initList();
+  },
+  { immediate: true }
+);
 
 const customers = computed(() => (users.value || []).filter(user => user.role == 'Customer'));
 
