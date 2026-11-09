@@ -96,6 +96,7 @@
               <ul>
                 <li>Indirizzo IP, data e ora della richiesta e informazioni sul browser, registrati dal server</li>
                 <li>Per l’app mobile: versione dell’app, numero di build, piattaforma (iOS o Android) e, in caso di errore, il messaggio e i dettagli tecnici dell’errore (rapporto di errore)</li>
+                <li>Registri tecnici delle richieste inviate alla piattaforma (data e ora, utente, operazione eseguita e dati trasmessi, comprese le coordinate inviate all’attivazione della posizione), consultabili solo dal super amministratore della piattaforma</li>
               </ul>
             </li>
           </ul>
@@ -104,15 +105,16 @@
           <ul>
             <li><strong>Posizione geografica precisa</strong> (latitudine e longitudine) del dispositivo in uso</li>
             <li><strong>Fotografie</strong> acquisite tramite la fotocamera o selezionate dalla galleria, a documentazione della consegna o del ritiro (bolle comprese)</li>
-            <li><strong>Firma grafometrica del destinatario</strong>, acquisita sullo schermo del dispositivo, e note di consegna</li>
+            <li><strong>Firma del destinatario</strong>, disegnata sullo schermo del dispositivo e salvata come immagine, e note di consegna</li>
             <li><strong>Rapporti di errore</strong> inviati al server quando l’app incontra un errore imprevisto, con le informazioni tecniche indicate al punto 2</li>
           </ul>
           <p>Le consegne compilate che non è stato possibile inviare (per assenza di rete o errore del server) restano salvate sul dispositivo e sono reinviate appena possibile; sono associate al corriere che le ha compilate. Le credenziali di sessione sono conservate nell’archivio protetto del dispositivo. L’app non contiene strumenti di analisi, pubblicità o tracciamento, non utilizza SDK di terze parti per tali finalità e non condivide dati con reti pubblicitarie.</p>
           <p><strong>Quando viene rilevata la posizione.</strong> La rilevazione è avviata dall’utente delivery tramite il comando di attivazione della posizione dal banner del borderò (“Inizia giornata”) e interrotta tramite “Finisci giornata”. All’interno di tale intervallo la posizione è rilevata in modo continuativo e trasmessa al gestionale, <strong>anche quando l’app è in secondo piano o lo schermo è bloccato</strong>. Al di fuori di tale intervallo l’app non rileva né trasmette alcun dato di posizione. L’attivazione della posizione è necessaria per lavorare sul borderò: senza di essa le operazioni di ritiro, attività e chiusura ordine non sono disponibili.</p>
           <p><strong>Trasparenza della rilevazione.</strong> Per tutta la durata della rilevazione il dispositivo segnala che la localizzazione è attiva: su Android tramite una notifica persistente, su iOS tramite l’indicatore di sistema. L’utente delivery può interrompere la rilevazione in qualsiasi momento terminando la giornata dall’app, oppure revocare i permessi di posizione, fotocamera e galleria dalle impostazioni del dispositivo; in tal caso le funzioni che dipendono da tali permessi non saranno disponibili.</p>
-          <p><strong>Finalità.</strong> Coordinamento e ottimizzazione dei giri di consegna, aggiornamento dello stato degli ordini, tracciabilità delle attività di consegna e sicurezza dell’operatore durante il servizio.</p>
+          <p><strong>Finalità.</strong> Coordinamento e ottimizzazione dei giri di consegna, aggiornamento dello stato degli ordini, tracciabilità delle attività di consegna, informazione del destinatario sull’avanzamento della consegna e sicurezza dell’operatore durante il servizio.</p>
           <p><strong>Base giuridica.</strong> Esecuzione del rapporto contrattuale (art. 6.1.b GDPR) e legittimo interesse del Titolare e dell’azienda cliente all’organizzazione e alla sicurezza del servizio logistico (art. 6.1.f GDPR). Il trattamento è effettuato nel rispetto dell’art. 4 della L. 300/1970 (Statuto dei lavoratori), <strong>[DA COMPLETARE: previo accordo sindacale stipulato in data __ / previa autorizzazione dell’Ispettorato Territoriale del Lavoro n. __ del __]</strong>.</p>
-          <p><strong>Conservazione dei dati di posizione.</strong> <strong>[DA COMPLETARE: indicare il periodo di conservazione dei dati di geolocalizzazione, che deve essere limitato a quanto strettamente necessario alle finalità sopra indicate]</strong>. Decorso tale termine i dati sono cancellati o resi anonimi.</p>
+          <p><strong>Conservazione dei dati di posizione.</strong> Per ogni corriere la piattaforma conserva soltanto l’ultima posizione ricevuta, che resta salvata fino al successivo aggiornamento e viene sostituita a ogni nuovo invio: non viene registrato lo storico degli spostamenti. Restano registrati la data e l’ora in cui la posizione è stata attivata, passata a un altro corriere e chiusa per ciascun borderò, e i registri tecnici indicati al punto 2, per <strong>[DA COMPLETARE: indicare il periodo di conservazione degli eventi di attivazione della posizione e dei registri tecnici]</strong>.</p>
+          <p><strong>Chi vede la posizione.</strong> Durante la consegna di un ordine la posizione più recente del corriere è visibile al destinatario tramite il link di tracciamento ricevuto via SMS, valido 90 giorni dall’emissione, e agli utenti dell’azienda cliente autorizzati a consultare l’ordine. Il link non mostra il numero di telefono del destinatario.</p>
           <p><strong>Limiti di utilizzo.</strong> I dati di geolocalizzazione non sono utilizzati per finalità di controllo a distanza dell’attività lavorativa del singolo, né per valutazioni automatizzate o processi decisionali automatizzati sui lavoratori. L’accesso ai dati è limitato al personale autorizzato per le sole finalità organizzative sopra indicate.</p>
           <h2>4. Finalità del trattamento</h2>
           <p>I dati personali sono trattati per le seguenti finalità:</p>
@@ -145,17 +147,18 @@
             <li>Aziende clienti e fornitori che utilizzano la piattaforma, limitatamente ai dati dei propri ordini e dei propri corrieri</li>
             <li>Utenti delivery incaricati della consegna</li>
             <li>Fornitori di servizi IT, hosting e posta elettronica, necessari al funzionamento dei servizi</li>
+            <li>Fornitori di servizi tecnici di cui la piattaforma si avvale: Resend (invio delle email), Vonage (invio degli SMS ai destinatari delle consegne) e Telegram (avvisi tecnici interni su errori e controlli del servizio). Google (mappe e suggerimento degli indirizzi nei moduli degli operatori). Per una parte delle ricerche di indirizzi la piattaforma usa anche un servizio gestito direttamente dal Titolare</li>
             <li>Consulenti tecnici e legali</li>
             <li>Autorità competenti, ove richiesto dalla legge</li>
           </ul>
           <p>I soggetti terzi operano come Responsabili del trattamento o Titolari autonomi, ove applicabile. I dati non sono diffusi né ceduti a fini pubblicitari o di marketing. <strong>[DA COMPLETARE: indicare i fornitori di hosting e di posta elettronica e la loro localizzazione]</strong></p>
           <h2>8. Trasferimento dei dati extra UE</h2>
-          <p>Qualora i dati personali siano trasferiti verso Paesi al di fuori dell’Unione Europea, il trasferimento avverrà nel rispetto degli artt. 44 e seguenti del GDPR, mediante l’adozione di garanzie adeguate, quali Clausole Contrattuali Standard.</p>
+          <p>Alcuni dei fornitori indicati al punto 7, ad esempio Resend, Telegram e Google, possono trattare dati in Paesi al di fuori dell’Unione Europea. Qualora i dati personali siano trasferiti verso tali Paesi, il trasferimento avverrà nel rispetto degli artt. 44 e seguenti del GDPR, mediante l’adozione di garanzie adeguate, quali Clausole Contrattuali Standard.</p>
           <h2>9. Periodo di conservazione</h2>
           <p>I dati personali sono conservati per il tempo strettamente necessario al perseguimento delle finalità indicate e, successivamente, per il periodo previsto dalla normativa vigente in materia civilistica e fiscale. In particolare:</p>
           <ul>
             <li>dati di posizione: vedi punto 3</li>
-            <li>richieste di demo: per il tempo necessario a gestire la richiesta e l’eventuale seguito precontrattuale. <strong>[DA COMPLETARE: indicare il termine di cancellazione]</strong></li>
+            <li>richieste di demo: salvate nell’archivio della piattaforma e inviate via email ai referenti commerciali, per il tempo necessario a gestire la richiesta e l’eventuale seguito precontrattuale. <strong>[DA COMPLETARE: indicare il termine di cancellazione]</strong></li>
             <li>registri tecnici del server e rapporti di errore: <strong>[DA COMPLETARE: indicare il termine di conservazione]</strong></li>
             <li>dati dell’account: fino alla disattivazione dell’utente da parte dell’azienda cliente o dell’amministratore</li>
           </ul>
