@@ -6,6 +6,7 @@ export const useServiceStore = defineStore('service', {
   state: () => ({
     list: [],
     element: {},
+    filters: {},
     ready: false,
     innerElement: {},
     activeForm: false,
@@ -30,9 +31,9 @@ export const useServiceStore = defineStore('service', {
     },
     initList() {
       storesUtils.refreshList(this, (callback) => http.makeRequest(
-        'service',
-        'GET',
-        {},
+        'service/filter',
+        'POST',
+        { body: { filters: storesUtils.formatFilters(this.filters, {}) } },
         callback
       ));
     },
