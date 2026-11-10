@@ -48,6 +48,7 @@ export const useCompanyStore = defineStore('company', {
             name: this.element.name,
             rae: this.element.rae || false,
             automatic_planning: this.element.automatic_planning || false,
+            automatic_payment: this.element.automatic_payment || false,
             admin_nickname: this.element.adminNickname,
             admin_password: this.element.adminPassword,
             ...this.legalBody(),
@@ -59,23 +60,19 @@ export const useCompanyStore = defineStore('company', {
         func
       );
     },
-    updateElement(func) {
-      http.uploadRequest(
-        `company/${this.element.id}`,
+    // Interruttori e prezzo direttamente dalla tabella: la PUT vuole sempre il
+    // nome, il resto sono solo i campi che cambiano.
+    updateSettings(company, changes, func) {
+      http.makeRequest(
+        `company/${company.id}`,
         'PUT',
-        {
-          body: {
-            name: this.element.name,
-            rae: this.element.rae || false,
-            automatic_planning: this.element.automatic_planning || false,
-            ...this.legalBody(),
-            ...this.activityHoursBody(),
-          },
-          files: { logo: this.element.logo },
-          extensions: fileUtils.imageExtensions,
-        },
+        { body: { name: company.name, ...changes } },
         func
       );
+    },
+    // Blocco manuale dell'attivita': gli utenti restano fuori finche' non si sblocca.
+    setBlocked(company, blocked, func) {
+      http.makeRequest(`company/${company.id}/block`, 'PUT', { body: { blocked } }, func);
     },
     selectElement(company, func) {
       // Il backend riemette il token con la company scelta e il client http lo
