@@ -147,13 +147,13 @@
             <li>Aziende clienti e fornitori che utilizzano la piattaforma, limitatamente ai dati dei propri ordini e dei propri corrieri</li>
             <li>Utenti delivery incaricati della consegna</li>
             <li>Fornitori di servizi IT, hosting e posta elettronica, necessari al funzionamento dei servizi</li>
-            <li>Fornitori di servizi tecnici di cui la piattaforma si avvale: Resend (invio delle email), Vonage (invio degli SMS ai destinatari delle consegne) e Telegram (avvisi tecnici interni su errori e controlli del servizio). Google (mappe e suggerimento degli indirizzi nei moduli degli operatori). Per una parte delle ricerche di indirizzi la piattaforma usa anche un servizio gestito direttamente dal Titolare</li>
+            <li>Fornitori di servizi tecnici di cui la piattaforma si avvale: Resend (invio delle email), Vonage (invio degli SMS ai destinatari delle consegne) e Telegram (avvisi tecnici interni su errori e controlli del servizio) e Cloudflare (distribuzione delle pagine web e rete di consegna dei contenuti). Google (mappe e suggerimento degli indirizzi nei moduli degli operatori). Per una parte delle ricerche di indirizzi la piattaforma usa anche un servizio gestito direttamente dal Titolare</li>
             <li>Consulenti tecnici e legali</li>
             <li>Autorità competenti, ove richiesto dalla legge</li>
           </ul>
-          <p>I soggetti terzi operano come Responsabili del trattamento o Titolari autonomi, ove applicabile. I dati non sono diffusi né ceduti a fini pubblicitari o di marketing. <strong>[DA COMPLETARE: indicare i fornitori di hosting e di posta elettronica e la loro localizzazione]</strong></p>
+          <p>I soggetti terzi operano come Responsabili del trattamento o Titolari autonomi, ove applicabile. I dati non sono diffusi né ceduti a fini pubblicitari o di marketing. I server applicativi e il database sono gestiti direttamente dal Titolare presso la propria sede in Italia. Le pagine web dei siti e della piattaforma sono distribuite tramite Cloudflare Pages (Cloudflare, Inc.), che può trattare indirizzi IP e dati tecnici di navigazione anche fuori dall’Unione Europea. L’invio delle email è affidato a Resend.</p>
           <h2>8. Trasferimento dei dati extra UE</h2>
-          <p>Alcuni dei fornitori indicati al punto 7, ad esempio Resend, Telegram e Google, possono trattare dati in Paesi al di fuori dell’Unione Europea. Qualora i dati personali siano trasferiti verso tali Paesi, il trasferimento avverrà nel rispetto degli artt. 44 e seguenti del GDPR, mediante l’adozione di garanzie adeguate, quali Clausole Contrattuali Standard.</p>
+          <p>Alcuni dei fornitori indicati al punto 7, ad esempio Resend, Telegram, Google e Cloudflare, possono trattare dati in Paesi al di fuori dell’Unione Europea. Qualora i dati personali siano trasferiti verso tali Paesi, il trasferimento avverrà nel rispetto degli artt. 44 e seguenti del GDPR, mediante l’adozione di garanzie adeguate, quali Clausole Contrattuali Standard.</p>
           <h2>9. Periodo di conservazione</h2>
           <p>I dati personali sono conservati per il tempo strettamente necessario al perseguimento delle finalità indicate e, successivamente, per il periodo previsto dalla normativa vigente in materia civilistica e fiscale. In particolare:</p>
           <ul>
