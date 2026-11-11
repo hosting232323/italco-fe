@@ -44,6 +44,10 @@
       >
         {{ orderUtils.LABELS.find(label => label.value == item.status).title }}
       </v-chip>
+      <div v-if="item.schedule_start_time">
+        <b>Orario borderò:</b>
+        {{ item.schedule_end_time ? `${item.schedule_start_time} - ${item.schedule_end_time}` : item.schedule_start_time }}
+      </div>
       <v-btn
         v-if="item.delay"
         title="Ordine in ritardo"

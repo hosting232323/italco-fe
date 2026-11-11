@@ -45,6 +45,9 @@ const stores = [
     useStore: useServiceStore,
     endpoint: 'service',
     listKey: 'services',
+    listEndpoint: 'service/filter',
+    listMethod: 'POST',
+    listBody: { filters: [] },
     excludedKeys: [...READ_ONLY_KEYS, 'users']
   },
   {
