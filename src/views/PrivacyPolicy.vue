@@ -151,7 +151,7 @@
             <li>Consulenti tecnici e legali</li>
             <li>Autorità competenti, ove richiesto dalla legge</li>
           </ul>
-          <p>I soggetti terzi operano come Responsabili del trattamento o Titolari autonomi, ove applicabile. I dati non sono diffusi né ceduti a fini pubblicitari o di marketing. I server applicativi e il database sono gestiti direttamente dal Titolare presso la propria sede in Italia. Le pagine web dei siti e della piattaforma sono distribuite tramite Cloudflare Pages (Cloudflare, Inc.), che può trattare indirizzi IP e dati tecnici di navigazione anche fuori dall’Unione Europea. L’invio delle email è affidato a Resend.</p>
+          <p>I soggetti terzi operano come Responsabili del trattamento o Titolari autonomi, ove applicabile. I dati non sono diffusi né ceduti a fini pubblicitari o di marketing. I server applicativi e il database sono gestiti direttamente dal Titolare presso la propria sede in Italia. Le copie di sicurezza periodiche del database e dei file (foto, firme e documenti) sono conservate su un server separato, anch’esso in Italia e gestito dal Titolare. Le pagine web dei siti e della piattaforma sono distribuite tramite Cloudflare Pages (Cloudflare, Inc.), che può trattare indirizzi IP e dati tecnici di navigazione anche fuori dall’Unione Europea. L’invio delle email è affidato a Resend.</p>
           <h2>8. Trasferimento dei dati extra UE</h2>
           <p>Alcuni dei fornitori indicati al punto 7, ad esempio Resend, Telegram, Google e Cloudflare, possono trattare dati in Paesi al di fuori dell’Unione Europea. Qualora i dati personali siano trasferiti verso tali Paesi, il trasferimento avverrà nel rispetto degli artt. 44 e seguenti del GDPR, mediante l’adozione di garanzie adeguate, quali Clausole Contrattuali Standard.</p>
           <h2>9. Periodo di conservazione</h2>
@@ -161,6 +161,7 @@
             <li>richieste di demo: salvate nell’archivio della piattaforma e inviate via email ai referenti commerciali, per il tempo necessario a gestire la richiesta e l’eventuale seguito precontrattuale e comunque non oltre 12 mesi, salvo che il richiedente diventi cliente. Possono essere cancellate prima su richiesta dell’interessato</li>
             <li>registri tecnici delle richieste: 90 giorni</li>
             <li>rapporti di errore dell’app e avvisi tecnici interni: 30 giorni</li>
+            <li>copie di sicurezza di database e file: 20 giorni; i dati cancellati dal sistema restano nelle copie di sicurezza per un massimo di ulteriori 20 giorni</li>
             <li>dati dell’account: fino alla disattivazione dell’utente da parte dell’azienda cliente o dell’amministratore</li>
           </ul>
           <h2>10. Diritti degli interessati</h2>
