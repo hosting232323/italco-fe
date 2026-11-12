@@ -85,12 +85,21 @@ const activityMinutes = computed(() => (schedule.value.schedule_items || [])
   .reduce((total, item) => total + (Number(item.duration_minutes) || 0), 0));
 const totalMin = computed(() => Number(durationMin.value) + activityMinutes.value);
 
-const searchNominatim = async (query) => {
+// La ricerca libera trova la prima via con quel nome nella provincia ("Via
+// Gioacchino Murat, 17, Bari" -> Putignano): con il CAP si scarta chi cade in
+// un altro CAP, come fa il backend. Senza postcode nel risultato non si puo'
+// dire, e vale.
+const postcodeMatches = (result, cap) => {
+  const postcode = result.address?.postcode?.trim();
+  return !cap || !postcode || postcode === String(cap).trim();
+};
+
+const searchNominatim = async (query, cap = null) => {
   try {
     const res = await fetch(
-      `https://nominatim.fastsite.it/search?format=json&q=${encodeURIComponent(query)}`
+      `https://nominatim.fastsite.it/search?format=json&addressdetails=1&q=${encodeURIComponent(query)}`
     );
-    const data = await res.json();
+    const data = (await res.json()).filter(result => postcodeMatches(result, cap));
 
     return data[0]
       ? { lat: +data[0].lat, lng: +data[0].lon }
@@ -126,16 +135,16 @@ const geocode = async (item) => {
 
   const queries = [];
   if (item.address) {
-    queries.push({ query: item.address, precision: 'full' });
+    queries.push({ query: item.address, precision: 'full', cap: item.cap });
     const simplified = simplifyAddress(item.address);
     if (simplified && simplified !== item.address)
-      queries.push({ query: simplified, precision: 'simplified' });
+      queries.push({ query: simplified, precision: 'simplified', cap: item.cap });
   }
   if (item.cap) queries.push({ query: `${item.cap} Italia`, precision: 'cap' });
 
   let result = null;
-  for (const { query, precision } of queries) {
-    const coords = await searchNominatim(query);
+  for (const { query, precision, cap } of queries) {
+    const coords = await searchNominatim(query, cap);
     if (coords) {
       result = { ...coords, precision };
       break;
