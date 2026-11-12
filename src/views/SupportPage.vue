@@ -63,7 +63,7 @@ import LandingHeader from '@/components/landing/LandingHeader.vue';
 import LandingMenuDialog from '@/components/landing/LandingMenuDialog.vue';
 
 // Email di assistenza pubblica. Vuota = la pagina mostra il segnaposto: non va online senza.
-const supportEmail = 'assistenza@hubstra.it';
+const supportEmail = 'giovanni.colasanto@fastsite.it';
 
 const previousTitle = document.title;
 
