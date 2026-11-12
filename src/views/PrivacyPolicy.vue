@@ -161,6 +161,7 @@
             <li>richieste di demo: salvate nell’archivio della piattaforma e inviate via email ai referenti commerciali, per il tempo necessario a gestire la richiesta e l’eventuale seguito precontrattuale e comunque non oltre 12 mesi, salvo che il richiedente diventi cliente. Possono essere cancellate prima su richiesta dell’interessato</li>
             <li>registri tecnici delle richieste: 90 giorni</li>
             <li>rapporti di errore dell’app e avvisi tecnici interni: 30 giorni</li>
+            <li>foto e firma di consegna: 24 mesi</li>
             <li>copie di sicurezza di database e file: 20 giorni; i dati cancellati dal sistema restano nelle copie di sicurezza per un massimo di ulteriori 20 giorni</li>
             <li>dati dell’account: fino alla disattivazione dell’utente da parte dell’azienda cliente o dell’amministratore</li>
           </ul>
