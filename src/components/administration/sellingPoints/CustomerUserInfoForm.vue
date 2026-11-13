@@ -1,7 +1,7 @@
 <template>
   <v-card
     v-if="activeForm"
-    :title="`Modifica Dati Punto Vendita per ${user.nickname} ID ${user.id}`"
+    :title="`Modifica Dati Punto Vendita per ${customer.customerName(user)} ID ${user.id}`"
     class="mt-10 mb-5"
   >
     <v-card-text>
@@ -9,10 +9,28 @@
         ref="form"
         @submit.prevent="submitForm"
       >
-        <v-text-field
-          v-model="data.import_code"
-          label="Codice Importazioni"
-        />
+        <v-row no-gutters>
+          <v-col
+            cols="12"
+            md="6"
+          >
+            <v-text-field
+              v-model="data.name"
+              label="Nome Punto Vendita"
+              :class="isMobile ? '' : 'mr-2'"
+            />
+          </v-col>
+          <v-col
+            cols="12"
+            md="6"
+          >
+            <v-text-field
+              v-model="data.import_code"
+              label="Codice Importazioni"
+              :class="isMobile ? '' : 'ml-2'"
+            />
+          </v-col>
+        </v-row>
         <v-row no-gutters>
           <v-col
             cols="12"
@@ -73,12 +91,17 @@
             md="6"
           >
             <v-text-field
-              v-model="data.rae_code"
-              label="Codice Distribuzione RAEE"
+              v-model="data.notification_email"
+              label="Email Gestione Notifiche"
+              :rules="validation.optionalEmailRules"
               :class="isMobile ? '' : 'ml-2'"
             />
           </v-col>
         </v-row>
+        <v-text-field
+          v-model="data.rae_code"
+          label="Codice Distribuzione RAEE"
+        />
         <FormButtons
           :loading="loading"
           @cancel="activeForm = false"
@@ -89,12 +112,14 @@
 </template>
 
 <script setup>
+import customer from '@/utils/customer';
 import FormButtons from '@/components/FormButtons';
 
 import http from '@/utils/http';
 import { ref, computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import mobile from '@/utils/mobile';
+import validation from '@/utils/validation';
 import storesUtils from '@/utils/stores';
 import { useAdministrationUserStore } from '@/stores/administrationUser';
 

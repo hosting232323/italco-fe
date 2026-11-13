@@ -62,20 +62,11 @@
               {{ item.address }}, {{ item.cap }}
             </p>
           </template>
-          <template #[`item.dpc`]="{ item }">
-            {{ item.dpc }}
-            <p
-              v-if="item.delivery_slot_start"
-              style="font-size: smaller;"
-            >
-              {{ item.delivery_slot_start.slice(0, 5) }} - {{ item.delivery_slot_end.slice(0, 5) }}
-            </p>
-          </template>
           <template #[`item.price`]="{ item }">
             {{ item.price == 0 ? '0' : (item.price ? item.price.toFixed(2) : '') }}€
           </template>
-          <template #[`item.user.company_name`]="{ item }">
-            {{ item.user?.company_name || item.user?.nickname || '' }}
+          <template #[`item.user.name`]="{ item }">
+            {{ customer.customerName(item.user) }}
           </template>
           <template #[`item.created_at`]="{ item }">
             {{ createdAt(item.created_at) }}
@@ -144,6 +135,7 @@
 </template>
 
 <script setup>
+import customer from '@/utils/customer';
 import OrderActions from '@/components/orders/OrderActions';
 import OrderInfoRow from '@/components/orders/OrderInfoRow';
 import OrderDatesForm from '@/components/orders/OrderDatesForm';
@@ -187,7 +179,7 @@ const getHeaders = () => {
     { title: 'Recapito', value: 'addressee_contact', sortable: false }
   ];
   if (role.value != 'Customer')
-    headers.push({ title: 'Punto Vendita', value: 'user.company_name', sortable: false });
+    headers.push({ title: 'Punto Vendita', value: 'user.name', sortable: false });
   headers.push(
     { title: 'D.P.C.', value: 'dpc', sortable: false },
     { title: 'D.R.C.', value: 'drc', sortable: false },

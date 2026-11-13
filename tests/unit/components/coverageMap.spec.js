@@ -192,14 +192,15 @@ describe('CoverageMap: punti di ritiro', () => {
     expect(leaflet.map.setView).toHaveBeenCalledWith([41.1256, 16.8698], 9);
   });
 
-  it('mostra ID, nome e ragione sociale per i punti senza coordinate', async () => {
+  it('mostra ID, nome e nome punto vendita per i punti senza coordinate', async () => {
     const point = { ...SENZA_COORDINATE, user_id: 17 };
     const { wrapper } = await mountMap([point], [], [{
       id: 17,
-      customer_user_info: { company_name: 'Acme S.r.l.' }
+      nickname: 'acme',
+      customer_user_info: { name: 'Acme Bari', company_name: 'Acme S.r.l.' }
     }]);
 
-    expect(wrapper.text()).toContain('ID 3 — Indirizzo introvabile — Acme S.r.l.');
+    expect(wrapper.text()).toContain('ID 3 — Indirizzo introvabile — Acme Bari');
   });
 
   it('con dei marker mantiene il centro e lo zoom indipendenti dai punti', async () => {

@@ -18,7 +18,7 @@
           { title: 'Prodotto', value: 'product', sortable: false },
           { title: 'Raggruppamento', value: 'product_group.group_code', sortable: false },
           { title: 'Destinatario', value: 'order.addressee', sortable: false },
-          { title: 'Punto Vendita', value: 'user.company_name', sortable: false },
+          { title: 'Punto Vendita', value: 'user.name', sortable: false },
           { title: 'Data DTR', value: 'dtr_date', sortable: false },
           { title: 'Data di emissione', value: 'emission_date', sortable: false }
         ]"
@@ -46,8 +46,8 @@
             {{ orderUtils.RAE_STATUS.find(label => label.value == item.status).title }}
           </v-chip>
         </template>
-        <template #[`item.user.company_name`]="{ item }">
-          {{ item.user?.company_name || item.user?.nickname || '' }}
+        <template #[`item.user.name`]="{ item }">
+          {{ customer.customerName(item.user) }}
         </template>
         <template #actions="{ item }">
           <v-btn
@@ -105,6 +105,7 @@
 </template>
 
 <script setup>
+import customer from '@/utils/customer';
 import DisposalForm from '@/components/operator/raeDisposal/DisposalForm';
 import SelectionTable from '@/components/SelectionTable';
 

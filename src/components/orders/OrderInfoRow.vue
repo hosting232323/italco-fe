@@ -26,6 +26,9 @@
         </template>
         Data Conferma: {{ item.confirmation_date ? item.confirmation_date : 'N/A' }}
       </v-tooltip>
+      <div v-if="role != 'Customer' && customer.customerName(item.user)">
+        <b>Punto Vendita:</b> {{ customer.customerName(item.user) }}
+      </div>
       <b>Tipo:</b> {{ orderUtils.TYPES.find(type => type.value == item.type)?.title }}<br>
       <div v-if="item.external_status">
         <b>Stato Esterno:</b>
@@ -81,6 +84,7 @@
 </template>
 
 <script setup>
+import customer from '@/utils/customer';
 import { ref } from 'vue';
 import http from '@/utils/http';
 import { useTheme } from 'vuetify';
