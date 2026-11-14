@@ -13,6 +13,11 @@ const routes = [
     component: () => import('@/views/PrivacyPolicy.vue')
   },
   {
+    path: '/assistenza',
+    name: 'Assistenza',
+    component: () => import('@/views/SupportPage.vue')
+  },
+  {
     path: '/',
     component: () => import('@/layouts/LoginLayout.vue'),
     children: [
@@ -162,7 +167,7 @@ const router = createRouter({
 });
 
 // Rotte raggiungibili senza sessione: fuori dal perimetro della guard.
-const PUBLIC_ROUTES = ['Landing', 'Login', 'Privacy Policy', 'Download App', 'OrderStatus', 'NotFound'];
+const PUBLIC_ROUTES = ['Landing', 'Login', 'Privacy Policy', 'Assistenza', 'Download App', 'OrderStatus', 'NotFound'];
 
 // Rotte del modulo RAEE: esistono solo per le attività che lo hanno acceso.
 const RAE_ROUTES = [
