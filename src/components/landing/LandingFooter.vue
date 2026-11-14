@@ -16,6 +16,7 @@
         <div class="legal-links">
           <a href="/privacy">Privacy</a>
           <a href="/assistenza">Assistenza</a>
+          <a href="/termini">Termini</a>
           <a
             href="#cookie"
             @click.prevent="emit('open-policy', 'cookie')"
