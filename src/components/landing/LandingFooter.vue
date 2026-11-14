@@ -15,6 +15,7 @@
         <span>© 2026 HUBSTRA</span>
         <div class="legal-links">
           <a href="/privacy">Privacy</a>
+          <a href="/assistenza">Assistenza</a>
           <a
             href="#cookie"
             @click.prevent="emit('open-policy', 'cookie')"
