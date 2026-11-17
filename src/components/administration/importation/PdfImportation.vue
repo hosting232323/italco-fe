@@ -74,7 +74,7 @@
               v-model="user"
               label="Punto Vendita"
               :items="users.filter(user => user.role == 'Customer')"
-              item-title="nickname"
+              :item-title="customer.customerName"
               item-value="id"
               :rules="validation.requiredRules"
             />
@@ -90,6 +90,7 @@
 </template>
 
 <script setup>
+import customer from '@/utils/customer';
 import FormButtons from '@/components/FormButtons';
 
 import { ref } from 'vue';

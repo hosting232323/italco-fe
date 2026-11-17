@@ -21,7 +21,7 @@
             <td class="label">
               Punto vendita
             </td>
-            <td>{{ order.user.company_name || order.user.nickname }}</td>
+            <td>{{ customer.customerName(order.user) }}</td>
           </tr>
         </tbody>
       </table>
@@ -133,6 +133,7 @@
 </template>
 
 <script setup>
+import customer from '@/utils/customer';
 import Map from '@/components/OpenLayerMap';
 
 import http from '@/utils/http';

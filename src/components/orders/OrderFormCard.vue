@@ -19,6 +19,7 @@
 </template>
 
 <script setup>
+import customer from '@/utils/customer';
 import OrderForm from '@/components/orders/OrderForm';
 import DatesForm from '@/components/orders/OrderDatesForm';
 import CustomerForm from '@/components/orders/OrderCustomerForm';
@@ -29,7 +30,7 @@ import { useOrderStore } from '@/stores/order';
 
 const orderStore = useOrderStore();
 const { activeForm, element: order } = storeToRefs(orderStore);
-const subtitle = ref(order.user ? `Punto Vendita: ${order.user.company_name || order.user.nickname}` : '');
+const subtitle = ref(order.user ? `Punto Vendita: ${customer.customerName(order.user)}` : '');
 
 const setSubtitle = (value) => {
   subtitle.value = value;
