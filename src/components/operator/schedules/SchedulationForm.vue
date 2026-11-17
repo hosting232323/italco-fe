@@ -196,6 +196,12 @@ const syncSuggestionScheduleItems = (suggestion) => {
     });
   });
 
+  // I ritiri già in proposta restano nell'ordine di visita calcolato dal
+  // backend; quelli richiesti da un ordine appena trascinato vanno in coda.
+  collectionPoints.sort(
+    (first, second) => (first.index ?? Infinity) - (second.index ?? Infinity),
+  );
+
   suggestion.schedule_items = [...collectionPoints, ...suggestion.orders].map(
     (item, index) => ({
       ...normalizeScheduleItem(item),
