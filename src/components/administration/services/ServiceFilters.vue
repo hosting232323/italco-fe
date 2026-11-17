@@ -45,7 +45,7 @@
                 :class="isMobile ? '' : 'ml-2'"
                 label="Punto Vendita"
                 :items="customers"
-                item-title="nickname"
+                :item-title="customer.customerName"
                 item-value="id"
                 clearable
               />
@@ -62,6 +62,7 @@
 </template>
 
 <script setup>
+import customer from '@/utils/customer';
 import FormButtons from '@/components/FormButtons';
 
 import { computed, onUnmounted, ref, watch } from 'vue';

@@ -14,7 +14,7 @@
         v-model="userId"
         label="Punto vendita di destinazione"
         :items="plan.target_users"
-        item-title="nickname"
+        :item-title="(user) => user.name || user.nickname"
         item-value="id"
         :disabled="loading"
       />

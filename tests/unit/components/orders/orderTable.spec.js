@@ -95,8 +95,29 @@ describe('OrderTable, colonna prezzo', () => {
   });
 });
 
+describe('OrderTable, punto vendita', () => {
+  it('mostra il nome del punto vendita al posto della ragione sociale', () => {
+    useUserStore().role = 'Admin';
+    useOrderStore().list = [{
+      id: 1,
+      products: {},
+      addressee: 'Mario Rossi',
+      address: 'Via Test 1',
+      cap: '70100',
+      dpc: '2026-07-20',
+      created_at: '20/07/2026 10:00',
+      user: { id: 5, nickname: 'pv-bari', name: 'Negozio Bari', company_name: 'Negozio SRL' }
+    }];
+
+    const text = mountTable().text();
+
+    expect(text).toContain('Negozio Bari');
+    expect(text).not.toContain('Negozio SRL');
+  });
+});
+
 describe('OrderTable, fascia oraria assegnata dalla copertura corrieri', () => {
-  it('mostra la fascia sotto la D.P.C. quando l\'ordine ne ha una', () => {
+  it('non ripete la fascia sotto la D.P.C.: l\'orario sta già in Info come orario borderò', () => {
     useUserStore().role = 'Admin';
     useOrderStore().list = [{
       id: 1,
@@ -112,7 +133,7 @@ describe('OrderTable, fascia oraria assegnata dalla copertura corrieri', () => {
 
     const wrapper = mountTable();
 
-    expect(wrapper.text()).toContain('08:00 - 12:00');
+    expect(wrapper.text()).not.toContain('08:00 - 12:00');
   });
 
   it('non mostra nulla quando l\'ordine non ha una fascia assegnata', () => {

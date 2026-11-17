@@ -86,6 +86,7 @@
 </template>
 
 <script setup>
+import customer from '@/utils/customer';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw';
@@ -131,9 +132,9 @@ const collectionPointsWithoutCoordinates = computed(() => collectionPoints.value
   (point) => point.lat == null || point.lon == null
 ));
 const describeUnlocatedPoint = (point) => {
-  const companyName = users.value.find((user) => user.id === point.user_id)
-    ?.customer_user_info?.company_name?.trim();
-  return [`ID ${point.id}`, point.name?.trim(), companyName].filter(Boolean).join(' — ');
+  const owner = users.value.find((user) => user.id === point.user_id);
+  const sellingPointName = owner ? customer.customerName(owner).trim() : '';
+  return [`ID ${point.id}`, point.name?.trim(), sellingPointName].filter(Boolean).join(' — ');
 };
 
 const weekDayOptions = days.weekDays;
