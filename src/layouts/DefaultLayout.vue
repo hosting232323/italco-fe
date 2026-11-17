@@ -21,7 +21,9 @@
         :http="http"
       /> -->
     </v-main>
-    <Footer />
+    <!-- Il footer non e' 'app': senza margine finisce sotto la barra laterale
+    (rail da 56px) e su laptop il testo a sinistra resta coperto. -->
+    <Footer :class="{ 'footer-rail': !companyBlocked }" />
   </v-app>
 </template>
 
@@ -66,3 +68,9 @@ onMounted(() => {
 //   }
 // };
 </script>
+
+<style scoped>
+.footer-rail {
+  margin-left: 56px;
+}
+</style>
