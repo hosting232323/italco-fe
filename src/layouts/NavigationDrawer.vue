@@ -5,6 +5,7 @@
     rail
     :color="theme.current.value.primaryColor"
     app
+    class="app-drawer"
   >
     <v-list-item
       prepend-icon="mdi-menu"
@@ -163,3 +164,17 @@ const { role, company, effectiveRole } = storeToRefs(userStore);
 // RAEE non esiste per nessun ruolo.
 const rae = computed(() => !!company.value?.rae);
 </script>
+
+<style scoped>
+/* Su schermi bassi (laptop) le voci non entrano in altezza: la scrollbar
+   verticale ruberebbe larghezza al rail da 56px tagliando icone ed evidenziazione.
+   Si scorre comunque con la rotella, la barra resta nascosta. */
+.app-drawer :deep(.v-navigation-drawer__content) {
+  overflow-x: hidden;
+  scrollbar-width: none;
+}
+
+.app-drawer :deep(.v-navigation-drawer__content::-webkit-scrollbar) {
+  display: none;
+}
+</style>
