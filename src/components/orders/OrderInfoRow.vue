@@ -29,6 +29,9 @@
       <div v-if="role != 'Customer' && customer.customerName(item.user)">
         <b>Punto Vendita:</b> {{ customer.customerName(item.user) }}
       </div>
+      <div v-if="role != 'Customer' && item.user?.customer_user_info?.company_name">
+        <b>Ragione Sociale:</b> {{ item.user.customer_user_info.company_name }}
+      </div>
       <b>Tipo:</b> {{ orderUtils.TYPES.find(type => type.value == item.type)?.title }}<br>
       <div v-if="item.external_status">
         <b>Stato Esterno:</b>

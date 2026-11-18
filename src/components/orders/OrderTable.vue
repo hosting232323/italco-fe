@@ -65,9 +65,6 @@
           <template #[`item.price`]="{ item }">
             {{ item.price == 0 ? '0' : (item.price ? item.price.toFixed(2) : '') }}€
           </template>
-          <template #[`item.user.name`]="{ item }">
-            {{ customer.customerName(item.user) }}
-          </template>
           <template #[`item.created_at`]="{ item }">
             {{ createdAt(item.created_at) }}
           </template>
@@ -135,7 +132,6 @@
 </template>
 
 <script setup>
-import customer from '@/utils/customer';
 import OrderActions from '@/components/orders/OrderActions';
 import OrderInfoRow from '@/components/orders/OrderInfoRow';
 import OrderDatesForm from '@/components/orders/OrderDatesForm';
@@ -178,8 +174,6 @@ const getHeaders = () => {
     { title: 'Destinatario', value: 'addressee', sortable: false },
     { title: 'Recapito', value: 'addressee_contact', sortable: false }
   ];
-  if (role.value != 'Customer')
-    headers.push({ title: 'Punto Vendita', value: 'user.name', sortable: false });
   headers.push(
     { title: 'D.P.C.', value: 'dpc', sortable: false },
     { title: 'D.R.C.', value: 'drc', sortable: false },
