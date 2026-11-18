@@ -66,23 +66,19 @@
         <strong>iOS</strong>
       </div>
       <ol class="pl-4 mb-4">
-        <li>Il tuo responsabile ti invita come tester: ricevi una mail da Apple</li>
-        <li>Apri quella mail e accetta l'invito a TestFlight</li>
-        <li>Da TestFlight installi l'app Hubstra Delivery</li>
+        <li>Apri la pagina dell'app Hubstra Delivery sull'App Store</li>
+        <li>Tocca "Ottieni" per installarla</li>
+        <li>Accedi con le credenziali che ti ha dato il tuo responsabile</li>
       </ol>
-      <p class="text-body-2 mb-3">
-        Non hai ancora ricevuto l'invito? Contatta il tuo responsabile: l'accesso all'app
-        va abilitato da lui uno per uno, non c'è un link pubblico.
-      </p>
       <v-btn
-        href="https://apps.apple.com/app/testflight/id899247664"
+        href="https://apps.apple.com/it/app/hubstra-delivery/id6802349894"
         target="_blank"
         rel="noopener"
         color="primary"
         variant="outlined"
         block
       >
-        Installa TestFlight
+        Scarica dall'App Store
       </v-btn>
     </v-card>
 
