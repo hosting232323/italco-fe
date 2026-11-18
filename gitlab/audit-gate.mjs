@@ -5,7 +5,11 @@ import { readFileSync } from 'node:fs';
 // braces <=3.0.3 (ReDoS su pattern annidati): nessuna versione corretta,
 // arriva solo da unplugin-fonts -> fast-glob -> micromatch, cioe' dal build.
 // Da togliere appena braces pubblica un fix.
-const ACCEPTED = ['GHSA-vfj7-8cjw-p6xm'];
+//
+// picomatch <=4.0.7 (ReDoS su extglob ripetuti): la 4.0.7 e' l'ultima uscita e
+// ricade ancora nel range, nessun fix pubblicato. Arriva solo dal tooling di
+// build/test (vite, vitest, unplugin). Da togliere appena esce un fix.
+const ACCEPTED = ['GHSA-vfj7-8cjw-p6xm', 'GHSA-fc5q-39xc-vjpf'];
 
 const report = JSON.parse(readFileSync('npm-audit-report.json', 'utf8'));
 const advisories = Object.values(report.vulnerabilities ?? {})
