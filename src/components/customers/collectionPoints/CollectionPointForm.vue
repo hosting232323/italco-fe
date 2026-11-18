@@ -14,6 +14,19 @@
           label="Nome"
           :rules="validation.requiredRules"
         />
+        <v-autocomplete
+          v-if="canPickExisting"
+          v-model="collectionPoint.pickup_point_id"
+          :items="pickupPoints"
+          :item-title="pickupPointLabel"
+          item-value="id"
+          label="Punto di ritiro esistente"
+          hint="Scegline uno già presente nel catalogo, oppure lascia vuoto e inserisci un indirizzo per crearne uno personale"
+          persistent-hint
+          clearable
+          class="mb-4"
+          @update:model-value="pickExisting"
+        />
         <v-row no-gutters>
           <v-col
             cols="12"
@@ -86,12 +99,14 @@ import FormButtons from '@/components/FormButtons';
 import { AddressAutocomplete } from 'generic-module';
 import { GOOGLE_API_KEY } from '@/utils/googleMaps';
 
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import mobile from '@/utils/mobile';
 import { storeToRefs } from 'pinia';
 import validation from '@/utils/validation';
 import { useCollectionPointStore } from '@/stores/collectionPoint';
 import { useUserStore } from '@/stores/user';
+import { usePickupPointStore } from '@/stores/pickupPoint';
+import storesUtils from '@/utils/stores';
 
 const form = ref(null);
 const loading = ref(false);
@@ -101,6 +116,28 @@ const { element: collectionPoint, activeForm } = storeToRefs(collectionPointStor
 // Il precarico cambia la pianificazione dei veicoli: lo imposta solo l'admin.
 const { effectiveRole } = storeToRefs(useUserStore());
 const isAdmin = computed(() => effectiveRole.value == 'Admin');
+
+// Il catalogo dei punti di ritiro lo leggono admin e operatori; il cliente crea solo punti propri.
+const canPickExisting = computed(() => ['Admin', 'Operator'].includes(effectiveRole.value));
+const pickupPointStore = usePickupPointStore();
+const pickupPoints = canPickExisting.value ? storesUtils.getStoreList(pickupPointStore) : ref([]);
+
+const pickupPointLabel = (item) => `${item.name} · ${item.address} (${item.cap})`;
+
+// Scegliere una voce ne copia l'indirizzo; il nome resta quello del cliente.
+// Ritoccare l'indirizzo a mano la scollega: il punto diventa personale.
+const pickExisting = (id) => {
+  const pickupPoint = pickupPoints.value.find(item => item.id == id);
+  if (!pickupPoint) {
+    collectionPoint.value.pickup_point_id = null;
+    return;
+  }
+  collectionPoint.value.address = pickupPoint.address;
+  collectionPoint.value.cap = pickupPoint.cap;
+  collectionPoint.value.lat = pickupPoint.lat;
+  collectionPoint.value.lon = pickupPoint.lon;
+  if (!collectionPoint.value.name) collectionPoint.value.name = pickupPoint.name;
+};
 
 const submitForm = async () => {
   if (!(await form.value.validate()).valid) return;
@@ -120,6 +157,12 @@ const callback = (data) => {
     activeForm.value = false;
   }
 };
+
+watch(() => [collectionPoint.value.address, collectionPoint.value.cap], ([address, cap]) => {
+  const linked = pickupPoints.value.find(item => item.id == collectionPoint.value.pickup_point_id);
+  if (linked && (linked.address != address || linked.cap != cap))
+    collectionPoint.value.pickup_point_id = null;
+});
 
 const handleAddressComponents = (components) => {
   collectionPoint.value.address = components.address;

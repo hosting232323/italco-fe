@@ -5,6 +5,7 @@ import { useCollectionPointStore } from '@/stores/collectionPoint';
 import { useCustomerGroupStore } from '@/stores/customerGroup';
 import { useCustomerRuleStore } from '@/stores/customerRule';
 import { useGeographicZoneStore } from '@/stores/geographicZone';
+import { usePickupPointStore } from '@/stores/pickupPoint';
 import { useRaeCarrierStore } from '@/stores/raeCarrier';
 import { useRaeCollectionCenterStore } from '@/stores/raeCollectionCenter';
 import { useRaeDisposalStore } from '@/stores/raeDisposal';
@@ -39,6 +40,13 @@ const stores = [
     endpoint: 'collection-point',
     listKey: 'collection_points',
     excludedKeys: [...READ_ONLY_KEYS, 'users']
+  },
+  {
+    name: 'pickupPoint',
+    useStore: usePickupPointStore,
+    endpoint: 'pickup-point',
+    listKey: 'pickup_points',
+    excludedKeys: [...READ_ONLY_KEYS, 'customers']
   },
   {
     name: 'service',

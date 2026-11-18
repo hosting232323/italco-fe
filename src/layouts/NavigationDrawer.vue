@@ -43,6 +43,11 @@
         title="Borderò"
         prepend-icon="mdi-text-box-multiple-outline"
       />
+      <v-list-item
+        to="/pickup-points"
+        title="Punti di Ritiro"
+        prepend-icon="mdi-map-marker-multiple"
+      />
       <template v-if="effectiveRole == 'Admin'">
         <v-list-item
           to="/services"

@@ -112,6 +112,11 @@ const routes = [
         component: () => import('@/views/customer/CollectionPoints.vue')
       },
       {
+        path: 'pickup-points',
+        name: 'Catalogo Punti di Ritiro',
+        component: () => import('@/views/operator/PickupPoints.vue')
+      },
+      {
         path: 'rae-dashboard',
         name: 'Ritiri Raee',
         component: () => import('@/views/operator/RaeDashboard.vue')
@@ -181,7 +186,7 @@ const RAE_ROUTES = [
 
 // Le pagine di pianificazione sono di admin e operatori: il backend risponde 403
 // ai clienti, che ci arrivano solo da un URL digitato o da un preferito.
-const PLANNING_ROUTES = ['Vincoli', 'Pianificazione'];
+const PLANNING_ROUTES = ['Vincoli', 'Pianificazione', 'Catalogo Punti di Ritiro'];
 
 
 router.beforeEach((to) => {
