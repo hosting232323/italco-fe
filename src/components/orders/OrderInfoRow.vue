@@ -1,5 +1,5 @@
 <template>
-  <div style="display: flex; gap: 2px; width: 230px; align-items: center;">
+  <div style="display: flex; gap: 2px; width: 320px; align-items: center;">
     <v-btn
       size="small"
       variant="text"
