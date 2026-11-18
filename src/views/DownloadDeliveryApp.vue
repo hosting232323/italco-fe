@@ -71,7 +71,7 @@
         <li>Accedi con le credenziali che ti ha dato il tuo responsabile</li>
       </ol>
       <v-btn
-        href="https://apps.apple.com/app/id6802349894"
+        href="https://apps.apple.com/it/app/hubstra-delivery/id6802349894"
         target="_blank"
         rel="noopener"
         color="primary"
