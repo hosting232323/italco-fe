@@ -29,13 +29,13 @@ beforeEach(() => {
 
 
 describe('OrderInfoRow, punto vendita', () => {
-  it.each(['Admin', 'Operator'])('mostra il nome del punto vendita al ruolo %s', (role) => {
+  it.each(['Admin', 'Operator'])('mostra punto vendita e ragione sociale al ruolo %s', (role) => {
     useUserStore().role = role;
 
     const text = mountRow().text();
 
     expect(text).toContain('Punto Vendita: Negozio Bari');
-    expect(text).not.toContain('Negozio SRL');
+    expect(text).toContain('Ragione Sociale: Negozio SRL');
   });
 
   it('ripiega sul nickname se il punto vendita non ha un nome', () => {
@@ -47,6 +47,9 @@ describe('OrderInfoRow, punto vendita', () => {
   it('non lo mostra al punto vendita stesso', () => {
     useUserStore().role = 'Customer';
 
-    expect(mountRow().text()).not.toContain('Punto Vendita');
+    const text = mountRow().text();
+
+    expect(text).not.toContain('Punto Vendita');
+    expect(text).not.toContain('Ragione Sociale');
   });
 });

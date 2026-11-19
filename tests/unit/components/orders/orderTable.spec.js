@@ -96,23 +96,13 @@ describe('OrderTable, colonna prezzo', () => {
 });
 
 describe('OrderTable, punto vendita', () => {
-  it('mostra il nome del punto vendita al posto della ragione sociale', () => {
+  it('non ha una colonna dedicata: nome e ragione sociale stanno in Info', () => {
     useUserStore().role = 'Admin';
-    useOrderStore().list = [{
-      id: 1,
-      products: {},
-      addressee: 'Mario Rossi',
-      address: 'Via Test 1',
-      cap: '70100',
-      dpc: '2026-07-20',
-      created_at: '20/07/2026 10:00',
-      user: { id: 5, nickname: 'pv-bari', name: 'Negozio Bari', company_name: 'Negozio SRL' }
-    }];
 
-    const text = mountTable().text();
+    const headers = mountTable().findAllComponents({ name: 'VDataTable' })[0].props('headers').map(header => header.title);
 
-    expect(text).toContain('Negozio Bari');
-    expect(text).not.toContain('Negozio SRL');
+    expect(headers).not.toContain('Punto Vendita');
+    expect(headers).not.toContain('Ragione Sociale');
   });
 });
 
