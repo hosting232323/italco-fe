@@ -20,6 +20,12 @@
           >
             Privacy Policy
           </router-link>
+          <router-link
+            to="/termini"
+            class="footer-link"
+          >
+            Termini di utilizzo
+          </router-link>
           <div>
             Powered by 
             <a

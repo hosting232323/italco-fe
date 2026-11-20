@@ -37,7 +37,7 @@
             <li>che cosa stavi facendo quando è comparso il problema, con uno screenshot se puoi</li>
           </ul>
           <h2>Privacy e dati personali</h2>
-          <p>Per le richieste sui tuoi dati personali consulta l’<a href="/privacy">informativa sulla privacy</a>.</p>
+          <p>Per le richieste sui tuoi dati personali consulta l’<a href="/privacy">informativa sulla privacy</a>. Le regole di utilizzo del servizio sono nei <a href="/termini">termini e condizioni d’uso</a>.</p>
           <h2>Vuoi usare Hubstra nella tua azienda?</h2>
           <p>Scopri come funziona e richiedi una demo dalla <a href="/">pagina principale</a>.</p>
         </article>
